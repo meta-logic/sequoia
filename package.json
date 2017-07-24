@@ -1,0 +1,28 @@
+{
+  "name": "sequoia",
+  "version": "1.0.0",
+  "description": "Sequent calculus proof construction tool",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AboudFayad/sequoia.git"
+  },
+  "author": "AbdulRahman Alfayad",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AboudFayad/sequoia/issues"
+  },
+  "homepage": "https://github.com/AboudFayad/sequoia#readme",
+  "dependencies": {
+    "body-parser": "1.17.2",
+    "cookie-parser": "1.4.3",
+    "express": "4.15.3",
+    "express-handlebars": "3.0.0",
+    "helmet": "3.8.0",
+    "mongoose": "4.11.3",
+    "morgan": "1.8.2"
+  }
+}
