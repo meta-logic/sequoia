@@ -5,7 +5,7 @@ Sequent calculus proof construction tool
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
 
 ### Prerequisites
-You need to have [Node.js](http://nodejs.org/) installed.
+You need to have [Node.js](http://nodejs.org/) and [https://www.mongodb.com/download-center?jmp=nav](MongoDB) installed.
 
 ### Installing
 
@@ -23,6 +23,13 @@ npm install
 ```
 
 ### Running
+
+Run mongoDB
+
+```
+mongod
+```
+Then, run the server
 
 ```
 npm start
