@@ -8,7 +8,11 @@ var Schema   = mongoose.Schema;
 
 //defining the calculus schema
 var calculusSchema = new Schema({
-	rules : [Number]
+	rules : [{
+		id        : Number,
+		upper_rep : [String],
+		lower_rep : String
+	}]
 });
 
 module.exports = mongoose.model('Calculus', calculusSchema);
