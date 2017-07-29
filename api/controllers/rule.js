@@ -79,9 +79,25 @@ function updateRule (req, res) {
 }
 
 
+//deleting a rule
+function deleteRule (req, res) {
+	//deleting a rule
+	Rule.remove({ _id : req.params.id}, function (err, rule) {
+		//if the rule does not exist
+		if (err || rule == null) {
+			return res.status(400).json({
+				'status'  : 'failure',
+				'message' : 'rule does not exist'
+			});
+		}
+ 
+		//rule deleted
+		return res.status(200).json({
+			'status'  : 'success',
+			'message' : 'rule successfully deleted'
+		});
+	});
+}
 
 
-
-
-
-
+module.exports = {createRule, getRule, updateRule, deleteRule};
