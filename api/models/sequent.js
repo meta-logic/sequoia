@@ -1,12 +1,12 @@
-//api/models/premise.js
+//api/models/sequent.js
 'use strict';
 
 //Loading Dependencies =============================================
 var mongoose = require('mongoose');
 var Schema   = mongoose.Schema;
 
-//defining the premise object
-var premise = {
+//defining the sequent object
+var sequent = {
 	atom           : Boolean,
 	left           : [Schema.Types.Mixed],
 	right          : [Schema.Types.Mixed],
@@ -18,4 +18,4 @@ var premise = {
 
 };
 
-module.exports = premise;
+module.exports = sequent;

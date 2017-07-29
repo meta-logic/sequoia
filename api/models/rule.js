@@ -4,12 +4,12 @@
 //Loading Dependencies =============================================
 var mongoose = require('mongoose');
 var Schema   = mongoose.Schema;
-var premise  = require('./premise');
+var sequent  = require('./sequent');
 
 //defining the rule schema
 var ruleSchema = new Schema({
-	premises   : [premise],
-	conclusion : premise
+	sequents   : [sequent],
+	conclusion : sequent
 });
 
 module.exports = mongoose.model('Rule', ruleSchema);

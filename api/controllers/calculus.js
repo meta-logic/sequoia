@@ -35,7 +35,7 @@ function createCalculus (req, res) {
 //fetching a calculus
 function getCalculus (req, res) {
 	//looking up the calculus
-	Calculus.findById(req.params.id, function(err, calculus) {
+	Calculus.findById(req.params.id, function (err, calculus) {
 
 		//if the calculus does not exist
 		if (err || calculus == null) {
