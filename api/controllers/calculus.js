@@ -57,7 +57,7 @@ function getCalculus (req, res) {
 //updating a calculus
 function updateCalculus (req, res) {
 	//looking up the calculus and updating it
-	Calculus.findOneAndUpdate({ _id : req.params.id}, { rules : req.body.rules }, { new : true}, 
+	Calculus.findOneAndUpdate({ _id : req.params.id}, { rules : JSON.parse(req.body.rules) }, { new : true}, 
 		function (err, calculus) {
 			//if the calculus does not exist
 			if (err || calculus == null) {

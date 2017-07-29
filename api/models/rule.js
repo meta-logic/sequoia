@@ -8,7 +8,7 @@ var sequent  = require('./sequent');
 
 //defining the rule schema
 var ruleSchema = new Schema({
-	sequents   : [sequent],
+	premises   : [sequent],
 	conclusion : sequent
 });
 
