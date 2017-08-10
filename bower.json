@@ -1,0 +1,17 @@
+{
+  "name": "sequoia",
+  "description": "Sequent calculus proof construction tool",
+  "main": "server.js",
+  "authors": [
+    "AbdulRahman Alfayad"
+  ],
+  "license": "ISC",
+  "homepage": "https://github.com/AboudFayad/sequoia",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

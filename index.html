@@ -1,0 +1,127 @@
+<html>
+
+<head>
+	<title>Test</title>
+	<script type="text/javascript" src="bower_components/MathJax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+	<script type="text/javascript" src="bower_components/jquery/dist/jquery.min.js"></script>
+	<script type="text/javascript" src="bower_components/semantic/dist/semantic.min.js"></script>
+	<script type="text/javascript" src="bower_components/semantic/dist/tablesort.js"></script>
+	<link rel="stylesheet" type="text/css" href="bower_components/semantic/dist/semantic.min.css">
+	<style type="text/css">
+		.ui.fixed.table th,
+		.ui.fixed.table td {
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
+	</style>
+</head>
+
+<body>
+
+	<div class="ui middle aligned center aligned grid" style="margin-top: 35px; margin-bottom: 50px">
+		<div class="ui container">
+			<div class="row">
+				<div class="ui right input">
+					<input id="rule_connective" type="text" placeholder="Rule">
+				</div>
+			</div>
+			<br>
+			<div class="row">
+				<div class="ui input eight column wide " id="hello">
+					<input id="i0" type="text" placeholder="Premise" class="column">
+					<p style="color: white">s</p>
+				</div>
+
+				<button onclick="c()" class="circular ui icon button green">
+					<i class="icon add"></i>
+				</button>
+			</div>
+			<div class="ui divider"></div>
+			<div class="row">
+				<div class="ui input fluid">
+					<input type="text" id="Conclusion" placeholder="Conclusion">
+				</div>
+			</div>
+			<br>
+			<button class="ui button primary" onclick="DynamicMJ.update()">
+				Preview
+			</button>
+			<div id="rule">
+			</div>
+
+			<br>
+			<div id="table">
+		
+			</div>
+			</div>
+		</div>
+	</body>
+
+	<script type="text/javascript">
+
+		
+
+		var v = 0;
+		var symbols = "";
+		function c() {
+			v++;
+			var div = document.getElementById('hello');
+			div.innerHTML = div.innerHTML + '<input type="text" id="i' + v.toString() + '" placeholder="Premise"><p style="color: white">s</p>';
+			console.log(v);
+		}
+
+		var DynamicMJ = {
+			rule: document.getElementById("rule"),
+
+			update: function () {
+				symbols = "";
+				var rule_connective = document.getElementById("rule_connective").value;
+				var premises = document.getElementById("i0").value;
+				symbols += premises;
+				for (var i = 1; i <= v; i++) {
+					symbols += " " + document.getElementById("i" + i.toString()).value;
+					premises += " \\quad \\quad " + document.getElementById("i" + i.toString()).value;
+				}
+				var conc = document.getElementById("Conclusion").value;
+				symbols += " " + conc;
+				this.rule.innerHTML = "\\[\\frac{"+premises+"}{"+conc+"}"+rule_connective+"\\]";
+				MathJax.Hub.Queue(["Typeset",MathJax.Hub,this.rule]);
+				table(symbols);
+			}
+		};
+
+
+		function table(symbols) {
+			console.log(symbols.split(" "));
+			symbols = symbols.split(" ");
+			var uniqueSymbols = [];
+			$.each(symbols, function(i, el){
+			    if($.inArray(el, uniqueSymbols) === -1) uniqueSymbols.push(el);
+			});
+			for (var i = uniqueSymbols.length - 1; i >= 0; i--) {
+				uniqueSymbols[i] = uniqueSymbols[i].replace (/,/g, "");
+			}
+
+			uniqueSymbols.filter(Boolean);
+			console.log(uniqueSymbols);
+
+			var table = document.getElementById('table');
+			table.innerHTML = '<table class="ui sortable fixed single line celled table"> <thead> <tr><th>Symbols</th> <th>Type</th> <th>Precedent</th> </tr></thead> <tbody id="table_body"></tbody> </table>';
+			var table_body = document.getElementById('table_body');
+			table_body.innerHTML = "";
+			for (var i = 0; i < uniqueSymbols.length; i++) {
+				table_body.innerHTML += '<tr><td id="t' + i.toString() + '" >$$'+  uniqueSymbols[i] + '$$</td><td style="overflow: visible;"><select class="ui search dropdown" style="z-index: 1; position: fixed"><option value="">Type</option><option value="0">atom</option><option value="1">formula</option><option value="2">connective</option><option value="3">list</option><option value="4">set</option><option value="5">empty</option><option value="6">seperator</option></select></td> <td><div class="ui right input"><input id="'+i.toString() +'" type="text" placeholder="Precedent"></div></td></tr>';
+			}
+			table.innerHTML += '<button class="ui teal button" >Add Rule</button>';
+			for (var i = 0; i < uniqueSymbols.length; i++) {
+
+				MathJax.Hub.Queue(["Typeset",MathJax.Hub,document.getElementById('t' + i.toString())]);
+			}
+			$('table').tablesort();
+			$('.ui.search.dropdown').dropdown();
+		}
+
+
+
+	</script>
+	</html>

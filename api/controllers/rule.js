@@ -83,7 +83,7 @@ function updateRule (req, res) {
 function deleteRule (req, res) {
 	//deleting a rule
 	Rule.remove({ _id : req.params.id}, function (err, rule) {
-		//if the rule does not exist
+		//if the rule does not exists
 		if (err || rule == null) {
 			return res.status(400).json({
 				'status'  : 'failure',

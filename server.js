@@ -34,6 +34,8 @@ app.set('view engine', 'hbs');
 
 // public folder path setup
 app.use('/static', express.static(path.join(__dirname, 'public')));
+app.use('/bower', express.static(path.join(__dirname, 'bower_components')));
+
 
 //connecting to mongo database 
 mongoose.connect(database.local);
@@ -42,7 +44,9 @@ mongoose.connect(database.local);
 //Routers ===========================================================
 // app.use('/api', sequiaRoutes);
 
-
+app.get('/', function (req, res) {
+	return res.render('rule/index', {'layout' : 'rule'});
+});
 //intiating server ==================================================
 app.listen(port);
 console.log("listening on port " + port);
