@@ -5,7 +5,7 @@ Sequent calculus proof construction tool
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
 
 ### Prerequisites
-You need to have [Node.js](http://nodejs.org/) and [MongoDB](https://www.mongodb.com/download-center?jmp=nav) installed.
+You need to have [Node.js](http://nodejs.org/), [Bower](https://bower.io/) and [MongoDB](https://www.mongodb.com/download-center?jmp=nav) installed.
 
 ### Installing
 
@@ -20,6 +20,7 @@ Installing the dependencies
 ```
 cd sequoia
 npm install
+bower install
 ```
 
 ### Running

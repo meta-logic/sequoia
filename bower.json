@@ -13,5 +13,9 @@
     "bower_components",
     "test",
     "tests"
-  ]
+  ],
+  "dependencies": {
+    "semantic": "^2.2.13",
+    "MathJax": "^2.7.1"
+  }
 }
