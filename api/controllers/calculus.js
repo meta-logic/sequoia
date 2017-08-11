@@ -9,8 +9,9 @@ var Calculus = require('../models/calculus');
 function createCalculus (req, res) {
 	var calculus = new Calculus();
 
-	//populating the calculus model with the rules from the reuest body
+	//populating the calculus model with the rules and symbols from the reuest body
 	calculus.rules = JSON.parse(req.body.rules);
+	calculus.symbols = JSON.parse(req.body.symbols);
 
 	//saving the calculus in the database
 	calculus.save(function (err) {
@@ -57,7 +58,8 @@ function getCalculus (req, res) {
 //updating a calculus
 function updateCalculus (req, res) {
 	//looking up the calculus and updating it
-	Calculus.findOneAndUpdate({ _id : req.params.id}, { rules : JSON.parse(req.body.rules) }, { new : true}, 
+	Calculus.findOneAndUpdate({ _id : req.params.id}, 
+		{ rules : JSON.parse(req.body.rules), symbols :  JSON.parse(req.body.symbols)}, { new : true}, 
 		function (err, calculus) {
 			//if the calculus does not exist
 			if (err || calculus == null) {
