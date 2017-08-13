@@ -10,8 +10,11 @@ function createRule (req, res) {
 	var rule = new Rule();
 
 	//populating the rule model with sequents and their connectives
-	rule.premises  = JSON.parse(req.body.premises);
-	rule.conlusion = JSON.parse(req.body.conlusion);
+	rule.rule      = req.body.rule;
+	rule.premises  = req.body.premises;
+	rule.conclusion = req.body.conclusion;
+
+	console.log(rule);
 
 	//saving the rule in the database
 	rule.save(function (err) {

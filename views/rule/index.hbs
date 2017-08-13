@@ -4,19 +4,24 @@
 	<div class="ui container">
 		{{!-- Rule Input --}}
 		<div class="row">
-			{{> rule/input div_id="" id="rule_connective" holder="Rule"}}
+			<div class="ui input">
+				<input id="rule_connective" type="text" placeholder="Rule">
+			</div>
 		</div>
 		
 		<br>
 		
 		{{!-- Premises Inputs --}}
 		<div class="row">
-			{{> rule/input div_id="premise" id="i0" holder="Premise"}}
-
-			{{!-- adding premise button --}}
-			<button onclick="addPremise()" class="circular ui icon button green">
-				<i class="icon add"></i>
-			</button>
+			<div class="ui fluid action input" id="premise">
+				<input id="i0" type="text" placeholder="Premise">
+				
+				{{!-- Adding Premise button --}}
+				<button onclick="addPremise()" class="ui circular icon button green">
+					<i class="icon add"></i>
+				</button>
+				<p style="color: white">s</p>
+			</div>
 		</div>
 		
 		{{!-- Divider Line --}}

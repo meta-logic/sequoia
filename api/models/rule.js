@@ -8,8 +8,9 @@ var sequent  = require('./sequent');
 
 //defining the rule schema
 var ruleSchema = new Schema({
-	premises   : [sequent],
-	conclusion : sequent
+	rule       : String,
+	premises   : [String],
+	conclusion : String
 });
 
 module.exports = mongoose.model('Rule', ruleSchema);
