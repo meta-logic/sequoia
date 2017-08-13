@@ -23,7 +23,7 @@ function table(symbols) {
 
 	// filling the table with symbols
 	for (var i = 0; i < uniqueSymbols.length; i++) {
-		table_body.innerHTML += '<tr><td id="t' + i.toString() + '" >$$'+  uniqueSymbols[i] + '$$</td><td style="overflow: visible;"><select class="ui search dropdown" style="z-index: 1; position: fixed"><option value="">Type</option><option value="0">atom</option><option value="1">formula</option><option value="2">connective</option><option value="3">list</option><option value="4">set</option><option value="5">empty</option><option value="6">multiset</option><option value="7">separator</option></select></td> <td><div class="ui right input"><input id="'+i.toString() +'" type="text" placeholder="Precedent"></div></td></tr>';
+		table_body.innerHTML += '<tr><td id="t' + i.toString() + '" >$$'+  uniqueSymbols[i] + '$$</td><td style="overflow: visible;"><select class="ui search dropdown" style="z-index: 1; position: fixed"><option value="">Type</option><option value="0">atom</option><option value="1">formula</option><option value="2">connective</option><option value="3">list</option><option value="4">set</option><option value="5">empty</option><option value="6">multiset</option><option value="7">separator</option></select></td> <td><div class="ui right input"><input id="'+i.toString() +'" type="text" placeholder="Precedence"></div></td></tr>';
 	}
 
 	table.innerHTML += '<a onClick="addRule()" class="ui teal button" href="/">Add Rule</a>';
