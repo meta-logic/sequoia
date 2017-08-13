@@ -65,7 +65,7 @@ app.get('/api/get-rules', function (req, res) {
 });
 
 app.get('/', function (req, res) {
-	return res.render('main/index', {'title' : 'Sequoia','layout' : 'rule'});
+	return res.render('main/index', {'title' : 'Sequoia','layout' : 'calculus'});
 });
 //intiating server ==================================================
 app.listen(port);
