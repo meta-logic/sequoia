@@ -50,7 +50,7 @@ app.use('/api', ruleRoutes);
 
 
 app.get('/add-rule', function (req, res) {
-	return res.render('rule/index', {'layout' : 'rule'});
+	return res.render('rule/index', {'title' : 'Sequoia - add rule', 'layout' : 'rule'});
 });
 
 app.get('/api/get-rules', function (req, res) {
@@ -65,7 +65,7 @@ app.get('/api/get-rules', function (req, res) {
 });
 
 app.get('/', function (req, res) {
-	return res.render('main/index', {'layout' : 'rule'});
+	return res.render('main/index', {'title' : 'Sequoia','layout' : 'rule'});
 });
 //intiating server ==================================================
 app.listen(port);
