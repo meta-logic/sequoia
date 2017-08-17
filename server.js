@@ -53,6 +53,10 @@ app.get('/add-rule', function (req, res) {
 	return res.render('rule/index', {'title' : 'Sequoia - add rule', 'layout' : 'rule'});
 });
 
+app.get('/edit-rule/:id', function (req, res) {
+	return res.render('rule/edit', {'title' : 'Sequoia - edit rule', 'layout' : 'edit', 'id' : req.params.id });
+});
+
 app.get('/api/get-rules', function (req, res) {
 	var rules = Rule.find({}, function (err, rules) {
 		if (err) {

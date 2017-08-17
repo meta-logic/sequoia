@@ -1,0 +1,52 @@
+{{!-- Grid --}}
+<div class="ui middle aligned center aligned grid" style="margin-top: 35px">
+	{{!-- Container --}}
+	<div class="ui container">
+
+		<div id="id" hidden>{{id}}</div>
+		{{!-- Rule Input --}}
+		<div class="row">
+			<div class="ui input">
+				<input id="rule_connective" type="text" placeholder="Rule">
+			</div>
+		</div>
+		
+		<br>
+		
+		{{!-- Premises Inputs --}}
+		<div class="row">
+			<div class="ui fluid action input" id="premise">
+				<input id="i0" type="text" placeholder="Premise">
+				
+				{{!-- Adding Premise button --}}
+				<button onclick="addPremise()" class="ui circular icon button green">
+					<i class="icon add"></i>
+				</button>
+				<p style="color: white">s</p>
+			</div>
+		</div>
+		
+		{{!-- Divider Line --}}
+		<div class="ui divider"></div>
+		
+		{{!-- Conclusion Input --}}
+		<div class="row">
+			<div class="ui input fluid">
+				<input type="text" id="Conclusion" placeholder="Conclusion">
+			</div>
+		</div>
+
+		<br>
+		
+		{{!-- Preview Button --}}
+		<button class="ui button primary" onclick="preview()">
+			Preview
+		</button>
+		
+		{{!-- Rule container --}}
+		<div id="rule"></div>
+
+		{{!-- Table container --}}
+		<div id="table"></div>
+	</div>
+</div>

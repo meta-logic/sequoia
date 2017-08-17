@@ -40,6 +40,7 @@ function createRule (req, res) {
 //fetching a rule
 function getRule (req, res) {
 	//looking up the rule
+	console.log(req.params.id);
 	Rule.findById(req.params.id, function (err, rule) {
 
 		//if the rule does not exist
@@ -62,8 +63,8 @@ function getRule (req, res) {
 //updating a rule
 function updateRule (req, res) {
 	//looking up the rule and updating it
-	Rule.findOneAndUpdate({ _id : req.params.id}, 
-		{ premises : JSON.parse(req.body.premises), conlusion : JSON.parse(req.body.conlusion)}, { new : true}, 
+	Rule.findOneAndUpdate({ _id : req.body.id}, 
+		{ rule : req.body.rule, premises : req.body.premises, conlusion : req.body.conclusion}, { new : true}, 
 		function (err, rule) {
 			//if the rule does not exist
 			if (err || rule == null) {
