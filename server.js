@@ -58,7 +58,6 @@ app.get('/api/get-rules', function (req, res) {
 		if (err) {
 			console.log(err);
 		}
-		console.log(rules);
 		return res.json(rules);
 	});
 

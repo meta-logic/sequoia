@@ -85,7 +85,7 @@ function updateRule (req, res) {
 //deleting a rule
 function deleteRule (req, res) {
 	//deleting a rule
-	Rule.remove({ _id : req.params.id}, function (err, rule) {
+	Rule.remove({ _id : req.body.id}, function (err, rule) {
 		//if the rule does not exists
 		if (err || rule == null) {
 			return res.status(400).json({
@@ -97,7 +97,8 @@ function deleteRule (req, res) {
 		//rule deleted
 		return res.status(200).json({
 			'status'  : 'success',
-			'message' : 'rule successfully deleted'
+			'message' : 'rule successfully deleted',
+			'rule'    : rule
 		});
 	});
 }
