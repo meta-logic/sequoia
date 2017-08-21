@@ -49,6 +49,10 @@ app.use('/api', calculusRoutes);
 app.use('/api', ruleRoutes);
 
 
+app.get('/calculus', function (req, res) {
+	return res.render('calculus/index', {'title' : 'Sequoia - calculus', 'layout' : 'edit'});
+});
+
 app.get('/add-rule', function (req, res) {
 	return res.render('rule/index', {'title' : 'Sequoia - add rule', 'layout' : 'rule'});
 });
