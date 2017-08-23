@@ -101,4 +101,24 @@ function deleteCalculus (req, res) {
 }
 
 
-module.exports = {createCalculus, getCalculus, updateCalculus, deleteCalculus};
+function getCalculuses (req, res) {
+	//looking up the calculus
+	Calculus.find({}, function (err, calculuses) {
+
+		//if the calculus does not exist
+		if (err || calculuses == null) {
+			return res.status(400).json({
+				'status'  : 'failure',
+				'message' : err
+			});
+		}
+
+		//return the calculus 
+		return res.status(200).json({
+			'status'      : 'success',
+			'calculuses'  : calculuses
+		});
+	});
+}
+
+module.exports = {createCalculus, getCalculus, updateCalculus, deleteCalculus, getCalculuses};

@@ -64,7 +64,7 @@ function getRule (req, res) {
 function updateRule (req, res) {
 	//looking up the rule and updating it
 	Rule.findOneAndUpdate({ _id : req.body.id}, 
-		{ rule : req.body.rule, premises : req.body.premises, conlusion : req.body.conclusion}, { new : true}, 
+		{ rule : req.body.rule, premises : JSON.parse(req.body.premises), conlusion : req.body.conclusion}, { new : true}, 
 		function (err, rule) {
 			//if the rule does not exist
 			if (err || rule == null) {

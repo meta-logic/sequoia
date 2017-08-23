@@ -22,5 +22,7 @@ router.route('/calculus')
 	//delete a calculus
 	.delete(controller.deleteCalculus);
 
+router.get('/calculuses', controller.getCalculuses);
+
 
 module.exports = router;

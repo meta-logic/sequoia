@@ -2,22 +2,9 @@
 
 	
 	{{!-- Cards --}}
-	<div class="ui grid cards" id="calculus">
+	<div class="ui grid cards" id="calculuses">
 	
-		{{#each calculus}}
-		<div class="card">
-			<a class="image" href="calculus/{{this._id}}" style="color:black">
-		     <p id={{this.id}}> $$\frac{ {{this.premises}} }{ {{this.conclusion}} } {{this.rule}}$$ </p>
-		    </a>
-		    <div class="content">
-		      <div class="header">{{this.title}}</div>
-		      <div class="description">
-				{{this.description}}
-		      </div>
-		    </div>
-		</div>
-		{{/each}}
-
+	
 	</div>
 	<br>
 	{{!-- End of Cards --}}

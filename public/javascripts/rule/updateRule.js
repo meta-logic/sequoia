@@ -16,9 +16,10 @@ function addRule() {
     $.ajax({
 	    url: '/api/rule',
 	    type: 'PUT',
-	    data : { id : document.getElementById('id').innerHTML , rule : rule, premises : prem.toString() , conclusion : conc},
+	    data : { id : document.getElementById('id').innerHTML , rule : rule, premises : JSON.stringify(prem) , conclusion : conc},
 	    success: function(result) {
-	        console.log(result);
+	        console.log(data);
 	    }
 	});
 }
+
