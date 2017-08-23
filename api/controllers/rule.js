@@ -11,7 +11,7 @@ function createRule (req, res) {
 
 	//populating the rule model with sequents and their connectives
 	rule.rule      = req.body.rule;
-	rule.premises  = req.body.premises;
+	rule.premises  = JSON.parse(req.body.premises);
 	rule.conclusion = req.body.conclusion;
 
 	console.log(rule);

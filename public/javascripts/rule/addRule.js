@@ -22,9 +22,8 @@ function addRule() {
 
 	// conclusion
 	var conc = document.getElementById("Conclusion").value;
-	console.log(conc);
 
-	$.post('/api/rule', { rule : rule, premises : prem.toString() , conclusion : conc}, function(data, status){
+	$.post('/api/rule', { rule : rule, premises : JSON.stringify(prem) , conclusion : conc}, function(data, status){
 		console.log(data);
         console.log("Data: " + data + "\nStatus: " + status);
     });
