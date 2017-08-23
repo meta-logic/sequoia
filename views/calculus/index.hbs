@@ -2,36 +2,26 @@
 
 	
 	{{!-- Cards --}}
-	<div class="ui grid cards" id="rules">
-
+	<div class="ui grid cards" id="calculus">
+	
+		{{#each calculus}}
 		<div class="card">
-			<div class="image">
-		     <p> $$\frac{A}{A \vee B} \vee$$ </p>
-		    </div>
+			<a class="image" href="calculus/{{this._id}}" style="color:black">
+		     <p id={{this.id}}> $$\frac{ {{this.premises}} }{ {{this.conclusion}} } {{this.rule}}$$ </p>
+		    </a>
 		    <div class="content">
-		      <div class="header">G3K</div>
+		      <div class="header">{{this.title}}</div>
 		      <div class="description">
-				base labelled system for many modal logics
+				{{this.description}}
 		      </div>
 		    </div>
 		</div>
-
-		<div class="card">
-			<div class="image">
-		     <p> $$\frac{A \wedge B}{A} \wedge$$ </p>
-		    </div>
-		    <div class="content">
-		      <div class="header">mLJ</div>
-		      <div class="description">
-				multi-conclusion intuitionistic logic
-		      </div>
-		    </div>
-		</div>
+		{{/each}}
 
 	</div>
 	<br>
 	{{!-- End of Cards --}}
-	<a class="circular ui icon button green" href="">
+	<a class="circular ui icon button green" href="/add-calculus">
 		<i class="icon add"></i>
 	</a>
 </div>

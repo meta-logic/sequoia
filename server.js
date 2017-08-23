@@ -9,6 +9,7 @@ var helmet   = require('helmet');
 var path     = require('path');
 var mongoose = require('mongoose');
 var hbs      = require('express-handlebars');
+var routes   = require('./routes/main/home');
 var calculusRoutes = require('./api/routes/calculus');
 var ruleRoutes     = require('./api/routes/rule');
 
@@ -47,19 +48,7 @@ mongoose.connect(database.local);
 //Routers ===========================================================
 app.use('/api', calculusRoutes);
 app.use('/api', ruleRoutes);
-
-
-app.get('/calculus', function (req, res) {
-	return res.render('calculus/index', {'title' : 'Sequoia - calculus', 'layout' : 'edit'});
-});
-
-app.get('/add-rule', function (req, res) {
-	return res.render('rule/index', {'title' : 'Sequoia - add rule', 'layout' : 'rule'});
-});
-
-app.get('/edit-rule/:id', function (req, res) {
-	return res.render('rule/edit', {'title' : 'Sequoia - edit rule', 'layout' : 'edit', 'id' : req.params.id });
-});
+app.use('/', routes);
 
 app.get('/api/get-rules', function (req, res) {
 	var rules = Rule.find({}, function (err, rules) {
@@ -71,9 +60,7 @@ app.get('/api/get-rules', function (req, res) {
 
 });
 
-app.get('/', function (req, res) {
-	return res.render('main/index', {'title' : 'Sequoia','layout' : 'calculus'});
-});
+
 //intiating server ==================================================
 app.listen(port);
 console.log("listening on port " + port);

@@ -8,12 +8,10 @@ var Schema   = mongoose.Schema;
 
 //defining the calculus schema
 var calculusSchema = new Schema({
-	rules   : [{
-		id        : Number,
-		upper_rep : [String],
-		lower_rep : String
-	}], 
-	symbols : [{
+	title       : String,
+	description : String, 
+	rules       : [String], 
+	symbols     : [{
 		symbol     : String,
 		type       : String,
 		precedence : Number

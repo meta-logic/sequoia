@@ -10,8 +10,10 @@ function createCalculus (req, res) {
 	var calculus = new Calculus();
 
 	//populating the calculus model with the rules and symbols from the reuest body
-	calculus.rules = JSON.parse(req.body.rules);
-	calculus.symbols = JSON.parse(req.body.symbols);
+	calculus.title = req.body.title;
+	calculus.description = req.body.description;
+	calculus.rules = [];
+	calculus.symbols = [];
 
 	//saving the calculus in the database
 	calculus.save(function (err) {
