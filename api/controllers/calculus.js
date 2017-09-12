@@ -3,6 +3,7 @@
 
 //Loading Dependencies =============================================
 var Calculus = require('../models/calculus');
+var Rule     = require('../models/rule');
 
 
 //creating a calculus
@@ -102,6 +103,7 @@ function deleteCalculus (req, res) {
 
 
 function getCalculuses (req, res) {
+	var grule;
 	//looking up the calculus
 	Calculus.find({}, function (err, calculuses) {
 
@@ -113,6 +115,35 @@ function getCalculuses (req, res) {
 			});
 		}
 
+		for (var i = 0; i < calculuses.length; i++) {
+
+			if (calculuses[i].rules.length > 0) {
+				Rule.find ({_id : calculuses[i].rules[0]}, function (err, rule) {
+
+					//if the calculus does not exist
+					if (err || rule == null) {
+						return res.status(400).json({
+							'status'  : 'failure',
+							'message' : err
+						});
+					}
+
+					console.log(calculuses[i]);
+					console.log(rule);
+
+					grule = rule;
+					
+				});
+
+				console.log(grule);
+
+
+			} else {
+				calculuses[i].rule = "";
+				calculuses[i].premises = "";
+				calculuses[i].conclusion = "";
+			}
+		}
 		//return the calculus 
 		return res.status(200).json({
 			'status'      : 'success',
