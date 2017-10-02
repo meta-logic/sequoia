@@ -36,13 +36,13 @@ function match_tags (premise, tagged_premises) {
 	return tagged_premises;
 }
 
-function match_rules(premise, rule, index, seperator) {
+function apply_rule(premise, rule, index, seperator) {
 	premise = inputParser(premise);
 	var rule_ = rule.rule;
 	var premises = rule.premises;
 	premises = premises.map( x => inputParser(x));
 	var conclusion = inputParser(rule.conclusion);
 	var tagged_premises = tagging(premises, conclusion);
-
+	return match_tags(premise, tagged_premises);
 
 }
