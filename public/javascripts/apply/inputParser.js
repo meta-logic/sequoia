@@ -3,6 +3,7 @@ function inputParser(input) {
 	var tokens_list = [];
 	var between_parentheses_check = false;
 	var parentheses_count = 0;
+	input += ' ';
 
 	for (var i = 0; i < input.length; i++) {
 
