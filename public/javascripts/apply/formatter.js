@@ -5,15 +5,15 @@ function flatten(arr) {
 }
 
 //format the input given by the user to the desired form we need to apply the rules
-function formatter(input, connective) {
+function formatter(input, symbol) {
 
-	//splitting at the connective if presented
-	var temp_tokens = input.split(connective);
+	//splitting at the symbol if presented
+	var temp_tokens = input.split(symbol);
 	var tokens = [];
 	if (temp_tokens.length > 1) {
 		for (var i = 0; i < temp_tokens.length - 1; i++) {
 			tokens.push(temp_tokens[i]);
-			tokens.push(connective);
+			tokens.push(symbol);
 		}
 		tokens.push(temp_tokens[temp_tokens.length - 1]);
 	} else {
