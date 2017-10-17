@@ -49,6 +49,7 @@ function checkTypes (sequent, rule) {
 		}
 	} else {
 		console.log("non matching length");
+		return false;
 	}
 
 	return true;

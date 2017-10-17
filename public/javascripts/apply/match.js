@@ -7,21 +7,25 @@ function seperate_premise (premise, seperator) {
 
 function tagging (premises, conclusion) {
 
-	for (var k = 0; k < premises.length; k++) {
-		for (var i = 0; i < premises[k].length; i ++) {
-			premises[k][i] = [premises[k][i], -1];
+	var premises_c = premises.slice();
+
+	for (var k = 0; k < premises_c.length; k++) {
+		for (var i = 0; i < premises_c[k].length; i ++) {
+			premises_c[k][i] = [premises_c[k][i], -1];
 			for (var j = 0; j < conclusion.length; j++) {
-				if (conclusion[j] == premises[k][i][0]) {
-					premises[k][i][1] = j;
+				if (conclusion[j] == premises_c[k][i][0]) {
+					premises_c[k][i][1] = j;
 				}
 			}
 		}
 	}
 
-	return premises;
+	return premises_c;
 }
 
-function match_tags (premise, tagged_premises) {
+function match_tags (premise, tagged_premises_c) {
+
+	var tagged_premises = tagged_premises_c.slice();
 
 	for (var i = 0; i < tagged_premises.length; i++) {
 		for (var j = 0; j < tagged_premises[i].length; j++) {
@@ -34,15 +38,4 @@ function match_tags (premise, tagged_premises) {
 	}
 
 	return tagged_premises;
-}
-
-function apply_rule(premise, rule, index, seperator) {
-	premise = inputParser(premise);
-	var rule_ = rule.rule;
-	var premises = rule.premises;
-	premises = premises.map( x => inputParser(x));
-	var conclusion = inputParser(rule.conclusion);
-	var tagged_premises = tagging(premises, conclusion);
-	return match_tags(premise, tagged_premises);
-
 }
