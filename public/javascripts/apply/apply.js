@@ -1,7 +1,7 @@
 var stack = [];
 
 //check what rules we can apply on the premise
-function apply (premise, rule, types, arrow) {
+function apply (premise, rule, types) {
 	//getting needed information
 	var premises = rule.premises;
 	var conclusion = rule.conclusion;
@@ -21,6 +21,9 @@ function apply (premise, rule, types, arrow) {
 
 	//build up
 	var result = match_tags(premise, tagged_premises);
+
+	//pushing the result to the stack
+	stack.push(result);
 
 	return result;
 }
