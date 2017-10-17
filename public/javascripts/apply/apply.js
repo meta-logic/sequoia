@@ -11,7 +11,7 @@ function apply (premise, rule, types) {
 	conclusion = inputParser(conclusion);
 
 	//adding Types
-	var conclusion_types = addTypes(flatten(conclusion), types)
+	var conclusion_types = addTypes(conclusion, types)
 
 	//tagging
 	var tagged_premises = tagging(premises, conclusion);
@@ -21,6 +21,7 @@ function apply (premise, rule, types) {
 
 	//build up
 	var result = match_tags(premise, tagged_premises);
+	result = result[0].reduce(( acc, cur ) => acc.concat(cur), []);
 
 	//pushing the result to the stack
 	stack.push(result);
