@@ -21,7 +21,13 @@ function apply (premise, rule, types) {
 
 	//build up
 	var result = match_tags(premise, tagged_premises);
-	result = result[0].reduce(( acc, cur ) => acc.concat(cur), []);
+	if (result[0][1] === 'set' && result.length > 0) {
+		result[0] = result[0][0];
+		for (var i = 1; i < result.length; i++) {
+			result[0].push(result[i]);
+		}
+		result = result[0];
+	} 
 
 	//pushing the result to the stack
 	stack.push(result);
