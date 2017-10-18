@@ -9,7 +9,8 @@ var helmet   = require('helmet');
 var path     = require('path');
 var mongoose = require('mongoose');
 var hbs      = require('express-handlebars');
-var routes   = require('./routes/main/home');
+var home_routes    = require('./routes/main/home');
+var apply_routes   = require('./routes/main/apply');
 var calculusRoutes = require('./api/routes/calculus');
 var ruleRoutes     = require('./api/routes/rule');
 
@@ -48,7 +49,8 @@ mongoose.connect(database.local);
 //Routers ===========================================================
 app.use('/api', calculusRoutes);
 app.use('/api', ruleRoutes);
-app.use('/', routes);
+app.use('/', home_routes);
+app.use('/', apply_routes);
 
 app.get('/api/get-rules', function (req, res) {
 	var rules = Rule.find({}, function (err, rules) {
