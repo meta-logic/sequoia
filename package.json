@@ -24,6 +24,7 @@
     "express-handlebars": "3.0.0",
     "helmet": "3.8.0",
     "mongoose": "4.11.3",
-    "morgan": "1.8.2"
+    "morgan": "1.8.2",
+    "node-cmd": "3.0.0"
   }
 }

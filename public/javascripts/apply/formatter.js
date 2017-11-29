@@ -4,6 +4,17 @@ function flatten(arr) {
   }, []);
 }
 
+//remove the pranthesis eg. (A ^ (A v B)) => A, ^, (A v B)
+function remove(input) {
+	for (var i = 0 ; i < input.length; i++) {
+		if (input[i][0] == "(") {
+			input[i] = remove(inputParser(input[i].substr(1,input[i].length - 2)));
+		} 
+	}
+	
+	return input; 
+}
+
 //format the input given by the user to the desired form we need to apply the rules
 function formatter(input, symbol) {
 
@@ -26,6 +37,10 @@ function formatter(input, symbol) {
 
 	//applying the input parser on each input to get the symbols by themselves
 	tokens = tokens.map(inputParser);
+
+	//make copy of tokens
+	tokens_copy = tokens.splice();
+	tokens = tokens.map(remove);
 
 	return tokens;
 }
