@@ -1,3 +1,101 @@
+function inputParser(input) {
+	var token = '';
+	var tokens_list = [];
+	var between_parentheses_check = false;
+	var parentheses_count = 0;
+	input += ' ';
+
+	for (var i = 0; i < input.length; i++) {
+
+		//==== perantheses ====
+		if (input[i] == "(") {
+			between_parentheses_check = true;
+			parentheses_count ++;
+		}
+
+		if (input[i] == ")") {
+			parentheses_count --;
+
+			//check if the token is closed with perantheses
+			if (parentheses_count == 0) {
+				between_parentheses_check = false;
+				token += input[i];
+				tokens_list.push(token);
+				token = '';
+				i++;
+			}
+		}
+
+
+		//==== rest of input ====
+
+		if ((input[i] == ' ' || input[i] == ',') && !between_parentheses_check) {
+
+			if (i != 0 && input[i-1] != ")" && token != "" && token != " ") {
+				tokens_list.push(token);
+				token = '';
+			}
+		} else {
+			token += input[i];
+		}
+
+	}
+
+	//check if the input was only one word
+	if (tokens_list.length == 0) {
+		tokens_list.push(token);
+	}
+	return tokens_list;
+}
+
+function flatten(arr) {
+  return arr.reduce(function (flat, toFlatten) {
+    return flat.concat(Array.isArray(toFlatten) ? flatten(toFlatten) : toFlatten);
+  }, []);
+}
+
+//remove the pranthesis eg. (A ^ (A v B)) => A, ^, (A v B)
+function remove(input) {
+	for (var i = 0 ; i < input.length; i++) {
+		if (input[i][0] == "(") {
+			input[i] = remove(inputParser(input[i].substr(1,input[i].length - 2)));
+		} 
+	}
+	
+	return input; 
+}
+
+//format the input given by the user to the desired form we need to apply the rules
+function formatter(input, symbol) {
+
+	//splitting at the symbol if presented
+	var temp_tokens = input.split(symbol);
+	var tokens = [];
+	if (temp_tokens.length > 1) {
+		for (var i = 0; i < temp_tokens.length - 1; i++) {
+			tokens.push(temp_tokens[i]);
+			tokens.push(symbol);
+		}
+		tokens.push(temp_tokens[temp_tokens.length - 1]);
+	} else {
+		tokens = temp_tokens;
+	}
+
+	//seperating the formulas between the commas
+	tokens = tokens.map(function (x) {return x.split(",");});
+	tokens = flatten(tokens);
+
+	//applying the input parser on each input to get the symbols by themselves
+	tokens = tokens.map(inputParser);
+
+	//make copy of tokens
+	tokens_copy = tokens.splice();
+	tokens = tokens.map(remove);
+
+	return tokens;
+}
+
+
 Array.prototype.diff = function(a) {
     return this.filter(function(i) {return a.indexOf(i) < 0;});
 };
@@ -102,7 +200,52 @@ function split_all(list, symbols) {
 				temp = split_sep(list[i], symbols[j]);
 
 				check = true;
-				new_list.push(temp[0]);
+	function flatten(arr) {
+  return arr.reduce(function (flat, toFlatten) {
+    return flat.concat(Array.isArray(toFlatten) ? flatten(toFlatten) : toFlatten);
+  }, []);
+}
+
+//remove the pranthesis eg. (A ^ (A v B)) => A, ^, (A v B)
+function remove(input) {
+	for (var i = 0 ; i < input.length; i++) {
+		if (input[i][0] == "(") {
+			input[i] = remove(inputParser(input[i].substr(1,input[i].length - 2)));
+		} 
+	}
+	
+	return input; 
+}
+
+//format the input given by the user to the desired form we need to apply the rules
+function formatter(input, symbol) {
+
+	//splitting at the symbol if presented
+	var temp_tokens = input.split(symbol);
+	var tokens = [];
+	if (temp_tokens.length > 1) {
+		for (var i = 0; i < temp_tokens.length - 1; i++) {
+			tokens.push(temp_tokens[i]);
+			tokens.push(symbol);
+		}
+		tokens.push(temp_tokens[temp_tokens.length - 1]);
+	} else {
+		tokens = temp_tokens;
+	}
+
+	//seperating the formulas between the commas
+	tokens = tokens.map(function (x) {return x.split(",");});
+	tokens = flatten(tokens);
+
+	//applying the input parser on each input to get the symbols by themselves
+	tokens = tokens.map(inputParser);
+
+	//make copy of tokens
+	tokens_copy = tokens.splice();
+	tokens = tokens.map(remove);
+
+	return tokens;
+}			new_list.push(temp[0]);
 				new_list.push(temp[1]);
 				new_list.push(temp[2]);
 			}
@@ -203,6 +346,17 @@ function parser(input, seperator, symbols, seperators) {
 	var ctxParsedR = setParser(joinTagged[2], seperators);
 	return "(" + ctxParsedL + ', Con("' + joinTagged[1][0] + '"), ' + ctxParsedR + ")";
 }
+
+
+var input = "A, Gamma, B -> B";
+var sep = "->";
+var symbols = [{symbol : "A", type : "atom"}, {symbol : "B", type : "formula"},{symbol : "->", type : "connective"}, {symbol : "Gamma", type :"set"}];
+var seperators = [";"];
+
+console.log(parser(input, sep, symbols, seperators));
+
+
+
 
 
 
