@@ -1,7 +1,3 @@
-Array.prototype.diff = function(a) {
-    return this.filter(function(i) {return a.indexOf(i) < 0;});
-};
-
 function getType (type, element) {
 	switch(type) {
 	    case 'connective':
@@ -12,6 +8,8 @@ function getType (type, element) {
 	        return 'Form (' + element + ')';
 	    case 'set' :
 	    	return 'Set (' + element + ')';
+	    case 'unary' :
+	    	return 'Uform (' + element + ')';
 	    default :
 	    	return 'hell';
 	}
