@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-=======
 function inputParser(input) {
 	var token = '';
 	var tokens_list = [];
@@ -102,7 +100,6 @@ Array.prototype.diff = function(a) {
     return this.filter(function(i) {return a.indexOf(i) < 0;});
 };
 
->>>>>>> 88dcc1ab7111a5ca6e1a7872a0345977a5b94ece
 function getType (type, element) {
 	switch(type) {
 	    case 'connective':
@@ -138,6 +135,14 @@ function tag (listc, symbols) {
 	return list;
 }
 
+
+function unary(listc, i) {
+	var list = listc.slice();
+	var temp = list[i].split("(")[1].split(")")[0];
+	list.splice(0,1);
+	return "Uform(" + temp + ", " + joinTags(list) + ")"; 
+}
+
 function joinTags (listc) {
 	var list = listc.slice();
 	for (var i = 0; i < list.length; i++) {
@@ -147,8 +152,13 @@ function joinTags (listc) {
 	}
 
 	for (var i = 0; i < list.length; i++) {
+		if (list[i].includes('Uform') && list.length != 1) {
+			return unary(list, i);
+		}
+
 		if (list[i].includes('Con') && list.length != 1) {
-			return 'Form(' + list.join() + ')';
+			var temp = list.splice(0,2);
+			return 'Form(' + temp.join() + "," + joinTags(list) + ')';
 		} 
 	}
 
@@ -321,25 +331,6 @@ function setParser (listc, symbols) {
 }
 
 
-// function repeats(list) {
-// 	var flattened_list = flatten(list);
-// 	var unique_list = Array.from(new Set(flattened_list));
-// 	var unique_list = unique_list.map(function (x) {return [x, 0];});
-// 	console.log(unique_list);
-// 	for (var i = 0; i < flattened_list.length; i++) {
-// 		for (var j = 0; j < unique_list.length; j++) {
-// 			if (unique_list[j][0] == flattened_list[i]) {
-// 				unique_list[j][1] ++;
-// 				if (unique_list[j][1] > 1) {
-// 					flattened_list[i] = flattened_list[i] + unique_list[j][1].toString();
-// 				}
-// 			}
-// 		}
-// 	} 
-// 	console.log(flattened_list);
-// 	return list;
-// }
-
 function parser(input, seperator, symbols, seperators) {
 	var parsedInput = formatter(input, seperator);
 	// var repeat = repeats(parsedInput);
@@ -353,16 +344,12 @@ function parser(input, seperator, symbols, seperators) {
 }
 
 
-var input = "A, Gamma, B -> B";
+var input = "A v B, Gamma, B -> B";
 var sep = "->";
-var symbols = [{symbol : "A", type : "atom"}, {symbol : "B", type : "formula"},{symbol : "->", type : "connective"}, {symbol : "Gamma", type :"set"}];
+var symbols = [{symbol : "A", type : "atom"}, {symbol : "B", type : "formula"}, {symbol : "v", type : "connective"}, {symbol : "->", type : "connective"}, {symbol : "Gamma", type :"set"}, {symbol : "neg", type :"unary"}];
 var seperators = [";"];
 
 console.log(parser(input, sep, symbols, seperators));
-
-
-
-
 
 
 
