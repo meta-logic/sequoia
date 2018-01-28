@@ -215,6 +215,7 @@ function split_all(list, symbols) {
 				temp = split_sep(list[i], symbols[j]);
 
 				check = true;
+				new_list.push(temp[0]);
 	function flatten(arr) {
   return arr.reduce(function (flat, toFlatten) {
     return flat.concat(Array.isArray(toFlatten) ? flatten(toFlatten) : toFlatten);
@@ -331,9 +332,43 @@ function setParser (listc, symbols) {
 }
 
 
+
+function repeats(input, symbols, counter) {
+	var temp;
+	for (var i = 0; i < input.length; i++) {
+		if (Array.isArray(input[i])) {
+			input[i] = repeats(input[i], symbols, counter);
+		} else {
+			if (checkRepeat(input[i], symbols)){ 
+				if (input[i] in counter) {
+					temp = input[i];
+					input[i] = input[i] + counter[temp];
+					counter[temp] ++;
+				} else {
+					temp = input[i];
+					counter[input[i]] = 0;
+				}
+			}
+		}
+	}
+	return input;
+}
+
+function checkRepeat(symbol, symbols) {
+	for (var i = 0; i < symbols.length; i++) {
+		if (symbol == symbols[i].symbol) {
+			if (symbols[i].type == "atom" || symbols[i].type == "formula") {
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
 function parser(input, seperator, symbols, seperators) {
 	var parsedInput = formatter(input, seperator);
-	// var repeat = repeats(parsedInput);
+	repeats(parsedInput, symbols, new Object());
 	var taggedInput = tag(parsedInput, symbols);
 	var parsedTagged = split_all(taggedInput, seperators);
 	var splitParsedTagged = final_split(parsedTagged, seperator);
@@ -344,12 +379,25 @@ function parser(input, seperator, symbols, seperators) {
 }
 
 
-var input = "A v B, Gamma, B -> B";
+var input = "neg (A v neg B), Gamma, B -> B";
 var sep = "->";
 var symbols = [{symbol : "A", type : "atom"}, {symbol : "B", type : "formula"}, {symbol : "v", type : "connective"}, {symbol : "->", type : "connective"}, {symbol : "Gamma", type :"set"}, {symbol : "neg", type :"unary"}];
 var seperators = [";"];
 
 console.log(parser(input, sep, symbols, seperators));
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
