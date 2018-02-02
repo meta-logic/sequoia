@@ -7,12 +7,12 @@ function getSymbols() {
 	for (var i = 0; i < table_symbols.length; i++) {
 		var symbol = document.getElementById("t" + i).getElementsByTagName("script")[0].innerHTML;
 		var type = table_symbols[i].getElementsByClassName("text")[0].innerHTML;
-		if (type == "primary seperator") {
+		if (type == "primary separator") {
 			sep = symbol;
 			type = 'connective';
 		}
 
-		if (type == 'seperator') {
+		if (type == 'separator') {
 			seperator.push(symbol);
 			type = 'connective';
 		}
