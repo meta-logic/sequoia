@@ -14,6 +14,9 @@ var apply_routes   = require('./routes/main/apply');
 var calculusRoutes = require('./api/routes/calculus');
 var ruleRoutes     = require('./api/routes/rule');
 
+// testing
+var test_routes   = require('./routes/test/test');
+
 
 var morgan       = require('morgan');
 var cookieParser = require('cookie-parser');
@@ -49,6 +52,7 @@ mongoose.connect(database.local);
 //Routers ===========================================================
 app.use('/api', calculusRoutes);
 app.use('/api', ruleRoutes);
+app.use('/', test_routes);
 app.use('/', home_routes);
 app.use('/', apply_routes);
 
