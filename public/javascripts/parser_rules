@@ -1,9 +1,9 @@
 {
- 	var count = 0;
- 	function getSymbol() {
-  		count += 1;
- 		return count;
-	}
+     var count = 0;
+     function getSymbol() {
+          count += 1;
+         return count;
+    }
 }
 
 //Seq
@@ -17,11 +17,11 @@ CTX =  list:List _ sep:SEP _ ctx:CTX
 
 List = 
 set:SET _ "," _ list:List {
-	if (list.includes("::nil")) {
-		return list.slice(0, -5) + "::" + set}
-	else {
-		return list + "::" + set
-	}
+    if (list.includes("::nil")) {
+        return list.slice(0, -5) + "::" + set}
+    else {
+        return list + "::" + set
+    }
 }/
 form:F _ "," _ list:List _ {return form + "::" + list}/
 set:SET {return set} /
@@ -29,7 +29,9 @@ form:F {return form + "::nil"}
 
 //Formula
 F = 
+_ uconn:UCONN _ "(" _ form1:F _ ")" _ conn:CONN _ form2:F _  {return "(Form (Uform (" + uconn + ", " + form1 + "), " + conn + ", " + form2 + "))"} /
 _ "(" _ form1:F _ ")" _ conn:CONN _ form2:F _  {return "(Form (" + form1 + ", " + conn + ", " + form2 + "))"} /
+_ uconn:UCONN _ "(" _ form:F _ ")" _  {return "Uform (" + uconn + ", " + form + ")"} /
 _ "(" _ form:F _ ")" _  {return form} /
 _ UConn:UCONN _ fotom:FOTOM _ conn:CONN _ formula:F _ {return "Form (Uform (" + UConn + ", " + fotom + "), " + conn + ", " + formula + ")"} /
 _ UConn:UCONN _ fotom:FOTOM _ {return "Uform (" + UConn + ", " + fotom + ")"} /
@@ -49,9 +51,9 @@ UConn = "~"
 CONN = conn:Conn {return "Con (" + conn  + ")"}
 Conn = "^" / "v" 
 SET = "Gamma" / "Delta" / "random"
-FORM = form:Form {return "Form (" + form + ")"}
+FORM = form:Form {return "Form (" + form + getSymbol() + ")"}
 Form = "F"
-ATOM = atom:Atom {return "Atom (" + atom + ")"}
+ATOM = atom:Atom {return "Atom (" + atom + getSymbol() + ")"}
 Atom = "A" / "B" / "C" / "D"
 
 
