@@ -1,0 +1,42 @@
+//context
+CTX =  list:List _ sep:SEP _ ctx:CTX 
+{return "Mult (" + list + ", Con (" + sep + "), " + ctx + ")"}
+/ list:List {return "Single (" + list + ")" }
+
+List = 
+set:SET _ "," _ list:List {
+	if (list.includes("::nil")) {
+		return list.slice(0, -5) + "::" + set}
+	else {
+		return list + "::" + set
+	}
+}/
+form:F _ "," _ list:List _ {return form + "::" + list}/
+set:SET {return set} /
+form:F {return form + "::nil"} 
+
+//Formula
+F = 
+_ "(" _ form1:F _ ")" _ conn:CONN _ form2:F _  {return "(Form (" + form1 + ", " + conn + ", " + form2 + "))"} /
+_ "(" _ form:F _ ")" _  {return form} /
+_ fotom:FOTOM _ conn:CONN _ formula:F _ {return "(Form (" + fotom + ", " + conn + ", " + formula + "))" } /
+_ fotom:FOTOM _ {return fotom}
+
+
+//Form_Atom
+FOTOM = FORM / ATOM
+
+
+//symbols
+SEP = ";"
+CONN = conn:Conn {return "Con (" + conn  + ")"}
+Conn = "^" / "v"
+SET = "Gamma" / "Delta" / "random"
+FORM = form:Form {return "Form (" + form + ")"}
+Form = "F"
+ATOM = atom:Atom {return "Atom (" + atom  + ")"}
+Atom = "A" / "B" / "C" / "D"
+
+
+_ "whitespace"
+  = [ \t\n\r]*

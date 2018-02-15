@@ -41,5 +41,5 @@ function writeRule(rule, conclusion, premises, conclusion_list, premises_list) {
 	});
 }
 
-writeRule('And', 'Form(Form(Atom (A),Con ("\\\\wedge"),Atom (B)),(Con ("\\\\Rightarrow")),(Atom (C)))', ['Form((Atom (A)),(Con ("\\\\Rightarrow")),(Atom (C)))'], ["A", "B"], [["A", "B", "C"], ["A", "B", "C", "D"]]);
+writeRule('And', 'Form(Form(Atom (A),Con ("\\\\wedge"),Atom (B)),(Con ("\\\\Rightarrow")),(Atom (C)))', ['Form((Atom (A)),(Con ("\\\\Rightarrow")),(Atom (C)))'], ["A", "B"], [["A", "B", "C", "D"]]);
 

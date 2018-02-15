@@ -379,7 +379,7 @@ function parser(input, seperator, symbols, seperators) {
 }
 
 
-var input = "A v B -> B";
+var input = "A v B ; A, Delta -> B";
 var sep = "->";
 var symbols = [{symbol : "A", type : "atom"}, {symbol : "B", type : "formula"}, {symbol : "v", type : "connective"}, {symbol : "->", type : "connective"}, {symbol : "Gamma", type :"set"}, {symbol : "neg", type :"unary"}];
 var seperators = [";"];
