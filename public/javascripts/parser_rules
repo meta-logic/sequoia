@@ -1,3 +1,15 @@
+{
+ 	var count = 0;
+ 	function getSymbol() {
+  		count += 1;
+ 		return count;
+	}
+}
+
+//Seq
+SEQ = ctx1:CTX _ arrow:ARROW _ ctx2:CTX {return "(" + ctx1 + ", Con (" + arrow + "), " + ctx2 + ")"}
+/ CTX
+
 //context
 CTX =  list:List _ sep:SEP _ ctx:CTX 
 {return "Mult (" + list + ", Con (" + sep + "), " + ctx + ")"}
@@ -19,6 +31,8 @@ form:F {return form + "::nil"}
 F = 
 _ "(" _ form1:F _ ")" _ conn:CONN _ form2:F _  {return "(Form (" + form1 + ", " + conn + ", " + form2 + "))"} /
 _ "(" _ form:F _ ")" _  {return form} /
+_ UConn:UCONN _ fotom:FOTOM _ conn:CONN _ formula:F _ {return "Form (Uform (" + UConn + ", " + fotom + "), " + conn + ", " + formula + ")"} /
+_ UConn:UCONN _ fotom:FOTOM _ {return "Uform (" + UConn + ", " + fotom + ")"} /
 _ fotom:FOTOM _ conn:CONN _ formula:F _ {return "(Form (" + fotom + ", " + conn + ", " + formula + "))" } /
 _ fotom:FOTOM _ {return fotom}
 
@@ -28,13 +42,16 @@ FOTOM = FORM / ATOM
 
 
 //symbols
+ARROW = "=>"
 SEP = ";"
+UCONN = conn:UConn {return "Con (" + conn  + ")"}
+UConn = "~" 
 CONN = conn:Conn {return "Con (" + conn  + ")"}
-Conn = "^" / "v"
+Conn = "^" / "v" 
 SET = "Gamma" / "Delta" / "random"
 FORM = form:Form {return "Form (" + form + ")"}
 Form = "F"
-ATOM = atom:Atom {return "Atom (" + atom  + ")"}
+ATOM = atom:Atom {return "Atom (" + atom + ")"}
 Atom = "A" / "B" / "C" / "D"
 
 
