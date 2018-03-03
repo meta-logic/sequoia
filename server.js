@@ -66,6 +66,7 @@ app.get('/api/get-rules', function (req, res) {
 
 });
 
+global.__basedir = __dirname;
 
 //intiating server ==================================================
 app.listen(port);

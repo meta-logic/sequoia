@@ -1,11 +1,3 @@
-{
-     var count = 0;
-     function getSymbol() {
-          count += 1;
-         return count;
-    }
-}
-
 //Seq
 SEQ = ctx1:CTX _ arrow:ARROW _ ctx2:CTX {return "(" + ctx1 + ", Con (" + arrow + "), " + ctx2 + ")"}
 / CTX
@@ -44,16 +36,17 @@ FOTOM = FORM / ATOM
 
 
 //symbols
+UCONN = conn:UConn {return 'Con ("' + conn  + '")'}
+CONN = conn:Conn {return 'Con ("' + conn  + '")'}
+FORM = form:Form {return "Form (" + form + ")"}
+ATOM = atom:Atom {return "Atom (" + atom + ")"}
+
 ARROW = "=>"
 SEP = ";"
-UCONN = conn:UConn {return "Con (" + conn  + ")"}
 UConn = "~" 
-CONN = conn:Conn {return "Con (" + conn  + ")"}
 Conn = "^" / "v" 
 SET = "Gamma" / "Delta" / "random"
-FORM = form:Form {return "Form (" + form + getSymbol() + ")"}
 Form = "F"
-ATOM = atom:Atom {return "Atom (" + atom + getSymbol() + ")"}
 Atom = "A" / "B" / "C" / "D"
 
 

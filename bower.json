@@ -18,6 +18,7 @@
     "semantic": "^2.2.13",
     "MathJax": "^2.7.1",
     "async": "^2.5.0",
-    "bootstrap": "^3.3.7"
+    "bootstrap": "^3.3.7",
+    "pegjs": "^0.10.0"
   }
 }
