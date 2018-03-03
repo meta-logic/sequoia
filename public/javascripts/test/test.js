@@ -157,6 +157,7 @@ function addRule() {
 	var prem_symbols = [];
 	var conc_symbols = [];
 	var rule = document.getElementById("rule_connective").value;
+	rule = rule.replace("\\", "");
 	console.log(rule);
 	// adding premises
 	prem.push(document.getElementById("i0").value);
