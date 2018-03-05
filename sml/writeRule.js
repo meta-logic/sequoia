@@ -1,28 +1,5 @@
 var fs = require('fs');
 
-Array.prototype.diff = function(a) {
-    return this.filter(function(i) {return a.indexOf(i) < 0;});
-};
-
-function flatten(arr) {
-  return arr.reduce(function (flat, toFlatten) {
-    return flat.concat(Array.isArray(toFlatten) ? flatten(toFlatten) : toFlatten);
-  }, []);
-}
-
-function extraArguments(conclusion_list, premises_list) {
-
-	var arguments = [];
-
-	for (var i = 0; i < premises_list.length; i++) {
-		arguments.push(premises_list[i].diff(conclusion_list));
-	}
-
-	arguments = flatten(arguments);
-	return Array.from(new Set(arguments));
-
-}
-
 function writeRule(rule, conclusion, premises, conclusion_list, premises_list) {
 	console.log(__basedir);
 	var datatypes = fs.readFileSync(__basedir + '/sml/datatypes.sml','utf8');

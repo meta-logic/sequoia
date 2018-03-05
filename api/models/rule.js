@@ -10,7 +10,8 @@ var sequent  = require('./sequent');
 var ruleSchema = new Schema({
 	rule       : String,
 	premises   : [String],
-	conclusion : String
+	conclusion : String,
+	extraArguments : [String]
 });
 
 module.exports = mongoose.model('Rule', ruleSchema);
