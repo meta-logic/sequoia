@@ -103,15 +103,15 @@ function getSymbols() {
 		}
 
 		if (type == 'set') {
-			set += '/ "' + symbol.replace("\\", "") + '" ';
+			set += '/ "' + symbol + '" ';
 		}
 
 		if (type == 'formula') {
-			form += '/ "' + symbol.replace("\\", "") + '" ';
+			form += '/ "' + symbol + '" ';
 		}
 
 		if (type == 'atom') {
-			atom += '/ "' + symbol.replace("\\", "") + '" ';
+			atom += '/ "' + symbol + '" ';
 		}
 	}
 	parser_text += arrow + "\n" + sep + "\n" + uconn + "\n" + conn + "\n" + set + "\n" + form + "\n" + atom + "\n"; 

@@ -6,7 +6,7 @@ SEQ = ctx1:CTX _ arrow:ARROW _ ctx2:CTX {return "(" + ctx1 + ', Con ("' + arrow 
 
 //context
 CTX =  list:List _ sep:SEP _ ctx:CTX 
-{return "Mult (" + list + ", Con (" + sep + "), " + ctx + ")"}
+{return "Mult (" + list + ', Con ("' + sep + '"), ' + ctx + ")"}
 / list:List {return "Single (" + list + ")" }
 
 List = 
@@ -103,15 +103,15 @@ function getSymbols() {
 		}
 
 		if (type == 'set') {
-			set += '/ "' + symbol.replace("\\", "") + '" ';
+			set += '/ "' + symbol + '" ';
 		}
 
 		if (type == 'formula') {
-			form += '/ "' + symbol.replace("\\", "") + '" ';
+			form += '/ "' + symbol + '" ';
 		}
 
 		if (type == 'atom') {
-			atom += '/ "' + symbol.replace("\\", "") + '" ';
+			atom += '/ "' + symbol + '" ';
 		}
 	}
 	parser_text += arrow + "\n" + sep + "\n" + uconn + "\n" + conn + "\n" + set + "\n" + form + "\n" + atom + "\n"; 

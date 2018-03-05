@@ -5,6 +5,14 @@ function writeRule(rule, conclusion, premises, arguments) {
 	var datatypes = fs.readFileSync(__basedir + '/sml/datatypes.sml','utf8');
 	rule = rule.replace("\\", "");
 	rule = rule.replace(/ /g, "_");
+
+	conclusion = conclusion.replace(/"\\/g, "temp@");
+	premises = premises.map(function (premise) {return premise.replace(/"\\/g, "temp@")});
+	conclusion = conclusion.replace(/\\/g, "");
+	premises = premises.map(function (premise) {return premise.replace(/\\/g, "")});
+	conclusion = conclusion.replace(/temp@/g, '"\\\\');
+	premises = premises.map(function (premise) {return premise.replace(/temp@/g, '"\\\\')});
+
 	if (arguments.length == 0) {
 		var file = datatypes + 'fun ' + rule + ' (' + conclusion + ') = [' + premises.join() + ']\n\t| ' + rule +' _ = []\n';
 	} else {

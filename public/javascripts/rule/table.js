@@ -1,16 +1,26 @@
 function table(symbols) {
 
-	var uniqueSymbols = [];
+	var pre_uniqueSymbols = [];
 
 	// parsing the symbols and filtering it off duplicates and commas
 	symbols = symbols.split(" ");
 	$.each(symbols, function(i, el){
-	    if($.inArray(el, uniqueSymbols) === -1) uniqueSymbols.push(el);
+	    if($.inArray(el, pre_uniqueSymbols) === -1) pre_uniqueSymbols.push(el);
 	});
-	for (var i = uniqueSymbols.length - 1; i >= 0; i--) {
-		uniqueSymbols[i] = uniqueSymbols[i].replace (/,/g, "");
+	for (var i = pre_uniqueSymbols.length - 1; i >= 0; i--) {
+		pre_uniqueSymbols[i] = pre_uniqueSymbols[i].replace (/,/g, "");
 	}
-	uniqueSymbols.filter(Boolean);
+	pre_uniqueSymbols.filter(Boolean);
+
+	var uniqueSymbols = [];
+
+	for (var i = 0; i < pre_uniqueSymbols.length; i++) {
+		if (!(uniqueSymbols.includes(pre_uniqueSymbols[i]))) {
+			uniqueSymbols.push(pre_uniqueSymbols[i]);
+		}
+	}
+
+
 
 	console.log(uniqueSymbols);
 	// geeting the table container
@@ -26,7 +36,7 @@ function table(symbols) {
 		table_body.innerHTML += '<tr><td id="t' + i.toString() + '" >$$'+  uniqueSymbols[i] + '$$</td><td style="overflow: visible;"><select class="ui search dropdown" style="z-index: 1; position: fixed"><option value="">Type</option><option value="0">atom</option><option value="1">formula</option><option value="2">connective</option><option value="3">set</option><option value="4">unary</option><option value="5">primary separator</option><option value="6">separator</option></select></td> <td><div class="ui right input"><input id="'+i.toString() +'" type="text" placeholder="Precedence"></div></td></tr>';
 	}
 
-	table.innerHTML += '<a onClick="addRule()" class="ui teal button" href="/">Add Rule</a>';
+	table.innerHTML += '<a onClick="addRule()" class="ui teal button" >Add Rule</a>';
 
 	// rendering the symbols in mathjax
 	for (var i = 0; i < uniqueSymbols.length; i++) {
