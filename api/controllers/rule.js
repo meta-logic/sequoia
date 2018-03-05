@@ -19,14 +19,14 @@ function flatten(arr) {
 
 function extraArguments(conclusion_list, premises_list) {
 
-	var arguments = [];
+	var argumentsDup = [];
 
 	for (var i = 0; i < premises_list.length; i++) {
-		arguments.push(premises_list[i].diff(conclusion_list));
+		argumentsDup.push(premises_list[i].diff(conclusion_list));
 	}
 
-	arguments = flatten(arguments);
-	return Array.from(new Set(arguments));
+	argumentsDup = flatten(argumentsDup);
+	return Array.from(new Set(argumentsDup));
 
 }
 
