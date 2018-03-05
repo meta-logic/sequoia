@@ -1,12 +1,12 @@
 var parser_text = 
 `
 //Seq
-SEQ = ctx1:CTX _ arrow:ARROW _ ctx2:CTX {return "(" + ctx1 + ", Con (" + arrow + "), " + ctx2 + ")"}
+SEQ = ctx1:CTX _ arrow:ARROW _ ctx2:CTX {return "(" + ctx1 + ', Con ("' + arrow + '"), ' + ctx2 + ")"}
 / CTX
 
 //context
 CTX =  list:List _ sep:SEP _ ctx:CTX 
-{return "Mult (" + list + ", Con (" + sep + "), " + ctx + ")"}
+{return "Mult (" + list + ', Con ("' + sep + '"), ' + ctx + ")"}
 / list:List {return "Single (" + list + ")" }
 
 List = 
@@ -103,15 +103,15 @@ function getSymbols() {
 		}
 
 		if (type == 'set') {
-			set += '/ "' + symbol + '" ';
+			set += '/ "' + symbol.replace("\\", "") + '" ';
 		}
 
 		if (type == 'formula') {
-			form += '/ "' + symbol + '" ';
+			form += '/ "' + symbol.replace("\\", "") + '" ';
 		}
 
 		if (type == 'atom') {
-			atom += '/ "' + symbol + '" ';
+			atom += '/ "' + symbol.replace("\\", "") + '" ';
 		}
 	}
 	parser_text += arrow + "\n" + sep + "\n" + uconn + "\n" + conn + "\n" + set + "\n" + form + "\n" + atom + "\n"; 
@@ -157,8 +157,6 @@ function addRule() {
 	var prem_symbols = [];
 	var conc_symbols = [];
 	var rule = document.getElementById("rule_connective").value;
-	rule = rule.replace("\\", "");
-	console.log(rule);
 	// adding premises
 	prem.push(document.getElementById("i0").value);
 	for (var i = 1; i <= v; i++) {
