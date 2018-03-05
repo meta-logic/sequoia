@@ -90,12 +90,12 @@ function getRule (req, res) {
 
 //updating a rule
 function updateRule (req, res) {
-	var extraArguments = extraArguments(JSON.parse(req.body.conc), JSON.parse(req.body.prem));
-
 	//looking up the rule and updating it
 	Rule.findOneAndUpdate({ _id : req.body.id}, 
 		{ rule : req.body.rule, premises : JSON.parse(req.body.premises), 
-		  conlusion : req.body.conclusion, extraArguments : extraArguments}, { new : true}, 
+		  conclusion : req.body.conclusion, 
+		  extraArguments : extraArguments(JSON.parse(req.body.conc), JSON.parse(req.body.prem))}, 
+		  { new : true}, 
 		function (err, rule) {
 			//if the rule does not exist
 			if (err || rule == null) {
@@ -105,7 +105,8 @@ function updateRule (req, res) {
 				});
 			}
 
-		sml.writeRule(req.body.rule, req.body.parsed_conc, JSON.parse(req.body.parsed_prem), extraArguments);
+		sml.writeRule(req.body.rule, req.body.parsed_conc, JSON.parse(req.body.parsed_prem), 
+			extraArguments(JSON.parse(req.body.conc), JSON.parse(req.body.prem)));
 
 		//send back the updated rule 
 		return res.status(200).json({

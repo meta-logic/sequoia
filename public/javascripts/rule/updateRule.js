@@ -187,12 +187,6 @@ function addRule() {
 	var conc_final = uniqeSymbols(parser.parse(conc), prem_conc_symbols(conc));
 	console.log(conc_final);
 
-	$.post('/api/rule', {rule : rule, conclusion : conc, premises : JSON.stringify(prem),
-		parsed_conc : conc_final ,parsed_prem : JSON.stringify(parsed_prem) ,
-		conc : JSON.stringify(prem_conc_symbols(conc)), prem : JSON.stringify(prem_sym)}, function(data, status){
-		console.log(data);
-        console.log("Data: " + data + "\nStatus: " + status);
-    });
 
     $.ajax({
 	    url: '/api/rule',
@@ -202,7 +196,7 @@ function addRule() {
 	    parsed_prem : JSON.stringify(parsed_prem) , conc : JSON.stringify(prem_conc_symbols(conc)), 
 	    prem : JSON.stringify(prem_sym)},
 	    success: function(result) {
-	        console.log(data);
+	        console.log(result);
 	    }
 	});
 
