@@ -12,7 +12,7 @@ function table(symbols) {
 	}
 	uniqueSymbols.filter(Boolean);
 
-
+	console.log(uniqueSymbols);
 	// geeting the table container
 	var table = document.getElementById('table');
 

@@ -4,6 +4,7 @@ function writeRule(rule, conclusion, premises, arguments) {
 	console.log(__basedir);
 	var datatypes = fs.readFileSync(__basedir + '/sml/datatypes.sml','utf8');
 	rule = rule.replace("\\", "");
+	rule = rule.replace(/ /g, "_");
 	if (arguments.length == 0) {
 		var file = datatypes + 'fun ' + rule + ' (' + conclusion + ') = [' + premises.join() + ']\n\t| ' + rule +' _ = []\n';
 	} else {
