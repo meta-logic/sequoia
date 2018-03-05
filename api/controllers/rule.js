@@ -3,7 +3,32 @@
 
 //Loading Dependencies =============================================
 var Rule = require('../models/rule');
+var sml     = require('../../sml/writeRule');
 
+//helper functions for extraArguents
+
+Array.prototype.diff = function(a) {
+    return this.filter(function(i) {return a.indexOf(i) < 0;});
+};
+
+function flatten(arr) {
+  return arr.reduce(function (flat, toFlatten) {
+    return flat.concat(Array.isArray(toFlatten) ? flatten(toFlatten) : toFlatten);
+  }, []);
+}
+
+function extraArguments(conclusion_list, premises_list) {
+
+	var arguments = [];
+
+	for (var i = 0; i < premises_list.length; i++) {
+		arguments.push(premises_list[i].diff(conclusion_list));
+	}
+
+	arguments = flatten(arguments);
+	return Array.from(new Set(arguments));
+
+}
 
 //creating a rule
 function createRule (req, res) {
@@ -13,6 +38,7 @@ function createRule (req, res) {
 	rule.rule      = req.body.rule;
 	rule.premises  = JSON.parse(req.body.premises);
 	rule.conclusion = req.body.conclusion;
+	rule.extraArguments = extraArguments(JSON.parse(req.body.conc), JSON.parse(req.body.prem));
 
 	console.log(rule);
 
@@ -26,6 +52,8 @@ function createRule (req, res) {
 				'message' : 'something went wrong while creating the rule'
 			});
 		}
+
+		sml.writeRule(rule.rule, req.body.parsed_conc, JSON.parse(req.body.parsed_prem), rule.extraArguments);
 
 		//send success message and created rule
 		return res.status(200).json({
@@ -62,9 +90,12 @@ function getRule (req, res) {
 
 //updating a rule
 function updateRule (req, res) {
+	var extraArguments = extraArguments(JSON.parse(req.body.conc), JSON.parse(req.body.prem));
+
 	//looking up the rule and updating it
 	Rule.findOneAndUpdate({ _id : req.body.id}, 
-		{ rule : req.body.rule, premises : JSON.parse(req.body.premises), conlusion : req.body.conclusion}, { new : true}, 
+		{ rule : req.body.rule, premises : JSON.parse(req.body.premises), 
+		  conlusion : req.body.conclusion, extraArguments : extraArguments}, { new : true}, 
 		function (err, rule) {
 			//if the rule does not exist
 			if (err || rule == null) {
@@ -73,6 +104,8 @@ function updateRule (req, res) {
 					'message' : 'rule does not exist'
 				});
 			}
+
+		sml.writeRule(req.body.rule, req.body.parsed_conc, JSON.parse(req.body.parsed_prem), extraArguments);
 
 		//send back the updated rule 
 		return res.status(200).json({
