@@ -72,18 +72,18 @@ _ "whitespace"
 var parser_copy = parser_text; 
 
 var symbols = {};
+var symbolsTypes = {};
 function addSymbols() {
 	var table_symbols = document.getElementsByClassName("ui search dropdown selection");
 	for (var i = 0; i < table_symbols.length; i++) {
 		var symbol = document.getElementById("t" + i).getElementsByTagName("script")[0].innerHTML;
 		var type = table_symbols[i].getElementsByClassName("text")[0].innerHTML;
-		if (type == "primary separator") {
+		if (type == "primary separator" || type == 'separator') {
+			symbolsTypes[symbol] = type;
 			sep = symbol;
 			type = 'connective';
-		}
-
-		if (type == 'separator') {
-			type = 'connective';
+		} else {
+			symbolsTypes[symbol] = type;
 		}
 
 		symbols[symbol] = type;
@@ -219,12 +219,14 @@ function addRule() {
 	    }
 	});
 
+
+
 	if (DBSymbols != null) {
 		var update;
-		var extra = Object.keys(symbols);
+		var extra = Object.keys(symbolsTypes);
 		if (extra.length != 0) {
 			for (var i = 0; i < extra.length; i++) {
-				DBSymbols[extra[i]] = symbols[extra[i]];
+				DBSymbols[extra[i]] = symbolsTypes[extra[i]];
 			}
 			$.ajax({
 			    url: '/api/symbols',
@@ -239,7 +241,7 @@ function addRule() {
 		$.ajax({
 			    url: '/api/symbols',
 			    type: 'PUT',
-			    data : {update : JSON.stringify({symbols : symbols})},
+			    data : {update : JSON.stringify({symbols : symbolsTypes})},
 			    success: function (result) {
 				    console.log(result);
 				}
