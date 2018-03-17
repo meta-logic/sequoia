@@ -1,3 +1,27 @@
+//helper functions for extraArguents
+
+Array.prototype.diff = function(a) {
+    return this.filter(function(i) {return a.indexOf(i) < 0;});
+};
+
+function flatten(arr) {
+  return arr.reduce(function (flat, toFlatten) {
+    return flat.concat(Array.isArray(toFlatten) ? flatten(toFlatten) : toFlatten);
+  }, []);
+}
+
+function extraArguments(a, b) {
+
+	var argumentsDup = [];
+
+	argumentsDup.push(b.diff(a));
+
+	argumentsDup = flatten(argumentsDup);
+	return Array.from(new Set(argumentsDup));
+
+}
+
+
 var parser_text = 
 `
 //Seq
@@ -191,5 +215,37 @@ function addRule() {
 		console.log(data);
         console.log("Data: " + data + "\nStatus: " + status);
     });
+
+	if (DBSymbols != null) {
+		var update;
+		var extra = Object.keys(symbols);
+		if (extra.length != 0) {
+			for (var i = 0; i < extra.length; i++) {
+				DBSymbols[extra[i]] = symbols[extra[i]];
+			}
+			$.ajax({
+			    url: '/api/symbols',
+			    type: 'PUT',
+			    data : {update : JSON.stringify({symbols : DBSymbols})},
+			    success: function (result) {
+				    console.log(result);
+				}
+			});
+		} 
+	} else {
+		$.ajax({
+			    url: '/api/symbols',
+			    type: 'PUT',
+			    data : {update : JSON.stringify({symbols : symbols})},
+			    success: function (result) {
+				    console.log(result);
+				}
+			});
+	}
+
+    
+
+    console.log("symbols:")
+	console.log(DBSymbols);
 
 }

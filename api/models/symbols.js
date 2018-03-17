@@ -10,4 +10,4 @@ var symbolsSchema = new Schema({
 	symbols : Object
 });
 
-module.exports = mongoose.model('Symbols', ruleSchema);
+module.exports = mongoose.model('Symbols', symbolsSchema);

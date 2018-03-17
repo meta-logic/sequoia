@@ -13,6 +13,7 @@ var home_routes    = require('./routes/main/home');
 var apply_routes   = require('./routes/main/apply');
 var calculusRoutes = require('./api/routes/calculus');
 var ruleRoutes     = require('./api/routes/rule');
+var symbolsRoutes  = require('./api/routes/symbols');
 
 // testing
 var test_routes   = require('./routes/test/test');
@@ -52,6 +53,7 @@ mongoose.connect(database.local);
 //Routers ===========================================================
 app.use('/api', calculusRoutes);
 app.use('/api', ruleRoutes);
+app.use('/api', symbolsRoutes);
 app.use('/', test_routes);
 app.use('/', home_routes);
 app.use('/', apply_routes);

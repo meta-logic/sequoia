@@ -4,5 +4,5 @@ datatype form = Atom of string | Form of form * conn * form | Uform of conn * fo
 datatype ctx = Single of form list | Mult of form list * conn * ctx
 type seq = ctx * conn * ctx
 
-fun a (Single (Atom (a)::nil)) = [Single (Atom (a)::nil)]
-	| a _ = []
+fun s (Single (Atom (A)::nil)) = [Single (Atom (A)::nil)]
+	| s _ = []
