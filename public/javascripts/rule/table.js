@@ -61,7 +61,7 @@ function table1(symbols, DBSymbols) {
 		}
 	}
 
-	table.innerHTML += '<a onClick="addRule()" class="ui teal button" >Add Rule</a>';
+	table.innerHTML += '<a onClick="addRule()" class="ui teal button" href="/">Add Rule</a>';
 
 	// rendering the symbols in mathjax
 	for (var i = 0; i < uniqueSymbols.length; i++) {
