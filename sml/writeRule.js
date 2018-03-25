@@ -1,8 +1,14 @@
 var fs = require('fs');
 
-function writeRule(rule, conclusion, premises, arguments) {
-	console.log(__basedir);
+function writeRule(rule, conclusion, premises, arguments, toString) {
+
 	var datatypes = fs.readFileSync(__basedir + '/sml/datatypes.sml','utf8');
+	if (toString == "ctx") {
+		datatypes += "\nfun toString (s) = ctx_toString(s)\n\n\n";
+	} else {
+		datatypes += "\nfun toString (s) = seq_toString(s)\n\n\n";
+	}
+
 	rule = rule.replace("\\", "");
 	rule = rule.replace(/ /g, "_");
 

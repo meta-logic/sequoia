@@ -53,7 +53,7 @@ function createRule (req, res) {
 			});
 		}
 
-		sml.writeRule(rule.rule, req.body.parsed_conc, JSON.parse(req.body.parsed_prem), rule.extraArguments);
+		sml.writeRule(rule.rule, req.body.parsed_conc, JSON.parse(req.body.parsed_prem), rule.extraArguments, req.body.toString);
 
 		//send success message and created rule
 		return res.status(200).json({
@@ -106,7 +106,7 @@ function updateRule (req, res) {
 			}
 
 		sml.writeRule(req.body.rule, req.body.parsed_conc, JSON.parse(req.body.parsed_prem), 
-			extraArguments(JSON.parse(req.body.conc), JSON.parse(req.body.prem)));
+			extraArguments(JSON.parse(req.body.conc), JSON.parse(req.body.prem)), req.body.toString);
 
 		//send back the updated rule 
 		return res.status(200).json({

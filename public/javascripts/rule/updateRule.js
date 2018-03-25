@@ -206,12 +206,17 @@ function addRule() {
 	var conc_final = uniqeSymbols(parser.parse(conc), prem_conc_symbols(conc));
 	console.log(conc_final);
 
+	//toString check
+	var toString = 'ctx';
+	if (Object.values(symbolsTypes).includes('primary separator')) {
+		toString  = 'seq';
+	}
 
     $.ajax({
 	    url: '/api/rule',
 	    type: 'PUT',
 	    data : { id : document.getElementById('id').innerHTML , rule : rule, 
-	    conclusion : conc, premises : JSON.stringify(prem), parsed_conc : conc_final ,
+	    conclusion : conc, premises : JSON.stringify(prem), parsed_conc : conc_final , toString : toString,
 	    parsed_prem : JSON.stringify(parsed_prem) , conc : JSON.stringify(prem_conc_symbols(conc)), 
 	    prem : JSON.stringify(prem_sym)},
 	    success: function(result) {
