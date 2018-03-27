@@ -2,20 +2,19 @@
 <html>
   <head>
     <title>{{title}}</title>
-    <link rel="stylesheet" type="text/css" href="bower/semantic/dist/semantic.min.css">
-    <link rel="stylesheet" type="text/css" href="bower/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/bower/semantic/dist/semantic.min.css">
   </head>
   <body>
-  	{{> navbar}}
-	  {{{body}}}
-  	<script type="text/javascript" src="bower/MathJax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-  	<script type="text/javascript" src="bower/jquery/dist/jquery.min.js"></script>
-    <script type="text/javascript" src="bower/semantic/dist/semantic.min.js"></script>
-  	<script type="text/javascript" src="bower/bootstrap/dist/js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="static/javascripts/apply/inputParser.js"></script>
-    <script type="text/javascript" src="static/javascripts/apply/formatter.js"></script>
-    <script type="text/javascript" src="static/javascripts/apply/match.js"></script>
-    <script type="text/javascript" src="static/javascripts/apply/validate.js"></script>
-    <script type="text/javascript" src="static/javascripts/apply/apply.js"></script>
+    {{> navbar}}
+  {{{body}}}
+    <script type="text/javascript" src="/bower/MathJax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  <script type="text/javascript" src="/bower/jquery/dist/jquery.min.js"></script>
+  <script type="text/javascript" src="/bower/pegjs/peg-0.10.0.min.js"></script>
+  <script type="text/javascript" src="/bower/semantic/dist/semantic.min.js"></script>
+  <script type="text/javascript" src="/static/javascripts/rule/tablesort.js"></script>
+  <script type="text/javascript" src="/static/javascripts/rule/addPremise.js"></script>
+  <script type="text/javascript" src="/static/javascripts/rule/updateRule.js"></script>
+  <script type="text/javascript" src="/static/javascripts/rule/table.js"></script>
+  <script type="text/javascript" src="/static/javascripts/rule/preview.js"></script>
   </body>
 </html>

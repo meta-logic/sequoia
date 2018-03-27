@@ -1,20 +1,29 @@
-<div class="container">
-  <!-- Example row of columns -->
-  <div class="row">
-    <div class="col-md-4">
-      <h2>Heading</h2>
-      <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
-      <p><a class="btn btn-secondary" href="#" role="button">View details &raquo;</a></p>
+{{!-- Grid --}}
+<div class="ui middle aligned center aligned grid" style="margin-top: 35px">
+  {{!-- Container --}}
+  <div class="ui container">
+
+    <div id="id" hidden>{{id}}</div>
+    
+    
+    {{!-- Sequent Input --}}
+    <div class="row">
+      <div class="ui input fluid">
+        <input type="text" id="Sequent" placeholder="Sequent">
+      </div>
     </div>
-    <div class="col-md-4">
-      <h2>Heading</h2>
-      <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
-      <p><a class="btn btn-secondary" href="#" role="button">View details &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-      <h2>Heading</h2>
-      <p>Donec sed odio dui. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Vestibulum id ligula porta felis euismod semper. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>
-      <p><a class="btn btn-secondary" href="#" role="button">View details &raquo;</a></p>
-    </div>
+
+    <br>
+    
+    {{!-- Preview Button --}}
+    <button class="ui button primary" onclick="preview()">
+      Preview
+    </button>
+    
+    {{!-- Rule container --}}
+    <div id="rule"></div>
+
+    {{!-- Table container --}}
+    <div id="table"></div>
   </div>
- </div>
+</div>
