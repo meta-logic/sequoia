@@ -212,7 +212,7 @@ function addRule() {
 		toString  = 'seq';
 	}
 
-    $.ajax({
+        $.ajax({
 	    url: '/api/rule',
 	    type: 'PUT',
 	    data : { id : document.getElementById('id').innerHTML , rule : rule, 
@@ -220,8 +220,13 @@ function addRule() {
 	    parsed_prem : JSON.stringify(parsed_prem) , conc : JSON.stringify(prem_conc_symbols(conc)), 
 	    prem : JSON.stringify(prem_sym)},
 	    success: function(result) {
+                console.log("Rule added successfully.");
 	        console.log(result);
-	    }
+	    },
+            error: function(result) {
+                console.log("ERROR: could not add rule.");
+                console.log(result);
+            }
 	});
 
 
