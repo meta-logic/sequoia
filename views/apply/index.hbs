@@ -3,11 +3,10 @@
   {{!-- Container --}}
   <div class="ui container">
 
-    <div id="id" hidden>{{id}}</div>
     
     
     {{!-- Sequent Input --}}
-    <div class="row">
+    <div class="row" id="seq">
       <div class="ui input fluid">
         <input type="text" id="Sequent" placeholder="Sequent">
       </div>
@@ -16,9 +15,11 @@
     <br>
     
     {{!-- Preview Button --}}
-    <button class="ui button primary" onclick="preview()">
-      Preview
-    </button>
+    <div id="preview">
+      <button class="ui button primary" onclick="preview()">
+        Preview
+      </button>
+    </div>
     
     {{!-- Rule container --}}
     <div id="rule"></div>
