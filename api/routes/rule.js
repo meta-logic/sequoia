@@ -11,13 +11,22 @@ var controller = require('../controllers/rule');
 router.route('/rule')
 
 	//creating a rule
-	.post(controller.createRule)
+	.post(function(req, res) {
+          console.log("***** ROUTES: post *****");
+          controller.createRule(req. res);
+        })
 
 	//update rule information
-	.put(controller.updateRule)
+	.put(function(req, res) {
+          console.log("***** ROUTES: put *****");
+          controller.updateRule(req, res);
+        })
 
 	//delete a rule
-	.delete(controller.deleteRule);
+	.delete(function(req, res) {
+          console.log("***** ROUTES: delete *****");
+          controller.deleteRule(req, res);
+        });
 
 //get rule information
 router.get('/rule/:id', controller.getRule);
