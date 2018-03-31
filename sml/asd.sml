@@ -20,5 +20,5 @@ fun seq_toString (ctx1, Con (c), ctx2) = ctx_toString(ctx1) ^ " " ^ c ^ " " ^ ct
 fun toString (s) = ctx_toString(s)
 
 
-fun and_R (Single ((Form (Form (A), Con ("\\wedge"), Form (B)))::nil)) = [Single (Form (B)::nil)]
-	| and_R _ = []
+fun asd (Single (B::nil),A) = [Single (A::nil)]
+	| asd _ = []

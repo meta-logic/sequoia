@@ -40,7 +40,7 @@ FOTOM = FORM / ATOM
 //symbols
 UCONN = conn:UConn {return 'Con ("' + conn  + '")'}
 CONN = conn:Conn {return 'Con ("' + conn  + '")'}
-FORM = form:Form {return "Form (" + form + ")"}
+FORM = form:Form {return  form }
 ATOM = atom:Atom {return "Atom (" + atom + ")"}
 
 

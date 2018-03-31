@@ -32,7 +32,6 @@ function extraArguments(conclusion_list, premises_list) {
 
 //creating a rule
 function createRule (req, res) {
-        console.log("***** CONTROLLER: create *****");
 	var rule = new Rule();
 
 	//populating the rule model with sequents and their connectives
@@ -91,7 +90,6 @@ function getRule (req, res) {
 
 //updating a rule
 function updateRule (req, res) {
-        console.log("***** CONTROLLER: update *****");
 	//looking up the rule and updating it
 	Rule.findOneAndUpdate({ _id : req.body.id}, 
 		{ rule : req.body.rule, premises : JSON.parse(req.body.premises), 
@@ -121,7 +119,6 @@ function updateRule (req, res) {
 
 //deleting a rule
 function deleteRule (req, res) {
-        console.log("***** CONTROLLER: delete *****");
 	//deleting a rule
 	Rule.remove({ _id : req.body.id}, function (err, rule) {
 		//if the rule does not exists
