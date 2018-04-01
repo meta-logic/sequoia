@@ -1,12 +1,11 @@
+<div class="ui right fixed vertical menu" id="rules" style="margin-top: 61px;overflow-y:scroll;">
+</div>
 {{!-- Grid --}}
-<div class="ui middle aligned center aligned grid" style="margin-top: 35px">
-  {{!-- Container --}}
   <div class="ui container">
-
-    
-    
+<div class="ui grid" style="margin-top: 35px">
+  {{!-- Container --}}
     {{!-- Sequent Input --}}
-    <div class="row" id="seq">
+    <div class="fourteen wide column" id="seq">
       <div class="ui input fluid">
         <input type="text" id="Sequent" placeholder="Sequent">
       </div>
@@ -15,16 +14,21 @@
     <br>
     
     {{!-- Preview Button --}}
+    <div class="ten wide column">
+      
     <div id="preview">
       <button class="ui button primary" onclick="preview()">
         Preview
       </button>
     </div>
+    </div>
     
+    <div class="fourteen wide column">
     {{!-- Rule container --}}
     <div id="rule"></div>
 
     {{!-- Table container --}}
     <div id="table"></div>
+  </div>
   </div>
 </div>

@@ -20,5 +20,5 @@ fun seq_toString (ctx1, Con (c), ctx2) = ctx_toString(ctx1) ^ " " ^ c ^ " " ^ ct
 fun toString (s) = ctx_toString(s)
 
 
-fun asd (Single (Nourhan::nil),A) = [Single (Atom (A)::nil)]
-	| asd _ = []
+fun andf (Single ((Form (B, Con ("\\wedge"), Atom (A)))::nil)) = [Single ((Form (Atom (A), Con ("\\wedge"), B))::nil)]
+	| andf _ = []
