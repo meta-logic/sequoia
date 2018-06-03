@@ -1,7 +1,9 @@
 var cmd = require('node-cmd');
 
 function applyRule (rule, input, res) {
-	console.log("I am in");
+	rule = rule.replace("\\", "");
+	rule = rule.replace(/ /g, "_");
+
 	const processRef = cmd.get('sml');
 	let data_line = '';
 	var x = '';
@@ -17,7 +19,7 @@ function applyRule (rule, input, res) {
 
 	   //  if (data_line[data_line.length-1] == '\n') {
     // }
-    if (count == 7) {
+    if (count == 8) {
     	x = data_line.split('it =');
     	try {
     		var answer = x[2].split(':')[0].replace("[", '').replace("]", '');

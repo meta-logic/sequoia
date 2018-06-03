@@ -1,3 +1,4 @@
+
 var parser_text = 
 `
 //Seq
@@ -139,12 +140,12 @@ function prem_sequent_symbols(text) {
 
 
 
-
+parser = ""
 function apply() {
 	parser_text = parser_copy;
 	addSymbols();
 	getSymbols();
-	var parser = peg.generate(parser_text);
+	parser = peg.generate(parser_text);
 	var prem = [];
 	var prem_symbols = [];
 	var sequent_symbols = [];
@@ -161,16 +162,14 @@ function apply() {
 	var sequent_final = parser.parse(sequent).replace(/\\/g, "\\\\");
 	console.log(sequent_final);
 
+
+
 	//toString check
 	var toString = 'ctx';
 	if (Object.values(symbolsTypes).includes('primary separator')) {
 		toString  = 'seq';
 	}
 
-	$.post('/apply', {rule : 'and_R', sequent : sequent_final}, function(data, status){
-		console.log("Derivation: " + data.output.replace(/ "/g, "").replace(/" /g, "").replace(/"/g, ""));
-        console.log("Data: " + data + "\nStatus: " + status);
-    });
 
 	if (DBSymbols != null) {
 		var update;
