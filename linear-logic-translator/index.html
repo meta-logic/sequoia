@@ -20,13 +20,13 @@
 			<div class="row">
 				<div class="six wide column">
 					<div class="ui input fluid">
-						<input type="text" placeholder="premise">
+						<input type="text" placeholder="premise" id="premise-1">
 					</div>
 				</div>
 
 				<div class="six wide column">
 					<div class="ui input fluid">
-						<input type="text" placeholder="premise">
+						<input type="text" placeholder="premise (optional)" id="premise-2">
 					</div>
 				</div>
 			</div>
@@ -34,7 +34,7 @@
 			<div class="row">
 				<div class="twelve wide column" style="margin-top: -15px">
 					<div class="ui input fluid">
-						<input type="text" placeholder="conclusion">
+						<input type="text" placeholder="conclusion" id="conclusion">
 					</div>
 				</div>
 			</div>
@@ -43,7 +43,7 @@
 			<div class="row">
 
 				<div class="twelve wide column">
-					<button class="ui primary button right floated">Preview</button>
+					<button class="ui primary button right floated" onclick="getValues()">Preview</button>
 				</div>
 			</div>
 			
@@ -53,5 +53,45 @@
 	<!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="../bower_components/jquery/dist/jquery.slim.min.js"></script>
     <script src="../bower_components/semantic/dist/semantic.min.js"></script>
+	
+	<script type="text/javascript">
+		
+		//getting the values from the input fields
+		function getValues () {
+
+			var premise1 = $("#premise-1").val();
+			var premise2 = $("#premise-2").val();
+			var conclusion = $("#conclusion").val();
+
+			return [premise1, premise2, conclusion];
+		}
+
+		// remove commas and extra spaces fromt a sequent and replace them with a single space
+		function removeCommaHelper(sequent) {
+			sequent = sequent.replace(/,/g, " ");
+			sequent = sequent.replace(/ +/g, " ");
+		}
+
+		// remove commas and spaces from a list of sequents and rplaces them with one single space
+		function removeCommas (seq_list) {
+			return seq_list.map(removeCommaHelper); 
+		}
+
+		// removing duplicates
+		function removeDuplicatesHelper(seq) {
+			var unique_seq = Array.from(new Set(seq))
+		    return unique_seq
+		}
+
+		// removing duplicates from a list of sequents
+		function removeDuplicates(seq_list) {
+			return seq_list.map(removeDuplicatesHelper);
+		}
+
+
+
+
+	</script>
+
 </body>
 </html>
