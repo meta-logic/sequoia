@@ -43,7 +43,7 @@
 			<div class="row">
 
 				<div class="twelve wide column">
-					<button class="ui primary button right floated" onclick="getValues()">Preview</button>
+					<button class="ui primary button right floated" onclick="getSequentSymbols()">Preview</button>
 				</div>
 			</div>
 			
@@ -70,6 +70,7 @@
 		function removeCommaHelper(sequent) {
 			sequent = sequent.replace(/,/g, " ");
 			sequent = sequent.replace(/ +/g, " ");
+			return  (sequent.length != 0) ? sequent.split(" ")  : sequent;
 		}
 
 		// remove commas and spaces from a list of sequents and rplaces them with one single space
@@ -77,15 +78,27 @@
 			return seq_list.map(removeCommaHelper); 
 		}
 
-		// removing duplicates
+		// removing duplicates and spaces
 		function removeDuplicatesHelper(seq) {
 			var unique_seq = Array.from(new Set(seq))
+			unique_seq = unique_seq.filter (function (elem) { return elem != " "; });
 		    return unique_seq
 		}
 
 		// removing duplicates from a list of sequents
 		function removeDuplicates(seq_list) {
 			return seq_list.map(removeDuplicatesHelper);
+		}
+
+		// get the uniques symbols used in all the sequents
+		function getSequentSymbols () {
+			var sequents = getValues();
+			sequents = removeCommas(sequents);
+			sequents = removeDuplicates(sequents);
+			var symbols = [].concat.apply([], sequents);
+			symbols = removeDuplicatesHelper(symbols);
+			console.log(sequents);
+			return [sequents, symbols];
 		}
 
 
