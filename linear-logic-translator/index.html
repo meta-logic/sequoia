@@ -20,7 +20,7 @@
 			<div class="row">
 				<div class="six wide column">
 					<div class="ui input fluid">
-						<input type="text" placeholder="premise" id="premise-1">
+						<input type="text" placeholder="premise (optional)" id="premise-1">
 					</div>
 				</div>
 
@@ -70,7 +70,8 @@
 		function removeCommaHelper(sequent) {
 			sequent = sequent.replace(/,/g, " ");
 			sequent = sequent.replace(/ +/g, " ");
-			return  (sequent.length != 0) ? sequent.split(" ")  : sequent;
+			sequent = (sequent.length != 0) ? sequent.split(" ")  : [];
+			return sequent.filter(function (elem) { return elem != ""; });
 		}
 
 		// remove commas and spaces from a list of sequents and rplaces them with one single space
@@ -94,8 +95,8 @@
 		function getSequentSymbols () {
 			var sequents = getValues();
 			sequents = removeCommas(sequents);
-			sequents = removeDuplicates(sequents);
-			var symbols = [].concat.apply([], sequents);
+			var symbols = removeDuplicates(sequents);
+			symbols = [].concat.apply([], sequents);
 			symbols = removeDuplicatesHelper(symbols);
 			console.log(sequents);
 			return [sequents, symbols];
