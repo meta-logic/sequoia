@@ -1,12 +1,36 @@
-// check if there are any premises
-function existPremises (seq_list) {
-	if (seq_list[0].length == 0 && seq_list[0].length == 0) {
-		return false;
+// helper functions
+function equalArr (arr1, arr2) {
+	if(arr1.sort().join(',') === arra.sort().join(',')){
+		return true;
 	}
-	return true;
+	return false;
 }
 
-// check which side the formula is on
+function elemExist (arr1, arr2) {
+	var length = arr1.length;
+
+	if (arr1.length > arr2.length) {
+		length = arr2.length;
+	}
+
+	for (var i = 0; i < length; i++) {
+		if (arr1[i] == arr2[2]) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+// check if there are any premises
+function existPremises (seq_list) {
+	if (seq_list.length == 1) {
+		return true;
+	}
+	return false;
+}
+
+// check which side the formula is on =================================
 function checkSide (sequent, formulaIndex, arrow) {
 	var arrowIndex = sequent.indexOf(arrow);
 	if (formulaIndex < arrowIndex) {
@@ -15,6 +39,7 @@ function checkSide (sequent, formulaIndex, arrow) {
 	return "right";
 }
 
+// checking types
 function isFormula (formula, types) {
 	return types[formula] == "formula";
 }
@@ -25,6 +50,16 @@ function isContext (context, types) {
 
 function isSeparator (separator, types) {
 	return types[separator] == "separator";
+}
+
+
+// getting symbols depending on the type and side into a list =================================
+function getArrow (sequent, types) {
+	for (var i = 0; i < sequent.length; i++) {
+		if (types[sequent[i]] == "arrow") {
+			return sequent[i];
+		}
+	}
 }
 
 function getLeftSeparators (sequent, arrow, types) {
@@ -105,8 +140,68 @@ function getRightContext (sequent, arrow, types) {
 	return rightContext;
 }
 
+// checking for connectives =================================
+
 // check which connective to use between premise formulas
-function chekConnective () {
+function chekConnective (seq_list, types) {
+	var arrow = getArrow(seq_list[0], types);
+
+	if (!existPremises(seq_list)) {
+		return "";
+	} 
+
+	// ⅋ (!&) and (+) cases
+	if (seq_list.lenght ==  2) {
+		// getting the left and right context of the premise
+		leftContextPremise1 = getLeftContext(seq_list[0], arrow, types);
+		rightContextPremise1 = getRightContext(seq_list[0], arrow, types);
+
+		// getting the left and right context of the conclusion
+		leftContextConclusion = getLeftContext(seq_list[1], arrow, types);
+		rightContextConclusion = getRightContext(seq_list[1], arrow, types);
+
+		// ⅋ (!&) CASE:
+		if (equalArr(leftContextPremise1, leftContextConclusion) && 
+			equalArr(rightContextPremise1, rightContextConclusion)) {
+			return "!&";
+		}
+
+		// (+) CASE:
+		leftContextPremise1 = leftContextPremise1.map(function (elem) {return elem.split("_")[0]});
+		leftContextConclusion = leftContextConclusion.map(function (elem) {return elem.split("_")[0]});
+
+		rightContextPremise1 = rightContextPremise1.map(function (elem) {return elem.split("_")[0]});
+		rightContextConclusion = rightContextConclusion.map(function (elem) {return elem.split("_")[0]});
+
+		if (elemExist(leftContextPremise1, leftContextConclusion) && 
+			elemExist(rightContextPremise1, rightContextConclusion)) {
+			return "(+)";
+		}
+
+
+	}
+
+	// & and (x) cases
+
+	// getting the left and right context of the premise
+	leftContextPremise1 = getLeftContext(seq_list[0], arrow, types);
+	rightContextPremise1 = getRightContext(seq_list[0], arrow, types);
+
+	// getting the left and right context of the premise
+	leftContextPremise2 = getLeftContext(seq_list[1], arrow, types);
+	rightContextPremise2 = getRightContext(seq_list[1], arrow, types);
+
+	// getting the left and right context of the conclusion
+	leftContextConclusion = getLeftContext(seq_list[2], arrow, types);
+	rightContextConclusion = getRightContext(seq_list[2], arrow, types);
+
+	// & CASE:
+	if (equalArr(leftContextPremise1, leftContextConclusion) && 
+		equalArr(rightContextPremise1, rightContextConclusion) &&
+		equalArr(leftContextPremise2, leftContextConclusion) && 
+		equalArr(rightContextPremise3, rightContextConclusion)) {
+		return "&";
+	}
 
 }
 

@@ -95,6 +95,7 @@
 		function getSequentSymbols () {
 			var sequents = getValues();
 			sequents = removeCommas(sequents);
+			sequents = sequents.filter(function (elem) { return elem.length != 0; });
 			var symbols = removeDuplicates(sequents);
 			symbols = [].concat.apply([], sequents);
 			symbols = removeDuplicatesHelper(symbols);
