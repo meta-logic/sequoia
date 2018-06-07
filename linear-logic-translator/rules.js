@@ -1,4 +1,4 @@
-// helper functions
+// helper functions =================================
 function equalArr (arr1, arr2) {
 	if(arr1.sort().join(',') === arra.sort().join(',')){
 		return true;
@@ -29,6 +29,10 @@ function existPremises (seq_list) {
 	}
 	return false;
 }
+
+Array.prototype.diff = function(a) {
+    return this.filter(function(i) {return a.indexOf(i) < 0;});
+};
 
 // check which side the formula is on =================================
 function checkSide (sequent, formulaIndex, arrow) {
@@ -209,6 +213,32 @@ function chekConnective (seq_list, types) {
 		return "(x)";
 	}
 
+}
+
+
+// getting subexponentials from the sequents by deciding the number of zones
+function getSubexponentials (seq_list, types) {
+	var leftSeperators = [];
+	var rightSeperators = [];
+
+	// getting the left and right subexponentials of the sequets
+	for (var i = 0; i < seq_list.length; i++) {
+		leftSeperators.push(getLeftSeparators(seq_list[i]));
+		rightSeperators.push(getRightSeparators(seq_list[i]));
+	}
+
+	// removing the duplicates
+	leftSeperators = Array.from(new Set(leftSeperators.flat()));
+	rightSeperators = Array.from(new Set(rightSeperators.flat()));
+
+	var subexponentials = []
+
+	// giving a number to each zone
+	for (var i = 0; i < leftSeparators.length + rightSeperators.length + 2; i++) {
+		subexponentials.push(i);	
+	}
+
+	return subexponentials;
 }
 
 
