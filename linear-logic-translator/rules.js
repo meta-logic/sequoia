@@ -199,8 +199,14 @@ function chekConnective (seq_list, types) {
 	if (equalArr(leftContextPremise1, leftContextConclusion) && 
 		equalArr(rightContextPremise1, rightContextConclusion) &&
 		equalArr(leftContextPremise2, leftContextConclusion) && 
-		equalArr(rightContextPremise3, rightContextConclusion)) {
+		equalArr(rightContextPremise2, rightContextConclusion)) {
 		return "&";
+	}
+
+	// (x) CASE:
+	if (equalArr(leftContextPremise1.concat(leftContextPremise2), leftContextConclusion) && 
+		equalArr(rightContextPremise1.concat(rightContextPremise2), rightContextConclusion)) {
+		return "(x)";
 	}
 
 }
