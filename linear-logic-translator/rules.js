@@ -234,9 +234,17 @@ function getSubexponentials (seq_list, types) {
 	var subexponentials = []
 
 	// giving a number to each zone
-	for (var i = 0; i < leftSeparators.length + rightSeperators.length + 2; i++) {
-		subexponentials.push(i);	
+	var i = 0;
+	for (; i < leftSeparators.length; i++) {
+		subexponentials.push([i + 1, leftSeparators[i], i + 2]);	
 	}
+
+	subexponentials.push([i + 2, "arrow", i + 3]);
+
+	for (; i < rightSeparators.length; i++) {
+		subexponentials.push([i + 1, rightSeparators[i], i + 2);	
+	}
+
 
 	return subexponentials;
 }
