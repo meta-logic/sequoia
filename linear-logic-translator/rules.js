@@ -242,7 +242,7 @@ function getSubexponentials (seq_list, types) {
 	subexponentials.push([i + 2, "arrow", i + 3]);
 
 	for (; i < rightSeparators.length; i++) {
-		subexponentials.push([i + 1, rightSeparators[i], i + 2);	
+		subexponentials.push([i + 1, rightSeparators[i], i + 2]);	
 	}
 
 
