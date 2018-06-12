@@ -253,6 +253,7 @@ function getSubexponentials (seq_list, types) {
 function check_LR_Context (sequent, separatorSub) {
 	var separatorIndex = sequent.indexOf(separatorSub[1]);
 	var emptyContext = [];
+	var nonEmptyContext = [];
 
 	// check if both are empty
 	if (separatorIndex == -1) {
@@ -263,6 +264,8 @@ function check_LR_Context (sequent, separatorSub) {
 	if (separatorIndex > 0) {
 		if (sequent[separatorIndex - 1] == ".") {
 			emptyContext.push(separatorSub[0]);
+		} else {
+			nonEmptyContext.push(separatorSub[0]);
 		}
 	}
 
@@ -270,10 +273,12 @@ function check_LR_Context (sequent, separatorSub) {
 	if (separatorIndex < sequent.length - 1) {
 		if (sequent[separatorIndex + 1] == ".") {
 			emptyContext.push(separatorSub[2]);
+		} else {
+			nonEmptyContext.push(separatorSub[2]);
 		}
 	}
 
-	return emptyContext;
+	return [emptyContext, nonEmptyContext];
 }
 
 // Check empty context
@@ -281,10 +286,19 @@ function checkEmptyContext (sequent, subexponentials) {
 	var emptyContext = [];
 
 	for (var i = 0; i < subexponentials.lenght; i++) {
-		emptyContext.push(check_LR_Context(getSubexponentials[i]));
+		emptyContext.push(check_LR_Context(getSubexponentials[i])[0]);
 	}
 
 	return Array.from(new Set(emptyContext.flat()));
 }
 
+// Check non empty context
+function checkNonEmptyContext (sequent, subexponentials) {
+	var nonEmptyContext = [];
 
+	for (var i = 0; i < subexponentials.lenght; i++) {
+		nonEmptyContext.push(check_LR_Context(getSubexponentials[i])[1]);
+	}
+
+	return Array.from(new Set(nonEmptyContext.flat()));
+}
