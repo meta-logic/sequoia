@@ -249,4 +249,42 @@ function getSubexponentials (seq_list, types) {
 	return subexponentials;
 }
 
+// check if the left and/or right context of the separator is empty
+function check_LR_Context (sequent, separatorSub) {
+	var separatorIndex = sequent.indexOf(separatorSub[1]);
+	var emptyContext = [];
+
+	// check if both are empty
+	if (separatorIndex == -1) {
+		return emptyContext;
+	}
+
+	// check if the left is empty
+	if (separatorIndex > 0) {
+		if (sequent[separatorIndex - 1] == ".") {
+			emptyContext.push(separatorSub[0]);
+		}
+	}
+
+	// check if the right is empty
+	if (separatorIndex < sequent.length - 1) {
+		if (sequent[separatorIndex + 1] == ".") {
+			emptyContext.push(separatorSub[2]);
+		}
+	}
+
+	return emptyContext;
+}
+
+// Check empty context
+function checkEmptyContext (sequent, subexponentials) {
+	var emptyContext = [];
+
+	for (var i = 0; i < subexponentials.lenght; i++) {
+		emptyContext.push(check_LR_Context(getSubexponentials[i]));
+	}
+
+	return Array.from(new Set(emptyContext.flat()));
+}
+
 
