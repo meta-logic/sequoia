@@ -1,3 +1,13 @@
+/*
+Algorithm:
+1- check if there are any premises
+2- Get the connective between the premises
+3- Get the subexponentials
+4- Check the empty context, to know what ! to use
+5- Check the non empty context, to know what ? to use
+*/
+
+
 // helper functions =================================
 function equalArr (arr1, arr2) {
 	if(arr1.sort().join(',') === arra.sort().join(',')){
@@ -147,7 +157,7 @@ function getRightContext (sequent, arrow, types) {
 // checking for connectives =================================
 
 // check which connective to use between premise formulas
-function chekConnective (seq_list, types) {
+function checkConnective (seq_list, types) {
 	var arrow = getArrow(seq_list[0], types);
 
 	if (!existPremises(seq_list)) {
@@ -155,7 +165,7 @@ function chekConnective (seq_list, types) {
 	} 
 
 	// ⅋ (!&) and (+) cases
-	if (seq_list.lenght ==  2) {
+	if (seq_list.length ==  2) {
 		// getting the left and right context of the premise
 		leftContextPremise1 = getLeftContext(seq_list[0], arrow, types);
 		rightContextPremise1 = getRightContext(seq_list[0], arrow, types);
@@ -285,7 +295,7 @@ function check_LR_Context (sequent, separatorSub) {
 function checkEmptyContext (sequent, subexponentials) {
 	var emptyContext = [];
 
-	for (var i = 0; i < subexponentials.lenght; i++) {
+	for (var i = 0; i < subexponentials.length; i++) {
 		emptyContext.push(check_LR_Context(getSubexponentials[i])[0]);
 	}
 
@@ -296,9 +306,47 @@ function checkEmptyContext (sequent, subexponentials) {
 function checkNonEmptyContext (sequent, subexponentials) {
 	var nonEmptyContext = [];
 
-	for (var i = 0; i < subexponentials.lenght; i++) {
+	for (var i = 0; i < subexponentials.length; i++) {
 		nonEmptyContext.push(check_LR_Context(getSubexponentials[i])[1]);
 	}
 
 	return Array.from(new Set(nonEmptyContext.flat()));
 }
+
+function applyContextCheck (sequent, subexponentials) {
+	var emptyContext = checkEmptyContext(sequent, subexponentials);
+	var nonEmptyContext = checkNonEmptyContext(sequent, subexponentials);
+	return [emptyContext, nonEmptyContext];
+}
+
+// Translate to linear logic =================================
+
+// getting the needed information to translate: connective, subexponentials, what ! and ? to use
+function getTranslateData (seq_list, types) {
+	var connective  = chekConnective(seq_list, types);
+	var subexponentials = getSubexponentials(seq_list, types);
+	var contexts = seq_list.map(function (elem) { applyContextCheck(elem, subexponentials); });
+	return contexts;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
