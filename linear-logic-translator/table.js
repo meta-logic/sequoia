@@ -1,4 +1,4 @@
-function table(symbols)
+function table(symbols) {
 
 	var table = document.getElementById('table');
 
@@ -9,10 +9,10 @@ function table(symbols)
 
 	// filling the table with symbols
 	for (var i = 0; i < symbols.length; i++) {
-		table_body.innerHTML += '<tr><td id="t' + i.toString() + '" >$$'+  symbols[i] + '$$</td><td style="overflow: visible;"><select class="ui search dropdown" style="z-index: 1; position: fixed" id="select-' + i +'" ><option value="">Type</option><option value="0">atom</option><option value="1">formula</option><option value="2">connective</option><option value="3">set</option><option value="4">unary</option><option value="5">primary separator</option><option value="6">separator</option></select></td></tr>';
+		table_body.innerHTML += '<tr><td id="t' + i.toString() + '" >$$'+  symbols[i] + '$$</td><td style="overflow: visible;"><select class="ui search fluid dropdown" style="z-index: 1; position: fixed" id="select-' + i +'" ><option value="">Type</option><option value="0">atom</option><option value="1">formula</option><option value="2">connective</option><option value="3">set</option><option value="4">unary</option><option value="5">primary separator</option><option value="6">separator</option></select></td></tr>';
 	}
 
-	table.innerHTML += '<a onClick="addRule()" class="ui teal button" href="/">Add Rule</a>';
+	table.innerHTML += '<a onClick="addRule()" class="ui teal button right floated" href="/">Translate</a>';
 
 	// rendering the symbols in mathjax
 	for (var i = 0; i < symbols.length; i++) {

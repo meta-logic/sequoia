@@ -16,8 +16,17 @@
 	
 	<div class="ui container">
 		<div class="ui center aligned grid">
-			
+
 			<div class="row">
+				<div class="two wide column">
+					<div class="ui input fluid">
+						<input type="text" placeholder="rule" id="rule_connective">
+					</div>
+				</div>
+				<div class="ten wide column"></div>
+			</div>
+			
+			<div class="row" style="margin-top: -15px">
 				<div class="six wide column">
 					<div class="ui input fluid">
 						<input type="text" placeholder="premise (optional)" id="premise-1">
@@ -43,16 +52,28 @@
 			<div class="row">
 
 				<div class="twelve wide column">
-					<button class="ui primary button right floated" onclick="getSequentSymbols()">Preview</button>
+					<button class="ui primary button right floated" onclick="preview()">Preview</button>
 				</div>
+			</div>
+			
+			<!-- Symbol Table -->
+			<div class="row">
+				
+			<div class="twelve wide column">
+				<div id="rule"></div>
+				<div id="table"></div>
+			</div>
 			</div>
 			
 		</div>
 	</div>
 
 	<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="../bower_components/MathJax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script src="../bower_components/jquery/dist/jquery.slim.min.js"></script>
     <script src="../bower_components/semantic/dist/semantic.min.js"></script>
+    <script src="rule_preview.js"></script>
+    <script src="table.js"></script>
 	
 	<script type="text/javascript">
 		
@@ -103,6 +124,12 @@
 			return [sequents, symbols];
 		}
 
+		// generating the symbol table
+		function preview() {
+			var symbols = getSequentSymbols()[1];
+			rule_preview();
+			table(symbols);
+		}
 
 
 
