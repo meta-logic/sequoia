@@ -10,10 +10,10 @@ Algorithm:
 
 // helper functions =================================
 function equalArr (arr1, arr2) {
-	if(arr1.sort().join(',') === arra.sort().join(',')){
-		return true;
-	}
-	return false;
+        if(arr1.sort().join(',') === arr2.sort().join(',')){
+                return true;
+        }
+        return false;
 }
 
 function elemExist (arr1, arr2) {
