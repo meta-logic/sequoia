@@ -17,17 +17,13 @@ function equalArr (arr1, arr2) {
 }
 
 function elemExist (arr1, arr2) {
-	var length = arr1.length;
+        var length = Math.min(arr1.length, arr2.length)
 
-	if (arr1.length > arr2.length) {
-		length = arr2.length;
-	}
-
-	for (var i = 0; i < length; i++) {
-		if (arr1[i] == arr2[2]) {
-			return true;
-		}
-	}
+        for (var i = 0; i < length; i++) {
+                if (arr1[i] == arr2[2]) {
+                        return true;
+                }
+        }
 
 	return false;
 }
