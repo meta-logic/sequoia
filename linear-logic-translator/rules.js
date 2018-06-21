@@ -89,7 +89,7 @@ function getLeftSeparators (sequent, arrow, types) {
 	return leftSeparators;
 }
 
-function rightSeparators (sequent, arrow, types) {
+function getRightSeparators (sequent, arrow, types) {
 	var arrowIndex = sequent.indexOf(arrow);
 	var rightSeparators = [];
 
@@ -228,18 +228,20 @@ function checkConnective (seq_list, types) {
 
 // getting subexponentials from the sequents by deciding the number of zones
 function getSubexponentials (seq_list, types) {
-	var leftSeperators = [];
-	var rightSeperators = [];
+	var leftSeparators = [];
+	var rightSeparators = [];
 
 	// getting the left and right subexponentials of the sequets
 	for (var i = 0; i < seq_list.length; i++) {
-		leftSeperators.push(getLeftSeparators(seq_list[i]));
-		rightSeperators.push(getRightSeparators(seq_list[i]));
+		leftSeparators.push(getLeftSeparators(seq_list[i]));
+		rightSeparators.push(getRightSeparators(seq_list[i]));
 	}
 
 	// removing the duplicates
-	leftSeperators = Array.from(new Set(leftSeperators.flat()));
-	rightSeperators = Array.from(new Set(rightSeperators.flat()));
+	leftSeparators = [].concat.apply([], leftSeparators);
+	rightSeparators = [].concat.apply([], rightSeparators);
+	leftSeparators = Array.from(new Set(leftSeparators));
+	rightSeparators = Array.from(new Set(rightSeparators));
 
 	var subexponentials = []
 
@@ -249,18 +251,19 @@ function getSubexponentials (seq_list, types) {
 		subexponentials.push([i + 1, leftSeparators[i], i + 2]);	
 	}
 
-	subexponentials.push([i + 2, "arrow", i + 3]);
+	subexponentials.push([i + 1, "arrow", i + 2]);
 
 	for (; i < rightSeparators.length; i++) {
 		subexponentials.push([i + 1, rightSeparators[i], i + 2]);	
 	}
 
-
+	console.log(subexponentials);
 	return subexponentials;
 }
 
 // check if the left and/or right context of the separator is empty
 function check_LR_Context (sequent, separatorSub) {
+	console.log(separatorSub);
 	var separatorIndex = sequent.indexOf(separatorSub[1]);
 	var emptyContext = [];
 	var nonEmptyContext = [];
@@ -296,10 +299,12 @@ function checkEmptyContext (sequent, subexponentials) {
 	var emptyContext = [];
 
 	for (var i = 0; i < subexponentials.length; i++) {
-		emptyContext.push(check_LR_Context(getSubexponentials[i])[0]);
+		console.log(subexponentials[i]);
+		emptyContext.push(check_LR_Context(sequent, subexponentials[i])[0]);
 	}
 
-	return Array.from(new Set(emptyContext.flat()));
+	emptyContext = [].concat.apply([], emptyContext);
+	return Array.from(new Set(emptyContext));
 }
 
 // Check non empty context
@@ -307,15 +312,17 @@ function checkNonEmptyContext (sequent, subexponentials) {
 	var nonEmptyContext = [];
 
 	for (var i = 0; i < subexponentials.length; i++) {
-		nonEmptyContext.push(check_LR_Context(getSubexponentials[i])[1]);
+		nonEmptyContext.push(check_LR_Context(sequent ,subexponentials[i])[1]);
 	}
 
-	return Array.from(new Set(nonEmptyContext.flat()));
+	nonEmptyContext = [].concat.apply([], nonEmptyContext);
+	return Array.from(new Set(nonEmptyContext));
 }
 
 function applyContextCheck (sequent, subexponentials) {
 	var emptyContext = checkEmptyContext(sequent, subexponentials);
 	var nonEmptyContext = checkNonEmptyContext(sequent, subexponentials);
+	console.log(emptyContext);
 	return [emptyContext, nonEmptyContext];
 }
 
@@ -323,9 +330,11 @@ function applyContextCheck (sequent, subexponentials) {
 
 // getting the needed information to translate: connective, subexponentials, what ! and ? to use
 function getTranslateData (seq_list, types) {
-	var connective  = chekConnective(seq_list, types);
+	var connective  = checkConnective (seq_list, types);
 	var subexponentials = getSubexponentials(seq_list, types);
 	var contexts = seq_list.map(function (elem) { applyContextCheck(elem, subexponentials); });
+	console.log("done");
+	console.log(contexts);
 	return contexts;
 }
 
