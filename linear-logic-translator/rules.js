@@ -10,24 +10,20 @@ Algorithm:
 
 // helper functions =================================
 function equalArr (arr1, arr2) {
-	if(arr1.sort().join(',') === arra.sort().join(',')){
-		return true;
-	}
-	return false;
+        if(arr1.sort().join(',') === arr2.sort().join(',')){
+                return true;
+        }
+        return false;
 }
 
 function elemExist (arr1, arr2) {
-	var length = arr1.length;
+        var length = Math.min(arr1.length, arr2.length)
 
-	if (arr1.length > arr2.length) {
-		length = arr2.length;
-	}
-
-	for (var i = 0; i < length; i++) {
-		if (arr1[i] == arr2[2]) {
-			return true;
-		}
-	}
+        for (var i = 0; i < length; i++) {
+                if (arr1[i] == arr2[2]) {
+                        return true;
+                }
+        }
 
 	return false;
 }
