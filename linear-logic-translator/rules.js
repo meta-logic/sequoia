@@ -226,6 +226,7 @@ function checkConnective (seq_list, types) {
 function getSubexponentials (seq_list, types) {
 	var leftSeparators = [];
 	var rightSeparators = [];
+	var arrow = getArrow(seq_list[0], types);
 
 	// getting the left and right subexponentials of the sequets
 	for (var i = 0; i < seq_list.length; i++) {
@@ -247,7 +248,7 @@ function getSubexponentials (seq_list, types) {
 		subexponentials.push([i + 1, leftSeparators[i], i + 2]);	
 	}
 
-	subexponentials.push([i + 1, "arrow", i + 2]);
+	subexponentials.push([i + 1, arrow, i + 2]);
 
 	for (; i < rightSeparators.length; i++) {
 		subexponentials.push([i + 1, rightSeparators[i], i + 2]);	
@@ -259,8 +260,11 @@ function getSubexponentials (seq_list, types) {
 
 // check if the left and/or right context of the separator is empty
 function check_LR_Context (sequent, separatorSub) {
+	console.log("check");
 	console.log(separatorSub);
+	console.log(sequent);
 	var separatorIndex = sequent.indexOf(separatorSub[1]);
+	console.log("sep", separatorIndex);
 	var emptyContext = [];
 	var nonEmptyContext = [];
 
@@ -273,8 +277,10 @@ function check_LR_Context (sequent, separatorSub) {
 	if (separatorIndex > 0) {
 		if (sequent[separatorIndex - 1] == ".") {
 			emptyContext.push(separatorSub[0]);
+			console.log("e", emptyContext);
 		} else {
 			nonEmptyContext.push(separatorSub[0]);
+			console.log("n", nonEmptyContext);
 		}
 	}
 
@@ -282,8 +288,10 @@ function check_LR_Context (sequent, separatorSub) {
 	if (separatorIndex < sequent.length - 1) {
 		if (sequent[separatorIndex + 1] == ".") {
 			emptyContext.push(separatorSub[2]);
+			console.log("e", emptyContext);
 		} else {
 			nonEmptyContext.push(separatorSub[2]);
+			console.log("n", nonEmptyContext);
 		}
 	}
 
@@ -297,6 +305,7 @@ function checkEmptyContext (sequent, subexponentials) {
 	for (var i = 0; i < subexponentials.length; i++) {
 		console.log(subexponentials[i]);
 		emptyContext.push(check_LR_Context(sequent, subexponentials[i])[0]);
+		console.log("empty", emptyContext);
 	}
 
 	emptyContext = [].concat.apply([], emptyContext);
@@ -318,6 +327,7 @@ function checkNonEmptyContext (sequent, subexponentials) {
 function applyContextCheck (sequent, subexponentials) {
 	var emptyContext = checkEmptyContext(sequent, subexponentials);
 	var nonEmptyContext = checkNonEmptyContext(sequent, subexponentials);
+	console.log("helo");
 	console.log(emptyContext);
 	return [emptyContext, nonEmptyContext];
 }
@@ -330,6 +340,7 @@ function getTranslateData (seq_list, types) {
 	var subexponentials = getSubexponentials(seq_list, types);
 	var contexts = seq_list.map(function (elem) { applyContextCheck(elem, subexponentials); });
 	console.log("done");
+	console.log(subexponentials);
 	console.log(contexts);
 	return contexts;
 }
