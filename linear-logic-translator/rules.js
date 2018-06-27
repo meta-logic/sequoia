@@ -335,7 +335,7 @@ function applyContextCheck (sequent, subexponentials) {
 // Translate to linear logic =================================
 
 // getting the needed information to translate: connective, subexponentials, what ! and ? to use
-function getTranslateData (seq_list, types) {
+/* function getTranslateData (seq_list, types) {
 	var connective  = checkConnective (seq_list, types);
 	var subexponentials = getSubexponentials(seq_list, types);
 	var contexts = seq_list.map(function (elem) { applyContextCheck(elem, subexponentials); });
@@ -343,7 +343,7 @@ function getTranslateData (seq_list, types) {
 	console.log(subexponentials);
 	console.log(contexts);
 	return contexts;
-}
+} */
 
 
 
