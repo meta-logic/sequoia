@@ -4,6 +4,12 @@ function equalArr (arr1, arr2) {
         return false;
 }
 
+// helper function - gets the difference between two arrays
+Array.prototype.diff = function(a) {
+    return this.filter(function(i) {return a.indexOf(i) < 0;});
+};
+
+
 // get the left side of the arrow - Tested
 function getLeftSide (sequent, arrow) {
 	var copy = sequent.slice();
@@ -97,4 +103,19 @@ function getConnective (sequent_list, types) {
 	}
 
 	return "(x)";
+}
+
+// get the the updated formulas - Tested
+function getUpdatedFormulas (premise, conclusion, types, arrow) {
+	var left_formulas = getLeftSide(premise, arrow);
+	var right_formulas = getRightSide(premise, arrow);
+
+	var conclusion_formulas = getSymbols(conclusion, types, "formula");
+	left_formulas = getSymbols(left_formulas, types, "formula");
+	right_formulas = getSymbols(right_formulas, types, "formula");
+
+	left_formulas = left_formulas.diff(conclusion_formulas);
+	right_formulas = right_formulas.diff(conclusion_formulas);
+
+	return [left_formulas, right_formulas];
 }
