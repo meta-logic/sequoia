@@ -45,13 +45,13 @@ function getSymbols (sequent, types, type) {
 }
 
 // generating subexponentials for a sequent - Tested
-function generateSub (sequent, types) {
+function generateSubs (sequent, types) {
 	var zone = 1;
 	var zones = [];
 	var separators = getSymbols(sequent, types, "separator");
 
 	for (var i = 0; i < separators.length; i++) {
-		zones.push([zone, zone + 1]);
+		zones.push([zone, separators[i], zone + 1]);
 		zone++;
 	}
 
@@ -64,20 +64,63 @@ function getEmptySubs (sequent, types, subs, arrow) {
 	var separators = getSymbols(sequent, types, "separator");
 	var left_separators = getLeftSide(subs.map(function (x) { return x[1]; }), arrow);
 	var right_separators = getRightSide(subs.map(function (x) { return x[1]; }), arrow);
-	var empty = [];
+	var emptyLeft = []; 
+	var emptyRight = [];
 
 	for (var i = 0; i < subs.length; i++) {
 		if (!separators.includes(subs[i][1])) {
 			// left side (checking the side of the separator to decide which zone to remove) 
-			if (left_separators.includes(subs[i][1])) empty.push(subs[i][0]);
+			if (left_separators.includes(subs[i][1])) emptyLeft.push(subs[i][0]);
 
 			// right side (checking the side of the separator to decide which zone to remove)
-			if (right_separators.includes(subs[i][1])) empty.push(subs[i][2]);
+			if (right_separators.includes(subs[i][1])) emptyRight.push(subs[i][2]);
 		}
 	}
 
-	return empty;
-} 
+	emptyLeft = emptyLeft.filter(function (elem) {return elem});
+	emptyRight = emptyRight.filter(function (elem) {return elem});
+
+	return [emptyLeft, emptyRight];
+}
+
+// getting the zone of the formula - Tested
+function getSub (formula, sequent, types, subs) {
+	var form_index = sequent.indexOf(formula);
+	var left_sep = "";
+	var right_sep = "";
+	var sub = "";
+	var i = form_index;
+
+	while (i < sequent.length && isType(sequent[i], types, "separator") != true) {
+		i++;
+	}
+
+	if (isType(sequent[i], types, "separator")) right_sep = sequent[i];
+
+	i = form_index;
+
+	while (i >= 0 && isType(sequent[i], types, "separator") != true) {
+		i--;
+	}
+
+	if (isType(sequent[i], types, "separator")) left_sep = sequent[i];
+
+	for (var i = 0; i < subs.length; i++) {
+		if (subs[i][1] == left_sep && right_sep == "") {
+			sub = subs[i][2];
+		}
+
+		if (subs[i][1] == right_sep && left_sep == "") {
+			sub = subs[i][0];
+		}
+
+		if (subs[i][1] == left_sep && right_sep != "") {
+			sub = subs[i][2];
+		}
+	}
+
+	return sub;
+}
 
 // getting the type of connective to put in between premises if any - Tested
 function getConnective (sequent_list, types) {
@@ -88,21 +131,21 @@ function getConnective (sequent_list, types) {
 		var conContext = getSymbols(sequent_list[2], types, "context");
 
 		if (equalArr(leftContext,conContext) && equalArr(rightContext, conContext)) {
-			return "&";
+			return "\\with";
 		} else {
-			return "(x)";
+			return "\\otimes";
 		}
 	}
 
 	if (sequent_list.length == 2) {
 		if (sequent_list[0].length > sequent_list[1].length) {
-			return "!&";
+			return "\\parr";
 		} else {
-			return "(+)";
+			return "\\oplus";
 		}
 	}
 
-	return "(x)";
+	return "\\otimes";
 }
 
 // get the the updated formulas - Tested
