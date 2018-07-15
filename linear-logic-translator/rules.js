@@ -58,6 +58,33 @@ function generateSubs (sequent, types) {
 	return zones;
 }
 
+// check if the zone is empty
+function checkZone (sequent, types, separator) {
+	var sep_index = sequent.indexOf(separator[1]);
+	var left = [];
+	var right = [];
+	var result = [[], []];
+	var i = sep_index + 1;
+
+	while (i < sequent.length && isType(sequent[i], types, "separator") != true) {
+		if (isType(sequent[i], types, "formula")) right.push(sequent[i]);
+		i++;
+	}
+
+	i = sep_index - 1;
+
+	while (i >= 0 && isType(sequent[i], types, "separator") != true) {
+		if (isType(sequent[i], types, "formula")) left.push(sequent[i]);
+		i--;
+	}
+
+
+	if (left.length == 0) result[0].push(separator[0]);
+	if (right.length == 0) result[1].push(separator[2]);
+
+	return result;
+}
+
 // getting the empty subs based on the zones - Tested 
 // (doesn't work if there are duplicate separators which are part of the rule)
 function getEmptySubs (sequent, types, subs, arrow) {
@@ -66,6 +93,7 @@ function getEmptySubs (sequent, types, subs, arrow) {
 	var right_separators = getRightSide(subs.map(function (x) { return x[1]; }), arrow);
 	var emptyLeft = []; 
 	var emptyRight = [];
+	var emptyZone = [];
 
 	for (var i = 0; i < subs.length; i++) {
 		if (!separators.includes(subs[i][1])) {
@@ -74,6 +102,16 @@ function getEmptySubs (sequent, types, subs, arrow) {
 
 			// right side (checking the side of the separator to decide which zone to remove)
 			if (right_separators.includes(subs[i][1])) emptyRight.push(subs[i][2]);
+		} else {
+			emptyZone = checkZone(sequent, types, subs[i]);
+
+			if (subs[i][1] == arrow) {
+				if (emptyZone[0].length != 0) emptyLeft.push(subs[i][0]);
+				if (emptyZone[1].length != 0) emptyLeft.push(subs[i][2]);
+			} else {
+				if (emptyZone[0].length != 0 && left_separators.includes(subs[i][1])) emptyLeft.push(subs[i][0]);
+				if (emptyZone[1].length != 0 && right_separators.includes(subs[i][1])) emptyLeft.push(subs[i][2]);
+			}
 		}
 	}
 
@@ -125,13 +163,16 @@ function getSub (formula, sequent, types, subs) {
 // getting the type of connective to put in between premises if any - Tested
 function getConnective (sequent_list, types) {
 
+	sequent_list = sequent_list.filter(function (seq) {return seq[0] != "";});
+	console.log("here", sequent_list);
+
 	if (sequent_list.length ==  3) {
 		var leftContext = getSymbols(sequent_list[0], types, "context");
 		var rightContext = getSymbols(sequent_list[1], types, "context");
 		var conContext = getSymbols(sequent_list[2], types, "context");
 
 		if (equalArr(leftContext,conContext) && equalArr(rightContext, conContext)) {
-			return "\\with";
+			return "\\&";
 		} else {
 			return "\\otimes";
 		}
@@ -139,7 +180,7 @@ function getConnective (sequent_list, types) {
 
 	if (sequent_list.length == 2) {
 		if (sequent_list[0].length > sequent_list[1].length) {
-			return "\\parr";
+			return "\\clubsuit";
 		} else {
 			return "\\oplus";
 		}

@@ -62,6 +62,7 @@
 			<div class="twelve wide column">
 				<div id="rule"></div>
 				<div id="table"></div>
+				<div id="tran" style="margin-top: 80px;"></div>
 			</div>
 			</div>
 			
@@ -74,6 +75,7 @@
     <script src="../bower_components/semantic/dist/semantic.min.js"></script>
     <script src="rule_preview.js"></script>
     <script src="rules.js"></script>
+    <script src="translate.js"></script>
     <script src="table.js"></script>
 	
 	<script type="text/javascript">
@@ -116,20 +118,23 @@
 		// get the uniques symbols used in all the sequents
 		function getSequentSymbols () {
 			var sequents = getValues();
+			var original_sequents = sequents
 			sequents = removeCommas(sequents);
 			sequents = sequents.filter(function (elem) { return elem.length != 0; });
 			var symbols = removeDuplicates(sequents);
 			symbols = [].concat.apply([], sequents);
 			symbols = removeDuplicatesHelper(symbols);
 			console.log(sequents);
-			return [sequents, symbols];
+			return [sequents, symbols, original_sequents];
 		}
 
 		// generating the symbol table
 		function preview() {
-			var symbols = getSequentSymbols()[1];
+			var values = getSequentSymbols();
+			var symbols = values[1];
+			var original_sequents = values[2];
 			rule_preview();
-			table(symbols);
+			table(symbols, original_sequents);
 		}
 
 
