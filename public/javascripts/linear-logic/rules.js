@@ -164,7 +164,7 @@ function getSub (formula, sequent, types, subs) {
 function getConnective (sequent_list, types) {
 
 	sequent_list = sequent_list.filter(function (seq) {return seq[0] != "";});
-	console.log("here", sequent_list);
+	//console.log("here", sequent_list);
 
 	if (sequent_list.length ==  3) {
 		var leftContext = getSymbols(sequent_list[0], types, "context");

@@ -46,10 +46,9 @@ function conclusionUpdatedFormulas (l, r) {
 	return result;
 }
 
-function translate(sequent_list, types, arrow) {
+function translate(sequent_list, types, arrow, subs, index, rule) {
 	// intializing the pre-reqs
 	var conclusion = sequent_list[sequent_list.length - 1];
-	var subs = generateSubs(conclusion, types);
 	var premises = [];
 	var result = [];
 	var conclusion_formulas = "";
@@ -62,9 +61,7 @@ function translate(sequent_list, types, arrow) {
 	// translation start
 	var emptySubs = premises.map(function (premise) { return getEmptySubs (premise, types, subs, arrow); });
 	var concEmptySubs = getEmptySubs(conclusion, types, subs, arrow);
-	console.log("empty", concEmptySubs);
 	var updatedFormulas = premises.map(function (premise) { return getUpdatedFormulas (premise, conclusion, types, arrow); });
-	console.log("this", sequent_list);
 	var connective = getConnective (sequent_list, types);
 	if (sequent_list.length == 1) {
 		conclusion_formulas = getUpdatedFormulas ([], conclusion, types, arrow);
@@ -81,22 +78,26 @@ function translate(sequent_list, types, arrow) {
 	var rightSubs = concEmptySubs[1].map(function (sub) { return "!^{" + sub + "}"; });
 
 
-	console.log(subs);
-	console.log(emptySubs);
-	console.log(updatedFormulas);
-	console.log(connective);
+	// console.log(subs);
+	// console.log(emptySubs);
+	// console.log(updatedFormulas);
+	// console.log(connective);
 
 	for (var i = 0; i < sequent_list.length - 1; i++) {
 		result.push(getLatex(updatedFormulas[i], premises[i], connective, emptySubs[i], subs, types));
 	}
 
-	var result = getConclusionLatex (conclusion_formulas, connective, concEmptySubs) + "^{\\bot} \\otimes " + leftSubs + rightSubs + "(" + result.join(connective) + ")";
+	var conclusionLatex = getConclusionLatex (conclusion_formulas, connective, concEmptySubs);
+	if (conclusionLatex.trim() != "") conclusionLatex = conclusionLatex + "^{\\bot} \\otimes " + leftSubs + rightSubs;
+	var result = conclusionLatex + "(" + result.join(connective) + ")";
 	console.log(result);
 
 	var translate = document.getElementById("tran");
+	translate.innerHTML += "<div id='tran-" + index +"' ></div>";
+	translate = document.getElementById("tran-"+index);
 
 	// Mathjax updating the rule container
-	translate.innerHTML = "\\["+ result +"\\]";
+	translate.innerHTML = "\\[("+ rule + ") \\quad " + result +"\\]";
 	MathJax.Hub.Queue(["Typeset",MathJax.Hub,translate]);
 
 

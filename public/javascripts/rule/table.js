@@ -55,7 +55,7 @@ function table1(symbols, DBSymbols) {
 
 	// filling the table with symbols
 	for (var i = 0; i < uniqueSymbols.length; i++) {
-		table_body.innerHTML += '<tr><td id="t' + i.toString() + '" >$$'+  uniqueSymbols[i] + '$$</td><td style="overflow: visible;"><select class="ui search dropdown" style="z-index: 1; position: fixed" id="select-' + i +'" ><option value="">Type</option><option value="0">atom</option><option value="1">formula</option><option value="2">connective</option><option value="3">set</option><option value="4">unary</option><option value="5">primary separator</option><option value="6">separator</option></select></td></tr>';
+		table_body.innerHTML += '<tr><td id="t' + i.toString() + '" >$$'+  uniqueSymbols[i] + '$$</td><td style="overflow: visible;"><select class="ui search dropdown" style="z-index: 1; position: fixed" id="select-' + i +'" ><option value="">Type</option><option value="0">atom</option><option value="1">formula</option><option value="2">connective</option><option value="3">set</option><option value="4">unary</option><option value="5">primary separator</option><option value="6">separator</option><option value="7">empty</option></select></td></tr>';
 		if (Object.keys(DBSymbols).includes(uniqueSymbols[i])) {
 			$('#select-' + i).dropdown('set text', DBSymbols[uniqueSymbols[i]]);
 		}

@@ -71,6 +71,9 @@ router.get('/edit-rule/:id', function (req, res) {
 	return res.render('rule/edit', {'title' : 'Sequoia - edit rule', 'layout' : 'edit', 'id' : req.params.id });
 });
 
+router.get('/translate', function (req, res) {
+	return res.render('linear-logic/index', {'title' : 'Sequoia - translate', 'layout' : 'translate'});
+});
 
 router.get('/', function (req, res) {
 	return res.render('main/index', {'title' : 'Sequoia','layout' : 'calculus'});
