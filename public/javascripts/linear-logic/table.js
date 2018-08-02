@@ -11,6 +11,7 @@ function fixTypes(original_types) {
 	}
 
 	types["arrow"] = [];
+	types["connective"] = [];
 	return types;
 }
 
@@ -18,19 +19,18 @@ function fixTypes(original_types) {
 function getSymbolTypes(rule, types) {
 	// getting the symbols
 	var seq_symbol = getSequentSymbols(rule);
-	var seq_list = seq_symbol[0];
 	var symbols = seq_symbol[1];
 	var original_sequents = seq_symbol[2];
 	var types = fixTypes(types);
-	var separators = [];
 	var connectives = [];
 	var subs = [];
 
-	// getting the types
+	// defining the types
 	for (var i = 0; i < symbols.length; i++) {
 
 		if (types[symbols[i]] == "connective") {
 			connectives.push(symbols[i]);
+			types["connective"].push(symbols[i]);
 		}
 
 		if (types[symbols[i]] == "separator") {
@@ -41,7 +41,6 @@ function getSymbolTypes(rule, types) {
 
 		if (types[symbols[i]] == "arrow") {
 			types["arrow"].push(symbols[i]);
-			console.log(types["arrow"]);
 			types[symbols[i]] = "separator";
 			original_sequents = original_sequents.map(function (seq) {
 				return seq.replace(symbols[i], "$split$" + symbols[i] + "$split$");
@@ -50,6 +49,7 @@ function getSymbolTypes(rule, types) {
 
 	}
 
+	// splitting the symbols at the right point
 	original_sequents = original_sequents.map( function (seq) { 
 		seq = seq.split(/\$split\$|,/);
 		seq = seq.map(function (symbol) {
@@ -63,14 +63,13 @@ function getSymbolTypes(rule, types) {
 		return seq;
 	});
 
+	// get the maximum length subexponential array
 	subs = original_sequents.map(function (seq) {return generateSubs(seq, types)});
 	var max = subs[0];
 	//console.log(subs);
 	for (var i = 0; i < subs.length; i++) {
 		if (max.length < subs[i].length) max = subs[i]; 
 	}
-	//console.log("subs", subs);
-	//console.log(original_sequents);
-	console.log(types);
+
 	return [original_sequents, types, max];
 }

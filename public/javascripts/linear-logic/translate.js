@@ -19,13 +19,16 @@ function getLatex (sequent, premise, connective, emptySubs, subs, types) {
 
 }
 
-function getConclusionLatex (sequent, connective, emptySubs) {
+function getConclusionLatex (sequent, connective, emptySubs, sequent_list) {
 
 	var left = sequent[0].map(function (formula) { return "\\lfloor " + formula + " \\rfloor"; });
 	var right = sequent[1].map(function (formula) { return "\\lceil " + formula + " \\rceil"; });
-	var leftSubs = emptySubs[0].map(function (sub) { return "!^{" + sub + "}"; });
-	var rightSubs = emptySubs[1].map(function (sub) { return "!^{" + sub + "}"; });
-	return left.join(connective) + " " + right.join(connective);
+	var result = "";
+	if (left.length == 0 && right.length == 0) return "";
+	if (left.length > 0 && right.length > 0 && sequent_list.length == 1) 
+	return left.join(connective) + "^{\\bot} \\otimes " + right.join(connective) + "^{\\bot}";
+	return left.join(connective) + " " + right.join(connective) + "^{\\bot} \\otimes "
+
 
 }
 
@@ -47,7 +50,8 @@ function conclusionUpdatedFormulas (l, r) {
 }
 
 function translate(sequent_list, types, arrow, subs, index, rule) {
-	// intializing the pre-reqs
+	console.log("types", types);
+	// initalizing the pre-req
 	var conclusion = sequent_list[sequent_list.length - 1];
 	var premises = [];
 	var result = [];
@@ -64,12 +68,14 @@ function translate(sequent_list, types, arrow, subs, index, rule) {
 	var updatedFormulas = premises.map(function (premise) { return getUpdatedFormulas (premise, conclusion, types, arrow); });
 	var connective = getConnective (sequent_list, types);
 	if (sequent_list.length == 1) {
-		conclusion_formulas = getUpdatedFormulas ([], conclusion, types, arrow);
+		conclusion_formulas = getConclusionUpdatedFormulas ([], conclusion, types, arrow);
 	} else if (sequent_list.length == 2) {
-		conclusion_formulas = getUpdatedFormulas (conclusion, premises[0], types, arrow);
+		console.log()
+		conclusion_formulas = getConclusionUpdatedFormulas  (premises[0], conclusion, types, arrow);
+		console.log("formulas", conclusion_formulas);
 	} else {
-		var conc1 = getUpdatedFormulas (conclusion, premises[0], types, arrow);
-		var conc2 = getUpdatedFormulas (conclusion, premises[1], types, arrow);
+		var conc1 = getConclusionUpdatedFormulas (premises[0], conclusion, types, arrow);
+		var conc2 = getConclusionUpdatedFormulas (premises[1], conclusion, types, arrow);
 		conclusion_formulas = [conclusionUpdatedFormulas(conc1[0], conc2[0]),
 							   conclusionUpdatedFormulas(conc1[1], conc2[1])];
 	}
@@ -87,9 +93,13 @@ function translate(sequent_list, types, arrow, subs, index, rule) {
 		result.push(getLatex(updatedFormulas[i], premises[i], connective, emptySubs[i], subs, types));
 	}
 
-	var conclusionLatex = getConclusionLatex (conclusion_formulas, connective, concEmptySubs);
-	if (conclusionLatex.trim() != "") conclusionLatex = conclusionLatex + "^{\\bot} \\otimes " + leftSubs + rightSubs;
-	var result = conclusionLatex + "(" + result.join(connective) + ")";
+	var conclusionLatex = getConclusionLatex (conclusion_formulas, "^{\\bot} \\otimes ", concEmptySubs, sequent_list);
+	if (conclusionLatex.trim() != "") conclusionLatex = conclusionLatex  + leftSubs + rightSubs;
+	if (result.length != 0) {
+		result = conclusionLatex + "(" + result.join(connective) + ")";
+	} else {
+		result = conclusionLatex;
+	}
 	console.log(result);
 
 	var translate = document.getElementById("tran");

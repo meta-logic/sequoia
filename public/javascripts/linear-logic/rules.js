@@ -9,22 +9,35 @@ Array.prototype.diff = function(a) {
     return this.filter(function(i) {return a.indexOf(i) < 0;});
 };
 
+// checking if all the elements of arr1 are included in arr2
+function all_included (arr1, arr2) {
+	for (var i = 0; i < arr1.length; i++) {
+		if (arr2.indexOf(arr1[i])) return false;
+	}
 
-// get the left side of the arrow - Tested
-function getLeftSide (sequent, arrow) {
+	return true;
+}
+
+// get the left side of the arrows - Tested
+function getLeftSide (sequent, arrows) {
 	var copy = sequent.slice();
-	var arrow_index = copy.indexOf(arrow);
-	if (arrow_index == -1) return copy;    
-	var left_side = copy.splice(0,arrow_index);
+	var left_side = copy;
+	var arrow_index = -1;
+	for (var i = 0; i < arrows.length; i++) {
+		arrow_index = copy.indexOf(arrows[i]);
+		if (arrow_index != -1) left_side = copy.splice(0,arrow_index);
+	}
 	return left_side; 
 }
 
-// get the right side of the arrow - Tested
-function getRightSide (sequent, arrow) {
+// get the right side of the arrows - Tested
+function getRightSide (sequent, arrows) {
 	var copy = sequent.slice();
-	var arrow_index = copy.indexOf(arrow);
-	if (arrow_index == -1) return copy;    
-	copy.splice(0,arrow_index + 1);
+	var arrow_index = -1;
+	for (var i = 0; i < arrows.length; i++) {
+		arrow_index = copy.indexOf(arrows[i]);
+		if (arrow_index != -1) copy.splice(0,arrow_index + 1);
+	}
 	return copy; 
 }
 
@@ -87,10 +100,10 @@ function checkZone (sequent, types, separator) {
 
 // getting the empty subs based on the zones - Tested 
 // (doesn't work if there are duplicate separators which are part of the rule)
-function getEmptySubs (sequent, types, subs, arrow) {
+function getEmptySubs (sequent, types, subs, arrows) {
 	var separators = getSymbols(sequent, types, "separator");
-	var left_separators = getLeftSide(subs.map(function (x) { return x[1]; }), arrow);
-	var right_separators = getRightSide(subs.map(function (x) { return x[1]; }), arrow);
+	var left_separators = getLeftSide(subs.map(function (x) { return x[1]; }), arrows);
+	var right_separators = getRightSide(subs.map(function (x) { return x[1]; }), arrows);
 	var emptyLeft = []; 
 	var emptyRight = [];
 	var emptyZone = [];
@@ -105,7 +118,7 @@ function getEmptySubs (sequent, types, subs, arrow) {
 		} else {
 			emptyZone = checkZone(sequent, types, subs[i]);
 
-			if (subs[i][1] == arrow) {
+			if (subs[i][1] == arrows) {
 				if (emptyZone[0].length != 0) emptyLeft.push(subs[i][0]);
 				if (emptyZone[1].length != 0) emptyLeft.push(subs[i][2]);
 			} else {
@@ -190,16 +203,60 @@ function getConnective (sequent_list, types) {
 }
 
 // get the the updated formulas - Tested
-function getUpdatedFormulas (premise, conclusion, types, arrow) {
-	var left_formulas = getLeftSide(premise, arrow);
-	var right_formulas = getRightSide(premise, arrow);
+function getUpdatedFormulas (premise, conclusion, types, arrows) {
+	var left_formulas = getLeftSide(premise, arrows);
+	var right_formulas = getRightSide(premise, arrows);
 
 	var conclusion_formulas = getSymbols(conclusion, types, "formula");
 	left_formulas = getSymbols(left_formulas, types, "formula");
 	right_formulas = getSymbols(right_formulas, types, "formula");
+
+	if ((all_included(left_formulas, conclusion_formulas) || left_formulas.length == 0)
+	&&  (all_included(right_formulas, conclusion_formulas) || right_formulas.length == 0))
+	return [left_formulas, right_formulas];
 
 	left_formulas = left_formulas.diff(conclusion_formulas);
 	right_formulas = right_formulas.diff(conclusion_formulas);
 
 	return [left_formulas, right_formulas];
 }
+
+// get the the conclusion updated formulas - Tested
+function getConclusionUpdatedFormulas (premise, conclusion, types, arrows) {
+	console.log(conclusion, "x", premise);
+	var left_formulas = getLeftSide(conclusion, arrows);
+	var right_formulas = getRightSide(conclusion, arrows);
+	var l = "";
+	var r = "";
+
+	var premise_formulas = getSymbols(premise, types, "formula");
+	left_formulas = getSymbols(left_formulas, types, "formula");
+	right_formulas = getSymbols(right_formulas, types, "formula");
+	console.log(premise_formulas, "g", left_formulas, "g", right_formulas);
+
+	l = left_formulas.diff(premise_formulas);
+	r = right_formulas.diff(premise_formulas);
+	console.log(l, "v", r);
+	var connectives = types["connective"];
+
+	if (l.length == 0) {
+		for (var i = 0; i < left_formulas.length; i++) {
+			for (var j = 0; j < connectives.length; j++) {
+				// console.log(left_formulas[i], "connective", connectives[j]);
+				if (left_formulas[i].includes(connectives[j])) l.push(left_formulas[i]);
+			}
+		}
+	}
+
+	if (r.length == 0) {
+		for (var i = 0; i < right_formulas.length; i++) {
+			for (var j = 0; j < connectives.length; j++) {
+				if (right_formulas[i].includes(connectives[j])) r.push(right_formulas[i]);
+			}
+		}
+	}
+
+	// console.log(left_formulas, right_formulas);
+	// console.log(l, r);
+	return [l, r];
+} 
