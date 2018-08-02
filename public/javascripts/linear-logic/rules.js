@@ -20,11 +20,13 @@ function all_included (arr1, arr2) {
 
 // get the left side of the arrows - Tested
 function getLeftSide (sequent, arrows) {
+	console.log(arrows);
 	var copy = sequent.slice();
 	var left_side = copy;
 	var arrow_index = -1;
 	for (var i = 0; i < arrows.length; i++) {
 		arrow_index = copy.indexOf(arrows[i]);
+		console.log("arrow", arrow_index, arrows[i], i);
 		if (arrow_index != -1) left_side = copy.splice(0,arrow_index);
 	}
 	return left_side; 

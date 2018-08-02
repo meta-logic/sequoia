@@ -51,6 +51,7 @@ function conclusionUpdatedFormulas (l, r) {
 
 function translate(sequent_list, types, arrow, subs, index, rule) {
 	console.log("types", types);
+	console.log("arrow", arrow);
 	// initalizing the pre-req
 	var conclusion = sequent_list[sequent_list.length - 1];
 	var premises = [];
