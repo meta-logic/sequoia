@@ -20,13 +20,13 @@ function all_included (arr1, arr2) {
 
 // get the left side of the arrows - Tested
 function getLeftSide (sequent, arrows) {
-	console.log(arrows);
+	//console.log(arrows);
 	var copy = sequent.slice();
 	var left_side = copy;
 	var arrow_index = -1;
 	for (var i = 0; i < arrows.length; i++) {
 		arrow_index = copy.indexOf(arrows[i]);
-		console.log("arrow", arrow_index, arrows[i], i);
+		//console.log("arrow", arrow_index, arrows[i], i);
 		if (arrow_index != -1) left_side = copy.splice(0,arrow_index);
 	}
 	return left_side; 
@@ -179,7 +179,7 @@ function getSub (formula, sequent, types, subs) {
 function getConnective (sequent_list, types) {
 
 	sequent_list = sequent_list.filter(function (seq) {return seq[0] != "";});
-	//console.log("here", sequent_list);
+	////console.log("here", sequent_list);
 
 	if (sequent_list.length ==  3) {
 		var leftContext = getSymbols(sequent_list[0], types, "context");
@@ -225,7 +225,7 @@ function getUpdatedFormulas (premise, conclusion, types, arrows) {
 
 // get the the conclusion updated formulas - Tested
 function getConclusionUpdatedFormulas (premise, conclusion, types, arrows) {
-	console.log(conclusion, "x", premise);
+	//console.log(conclusion, "x", premise);
 	var left_formulas = getLeftSide(conclusion, arrows);
 	var right_formulas = getRightSide(conclusion, arrows);
 	var l = "";
@@ -234,17 +234,17 @@ function getConclusionUpdatedFormulas (premise, conclusion, types, arrows) {
 	var premise_formulas = getSymbols(premise, types, "formula");
 	left_formulas = getSymbols(left_formulas, types, "formula");
 	right_formulas = getSymbols(right_formulas, types, "formula");
-	console.log(premise_formulas, "g", left_formulas, "g", right_formulas);
+	//console.log(premise_formulas, "g", left_formulas, "g", right_formulas);
 
 	l = left_formulas.diff(premise_formulas);
 	r = right_formulas.diff(premise_formulas);
-	console.log(l, "v", r);
+	//console.log(l, "v", r);
 	var connectives = types["connective"];
 
 	if (l.length == 0) {
 		for (var i = 0; i < left_formulas.length; i++) {
 			for (var j = 0; j < connectives.length; j++) {
-				// console.log(left_formulas[i], "connective", connectives[j]);
+				// //console.log(left_formulas[i], "connective", connectives[j]);
 				if (left_formulas[i].includes(connectives[j])) l.push(left_formulas[i]);
 			}
 		}
@@ -258,7 +258,7 @@ function getConclusionUpdatedFormulas (premise, conclusion, types, arrows) {
 		}
 	}
 
-	// console.log(left_formulas, right_formulas);
-	// console.log(l, r);
+	// //console.log(left_formulas, right_formulas);
+	// //console.log(l, r);
 	return [l, r];
 } 

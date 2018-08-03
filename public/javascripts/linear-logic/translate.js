@@ -14,7 +14,9 @@ function getLatex (sequent, premise, connective, emptySubs, subs, types) {
 	var rightSubs = emptySubs[1].map(function (sub) { return "!^{" + sub + "}"; });
 	leftSubs = leftSubs.join("");
 	rightSubs = rightSubs.join("");
-
+	console.log(left, right);
+	if (left.length != 0 && right.length != 0)
+	return leftSubs + left.join(" " + connective + " ") + " " + connective + " " + rightSubs + right.join(" " + connective + " ");
 	return leftSubs + left.join(" " + connective + " ") + " " + rightSubs + right.join(" " + connective + " ");
 
 }
@@ -50,8 +52,6 @@ function conclusionUpdatedFormulas (l, r) {
 }
 
 function translate(sequent_list, types, arrow, subs, index, rule) {
-	console.log("types", types);
-	console.log("arrow", arrow);
 	// initalizing the pre-req
 	var conclusion = sequent_list[sequent_list.length - 1];
 	var premises = [];
@@ -88,7 +88,7 @@ function translate(sequent_list, types, arrow, subs, index, rule) {
 	// console.log(subs);
 	// console.log(emptySubs);
 	// console.log(updatedFormulas);
-	// console.log(connective);
+	console.log("conncective",connective);
 
 	for (var i = 0; i < sequent_list.length - 1; i++) {
 		result.push(getLatex(updatedFormulas[i], premises[i], connective, emptySubs[i], subs, types));
