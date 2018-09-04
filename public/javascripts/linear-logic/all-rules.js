@@ -27,7 +27,8 @@ $.get('/api/get-rules', function (rules) {
 		for (var i = 0; i < assigned_rules.length; i++) {
 			empty_subs = assign_empty_subs(assigned_rules[i], max_subs);
 			assigned_rules[i] = empty_subs;
-			console.log(assign_subs(assigned_rules[i], rules_types[i]));
+			assigned_rules[i] = assign_subs(assigned_rules[i], rules_types[i]);
+			console.log(cleanup(assigned_rules[i], rules_types[i]));
 		}
 
 	});

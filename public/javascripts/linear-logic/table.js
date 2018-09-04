@@ -23,7 +23,6 @@ function getSymbolTypes(rule, types) {
 	var original_sequents = seq_symbol[2];
 	var types = fixTypes(types);
 	var connectives = [];
-	var subs = [];
 
 	// defining the types
 	for (var i = 0; i < symbols.length; i++) {

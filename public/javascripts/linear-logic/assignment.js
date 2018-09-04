@@ -7,7 +7,7 @@ function assign_sides (sequents, types) {
     var sequents_result = [];
 
     for (var i = 0; i < sequents.length; i++) {
-       for (var j = 0; j < sequents[i].length; j++) {
+        for (var j = 0; j < sequents[i].length; j++) {
             // switching sides when the primary separator is reached
             if (types['arrow'].includes(sequents[i][j])) {
                 side = "r";
@@ -32,6 +32,7 @@ function assign_sides (sequents, types) {
         formulas = [];
         separator_symbols = [];
         separators = [];
+        side = 'l';
     }
 
     return sequents_result;
@@ -46,15 +47,18 @@ function get_max_subs(rules) {
         for (var j = 0; j < rules[i].length; j++) {
             primary_separator = rules[i][j][1][0];
             separators = rules[i][j][1][2];
+
+            // checking if the primary separator in the dictionary, if not, create a key for it with an empty value
             if (!max_subs.hasOwnProperty(primary_separator)) max_subs[primary_separator] = '';
+            // if the current sequent sub is lager than the max, make it the new max
             if (separators.length > max_subs[primary_separator].length) max_subs[primary_separator] = separators;
         }
     }
 
+    // assigning subs/zones to the separators of their left side [;, ->] => [[;, 1], [->, 2]] where subs= 1 ; 2 -> 3
     for (var primary_separator in max_subs) {
         if (max_subs.hasOwnProperty(primary_separator)) {
             for (var i = 0; i < max_subs[primary_separator].length; i++) {
-                // if (max_subs[primary_separator][i][1] === 'r') counter++;
                 max_subs[primary_separator][i].push(counter);
                 counter++;
             }
@@ -109,12 +113,14 @@ function assign_subs (sequents, types) {
 
     for (var i = 0; i < sequents.length; i++) {
         separators = sequents[i][1][2];
+        // getting the subs of the separators presented in this particular sequent
         sequent_subs = separators.map(function (separator) { return separator[2]; });
         sequent_subs.push(sequent_subs[sequent_subs.length - 1] + 1);
         formulas = sequents[i][0];
         sub_index = 0;
 
         for (var j = 0; j < formulas.length; j++) {
+            // go to the next sub after encountering a separator
             if (isType(formulas[j][0], types, 'separator')) {
                 sub_index++;
             } else {
