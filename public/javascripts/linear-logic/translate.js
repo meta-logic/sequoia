@@ -14,7 +14,6 @@ function getLatex (sequent, premise, connective, emptySubs, subs, types) {
 	var rightSubs = emptySubs[1].map(function (sub) { return "!^{" + sub + "}"; });
 	leftSubs = leftSubs.join("");
 	rightSubs = rightSubs.join("");
-	console.log(left, right);
 	if (left.length != 0 && right.length != 0)
 	return leftSubs + left.join(" " + connective + " ") + " " + connective + " " + rightSubs + right.join(" " + connective + " ");
 	return leftSubs + left.join(" " + connective + " ") + " " + rightSubs + right.join(" " + connective + " ");
@@ -71,9 +70,7 @@ function translate(sequent_list, types, arrow, subs, index, rule) {
 	if (sequent_list.length == 1) {
 		conclusion_formulas = getConclusionUpdatedFormulas ([], conclusion, types, arrow);
 	} else if (sequent_list.length == 2) {
-		console.log()
 		conclusion_formulas = getConclusionUpdatedFormulas  (premises[0], conclusion, types, arrow);
-		console.log("formulas", conclusion_formulas);
 	} else {
 		var conc1 = getConclusionUpdatedFormulas (premises[0], conclusion, types, arrow);
 		var conc2 = getConclusionUpdatedFormulas (premises[1], conclusion, types, arrow);
@@ -84,11 +81,12 @@ function translate(sequent_list, types, arrow, subs, index, rule) {
 	var leftSubs = concEmptySubs[0].map(function (sub) { return "!^{" + sub + "}"; });
 	var rightSubs = concEmptySubs[1].map(function (sub) { return "!^{" + sub + "}"; });
 
-
-	// console.log(subs);
-	// console.log(emptySubs);
-	// console.log(updatedFormulas);
-	console.log("conncective",connective);
+	console.log("rule", rule, "==============");
+	console.log(premises);
+	console.log("empty subs", emptySubs);
+	console.log("Updated formulas:", updatedFormulas);
+	console.log("Conclusion formulas:", conclusion_formulas);
+	console.log("connective:",connective);
 
 	for (var i = 0; i < sequent_list.length - 1; i++) {
 		result.push(getLatex(updatedFormulas[i], premises[i], connective, emptySubs[i], subs, types));
@@ -101,7 +99,6 @@ function translate(sequent_list, types, arrow, subs, index, rule) {
 	} else {
 		result = conclusionLatex;
 	}
-	console.log(result);
 
 	var translate = document.getElementById("tran");
 	translate.innerHTML += "<div id='tran-" + index +"' ></div>";

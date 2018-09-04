@@ -20,5 +20,5 @@ fun seq_toString (ctx1, Con (c), ctx2) = ctx_toString(ctx1) ^ " " ^ c ^ " " ^ ct
 fun toString (s) = seq_toString(s)
 
 
-fun supset_R ((Single (Gamma), Con ("\\rightarrow"), Single ((Form (Atom (A), Con ("\\supset"), Atom (B)))::nil))) = [(Single (Atom (A)::Gamma), Con ("\\rightarrow"), Single (Atom (B)::nil))]
+fun supset_R ((Single (Gamma), Con ("\\rightarrow"), Mult ((Form (Atom (A), Con ("\\supset"), Atom (B)))::nil, Con (";"), Single (Delta)))) = [(Single (Atom (A)::Gamma), Con ("\\vdash"), Single (Atom (B)::nil))]
 	| supset_R _ = []

@@ -62,14 +62,8 @@ function getSymbolTypes(rule, types) {
 
 		return seq;
 	});
+	
+	console.log("OG", original_sequents);
 
-	// get the maximum length subexponential array
-	subs = original_sequents.map(function (seq) {return generateSubs(seq, types)});
-	var max = subs[0];
-	//console.log(subs);
-	for (var i = 0; i < subs.length; i++) {
-		if (max.length < subs[i].length) max = subs[i]; 
-	}
-
-	return [original_sequents, types, max];
+	return [original_sequents, types];
 }

@@ -20,5 +20,5 @@ fun seq_toString (ctx1, Con (c), ctx2) = ctx_toString(ctx1) ^ " " ^ c ^ " " ^ ct
 fun toString (s) = seq_toString(s)
 
 
-fun vee_R ((Single ((Form (Atom (A), Con ("\\vee"), Atom (B)))::Gamma), Con ("\\vdash"), Single (Atom (C)::nil))) = [(Single (Atom (A)::Atom (B)::Gamma), Con ("\\vdash"), Single (Atom (C)::nil))]
+fun vee_R ((Single (Gamma), Con ("\\rightarrow"), Mult ((Form (Atom (A), Con ("\\vee"), Atom (B)))::nil, Con (";"), Single (Delta)))) = [(Single (Gamma), Con ("\\vdash"), Single (Atom (A)::Atom (B)::Delta))]
 	| vee_R _ = []

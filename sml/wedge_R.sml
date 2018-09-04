@@ -17,8 +17,8 @@ fun ctx_toString (Single (fl)) = formL_toString(fl)
 
 fun seq_toString (ctx1, Con (c), ctx2) = ctx_toString(ctx1) ^ " " ^ c ^ " " ^ ctx_toString(ctx2)
 
-fun toString (s) = ctx_toString(s)
+fun toString (s) = seq_toString(s)
 
 
-fun wedge_R (Single ((Form (Atom (A), Con ("\\wedge"), (Form (Atom (B), Con ("\\rightarrow"), Atom (C)))))::nil)) = [Single ((Form (Atom (A), Con ("\\rightarrow"), Atom (C)))::nil),Single ((Form (Atom (B), Con ("\\rightarrow"), Atom (C)))::nil)]
+fun wedge_R ((Single (Gamma), Con ("\\rightarrow"), Mult ((Form (Atom (A), Con ("\\wedge"), Atom (B)))::nil, Con (";"), Single (Delta)))) = [(Single (Gamma), Con ("\\rightarrow"), Mult (Atom (A)::nil, Con (";"), Single (Delta))),(Single (Gamma), Con ("\\rightarrow"), Mult (Atom (B)::nil, Con (";"), Single (Delta)))]
 	| wedge_R _ = []

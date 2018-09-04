@@ -1,18 +1,33 @@
-$.get('/api/get-rules', function (rules, status) {
-	$.get('/api/symbols', function(types, status) {
-		// console.log("one time");
+$.get('/api/get-rules', function (rules) {
+	$.get('/api/symbols', function(types) {
 		var rules_sequents = [];
-		var temp = "";
-		var max_sub = [];
+		var rules_types = [];
+		var assigned_rules = [];
+		var temp = [];
+
 		for (var i = 0; i < rules.length; i++) {
 			temp = getSymbolTypes(rules[i], types.symbols.symbols);
-			if (temp[2].length > max_sub.length) max_sub = temp[2];
-			rules_sequents.push(temp);
+			rules_sequents.push(temp[0]);
+			rules_types.push(temp[1]);
 		}
-		types = rules_sequents[0][1];
+
+		console.log(rules_types);
+		var formula, assign, max_subs, empty_subs;
 		for (var i = 0; i < rules_sequents.length; i++) {
-			console.log(rules_sequents[i][0]);
-			translate(rules_sequents[i][0], rules_sequents[i][1], rules_sequents[i][1]["arrow"], max_sub, i, rules[i].rule);
+			formula = formulas(rules_sequents[i], rules_types[i]);
+			// console.log(formula);
+			assign = assign_sides(formula, rules_types[i]);
+			console.log(assign);
+			assigned_rules.push(assign);
+		}
+		max_subs = get_max_subs(assigned_rules);
+		console.log(max_subs);
+		
+		console.log("good so far");
+		for (var i = 0; i < assigned_rules.length; i++) {
+			empty_subs = assign_empty_subs(assigned_rules[i], max_subs);
+			assigned_rules[i] = empty_subs;
+			console.log(assign_subs(assigned_rules[i], rules_types[i]));
 		}
 
 	});
