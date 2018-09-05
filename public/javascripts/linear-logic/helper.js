@@ -26,3 +26,23 @@ function getSymbols(sequent, types, type) {
 
   return symbols;
 }
+
+function max_sub (separators, max, primary_separator) {
+  var left_separators = separators.filter(function (separator) { return separator[1] == 'l'; });
+  var left_max = max.filter(function (separator) { return separator[1] == 'l'; });
+  var right_separators = separators.filter(function (separator) { return separator[1] == 'r'; });
+  var right_max = max.filter(function (separator) { return separator[1] == 'r'; });
+
+  if (left_separators.length > left_max.length) left_max = left_separators;
+  if (right_separators.length > right_max.length) right_max = right_separators;
+
+  return [].concat.apply([], [left_max, [[primary_separator, 'lr']], right_max]);
+
+}
+
+function find_separator (separators, separator) {
+  for (var i = 0; i < separators.length; i++) {
+    if (separators[i][0] == separator[0] && separators[i][1] == separator[1]) return [true, i];
+  }
+  return [false, -1];
+}

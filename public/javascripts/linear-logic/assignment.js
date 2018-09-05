@@ -49,9 +49,9 @@ function get_max_subs(rules) {
             separators = rules[i][j][1][2];
 
             // checking if the primary separator in the dictionary, if not, create a key for it with an empty value
-            if (!max_subs.hasOwnProperty(primary_separator)) max_subs[primary_separator] = '';
+            if (!max_subs.hasOwnProperty(primary_separator)) max_subs[primary_separator] = [];
             // if the current sequent sub is lager than the max, make it the new max
-            if (separators.length > max_subs[primary_separator].length) max_subs[primary_separator] = separators;
+            max_subs[primary_separator] = max_sub(separators, max_subs[primary_separator], primary_separator);
         }
     }
 
@@ -70,25 +70,16 @@ function get_max_subs(rules) {
 }
 
 function assign_empty_subs (sequents, max_subs) {
-    var separators, separator_symbols, primary_separator;
-
+    var separators, primary_separator, includes_index;
     for (var i = 0; i < sequents.length; i++) {
         primary_separator = sequents[i][1][0];
-        separator_symbols = sequents[i][1][1];
         separators = sequents[i][1][2];
         
         for (var j = 0; j < max_subs[primary_separator].length; j++) {
             // assigning subs to the separators in the sequent
-            if (separator_symbols.includes(max_subs[primary_separator][j][0])) {
-                separators[separator_symbols.indexOf(max_subs[primary_separator][j][0])] = max_subs[primary_separator][j];
-                // edge cases: if the separator is a the beginning of the formulas list
-                if (sequents[i][0][0][0] === max_subs[primary_separator][j][0]) {
-                    sequents[i][2].push(max_subs[primary_separator][j][2]);
-                }
-                // edge cases: if the separator is a the end of the formulas list
-                if (sequents[i][0][sequents[i][0].length - 1][0] === max_subs[primary_separator][j][0]) {
-                    sequents[i][2].push(max_subs[primary_separator][j][2] + 1);
-                }
+            includes_index = find_separator(separators, max_subs[primary_separator][j]);
+            if (includes_index[0]) {
+                separators[includes_index[1]] = max_subs[primary_separator][j];
             
             // assigning the empty subs to the sequent based on it presence in the separator symbols list 
             } else {

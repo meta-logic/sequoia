@@ -20,5 +20,5 @@ fun seq_toString (ctx1, Con (c), ctx2) = ctx_toString(ctx1) ^ " " ^ c ^ " " ^ ct
 fun toString (s) = seq_toString(s)
 
 
-fun  ((Single (Form (A(x/t))::nil), Con ("\\rightarrow"), Single (Atom (C)::nil))) = []
+fun  ((Single (Atom (B)::nil), Con ("\\rightarrow"), Single (Atom (F)::nil)),A,D) = [(Mult (Atom (A)::nil, Con (";"), Single (Atom (B)::nil)), Con ("\\rightarrow"), Single (Atom (F)::nil)),(Single (Atom (B)::nil), Con ("\\rightarrow"), Mult (Atom (F)::nil, Con (";"), Single (D::nil)))]
 	|  _ = []
