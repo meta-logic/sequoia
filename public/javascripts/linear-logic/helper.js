@@ -27,6 +27,7 @@ function getSymbols(sequent, types, type) {
   return symbols;
 }
 
+// compare two sub lists and pick the max one
 function max_sub (separators, max, primary_separator) {
   var left_separators = separators.filter(function (separator) { return separator[1] == 'l'; });
   var left_max = max.filter(function (separator) { return separator[1] == 'l'; });
@@ -40,6 +41,7 @@ function max_sub (separators, max, primary_separator) {
 
 }
 
+// find the separator, if found, return true and the index of the separator
 function find_separator (separators, separator) {
   for (var i = 0; i < separators.length; i++) {
     if (separators[i][0] == separator[0] && separators[i][1] == separator[1]) return [true, i];
