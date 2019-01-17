@@ -42,7 +42,7 @@ function formulas(sequents, types) {
     // General Case
     } else {
 
-        // getting the translation formulas of the premises
+        // getting the translation formulas of the premises, premise - conclusion
         premises_formulas = premises.map(function (premise) {return premise.diff(conclusion); });
 
         // getting the translation formulas of the conclusion

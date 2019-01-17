@@ -16,3 +16,9 @@ fun ctx_toString (Single (fl)) = formL_toString(fl)
 	| ctx_toString (Mult (fl, Con (c), ctx)) = formL_toString(fl) ^ " " ^ c ^ " " ^ ctx_toString(ctx)
 
 fun seq_toString (ctx1, Con (c), ctx2) = ctx_toString(ctx1) ^ " " ^ c ^ " " ^ ctx_toString(ctx2)
+
+fun toString (s) = ctx_toString(s)
+
+
+fun wedge (Single (Atom (C)::nil),A,B) = [Single (Atom (A)::nil),Single (Atom (B)::nil)]
+	| wedge _ = []

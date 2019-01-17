@@ -20,5 +20,5 @@ fun seq_toString (ctx1, Con (c), ctx2) = ctx_toString(ctx1) ^ " " ^ c ^ " " ^ ct
 fun toString (s) = seq_toString(s)
 
 
-fun wedge_R ((Single (Gamma), Con ("\\rightarrow"), Mult ((Form (Atom (A), Con ("\\wedge"), Atom (B)))::nil, Con (";"), Single (Delta)))) = [(Single (Gamma), Con ("\\rightarrow"), Mult (Atom (A)::nil, Con (";"), Single (Delta))),(Single (Gamma), Con ("\\rightarrow"), Mult (Atom (B)::nil, Con (";"), Single (Delta)))]
+fun wedge_R ((Single ((Form (Atom (A), Con ("\\wedge"), Atom (B)))::Gamma), Con ("\\rightarrow"), Single (Atom (C)::nil))) = [(Single (Atom (A)::Gamma), Con ("\\rightarrow"), Single (Atom (C)::nil)),(Single (Atom (B)::Gamma), Con ("\\rightarrow"), Single (Atom (C)::nil))]
 	| wedge_R _ = []
