@@ -20,5 +20,5 @@ fun seq_toString (ctx1, Con (c), ctx2) = ctx_toString(ctx1) ^ " " ^ c ^ " " ^ ct
 fun toString (s) = seq_toString(s)
 
 
-fun init ((Single (Atom (A)::Gamma), Con ("\\vdash"), Single (Atom (A1)::nil))) = []
-	| init _ = []
+fun dfv ((Single (Atom (A)::Gamma), Con ("\\vdash"), Single (Atom (A1)::nil))) = []
+	| dfv _ = []

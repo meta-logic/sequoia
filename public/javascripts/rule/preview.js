@@ -4,6 +4,9 @@ function preview () {
 	var rule_connective = document.getElementById("rule_connective").value;
 	var premises = document.getElementById("i0").value;
 	premises.replace(/\s\s+/g, ' ');
+	if (premises == "" || premises == " ") {
+		premises = "";
+	}
 	if (premises != "" || premises != "") {
 		symbols += premises;
 	}

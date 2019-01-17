@@ -167,10 +167,18 @@ function addRule() {
 
 	// conclusion
 	var conc = document.getElementById("Conclusion").value;
+	conc = $.trim(conc);
+	console.log(conc);
+
 	var prem_sym = [];
 	var parsed_prem = [];
+
+	if (prem[0] != "" && prem[0][0].replace(/\s\s+/g, ' ') == " ") {
+		prem[0] = '';
+	}
+
 	if (prem[0] != ''){
-		prem[i].replace(/\s\s+/g, ' ');
+
 		console.log("premises:");
 		for (var i = 0; i < prem.length; i++) {
 			console.log(parser.parse(prem[i]));
