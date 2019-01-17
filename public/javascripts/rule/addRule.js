@@ -170,7 +170,7 @@ function addRule() {
 	var prem_sym = [];
 	var parsed_prem = [];
 	if (prem[0] != ''){
-
+		prem[i].replace(/\s\s+/g, ' ');
 		console.log("premises:");
 		for (var i = 0; i < prem.length; i++) {
 			console.log(parser.parse(prem[i]));
