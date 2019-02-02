@@ -26,7 +26,7 @@ function writeRule(rule, conclusion, premises, arguments, toString) {
 	}
 
 
-	fs.writeFile(__basedir + '/sml/' + rule + '.sml', file, function (err) { 
+	fs.writeFile(__basedir + '/sml/generated-sml/' + rule + '.sml', file, function (err) { 
 	    if (err)
 	        console.log(err);
 	    else

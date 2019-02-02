@@ -57,3 +57,7 @@ typings/
 # dotenv environment variables file
 .env
 
+#sml generated file
+!sml/generated-sml
+sml/generated-sml/*.sml
+

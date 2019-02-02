@@ -35,7 +35,7 @@ function applyRule (rule, input, res) {
 }
 );
 
-	const smlTerminalInput = 'use "' + __basedir + '/sml/' + rule + '.sml";\nmap(fn x => toString(x))(' + rule + ' (' + input + '));\nOS.Process.exit(OS.Process.success);\n';
+	const smlTerminalInput = 'use "' + __basedir + '/sml/generated-sml/' + rule + '.sml";\nmap(fn x => toString(x))(' + rule + ' (' + input + '));\nOS.Process.exit(OS.Process.success);\n';
 	console.log(smlTerminalInput);
 
 	processRef.stdin.write(smlTerminalInput);
