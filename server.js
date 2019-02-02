@@ -47,7 +47,7 @@ app.use('/bower', express.static(path.join(__dirname, 'bower_components')));
 
 
 //connecting to mongo database 
-mongoose.connect(database.local);
+mongoose.connect(database.local, {useNewUrlParser: true});
 
 
 //Routers ===========================================================

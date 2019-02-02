@@ -1,4 +1,4 @@
 module.exports = {
-	local  : "localhost:27017/sequoia",
+	local  : "mongodb://localhost:27017/sequoia",
 	remote : ""
 }
