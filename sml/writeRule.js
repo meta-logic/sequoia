@@ -1,6 +1,11 @@
 var fs = require('fs');
 
+
 function writeRule(rule, conclusion, premises, arguments, toString) {
+
+	if (!fs.existsSync(__dirname + '/generated-sml')) {
+		fs.mkdirSync(__dirname + '/generated-sml');
+	}
 
 	var datatypes = fs.readFileSync(__basedir + '/sml/datatypes.sml','utf8');
 	if (toString == "ctx") {

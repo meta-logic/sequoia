@@ -58,6 +58,5 @@ typings/
 .env
 
 #sml generated file
-!sml/generated-sml
 sml/generated-sml/*.sml
 
