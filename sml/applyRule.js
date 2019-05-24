@@ -16,7 +16,7 @@ function applyRule(rule, input, res) {
 
 		//  if (data_line[data_line.length-1] == '\n') {
 		// }
-		console.log(data_line);
+
 		if (count == 8) {
 			x = data_line.split('it =');
 			try {

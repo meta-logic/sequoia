@@ -4,10 +4,9 @@ function applyRule(i) {
 	var rule = $('#r' + i).data('rule');
 	console.log(rule);
 	console.log(sequentDerivation);
-	if (sequentDerivation == '') {
-		console.log(2123);
-		sequentDerivation = parser.parse(rule_id_text).replace(/\\/g, '\\\\');
-	}
+
+	sequentDerivation = parser.parse(rule_id_text).replace(/\\/g, '\\\\');
+
 	$.post('/apply', { rule: rule, sequent: sequentDerivation }, function(data, status) {
 		console.log('Derivation: ' + data.output.replace(/ "/g, '').replace(/" /g, '').replace(/"/g, ''));
 		console.log('Data: ' + data + '\nStatus: ' + status);
@@ -23,6 +22,7 @@ function addDerivation(rule, derivations) {
 	$('.conc-temp').click(function() {
 		rule_id = parseInt(this.id.split('_')[1]);
 		rule_id_text = $(this).find('script')[0].innerText;
+		console.log(rule_id_text);
 	});
 }
 
