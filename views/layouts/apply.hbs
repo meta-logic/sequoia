@@ -3,6 +3,22 @@
   <head>
     <title>{{title}}</title>
     <link rel="stylesheet" type="text/css" href="/bower/semantic/dist/semantic.min.css">
+    <style> td {
+                text-align:center;
+                height: 1em;
+                vertical-align:bottom;
+            }
+            td.conc {
+                border-top: solid 1px;
+            }
+            div.rulename {
+                margin-top:-2em;
+            }
+
+            .MJXc-display, .MathJax_Display {
+                margin:0px !important;
+            }
+            </style>
   </head>
   <body>
     {{> navbar}}
@@ -11,6 +27,7 @@
   <script type="text/javascript" src="/bower/jquery/dist/jquery.min.js"></script>
   <script type="text/javascript" src="/bower/pegjs/peg-0.10.0.min.js"></script>
   <script type="text/javascript" src="/bower/semantic/dist/semantic.min.js"></script>
+  <script type="text/javascript" src="/static/javascripts/apply/prooftree.js"></script>
   <script type="text/javascript" src="/static/javascripts/apply/applyRule.js"></script>
   <script type="text/javascript" src="/static/javascripts/apply/tablesort.js"></script>
   <script type="text/javascript" src="/static/javascripts/apply/table.js"></script>
