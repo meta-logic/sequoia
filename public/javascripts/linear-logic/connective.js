@@ -2,24 +2,24 @@
 function get_connective(sequents, types) {
 
     if (sequents.length == 3) {
-        var leftContext = getSymbols(sequents[0], types, "context");
-        var rightContext = getSymbols(sequents[1], types, "context");
-        var conContext = getSymbols(sequents[2], types, "context");
+        var leftContext = getSymbols(sequents[0], types, "context")
+        var rightContext = getSymbols(sequents[1], types, "context")
+        var conContext = getSymbols(sequents[2], types, "context")
 
         if (equalArr(leftContext, conContext) && equalArr(rightContext, conContext)) {
-            return "\\&";
+            return "\\&"
         } else {
-            return "\\otimes";
+            return "\\otimes"
         }
     }
 
     if (sequents.length == 2) {
         if (sequents[0].length > sequents[1].length) {
-            return "\\clubsuit";
+            return "\\clubsuit"
         } else {
-            return "\\oplus";
+            return "\\oplus"
         }
     }
 
-    return "\\otimes";
+    return "\\otimes"
 }
