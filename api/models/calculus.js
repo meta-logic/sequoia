@@ -1,21 +1,21 @@
 //api/models/calculus.js
-'use strict';
+"use strict"
 
 //Loading Dependencies =============================================
-var mongoose = require('mongoose');
-var Schema   = mongoose.Schema;
+var mongoose = require("mongoose")
+var Schema   = mongoose.Schema
 
 
 //defining the calculus schema
 var calculusSchema = new Schema({
-	title       : String,
-	description : String, 
-	rules       : [String], 
-	symbols     : [{
-		symbol     : String,
-		type       : String,
-		precedence : Number
-	}]
-});
+    title       : String,
+    description : String, 
+    rules       : [String], 
+    symbols     : [{
+        symbol     : String,
+        type       : String,
+        precedence : Number
+    }]
+})
 
-module.exports = mongoose.model('Calculus', calculusSchema);
+module.exports = mongoose.model("Calculus", calculusSchema)

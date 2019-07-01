@@ -1,13 +1,13 @@
 //api/models/symbols.js
-'use strict';
+"use strict"
 
 //Loading Dependencies =============================================
-var mongoose = require('mongoose');
-var Schema   = mongoose.Schema;
+var mongoose = require("mongoose")
+var Schema   = mongoose.Schema
 
 //defining the rule schema
 var symbolsSchema = new Schema({
-	symbols : Object
-});
+    symbols : Object
+})
 
-module.exports = mongoose.model('Symbols', symbolsSchema);
+module.exports = mongoose.model("Symbols", symbolsSchema)

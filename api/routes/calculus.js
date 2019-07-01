@@ -1,28 +1,28 @@
 //api/routes/calculus.js
-'use strict';
+"use strict"
 
 //Loading Dependencies =============================================
-var express    = require('express');
-var router     = express.Router();
-var controller = require('../controllers/calculus');
+var express    = require("express")
+var router     = express.Router()
+var controller = require("../controllers/calculus")
 
 
 //calculus
-router.route('/calculus')
+router.route("/calculus")
 
-	//creating a calculus
-	.post(controller.createCalculus)
+//creating a calculus
+    .post(controller.createCalculus)
 
-	//get calculus information
-	.get(controller.getCalculus)
+//get calculus information
+    .get(controller.getCalculus)
 
-	//update calculus information
-	.put(controller.updateCalculus)
+//update calculus information
+    .put(controller.updateCalculus)
 
-	//delete a calculus
-	.delete(controller.deleteCalculus);
+//delete a calculus
+    .delete(controller.deleteCalculus)
 
-router.get('/calculuses', controller.getCalculuses);
+router.get("/calculuses", controller.getCalculuses)
 
 
-module.exports = router;
+module.exports = router

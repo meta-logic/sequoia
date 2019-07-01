@@ -1,15 +1,15 @@
 //api/routes/symbols.js
-'use strict';
+"use strict"
 
 //Loading Dependencies =============================================
-var express    = require('express');
-var router     = express.Router();
-var controller = require('../controllers/symbols');
+var express    = require("express")
+var router     = express.Router()
+var controller = require("../controllers/symbols")
 
 
 //update symbols information
-router.put('/symbols', controller.updateSymbols);
-router.get('/symbols', controller.getSymbols);
+router.put("/symbols", controller.updateSymbols)
+router.get("/symbols", controller.getSymbols)
 
 
-module.exports = router;
+module.exports = router
