@@ -2,47 +2,50 @@ var parser_text =
 `
 // Sequent
 SEQ 
-  = ctx1:CTX _ arrow:ARROW _ ctx2:CTX { return "(" + ctx1 + ', Con ("' + arrow + '"), ' + ctx2 + ")" }
-  / CTX
+  = ctx1:CTX_STR _ seq_sign:SeqSign _ ctx2:CTX_STR { return "Seq (" + ctx1 + ', Con ("' + seq_sign + '"), ' + ctx2 + ")" }
+
+// Context struct
+CTX_STR 
+  = ctx:CTX _ ctx_sep:CtxSep _ ctx_str:CTX_STR { return "Mult ( Con (" + ctx_sep + "), " + ctx + ", " + ctx_str + ")" }
+  / ctx:CTX { return "Single (" + ctx + ")" } 
 
 // Context
 CTX 
-  = list:List _ sep:SEP _ ctx:CTX { return "Mult (" + list + ', Con ("' + sep + '"), ' + ctx + ")" }
-  / list:List { return "Single (" + list + ")" }
+  = ctx_lst:CTX_LST { 
+    var [ctx_vars, forms] = ctx_lst
+    var c = ctx_vars.join(", ")
+    var f = forms.join(", ")
+    return "Ctx ([" + c + "], [" + f + "])"
+  }
 
-List 
-  = set:SET _ "," _ list:List {
-      if (list.includes("::nil")) {
-        return list.slice(0, -5) + "::" + set}
-      else {
-        return list + "::" + set
-      }
+CTX_LST
+  = ctx_var:CTX_VAR _ "," _ ctx_lst:CTX_LST {
+      var [ctx_vars, forms] = ctx_lst
+      ctx_vars.push(ctx_var)
+      return [ctx_vars, forms]
     }
-  / form:F _ "," _ list:List _ { return form + "::" + list }
-  / set:SET { return set } 
-  / form:F { return form + "::nil" } 
+  / form:FORM _ "," _ ctx_lst:CTX_LST _ { 
+      var [ctx_vars, forms] = ctx_lst
+      forms.push(form)
+      return [ctx_vars, forms]
+    }
+  / ctx_var:CTX_VAR { return [[ctx_var], []] } 
+  / form:FORM { return [[], [form]] } 
 
-// Formula
-F 
-  = _ uconn:UCONN _ "(" _ form1:F _ ")" _ conn:CONN _ form2:F _  { return "(Form (Uform (" + uconn + ", " + form1 + "), " + conn + ", " + form2 + "))" } 
-  / _ "(" _ form1:F _ ")" _ conn:CONN _ form2:F _  { return "(Form (" + form1 + ", " + conn + ", " + form2 + "))" } 
-  / _ uconn:UCONN _ "(" _ form:F _ ")" _  { return "Uform (" + uconn + ", " + form + ")" } 
-  / _ "(" _ form:F _ ")" _  { return form } 
-  / _ UConn:UCONN _ fotom:FOTOM _ conn:CONN _ formula:F _ { return "Form (Uform (" + UConn + ", " + fotom + "), " + conn + ", " + formula + ")" } 
-  / _ UConn:UCONN _ fotom:FOTOM _ { return "Uform (" + UConn + ", " + fotom + ")" } 
-  / _ fotom:FOTOM _ conn:CONN _ formula:F _ { return "(Form (" + fotom + ", " + conn + ", " + formula + "))" } 
-  / _ fotom:FOTOM _ { return fotom }
-
-// Atomic formula
-FOTOM 
-  = FORM 
-  / ATOM
+// Formula (only unary and binary connectives supported so far)
+FORM
+  = "(" _ form:FORM _ ")" { return form }
+  / form_var:FORM_VAR _ conn:CONN _ form2:FORM { return "Form (" + conn + ", [" + form_var + "," + form2 + "])" }
+  / atom_var:ATOM_VAR _ conn:CONN _ form2:FORM { return "Form (" + conn + ", [" + atom_var + "," + form2 + "])" }
+  / conn:CONN _ form:FORM { return "Form (" + conn + ", [" + form + "])" }
+  / form_var:FORM_VAR { return form_var }
+  / atom_var:ATOM_VAR { return atom_var }
 
 // Symbols
-UCONN = conn:UConn { return 'Con ("' + conn  + '")' }
 CONN = conn:Conn { return 'Con ("' + conn  + '")' }
-FORM = form:Form { return  form }
-ATOM = atom:Atom { return "Atom (" + atom + ")" }
+CTX_VAR = ctx_var:CtxVar { return 'CtxVar ("' + ctx_var + '")' }
+FORM_VAR = form_var:FormVar { return 'FormVar ("' + form_var + '")' }
+ATOM_VAR = atom_var:AtomVar { return 'AtomVar ("' + atom_var + '")' }
 
 _ "whitespace"
   = [ ]*
@@ -73,13 +76,12 @@ function addSymbols() {
 }
 
 function getSymbols() {
-    var arrow = "ARROW = \"NO-ARROW\" "
-    var sep = "SEP = \"NO-SEP\" "
-    var uconn = "UConn = \"NO-UConn\" "
+    var arrow = "SeqSign = \"NO-ARROW\" "
+    var sep = "CtxSep = \"NO-SEP\" "
     var conn = "Conn = \"NO-Conn\" "
-    var set = "SET = \"NO-SET\" "
-    var form = "Form = \"NO-FORM\" "
-    var atom = "Atom = \"NO-ATOM\" "
+    var set = "CtxVar = \"NO-SET\" "
+    var form = "FormVar = \"NO-FORM\" "
+    var atom = "AtomVar = \"NO-ATOM\" "
     var table_symbols = document.getElementsByClassName("ui search dropdown selection")
     for (var i = 0; i < table_symbols.length; i++) {
         var symbol = document.getElementById("t" + i).getElementsByTagName("script")[0].innerHTML
@@ -93,10 +95,6 @@ function getSymbols() {
 
         if (type == "separator") {
             sep += "/ \"" + symbol + "\" "
-        }
-
-        if (type == "unary") {
-            uconn += "/ \"" + symbol + "\" "
         }
 
         if (type == "connective") {
