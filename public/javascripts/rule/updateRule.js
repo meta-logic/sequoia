@@ -21,49 +21,49 @@ function extraArguments(a, b) {
 
 var parser_text = 
 `
-//Seq
-SEQ = ctx1:CTX _ arrow:ARROW _ ctx2:CTX {return "(" + ctx1 + ', Con ("' + arrow + '"), ' + ctx2 + ")"}
-/ CTX
+// Sequent
+SEQ 
+  = ctx1:CTX _ arrow:ARROW _ ctx2:CTX { return "(" + ctx1 + ', Con ("' + arrow + '"), ' + ctx2 + ")" }
+  / CTX
 
-//context
-CTX =  list:List _ sep:SEP _ ctx:CTX 
-{return "Mult (" + list + ', Con ("' + sep + '"), ' + ctx + ")"}
-/ list:List {return "Single (" + list + ")" }
+// Context
+CTX 
+  = list:List _ sep:SEP _ ctx:CTX { return "Mult (" + list + ', Con ("' + sep + '"), ' + ctx + ")" }
+  / list:List { return "Single (" + list + ")" }
 
-List = 
-set:SET _ "," _ list:List {
-    if (list.includes("::nil")) {
+List 
+  = set:SET _ "," _ list:List {
+      if (list.includes("::nil")) {
         return list.slice(0, -5) + "::" + set}
-    else {
+      else {
         return list + "::" + set
+      }
     }
-}/
-form:F _ "," _ list:List _ {return form + "::" + list}/
-set:SET {return set} /
-form:F {return form + "::nil"} 
+  / form:F _ "," _ list:List _ { return form + "::" + list }
+  / set:SET { return set } 
+  / form:F { return form + "::nil" } 
 
-//Formula
-F = 
-_ uconn:UCONN _ "(" _ form1:F _ ")" _ conn:CONN _ form2:F _  {return "(Form (Uform (" + uconn + ", " + form1 + "), " + conn + ", " + form2 + "))"} /
-_ "(" _ form1:F _ ")" _ conn:CONN _ form2:F _  {return "(Form (" + form1 + ", " + conn + ", " + form2 + "))"} /
-_ uconn:UCONN _ "(" _ form:F _ ")" _  {return "Uform (" + uconn + ", " + form + ")"} /
-_ "(" _ form:F _ ")" _  {return form} /
-_ UConn:UCONN _ fotom:FOTOM _ conn:CONN _ formula:F _ {return "Form (Uform (" + UConn + ", " + fotom + "), " + conn + ", " + formula + ")"} /
-_ UConn:UCONN _ fotom:FOTOM _ {return "Uform (" + UConn + ", " + fotom + ")"} /
-_ fotom:FOTOM _ conn:CONN _ formula:F _ {return "(Form (" + fotom + ", " + conn + ", " + formula + "))" } /
-_ fotom:FOTOM _ {return fotom}
+// Formula
+F 
+  = _ uconn:UCONN _ "(" _ form1:F _ ")" _ conn:CONN _ form2:F _  { return "(Form (Uform (" + uconn + ", " + form1 + "), " + conn + ", " + form2 + "))" } 
+  / _ "(" _ form1:F _ ")" _ conn:CONN _ form2:F _  { return "(Form (" + form1 + ", " + conn + ", " + form2 + "))" } 
+  / _ uconn:UCONN _ "(" _ form:F _ ")" _  { return "Uform (" + uconn + ", " + form + ")" } 
+  / _ "(" _ form:F _ ")" _  { return form } 
+  / _ UConn:UCONN _ fotom:FOTOM _ conn:CONN _ formula:F _ { return "Form (Uform (" + UConn + ", " + fotom + "), " + conn + ", " + formula + ")" } 
+  / _ UConn:UCONN _ fotom:FOTOM _ { return "Uform (" + UConn + ", " + fotom + ")" } 
+  / _ fotom:FOTOM _ conn:CONN _ formula:F _ { return "(Form (" + fotom + ", " + conn + ", " + formula + "))" } 
+  / _ fotom:FOTOM _ { return fotom }
 
+// Atomic formula
+FOTOM 
+  = FORM 
+  / ATOM
 
-//Form_Atom
-FOTOM = FORM / ATOM
-
-
-//symbols
-UCONN = conn:UConn {return 'Con ("' + conn  + '")'}
-CONN = conn:Conn {return 'Con ("' + conn  + '")'}
-FORM = form:Form {return "Form (" + form + ")"}
-ATOM = atom:Atom {return "Atom (" + atom + ")"}
-
+// Symbols
+UCONN = conn:UConn { return 'Con ("' + conn  + '")' }
+CONN = conn:Conn { return 'Con ("' + conn  + '")' }
+FORM = form:Form { return "Form (" + form + ")" }
+ATOM = atom:Atom { return "Atom (" + atom + ")" }
 
 _ "whitespace"
   = [ ]*
