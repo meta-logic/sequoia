@@ -57,6 +57,11 @@ typings/
 # dotenv environment variables file
 .env
 
-#sml generated file
+#sml generated files
 sml/generated-sml/*.sml
 
+# VisualStudio config
+.vscode/
+
+# MacOS folder
+.DS_Store/
