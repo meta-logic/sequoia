@@ -1,0 +1,59 @@
+%a eq would be in the form eq([],[])
+	
+%eq([g1,g2],[g10,g20]).
+%eq([g10,g20],[g3,g4]).
+%eq([g10,g20],[g30,g40]).
+
+
+%generates all less predicates
+less(A,C):- less(A,B),less(B,C).
+
+%generate variables
+var_list(L) :- eq(L,_).
+var_list(L) :- eq(_,L).
+var_list(L) :- var_list([_|L]).
+var(X) :- var_list(L),#head(L,X).
+
+goal(A) :- goal(eq(A,_)).
+goal(B) :- goal(eq(_,B)).
+
+%split helper
+split3([],L,L):- split1(L).
+split3(L1,L2,L):- split3(L1p,[X|L2],L), #insLast(L1p,X,L1).
+
+%subset helper
+subset4([],[],L,L):- subset(L).
+subset4([X|L1],L2,L,Ls):- subset4(L1,L2,[X|L],Ls).
+subset4(L1,[X|L2],L,Ls):- subset4(L1,L2,[X|L],Ls).
+subset3(L,L1,L2):- subset4(L1p,L2p,[],L),#reverse(L1p,L1),#reverse(L2p,L2).
+
+%merge helper
+merge5([],L1,L2,L1,L2):- merge2(L1,L2).
+merge5([X|L1],L2,L3,L2s,L3s):- merge5(L1,L2p,L3,L2s,L3s),#head(L2p,X),#head(L3,Y),less(X,Y),#tail(L2p,L2).
+merge5([X|[X|L1]],L2,L3,L2s,L3s):- merge5(L1,L2p,L3p,L2s,L3s),#head(L2p,X),#head(L3p,X),#tail(L2p,L2),#tail(L3p,L3).
+merge5([Y|L1],L2,L3,L2s,L3s):- less(Y,X),merge5(L1,L2,L3p,L2s,L3s),#head(L2,X),#head(L3p,Y),less(Y,X),#tail(L3p,L3).
+merge5([Y|L1],[],L3,L2s,L3s):- merge5(L1,[],L3p,L2s,L3s),#head(L3p,Y),#tail(L3p,L3).
+merge5([X|L1],L2,[],L2s,L3s):- merge5(L1,L2p,[],L2s,L3s),#head(L2p,X),#tail(L2p,L2).
+merge3(L2s,L3s,L1):- merge5(L1p,[],[],L2s,L3s), #reverse(L1p,L1).
+
+
+
+%L =[] 
+no :- eq([_|L],[]).
+no :- eq(B,A), eq(C,A), subset3(C,B,D), not #length(A,0), not #length(D,0).
+
+%if L=L2, then L2 = L
+eq(L,L2):- eq(L2,L), not no.
+
+
+%if A U B = C U B, then A = C
+split1(L1):- eq(L1,L2),var(X),#member(X,L1),#member(X,L2).
+split1(L2):- eq(L1,L2),var(X),#member(X,L1),#member(X,L2).
+eq(L1,L2):- eq(L11,L22),var(X),split3(L1p,[X|L1q],L11),split3(L2p,[X|L2q],L22),#append(L2p,L2q,L2), #append(L1p,L1q,L1), not no.
+
+
+%if A U B = C, B = D, then A U D = C
+subset(A):- eq(C,A), goal(C), not no.
+merge2(D,A):-eq(C,AB),goal(C), eq(B,D),not goal(B),not #length(B,0),  subset3(AB,A,B), not no.
+eq(N,C):-eq(C,AB),goal(C),eq(B,D),not goal(B),not #length(B,0), subset3(AB,A,B),merge3(D,A,N), not no.
+

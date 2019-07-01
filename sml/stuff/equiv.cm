@@ -1,0 +1,9 @@
+Group
+  signature EQUIVALENCE
+  structure Equivalence
+is
+  helpers.cm
+  datatypes.cm
+  set.sml
+  dlv.sml
+  equiv.sml
