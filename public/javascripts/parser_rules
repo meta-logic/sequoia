@@ -4,7 +4,7 @@ SEQ
 
 // Context struct
 CTX_STR 
-  = ctx:CTX _ sep:SEP _ ctx_str:CTX_STR { return "Mult ( Con (" + sep + "), " + ctx + ", " + ctx_str + ")" }
+  = ctx:CTX _ ctx_sep:CtxSep _ ctx_str:CTX_STR { return "Mult ( Con (" + ctx_sep + "), " + ctx + ", " + ctx_str + ")" }
   / ctx:CTX { return "Single (" + ctx + ")" } 
 
 // Context
@@ -17,9 +17,9 @@ CTX
   }
 
 CTX_LST
-  = set:SET _ "," _ ctx_lst:CTX_LST {
+  = ctx_var:CTX_VAR _ "," _ ctx_lst:CTX_LST {
       var [ctx_vars, forms] = ctx_lst
-      ctx_vars.push('CtxVar ("' + set + '")')
+      ctx_vars.push(ctx_var)
       return [ctx_vars, forms]
     }
   / form:FORM _ "," _ ctx_lst:CTX_LST _ { 
@@ -27,7 +27,7 @@ CTX_LST
       forms.push(form)
       return [ctx_vars, forms]
     }
-  / set:SET { return [['CtxVar ("' + set + '")'], []] } 
+  / ctx_var:CTX_VAR { return [[ctx_var], []] } 
   / form:FORM { return [[], [form]] } 
 
 // Formula (only unary and binary connectives supported so far)
@@ -42,6 +42,7 @@ FORM
 
 // Symbols
 CONN = conn:Conn { return 'Con ("' + conn  + '")' }
+CTX_VAR = ctx_var:CtxVar { return 'CtxVar ("' + ctx_var + '")' }
 FORM_VAR = form_var:FormVar { return 'FormVar ("' + form_var + '")' }
 ATOM_VAR = atom_var:AtomVar { return 'AtomVar ("' + atom_var + '")' }
 ATOM = atom:Atom { return 'Atom ("' + atom + '")' }
