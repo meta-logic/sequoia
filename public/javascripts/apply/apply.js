@@ -2,7 +2,7 @@ var parser_text =
 `
 // Sequent
 SEQ 
-  = ctx1:CTX_STR _ seq_sign:SeqSign _ ctx2:CTX_STR { return "Seq (" + ctx1 + ', Con ("' + seq_sign + '"), ' + ctx2 + ")" }
+  = _ ctx1:CTX_STR _ seq_sign:SeqSign _ ctx2:CTX_STR _{ return "Seq (" + ctx1 + ', Con ("' + seq_sign + '"), ' + ctx2 + ")" }
 
 // Context struct
 CTX_STR 
