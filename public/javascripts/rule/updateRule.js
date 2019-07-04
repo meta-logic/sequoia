@@ -53,12 +53,24 @@ CTX_LST
   / ctx_var:CTX_VAR { return [[ctx_var], []] } 
   / form:FORM { return [[], [form]] } 
 
-// Formula (only unary and binary connectives supported so far)
-FORM
+// Formula 
+FORM = BIFORM / GENFORM  
+
+FORM_LIST 
+  = _ form:FORM _ "," _ form_lst:FORM_LIST _ { 
+  	  form_lst.push(form)
+      return form_lst 
+    }
+  / _ form:FORM _ { return [form] }
+
+BIFORM
+  = fr:GENFORM _ conn:CONN _ fr2:FORM 
+  { return "Form (" + conn + ", [" + fr + "," + fr2 + "])" }
+
+GENFORM
   = "(" _ form:FORM _ ")" { return form }
-  / form_var:FORM_VAR _ conn:CONN _ form2:FORM { return "Form (" + conn + ", [" + form_var + "," + form2 + "])" }
-  / atom_var:ATOM_VAR _ conn:CONN _ form2:FORM { return "Form (" + conn + ", [" + atom_var + "," + form2 + "])" }
-  / conn:CONN _ form:FORM { return "Form (" + conn + ", [" + form + "])" }
+  / conn:CONN _ form:GENFORM { return "Form (" + conn + ", [" + form + "])" }
+  / conn:CONN _ "(" _ fls:FORM_LIST _ ")" {return 'Form(' + conn + "," + fls + ")"} 
   / form_var:FORM_VAR { return form_var }
   / atom_var:ATOM_VAR { return atom_var }
   / atom:ATOM { return atom }
