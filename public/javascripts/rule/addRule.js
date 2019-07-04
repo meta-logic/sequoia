@@ -49,7 +49,7 @@ BIFORM
 GENFORM
   = "(" _ form:FORM _ ")" { return form }
   / conn:CONN _ form:GENFORM { return "Form (" + conn + ", [" + form + "])" }
-  / conn:CONN _ "(" _ fls:FORM_LIST _ ")" {return 'Form(' + conn + "," + fls + ")"} 
+  / conn:CONN _ "(" _ fls:FORM_LIST _ ")" {return 'Form(' + conn + ",[" + fls.join(", ") + "])"}
   / form_var:FORM_VAR { return form_var }
   / atom_var:ATOM_VAR { return atom_var }
   / atom:ATOM { return atom }
