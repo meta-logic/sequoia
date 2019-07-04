@@ -40,12 +40,14 @@ FORM
   / conn:CONN _ form:FORM { return "Form (" + conn + ", [" + form + "])" }
   / form_var:FORM_VAR { return form_var }
   / atom_var:ATOM_VAR { return atom_var }
+  / atom:ATOM { return atom }
 
 // Symbols
 CONN = conn:Conn { return 'Con ("' + conn  + '")' }
 CTX_VAR = ctx_var:CtxVar { return 'CtxVar ("' + ctx_var + '")' }
 FORM_VAR = form_var:FormVar { return 'FormVar ("' + form_var + '")' }
 ATOM_VAR = atom_var:AtomVar { return 'AtomVar ("' + atom_var + '")' }
+ATOM = atom:Atom { return 'Atom ("' + atom + '")' }
 
 _ "whitespace"
   = [ ]*
