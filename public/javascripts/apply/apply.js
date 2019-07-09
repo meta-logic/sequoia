@@ -103,7 +103,8 @@ function getSymbols() {
     var conn = "Conn = \"NO-Conn\" "
     var set = "CtxVar = \"NO-SET\" "
     var form = "FormVar = \"NO-FORM\" "
-    var atom = "AtomVar = \"NO-ATOM\" "
+    var atom_var = "AtomVar = \"NO-ATOMVAR\" "
+    var atom = "Atom = \"NO-ATOM\" "
     var table_symbols = document.getElementsByClassName("ui search dropdown selection")
     for (var i = 0; i < table_symbols.length; i++) {
         var symbol = document.getElementById("t" + i).getElementsByTagName("script")[0].innerHTML
@@ -135,7 +136,7 @@ function getSymbols() {
             atom += "/ \"" + symbol + "\" "
         }
     }
-    parser_text += arrow + "\n" + sep + "\n" + uconn + "\n" + conn + "\n" + set + "\n" + form + "\n" + atom + "\n" 
+    parser_text += arrow + "\n" + sep + "\n" + conn + "\n" + set + "\n" + form + "\n" + atom_var + "\n" + atom + "\n" 
     console.log(parser_text)
 }
 
