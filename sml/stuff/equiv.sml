@@ -3,34 +3,37 @@
 signature EQUIVALENCE = 
 sig
 	structure Dat : DATATYPES
-	type eq_constraint = (string * Dat.ctx_var list * Dat.ctx_var list)
 
 	val ctx_struct_equiv : Dat.ctx_struct * Dat.ctx_struct -> bool
 	
 	val seq_equiv : Dat.seq*Dat.seq -> bool
 	
-	val check_consistent : eq_constraint list * eq_constraint list-> bool
+	val check_consistent : (Dat.ctx_var * Dat.ctx_var list * Dat.ctx_var list) list * 
+	(Dat.ctx_var * Dat.ctx_var list * Dat.ctx_var list) list
+	* Dat.ctx_var list * Dat.ctx_var list-> bool
 
 	
-	val check_premises : (Dat.seq list * Dat.seq list * eq_constraint list* eq_constraint list * bool list) -> bool
+	val check_premises : (Dat.seq list * Dat.seq list * 
+	 (Dat.ctx_var * Dat.ctx_var list * Dat.ctx_var list) list*
+	 (Dat.ctx_var * Dat.ctx_var list * Dat.ctx_var list) list * bool list *
+	 Dat.ctx_var list * Dat.ctx_var list) -> bool
 	
+	val check_premises_wk : (Dat.seq list * Dat.seq list * 
+	 (Dat.ctx_var * Dat.ctx_var list * Dat.ctx_var list) list*
+	 (Dat.ctx_var * Dat.ctx_var list * Dat.ctx_var list) list *
+	 Dat.form* Dat.ctx_var list * Dat.ctx_var list) -> bool
 
-
-	val test1 : bool
-	val test2 : bool
 end
 
 
-structure Equivalence :> EQUIVALENCE = 
+functor Equivalence (Dat : DATATYPES) :> EQUIVALENCE = 
 struct
 	structure Set = SplaySetFn(StringKey);
 	(*constraint form: String*ctx_var list*ctx_var list *)
-	structure Dat = datatypesImpl
-
+	structure Dat = Dat
 	structure H = helpersImpl
 
 
-	type eq_constraint = (string * Dat.ctx_var list * Dat.ctx_var list)
 
 
 	(*given 2 sequents, check if they are equivalent*)
@@ -47,51 +50,7 @@ struct
 
 	fun seq_equiv (Dat.Seq(A1,con1,A2),Dat.Seq(B1,con2,B2)) = ctx_struct_equiv(A1,B1) andalso con1=con2 andalso ctx_struct_equiv(A2,B2)
 
-	fun ctx_var_list_to_string([]) = ""
-		|ctx_var_list_to_string([x]) = x
-		|ctx_var_list_to_string(x::L) = x^","^ctx_var_list_to_string(L)
-
-
-
-	fun eq_to_string ((_,L1,L2)) S=
-		let
-			fun mp (Dat.CtxVar(x)) = "g"^x
-			val L1p = List.map mp L1
-			val L2p = List.map mp L2
-			val L1S = Set.addList(S,L1p)
-			val L1sorted = ListMergeSort.sort (fn (x,y) => x>y) L1p
-			val L1string= "["^ctx_var_list_to_string(L1sorted)^"]" 
-			val L2S = Set.addList(L1S,L2p)
-			val L2sorted = ListMergeSort.sort (fn (x,y) => x>y) L2p
-			val L2string= "["^ctx_var_list_to_string(L2sorted)^"]"
-		in
-			("eq("^L1string^","^L2string^")",L2S)
-		end
-
-	fun cons_to_string ([]) S= ("\n",S)
-		|cons_to_string (x::L) S =
-		let
-		 	val (str,Sp) = cons_to_string L S
-		 	val (xp, Spp) = eq_to_string x Sp
-		 in
-		 	(xp^".\n"^str,Spp)
-		 end 
-
-	fun goal_to_string ([]) S = (".\n\n", S)
-	   |goal_to_string (x::L) S = 
-	   let
-	   	 	val (xs, Sp) = eq_to_string x S
-	   	 	val (rest, Spp) = goal_to_string L Sp
-	   	 in
-	   	 	case L of
-	   	 		nil => (xs^rest^"goal("^xs^").\n",Spp)
-	   	 		| _ => (xs^","^rest^"goal("^xs^").\n",Spp)
-	   	 end	 
-
-	fun less_predicates (x::nil) = "\n"
-		|less_predicates (nil) = "\n"
-		|less_predicates (x::y::L) = less_predicates(y::L)^"less("^x^","^y^").\n"
-
+	 
 
 	(*taken from: https://stackoverflow.com/questions/33597175/how-to-write-to-a-file-in-sml*)
 	fun writeFile filename content =
@@ -100,46 +59,63 @@ struct
 	        val _ = TextIO.closeOut fd
 	    in () end
 
-	(*goal has atleast one constraint*)
-	fun check_consistent (constraints,goals) =
+	fun list_to_vector ([],[]) = []
+		|list_to_vector (x,[]) = raise Fail ("there might be undefined vars\n"^Dat.ctx_varL_toString(x))
+		|list_to_vector (L,v::rest) = 
 		let
-			val (constraintS,S) = cons_to_string constraints Set.empty
-			val (goal1,Sp) = goal_to_string goals S
-			val (goal_final, less) = ("ok :- "^goal1, less_predicates(Set.listItems(Sp)))
-			val _ = writeFile "check.dlv" (constraintS^goal_final^less)
-			val result = Dlv.main_check("check.dlv")
-			val _ = OS.FileSys.remove("check.dlv")
+			val (L_v,L_rest) = List.partition (fn x => Dat.ctx_var_eq(x,v)) L
+			val v_num = List.length(L_v)
+		in
+			v_num::(list_to_vector(L_rest,rest))
+		end
+
+	fun constraint_to_row (cons as (_,left,right), var_list) = 
+		let
+			val left_v = list_to_vector(left,var_list)
+			val right_v = list_to_vector(right,var_list)
+		in
+			ListPair.mapEq (fn (x,y) => x-y) (left_v,right_v)
+		end
+
+	fun row_list_to_string ([]) = "\n"
+		|row_list_to_string ([x])=  x^"\n"
+		|row_list_to_string (x::L) = x^" "^row_list_to_string(L)
+
+	fun myIntToString (x) = case x>=0 of
+		true => Int.toString(x)
+		| false => "-"^Int.toString(x * ~1)
+
+	fun cons_to_matrix ([],_) = "\n"
+		|cons_to_matrix (x::L,var_list) =
+		let
+			val rest = cons_to_matrix (L,var_list)
+			val row_list = constraint_to_row (x,var_list)
+			val row = row_list_to_string (List.map myIntToString row_list)
+		in
+			row^rest
+		end
+
+	(*goal has atleast one constraint*)
+	fun check_consistent (constraints,goals,t1_vars,t2_vars) =
+		let
+			val new_cons = constraints@goals
+			val cons_len = List.length(new_cons)
+			val t1_var_num = List.length(t1_vars)
+			val var_num = t1_var_num + List.length(t2_vars)
+			val vars_list = t1_vars @ t2_vars
+			val line1 = Int.toString(cons_len)^" "^Int.toString(var_num)^" "^Int.toString(t1_var_num)^"\n"
+			val matrix = cons_to_matrix (new_cons,vars_list)
+			val _ = writeFile "check" (line1^matrix)
+			val result = Dlv.main_check("check")
+			val _ = OS.FileSys.remove("check")
 		in
 			result
 		end
 
-
-	val constraints = [("test",[Dat.CtxVar("")],[Dat.CtxVar("1"),Dat.CtxVar("2")]),
-					   ("test",[Dat.CtxVar("2")],[Dat.CtxVar("3"),Dat.CtxVar("4")]),
-					   ("test",[Dat.CtxVar("p")],[Dat.CtxVar("p1"),Dat.CtxVar("p2")]),
-					   ("test",[Dat.CtxVar("p1")],[Dat.CtxVar("p3"),Dat.CtxVar("p4")]),
-					   ("test",[Dat.CtxVar("1")],[Dat.CtxVar("p3")]),
-					   ("test",[Dat.CtxVar("3")],[Dat.CtxVar("p4")]),
-					   ("test",[Dat.CtxVar("4")],[Dat.CtxVar("p2")])]
-	val goal = [("test",[Dat.CtxVar("")],[Dat.CtxVar("p")])]
-
-	(*test 1, should succeed. G = G1,G2| G2 = G3,G4 | G' = G1',G2' | G1' =G3',G4' | G1 = G3' | G3 = G4' | G4 = G2'*)
-	(*checking if G = G'*)
-
-	val test1 = check_consistent (constraints,goal)
-
-	val constraints2 = [("test",[Dat.CtxVar("")],[Dat.CtxVar("1"),Dat.CtxVar("2")]),
-					   ("test",[Dat.CtxVar("1")],[Dat.CtxVar("p")]),
-					   ("test",[Dat.CtxVar("2")],[Dat.CtxVar("p")])]
-	(*test 2, should fail. G = G1,G2 | G1 = G' | G2 = G' |, checking if G = G'*)				 
-	val test2 = check_consistent (constraints2,goal)
+	
   
-	val true = test1
-	val false = test2
-  
-	fun check_premises _ = true
 
-	fun extract_constraints'' (Dat.Ctx (a,_), Dat.Ctx (b,_)) = ("eq",a,b)
+	fun extract_constraints'' (Dat.Ctx (a,_), Dat.Ctx (b,_)) = (Dat.CtxVar("eq"),a,b)
 
 	fun extract_constraints' (Dat.Empty,Dat.Empty) = []
 		| extract_constraints' (Dat.Single a, Dat.Single b) = [extract_constraints'' (a,b)]
@@ -148,8 +124,8 @@ struct
 
 	fun extract_constraints (Dat.Seq(A1,_,A2),Dat.Seq(B1,_,B2)) = extract_constraints'(A1,B1)@extract_constraints'(A2,B2)
 
-	fun check_premises (_,[],constraints,goals,_) = check_consistent(constraints,goals)
-		| check_premises (assumed_leaves,x::conc_leaves,cons,goals,wkL) = 
+	fun check_premises (_,[],constraints,goals,_,t1_vars,t2_vars) = check_consistent(constraints,goals,t1_vars,t2_vars)
+		| check_premises (assumed_leaves,x::conc_leaves,cons,goals,wkL,t1_vars,t2_vars) = 
 		let
 			val possible_premises = List.filter (fn y => seq_equiv (x,y)) assumed_leaves
 			fun find_match [] = false
@@ -157,7 +133,7 @@ struct
 				let
 					val new_cons = extract_constraints (y,x) @ cons
 				in
-					check_premises (assumed_leaves,conc_leaves,new_cons,goals,wkL) orelse
+					check_premises (assumed_leaves,conc_leaves,new_cons,goals,wkL,t1_vars,t2_vars) orelse
 					find_match L
 				end
 		in
@@ -193,8 +169,8 @@ struct
 
 
 	(*check premises with an extra term that can be weakened*)
-	fun check_premises_wk (_,[],constraints,goals,_) = check_consistent(constraints,goals)
-		|check_premises_wk (assumed_leaves,x::conc_leaves,cons,goals,term) = 
+	fun check_premises_wk (_,[],constraints,goals,_,t1_vars,t2_vars) = check_consistent(constraints,goals,t1_vars,t2_vars)
+		|check_premises_wk (assumed_leaves,x::conc_leaves,cons,goals,term,t1_vars,t2_vars) = 
 		let
 			val possible_premises = List.filter (fn y => seq_equiv_wk (y,x,term)) assumed_leaves
 			fun find_match [] = false
@@ -202,7 +178,7 @@ struct
 				let
 					val new_cons = extract_constraints (y,x) @ cons
 				in
-					check_premises_wk (assumed_leaves,conc_leaves,new_cons,goals,term) orelse
+					check_premises_wk (assumed_leaves,conc_leaves,new_cons,goals,term,t1_vars,t2_vars) orelse
 					find_match L
 				end
 		in

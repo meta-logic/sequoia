@@ -57,17 +57,17 @@ structure Dlv :>
    = 
 struct
   
-  fun check (cmd,s,n)= let
+  fun check (cmd)= let
     val f = Popen.popen(cmd, Popen.PIPE_R)
-    val _ = Posix.Process.sleep(Time.fromReal(0.3))
-    val output = Substring.full (Byte.bytesToString (Posix.IO.readVec (f,1000)))
+    val _ = Posix.Process.waitpid_nh (Posix.Process.W_ANY_CHILD, [])
+    val output = Substring.full (Byte.bytesToString (Posix.IO.readVec (f,1)))
     val _ = Popen.pclose f
   in
-    Substring.isSubstring s output andalso (not (Substring.isSubstring n output))
+    Substring.isSubstring "1" output
   end
 
   (*given a file with the starting facts, checks for a condition (defined in the starting facts)*)
-  fun main_check (file) = check ("dlv constraints.dlv "^file^" -nofinitecheck -silent -filter=ok,no", "ok", "no")
+  fun main_check (file) = check ("python milp/milp.py "^file)
 
   (*can be used to test stuff*)
   val test = "currently unused"
