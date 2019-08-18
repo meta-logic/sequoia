@@ -1,6 +1,6 @@
 Group
   signature EQUIVALENCE
-  functor Equivalence
+  structure Equivalence
 is
   helpers.cm
   datatypes.cm

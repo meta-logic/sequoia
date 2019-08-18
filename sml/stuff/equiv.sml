@@ -26,14 +26,12 @@ sig
 end
 
 
-functor Equivalence (Dat : DATATYPES) :> EQUIVALENCE = 
+structure Equivalence  : EQUIVALENCE = 
 struct
 	structure Set = SplaySetFn(StringKey);
 	(*constraint form: String*ctx_var list*ctx_var list *)
-	structure Dat = Dat
+	structure Dat = datatypesImpl
 	structure H = helpersImpl
-
-
 
 
 	(*given 2 sequents, check if they are equivalent*)
@@ -105,7 +103,8 @@ struct
 			val vars_list = t1_vars @ t2_vars
 			val line1 = Int.toString(cons_len)^" "^Int.toString(var_num)^" "^Int.toString(t1_var_num)^"\n"
 			val matrix = cons_to_matrix (new_cons,vars_list)
-			val _ = writeFile "check" (line1^matrix)
+			val line2 = row_list_to_string(List.map (fn Dat.CtxVar(x) => x) vars_list)
+			val _ = writeFile "check" (line1^line2^matrix)
 			val result = Dlv.main_check("check")
 			val _ = OS.FileSys.remove("check")
 		in

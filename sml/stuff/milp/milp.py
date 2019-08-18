@@ -10,7 +10,16 @@ file = sys.argv[1]
 
 
 f = open(file,"r")
+
+w = open("test.txt","a")
+
+w.write("_________________________________________________\n")
+
 row_num, var_num, t1_num = map(int,f.readline().split(" "))
+
+variables = f.readline().strip().split(" ")
+w.write(" ".join(variables)+"\n")
+assert(len(variables)==var_num)
 
 def get_model():
     nl = open(os.devnull,'w')
@@ -59,3 +68,8 @@ for i in range(t1_num):
 m.update()
 m.optimize()
 print int(m.status != GRB.INFEASIBLE)
+w.write(str(m.status != GRB.INFEASIBLE) + "\n")
+if (m.status != GRB.INFEASIBLE):
+	unifier = map((lambda x : map(lambda y: int(y.x),x)),unifier)
+	for i in range(len(unifier)):
+		w.write(" ".join(map(str,unifier[i])) +"\n")
