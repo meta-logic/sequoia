@@ -1,37 +1,11 @@
 
-
-signature EQUIVALENCE = 
-sig
-	structure Dat : DATATYPES
-
-	val ctx_struct_equiv : Dat.ctx_struct * Dat.ctx_struct -> bool
-	
-	val seq_equiv : Dat.seq*Dat.seq -> bool
-	
-	val check_consistent : (Dat.ctx_var * Dat.ctx_var list * Dat.ctx_var list) list * 
-	(Dat.ctx_var * Dat.ctx_var list * Dat.ctx_var list) list
-	* Dat.ctx_var list * Dat.ctx_var list-> bool
-
-	
-	val check_premises : (Dat.seq list * Dat.seq list * 
-	 (Dat.ctx_var * Dat.ctx_var list * Dat.ctx_var list) list*
-	 (Dat.ctx_var * Dat.ctx_var list * Dat.ctx_var list) list * bool list *
-	 Dat.ctx_var list * Dat.ctx_var list) -> bool
-	
-	val check_premises_wk : (Dat.seq list * Dat.seq list * 
-	 (Dat.ctx_var * Dat.ctx_var list * Dat.ctx_var list) list*
-	 (Dat.ctx_var * Dat.ctx_var list * Dat.ctx_var list) list *
-	 Dat.form* Dat.ctx_var list * Dat.ctx_var list) -> bool
-
-end
-
-
 structure Equivalence  : EQUIVALENCE = 
 struct
 	structure Set = SplaySetFn(StringKey);
 	(*constraint form: String*ctx_var list*ctx_var list *)
 	structure Dat = datatypesImpl
 	structure H = helpersImpl
+	structure C = Check
 
 
 	(*given 2 sequents, check if they are equivalent*)
@@ -105,7 +79,7 @@ struct
 			val matrix = cons_to_matrix (new_cons,vars_list)
 			val line2 = row_list_to_string(List.map (fn Dat.CtxVar(x) => x) vars_list)
 			val _ = writeFile "check" (line1^line2^matrix)
-			val result = Dlv.main_check("check")
+			val result = C.main_check("check")
 			val _ = OS.FileSys.remove("check")
 		in
 			result

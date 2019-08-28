@@ -67,4 +67,4 @@ sml/generated-sml/*.sml
 .DS_Store/
 
 # SML Compilation Manager files
-sml/stuff/.cm/
+.cm/

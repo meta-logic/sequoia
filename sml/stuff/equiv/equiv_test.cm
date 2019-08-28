@@ -1,6 +1,6 @@
 Group
   structure EquivTest
 is
-  datatypes.cm
+  ../basics/datatypes/datatypes.cm
   equiv.cm
   equiv_test.sml

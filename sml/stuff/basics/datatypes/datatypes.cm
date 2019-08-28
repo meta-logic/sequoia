@@ -2,7 +2,7 @@ Group
   signature DATATYPES
   structure datatypesImpl
 is
-  helpers.cm
+  ../helpers/helpers.cm
   datatypes.sig
   datatypes.sml
 

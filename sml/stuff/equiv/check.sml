@@ -49,7 +49,8 @@ struct
       | _ => raise Bind (* This should be impossible. *)
 end
 
-structure Dlv :>
+(*TODO proper name*)
+structure Check :>
   sig
     val main_check : string -> bool
     val test : string
@@ -67,7 +68,7 @@ struct
   end
 
   (*given a file with the starting facts, checks for a condition (defined in the starting facts)*)
-  fun main_check (file) = check ("python milp/milp.py "^file)
+  fun main_check (file) = check ("python3 milp/milp.py "^file)
 
   (*can be used to test stuff*)
   val test = "currently unused"

@@ -2,8 +2,8 @@ Group
   signature EQUIVALENCE
   structure Equivalence
 is
-  helpers.cm
-  datatypes.cm
+  ../basics/basics.cm
   set.sml
-  dlv.sml
+  check.sml
   equiv.sml
+  equiv.sig
