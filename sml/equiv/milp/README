@@ -1,0 +1,12 @@
+input for milp:
+1st row:
+R N M
+where R is the number of rows
+N is the number of variables
+M is the number of variables that come from the first tree
+2nd row:
+variable names in order (N nonempty strings seperated by a space)
+
+this line should be followed by an RxN matrix, where each row is a 
+constraint in the problem, and the variables from the first tree should
+be in the columns to the left

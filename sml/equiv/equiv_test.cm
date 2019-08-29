@@ -1,0 +1,6 @@
+Group
+  structure EquivTest
+is
+  ../basics/datatypes/datatypes.cm
+  equiv.cm
+  equiv_test.sml

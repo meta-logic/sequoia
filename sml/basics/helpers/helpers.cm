@@ -1,0 +1,11 @@
+Group 
+  signature HELPERS
+  structure helpersImpl
+  Library($/basis.cm)
+  Library($SMLNJ-LIB/Util/smlnj-lib.cm)
+is
+  helpers.sig
+  helpers.sml
+  $/basis.cm
+  $SMLNJ-LIB/Util/smlnj-lib.cm 
+

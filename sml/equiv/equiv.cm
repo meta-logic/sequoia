@@ -1,0 +1,9 @@
+Group
+  signature EQUIVALENCE
+  structure Equivalence
+is
+  ../basics/basics.cm
+  set.sml
+  check.sml
+  equiv.sml
+  equiv.sig

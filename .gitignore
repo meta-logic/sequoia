@@ -65,3 +65,6 @@ sml/generated-sml/*.sml
 
 # MacOS folder
 .DS_Store/
+
+# SML Compilation Manager files
+.cm/
