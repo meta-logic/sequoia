@@ -1,4 +1,4 @@
 Group is
-  unification.cm
-  tree_func.cm
-  equiv.cm
+  unification/unification.cm
+  tree_func/tree_func.cm
+  equiv/equiv.cm

@@ -2,8 +2,10 @@ import sys
 import os
 nl = open(os.devnull,'w')
 temp = sys.stdout
-sys.stdout = nl 
+temp2 = sys.stderr
 
+sys.stdout = nl 
+sys.stderr = nl
 
 
 from mip.model import *
@@ -36,15 +38,18 @@ assert(len(variables)==var_num)
 
 
 def get_model():
-    m = Model("test",solver_name=CBC)
+    m = Model("test",solver_name='cbc')
     return m
 
 m = get_model()
 
 
-nl.close()
-sys.stdout = temp
 m.verbose = 0
+sys.stdout = temp
+sys.stderr = temp2
+nl.close()
+
+
 #m.setParam("OutputFlag",0)
 
 rows = [0]*row_num
@@ -83,3 +88,4 @@ if (solved):
 	unifier = list(map((lambda x : list(map(lambda y: int(y.x),x))),unifier))
 	for i in range(len(unifier)):
 		w.write(" ".join(map(str,unifier[i])) +"\n")
+w.close()

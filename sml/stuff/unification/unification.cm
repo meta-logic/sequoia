@@ -2,8 +2,7 @@ Group
   signature UNIFICATION
   structure unifyImpl
 is
-  helpers.cm
-  datatypes.cm
-  applyunifier.cm
+  ../basics/basics.cm
+  ../applyunifier/applyunifier.cm
   unification.sig
   unification.sml

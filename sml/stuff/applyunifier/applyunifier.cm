@@ -2,7 +2,6 @@ Group
   signature APPLYUNIFIER
   structure applyunifierImpl
 is
-  helpers.cm
-  datatypes.cm
+  ../basics/basics.cm
   applyunifier.sig
   applyunifier.sml
