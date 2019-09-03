@@ -64,16 +64,26 @@ structure applyunifierImpl : APPLYUNIFIER = struct
                                                     in 
                                                         (DAT.CVs(a, DAT.Ctx(List.concat vls2, fls1 @ List.concat fls2)), false)
                                                     end
-    fun UnifierComposition (sigma1, []) = sigma1
-        | UnifierComposition ([], sigma2) = sigma2
-        | UnifierComposition (s::sigma1, sigma2) = 
+    fun UnifierComposition' (sigma1, []) = sigma1
+        | UnifierComposition' ([], sigma2) = sigma2
+        | UnifierComposition' (s::sigma1, sigma2) = 
             let val (s', equivalent) = compose(s, sigma2) 
-                val sigma1new = UnifierComposition(sigma1, sigma2) 
-                val sigma2new = List.filter(fn s2 => not 
-                            (List.exists (fn s1 => DAT.sub_prefix_eq(s1, s2)) 
-                            (if equivalent then sigma1new else (s')::sigma1new)))sigma2
+                val sigma1temp = UnifierComposition'(sigma1, sigma2)
+                val sigma1new = if equivalent then sigma1temp else (s')::sigma1temp
+                val sigma2new = List.filter (fn s2 => not 
+                            (List.exists (fn s1 => DAT.sub_prefix_eq(s2, s1)) 
+                            sigma2)) (if equivalent then sigma1new else (s')::sigma1new)
             in 
-                sigma1new @ sigma2new
+                sigma1new
             end
+
+    fun UnifierComposition (sigma1,sigma2)=
+        let
+            val sigma2new = List.filter (fn s2 => not 
+                            (List.exists (fn s1 => DAT.sub_prefix_eq(s2, s1)) 
+                            sigma1)) sigma2
+        in
+            UnifierComposition'(sigma1,sigma2new)
+        end
 
 end
