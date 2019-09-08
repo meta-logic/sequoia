@@ -6,15 +6,13 @@ var express = require('express');
 var router  = express.Router();
 var sml     = require('../../sml/applyRule');
 
-router.get('/apply', function (req, res) {
-	return res.render('apply/index', {'title' : 'Sequoia - apply', 'layout' : 'apply'});
-});
-
 
 router.post('/apply', function (req, res) {
 	var rule = req.body.rule;
-	var sequent = req.body.sequent;
-	var result = sml.applyRule(rule, sequent, res);
+	var tree = req.body.tree;
+	var id = req.body.node_id;
+	var result = sml.applyRule(rule, tree, id, res);
 });
+
 
 module.exports = router;
