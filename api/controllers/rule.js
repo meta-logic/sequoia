@@ -1,34 +1,9 @@
-//api/controllers/rule
+//api/controllers/rule.js
 "use strict"
 
 //Loading Dependencies =============================================
 var Rule = require("../models/rule")
-var sml     = require("../../sml/writeRule")
 
-//helper functions for extraArguents
-
-Array.prototype.diff = function(a) {
-    return this.filter(function(i) {return a.indexOf(i) < 0})
-}
-
-function flatten(arr) {
-    return arr.reduce(function (flat, toFlatten) {
-        return flat.concat(Array.isArray(toFlatten) ? flatten(toFlatten) : toFlatten)
-    }, [])
-}
-
-function extraArguments(conclusion_list, premises_list) {
-
-    var argumentsDup = []
-
-    for (var i = 0; i < premises_list.length; i++) {
-        argumentsDup.push(premises_list[i].diff(conclusion_list))
-    }
-
-    argumentsDup = flatten(argumentsDup)
-    return Array.from(new Set(argumentsDup))
-
-}
 
 //creating a rule
 function createRule (req, res) {
@@ -38,9 +13,8 @@ function createRule (req, res) {
     rule.rule      = req.body.rule
     rule.premises  = JSON.parse(req.body.premises)
     rule.conclusion = req.body.conclusion
-    rule.extraArguments = extraArguments(JSON.parse(req.body.conc), JSON.parse(req.body.prem))
-
-    console.log(rule)
+    rule.sml_prem = JSON.parse(req.body.parsed_prem)
+    rule.sml_conc = req.body.parsed_conc
 
     //saving the rule in the database
     rule.save(function (err) {
@@ -52,9 +26,6 @@ function createRule (req, res) {
                 "message" : "something went wrong while creating the rule"
             })
         }
-
-        sml.writeRule(rule.rule, req.body.parsed_conc, JSON.parse(req.body.parsed_prem), rule.extraArguments, req.body.toString)
-
         //send success message and created rule
         return res.status(200).json({
             "status"  : "success",
@@ -62,6 +33,55 @@ function createRule (req, res) {
             "rule"    : rule   
         })
     }) 
+}
+
+
+//updating a rule
+function updateRule (req, res) {
+    //looking up the rule and updating it
+    Rule.findOneAndUpdate({ _id : req.body.id}, 
+        {   rule : req.body.rule, 
+            premises : JSON.parse(req.body.premises), 
+            conclusion : req.body.conclusion, 
+            sml_prem : JSON.parse(req.body.parsed_prem),
+            sml_conc : req.body.parsed_conc
+        }, 
+        { new : true}, 
+        function (err, rule) {
+            //if the rule does not exist
+            if (err || rule == null) {
+                return res.status(400).json({
+                    "status"  : "failure",
+                    "message" : "rule does not exist"
+                })
+            }
+            //send back the updated rule 
+            return res.status(200).json({
+                "status" : "success",
+                "rule"   : rule
+            })
+        })
+}
+
+
+//deleting a rule
+function deleteRule (req, res) {
+    //deleting a rule
+    Rule.remove({ _id : req.body.id}, function (err, rule) {
+        //if the rule does not exists
+        if (err || rule == null) {
+            return res.status(400).json({
+                "status"  : "failure",
+                "message" : "rule does not exist"
+            })
+        }
+        //rule deleted
+        return res.status(200).json({
+            "status"  : "success",
+            "message" : "rule successfully deleted",
+            "rule"    : rule
+        })
+    })
 }
 
 
@@ -88,55 +108,4 @@ function getRule (req, res) {
 }
 
 
-//updating a rule
-function updateRule (req, res) {
-    //looking up the rule and updating it
-    Rule.findOneAndUpdate({ _id : req.body.id}, 
-        { rule : req.body.rule, premises : JSON.parse(req.body.premises), 
-            conclusion : req.body.conclusion, 
-            extraArguments : extraArguments(JSON.parse(req.body.conc), JSON.parse(req.body.prem))}, 
-        { new : true}, 
-        function (err, rule) {
-            //if the rule does not exist
-            if (err || rule == null) {
-                return res.status(400).json({
-                    "status"  : "failure",
-                    "message" : "rule does not exist"
-                })
-            }
-
-            sml.writeRule(req.body.rule, req.body.parsed_conc, JSON.parse(req.body.parsed_prem), 
-                extraArguments(JSON.parse(req.body.conc), JSON.parse(req.body.prem)), req.body.toString)
-
-            //send back the updated rule 
-            return res.status(200).json({
-                "status" : "success",
-                "rule"   : rule
-            })
-        })
-}
-
-
-//deleting a rule
-function deleteRule (req, res) {
-    //deleting a rule
-    Rule.remove({ _id : req.body.id}, function (err, rule) {
-        //if the rule does not exists
-        if (err || rule == null) {
-            return res.status(400).json({
-                "status"  : "failure",
-                "message" : "rule does not exist"
-            })
-        }
- 
-        //rule deleted
-        return res.status(200).json({
-            "status"  : "success",
-            "message" : "rule successfully deleted",
-            "rule"    : rule
-        })
-    })
-}
-
-
-module.exports = {createRule, getRule, updateRule, deleteRule}
+module.exports = {createRule, updateRule, deleteRule, getRule}
