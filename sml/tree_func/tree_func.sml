@@ -58,6 +58,11 @@ structure treefuncImpl : TREEFUNC = struct
             else if not (String.isPrefix id sid) then []
             else List.foldl(fn (branch, premises) => premises @ (get_premises_of(branch,sid)))([])pq
 
+    fun check_rule_of(DevTree(id, _, NoRule, pq), sid) = not (id = sid)
+        | check_rule_of(DevTree(id, _, rq, pq), sid) = if id = sid then true 
+        else if not (String.isPrefix id sid) then true
+        else List.foldl(fn (branch, bools) => bools andalso (check_rule_of(branch,sid)))(true)pq
+
     fun apply_rule((forms, cons, dt), rule, sid) =
         let 
             fun apply_rule_aux(DevTree(id, sq, NoRule, []), Rule(name, s, conc, premises), sid) =
