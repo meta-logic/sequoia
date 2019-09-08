@@ -1,52 +1,41 @@
 var cmd = require("node-cmd")
+const cmd2 = require("child_process")
+const fs = require('fs')
 
-function applyRule(rule, input, res) {
-    rule = rule.replace("\\", "")
-    rule = rule.replace(/ /g, "_")
+function applyRule(rule, tree, id, res) {
+    var val_name = "val temp"
+    var val_len = val_name.length
+    var sml_command = "treefuncImpl.translate_premises("+tree+","+rule+","+id+");\n"
+    const smlTerminalInput = 
+    "CM.make \"sml/unify.cm\";\n"
+    +"Control.Print.printDepth :=100;\n"
+    +"open datatypesImpl;\n"
+    +sml_command
+    +"OS.Process.exit(OS.Process.success);\n"
 
-    const processRef = cmd.get("sml")
-    let data_line = ""
-    var x = ""
-    var count = 0
-    var temp = []
-    //listen to the sml terminal output
-    processRef.stdout.on("data", function(data) {
-        data_line += data
-        count++
-
-        //  if (data_line[data_line.length-1] == '\n') {
-        // }
-
-        if (count == 8) {
-            x = data_line.split("it =")
+    const processRef = cmd2.spawn("sml")
+    processRef.stdin.write(smlTerminalInput)
+    processRef.on('close', function (code) {
+        try {
+            fs.readFile('sml/test.sml', (err, data) => {
+            var answer = data.toString()
             try {
-                var answer = x[2].split(":")[0].replace("[", "").replace("]", "")
-                console.log("Answer: ", answer)
+                fs.unlinkSync('sml/test.sml')
+                console.log(answer)
                 return res.status(200).json({
-                    status: "success",
+                    status: 'success',
                     output: answer
                 })
-            } catch (e) {
-                console.log(x)
+            } catch(err) {
+                console.error(err)
             }
+        })
+        } catch(err) {
+            console.error(err)
         }
     })
-
-    const smlTerminalInput =
-		"use \"" +
-		__basedir +
-		"/sml/generated-sml/" +
-		rule +
-		".sml\";\nmap(fn x => toString(x))(" +
-		rule +
-		" (" +
-		input +
-		"));\nOS.Process.exit(OS.Process.success);\n"
-    console.log(smlTerminalInput)
-
-    processRef.stdin.write(smlTerminalInput)
+        
 }
 
-// applyRule('and_R', 'Form(Form(Atom ("hi"),Con ("\\\\wedge"),Atom ("hello")),(Con ("\\\\Rightarrow")),(Atom ("Can")))');
 
 module.exports = { applyRule }
