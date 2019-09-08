@@ -5,9 +5,11 @@
 var mongoose = require("mongoose")
 var Schema   = mongoose.Schema
 
+
 //defining the rule schema
-var symbolsSchema = new Schema({
-    symbols : Object
+var symbolSchema = new Schema({
+    symbol : String,
+    type   : String
 })
 
-module.exports = mongoose.model("Symbols", symbolsSchema)
+module.exports = mongoose.model("Symbols", symbolSchema)
