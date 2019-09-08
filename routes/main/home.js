@@ -75,6 +75,10 @@ router.get('/translate', function (req, res) {
 	return res.render('linear-logic/index', {'title' : 'Sequoia - translate', 'layout' : 'translate'});
 });
 
+router.get('/apply', function (req, res) {
+	return res.render('apply/index', {'title' : 'Sequoia - apply', 'layout' : 'apply'});
+});
+
 router.get('/', function (req, res) {
 	return res.render('main/index', {'title' : 'Sequoia','layout' : 'calculus'});
 });
