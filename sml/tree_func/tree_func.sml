@@ -129,6 +129,27 @@ structure treefuncImpl : TREEFUNC = struct
             )(apply_rule_all_ways(dt, List.hd perm, true))(List.tl perm))
         (permutations(rule_ls)))
 
-    val test = apply_rule(([],[],DevTree("0",Seq (Single (Ctx ([], [Atom ("a")])), Con ("\\vdash"), Single (Ctx ([], [Atom ("t")]))), NoRule, [])),Rule("Rule",None,Seq (Single (Ctx ([], [Atom ("a")])), Con ("\vdash"), Single (Ctx ([], [Atom ("a")]))),[Seq (Single (Ctx ([], [FormVar ("A")])), Con ("\vdash"), Single (Ctx ([], [FormVar ("A")])))]),"0")
+    (*taken from: https://stackoverflow.com/questions/33597175/how-to-write-to-a-file-in-sml*)
+	fun writeFile filename content =
+        let val fd = TextIO.openOut filename
+            val _ = TextIO.output (fd, content) handle e => (TextIO.closeOut fd; raise e)
+            val _ = TextIO.closeOut fd
+        in () end
+
+    fun translate_premises(tree,rule,id) = 
+        let val new_trees = List.map(fn (_,_,tr) => tr)(apply_rule(([],[],tree),rule,id))
+            val filtered = List.filter(fn (tr) => check_rule_of(tr,id))new_trees
+        in
+            (case filtered of 
+                [] => writeFile "sml/test.sml" "NOT APPLICABLE"
+                | x::rest => 
+                    let val new_premises = List.map(fn (tr) => get_premises_of(tr,id)) filtered
+                        val new_premises_strings = List.map (fn pr_list => List.map (seq_toString) pr_list) new_premises
+                        val new_premises_strings2 = List.map (fn x => "{"^(List.foldl (fn (str1,str2) => str2^" ## "^str1) (List.hd(x)) (List.tl(x)))^"}") new_premises_strings
+                        val final_form = "["^(List.foldl (fn (str1,str2) => str2^" && "^str1) (List.hd(new_premises_strings2)) (List.tl(new_premises_strings2)))^"]"
+                    in 
+                        writeFile "sml/test.sml" final_form
+                    end)
+        end
 
 end
