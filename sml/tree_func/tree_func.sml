@@ -52,6 +52,12 @@ structure treefuncImpl : TREEFUNC = struct
             List.filter(fn (sb,_) => not (List.exists(fn s => bad_sub(s,sequent))sb))sigcons
         end
 
+    fun get_premises_of(DevTree(id, _, _, []), sid) = []
+        | get_premises_of(DevTree(id, _, _, pq), sid) = 
+            if id = sid then List.map(fn DevTree(_, sq, _, _) => sq)pq
+            else if not (String.isPrefix id sid) then []
+            else List.foldl(fn (branch, premises) => premises @ (get_premises_of(branch,sid)))([])pq
+
     fun apply_rule((forms, cons, dt), rule, sid) =
         let 
             fun apply_rule_aux(DevTree(id, sq, NoRule, []), Rule(name, s, conc, premises), sid) =
@@ -117,5 +123,7 @@ structure treefuncImpl : TREEFUNC = struct
                 List.concat(List.map(fn tree => apply_rule_all_ways(tree, rule, false))tree_ls)
             )(apply_rule_all_ways(dt, List.hd perm, true))(List.tl perm))
         (permutations(rule_ls)))
+
+    val test = apply_rule(([],[],DevTree("0",Seq (Single (Ctx ([], [Atom ("a")])), Con ("\\vdash"), Single (Ctx ([], [Atom ("t")]))), NoRule, [])),Rule("Rule",None,Seq (Single (Ctx ([], [Atom ("a")])), Con ("\vdash"), Single (Ctx ([], [Atom ("a")]))),[Seq (Single (Ctx ([], [FormVar ("A")])), Con ("\vdash"), Single (Ctx ([], [FormVar ("A")])))]),"0")
 
 end
