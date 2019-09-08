@@ -39,14 +39,31 @@
 		<br>
 		
 		{{!-- Preview Button --}}
-		<button class="ui button primary" onclick="preview()">
+		<button class="ui button primary" onclick="preview('Update')">
 			Preview
 		</button>
-		
+		<br><br><br>
 		{{!-- Rule container --}}
-		<div id="rule"></div>
-
+		<div id="rule" style="font-size: 150%"></div>
+		<br><br>
+		<div id="add"></div>
+		<br><br>
+		<div id="warning"></div>
+		<br><br>
 		{{!-- Table container --}}
 		<div id="table"></div>
+
+		<div class="ui modal">
+			<div class="header">Rules Affected</div>
+				<div class="content">
+				<p>Updating or removing existing symbols may affect the parsing of the rules above. This can result in the update or deletion of certain rules.
+					Would you like to continue?</p>
+				</div>
+			<div class="actions">
+				<div id="yes_button" class="ui approve button">Yes</div>
+				<div id="no_button" class="ui cancel button">No</div>
+			</div>
+		</div>
+
 	</div>
 </div>
