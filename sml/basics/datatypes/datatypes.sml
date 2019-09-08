@@ -7,8 +7,8 @@ structure datatypesImpl : DATATYPES = struct
 
 
     datatype form = Atom of string | AtomVar of string | FormVar of string | Form of conn * form list
-    fun form_toString (Atom (s)) = s
-        | form_toString (AtomVar(s)) = s
+    fun form_toString (Atom (s)) = s 
+        | form_toString (AtomVar(s)) = s 
         | form_toString (FormVar (s)) = s
         | form_toString (Form (Con (c), fl)) = c ^ "(" ^ subforms_toString(fl) ^ ")"
     and subforms_toString (nil) = ""
