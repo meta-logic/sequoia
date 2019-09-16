@@ -1,9 +1,0 @@
-\documentclass[10pt]{article}
-\usepackage{amsmath}
-\usepackage{amsfonts}
-\usepackage{amssymb}
-\usepackage{proof}
-\begin{document}
-\begin{align*}
-\infer[\wedge R]{\Gamma1000004, \wedge(A1000005, B1000006) \rightarrow \wedge(A1000001, B1000002)}{\deduce[]{\Gamma1000004, \wedge(A1000005, B1000006) \rightarrow A1000001}{00} & \quad\infer[\wedge L]{\Gamma1000004, \wedge(A1000005, B1000006) \rightarrow B1000002}{\deduce[]{\Gamma1000004, A1000005, B1000006 \rightarrow B1000002}{010}}}\end{align*}
-\end{document}
