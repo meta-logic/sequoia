@@ -1,0 +1,10 @@
+SML structures for proof system rules.
+each system has a file
+
+files:
+linear logic
+constructive logic
+
+
+TODO
+multi conclusion sequent calculus

@@ -1,15 +1,19 @@
 structure latexImpl : EXPORTLATEX = struct
 
-    open datatypesImpl
-    open applyunifierImpl
+    structure Dat = datatypesImpl
+    structure D = Dat
 
-    fun dev_tree_toLatex (DevTree(id, s, NoRule, pq)) = "\\deduce[]{"^(seq_toString s)^"}{"^id^"}"
-        | dev_tree_toLatex (DevTree(id, s, RuleName nm, [])) = "\\infer["^nm^"]{"^(seq_toString s)^"}{}"
-        | dev_tree_toLatex (DevTree(id, s, RuleName nm, pq)) = 
+    type dev_tree = Dat.dev_tree
+
+    structure App = applyunifierImpl
+
+    fun dev_tree_toLatex (D.DevTree(id, s, D.NoRule, pq)) = "\\deduce[]{"^(D.seq_toString s)^"}{"^id^"}"
+        | dev_tree_toLatex (D.DevTree(id, s, D.RuleName nm, [])) = "\\infer["^nm^"]{"^(D.seq_toString s)^"}{}"
+        | dev_tree_toLatex (D.DevTree(id, s, D.RuleName nm, pq)) = 
             let val fst = dev_tree_toLatex (List.hd pq)
                 val rest = List.tl(pq)
                 val prem_latex = List.foldl(fn (prem, st) => st^" & \\quad"^(dev_tree_toLatex prem))(fst)rest
-                val conclusion = "\\infer["^nm^"]{"^(seq_toString s)^"}"
+                val conclusion = "\\infer["^nm^"]{"^(D.seq_toString s)^"}"
             in conclusion^"{"^prem_latex^"}" end
 
     fun export_toLatex filename tree =

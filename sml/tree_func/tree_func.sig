@@ -1,18 +1,20 @@
 signature TREEFUNC = sig
 
-    structure DAT : DATATYPES
-    type conn = DAT.conn
-    type form = DAT.form
-    type ctx_var = DAT.ctx_var
-    type ctx = DAT.ctx
-    type ctx_struct = DAT.ctx_struct
-    type seq = DAT.seq
-    type side = DAT.side
-    type rule = DAT.rule
-    type sub = DAT.sub
-    type rule_name = DAT.rule_name
-    type dev_tree = DAT.dev_tree
+    structure Dat : DATATYPES
+    type conn = Dat.conn
+    type form = Dat.form
+    type ctx_var = Dat.ctx_var
+    type ctx = Dat.ctx
+    type ctx_struct = Dat.ctx_struct
+    type seq = Dat.seq
+    type side = Dat.side
+    type rule = Dat.rule
+    type sub = Dat.sub
+    type rule_name = Dat.rule_name
+    type dev_tree = Dat.dev_tree
 
+
+    val get_tree_height : dev_tree -> int
     val get_open_prems : dev_tree -> dev_tree list
     val closed_tree : dev_tree -> bool
     val atomic_transform : seq -> seq
@@ -35,5 +37,6 @@ signature TREEFUNC = sig
         rule list
         -> (form list * (ctx_var * ctx_var list * ctx_var list) list * dev_tree) 
             list
+
 
 end

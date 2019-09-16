@@ -1,0 +1,8 @@
+Group
+  signature EXPORTLATEX
+  structure latexImpl
+is
+  ../basics/basics.cm
+  ../applyunifier/applyunifier.cm
+  latex_exporter.sig
+  latex_exporter.sml

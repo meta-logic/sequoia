@@ -1,0 +1,11 @@
+Group
+  signature PROPERTIES
+  structure Properties
+is
+  ../basics/basics.cm
+  ../tree_func/tree_func.cm
+  ../applyunifier/applyunifier.cm
+  ../unification/unification.cm
+  ../equiv/equiv.cm
+  properties.sig
+  properties.sml
