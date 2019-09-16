@@ -1,3 +1,5 @@
+var pt = 
+`
 // Sequent
 SEQ 
   = _ ctx1:CTX_STR _ seq_sign:SeqSign _ ctx2:CTX_STR _{ return "Seq (" + ctx1 + ', Con ("' + seq_sign + '"), ' + ctx2 + ")" }
@@ -35,7 +37,7 @@ FORM = BIFORM / GENFORM
 
 FORM_LIST 
   = _ form:FORM _ "," _ form_lst:FORM_LIST _ { 
-  	  form_lst.push(form)
+      form_lst.push(form)
       return form_lst 
     }
   / _ form:FORM _ { return [form] }
@@ -62,10 +64,4 @@ ATOM = atom:Atom { return 'Atom ("' + atom + '")' }
 _ "whitespace"
   = [ ]*
 
-ARROW = "=>"
-SEP = ";"
-Conn = "^" / "v" /  "~"
-SET = "Gamma" / "Delta" / "random"
-FormVar = "F"
-AtomVar = "A" / "B" / "C" / "D"
-
+`

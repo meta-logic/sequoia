@@ -64,6 +64,7 @@ structure applyunifierImpl : APPLYUNIFIER = struct
                                                     in 
                                                         (DAT.CVs(a, DAT.Ctx(List.concat vls2, fls1 @ List.concat fls2)), false)
                                                     end
+    
     fun UnifierComposition' (sigma1, []) = sigma1
         | UnifierComposition' ([], sigma2) = sigma2
         | UnifierComposition' (s::sigma1, sigma2) = 

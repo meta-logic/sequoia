@@ -14,6 +14,7 @@ var apply_routes   = require('./routes/main/apply');
 var calculusRoutes = require('./api/routes/calculus');
 var ruleRoutes     = require('./api/routes/rule');
 var symbolsRoutes  = require('./api/routes/symbols');
+// var treeRoutes     = require('./api/routes/prooftree');
 
 // testing
 var test_routes   = require('./routes/test/test');
@@ -27,6 +28,8 @@ var bodyParser   = require('body-parser');
 //loading local files ===============================================
 var database     = require('./config/db');
 var Rule         = require('./api/models/rule');
+var Symbols      = require('./api/models/symbols');
+// var ProofTree    = require('./api/models/prooftree');
 
 
 //Configurations =====================================================
@@ -54,6 +57,7 @@ mongoose.connect(database.local, {useNewUrlParser: true});
 app.use('/api', calculusRoutes);
 app.use('/api', ruleRoutes);
 app.use('/api', symbolsRoutes);
+// app.use('/api', treeRoutes);
 app.use('/', test_routes);
 app.use('/', home_routes);
 app.use('/', apply_routes);
@@ -67,6 +71,26 @@ app.get('/api/get-rules', function (req, res) {
 	});
 
 });
+
+app.get('/api/get-symbols', function (req, res) {
+	var symbols = Symbols.find({}, function (err, symbols) {
+		if (err) {
+			console.log(err);
+		}
+		return res.json(symbols);
+	});
+
+});
+
+// app.get('/api/get-prooftree', function (req, res) {
+// 	var tree = ProofTree.find({}, function (err, tree) {
+// 		if (err) {
+// 			console.log(err);
+// 		}
+// 		return res.json(tree);
+// 	});
+
+// });
 
 global.__basedir = __dirname;
 

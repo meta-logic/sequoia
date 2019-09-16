@@ -21,6 +21,8 @@ signature TREEFUNC = sig
     val get_forms : seq -> form list
     val get_ctx_vars : seq -> ctx_var list
     val filter_bad_subs : (sub list * 'a) list * seq -> (sub list * 'a) list
+    val get_premises_of : dev_tree * string -> seq list
+    val check_rule_of : dev_tree * string -> bool
     val apply_rule : (form list * (ctx_var * ctx_var list * ctx_var list) list * dev_tree) * 
         rule * string
         -> (form list * (ctx_var * ctx_var list * ctx_var list) list * dev_tree) 
@@ -37,6 +39,5 @@ signature TREEFUNC = sig
         rule list
         -> (form list * (ctx_var * ctx_var list * ctx_var list) list * dev_tree) 
             list
+    val translate_premises : dev_tree * rule * string -> unit
 
-
-end

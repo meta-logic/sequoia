@@ -1,59 +1,54 @@
-//api/controllers/symbols
+//api/controllers/symbols.js
 "use strict"
 
 //Loading Dependencies =============================================
 var Symbols = require("../models/symbols")
 
 
+//adding a symbol
+function addSymbol (req, res) {
+    var symbol = new Symbols()
+    symbol.symbol     = req.body.symbol
+    symbol.type       = req.body.type
+    symbol.save(function (err) {
 
-//fetching a symbols
-function getSymbols (req, res) {
-    //looking up the symbols
-    Symbols.findOne({}, function (err, symbols) {
-  
-        //if the symbols does not exist
-        if (err || symbols == null) {
+        //if something went wrong while saving, return the error
+        if (err) {
             return res.status(400).json({
                 "status"  : "failure",
-                "message" : "symbols does not exist"
+                "message" : "something went wrong while creating the symbol"
             })
         }
-
-        //return the symbols 
+        //send success message and created rule
         return res.status(200).json({
             "status"  : "success",
-            "symbols" : symbols
+            "message" : "symbol was created",
+            "symbol"    : symbol  
+        })
+    }) 
+}
+
+
+//deleting a symbol
+function deleteSymbols (req, res) {
+    //deleting a symbol
+
+    Symbols.remove({symbol : req.body.symbol}, function (err, symbol) {
+        //if the symbol does not exists
+        if (err || symbol == null) {
+            return res.status(400).json({
+                "status"  : "failure",
+                "message" : "symbol does not exist"
+            })
+        }
+        //rule deleted
+        return res.status(200).json({
+            "status"  : "success",
+            "message" : "symbol successfully deleted",
+            "rule"    : symbol
         })
     })
 }
 
 
-//updating a symbols
-function updateSymbols (req, res) {
-    var query = {},
-        update = JSON.parse(req.body.update),
-        options = { upsert: true, new: true, setDefaultsOnInsert: true }
-    console.log("update")
-    console.log(Object.update)
-
-    //looking up the symbols and updating it
-    Symbols.findOneAndUpdate(query, update, options, 
-        function (err, symbols) {
-            //if the symbols does not exist
-            if (err || symbols == null) {
-                return res.status(400).json({
-                    "status"  : "failure",
-                    "message" : "symbols does not exist"
-                })
-            }
-
-            //send back the updated symbols 
-            return res.status(200).json({
-                "status"  : "success",
-                "symbols" : symbols
-            })
-        })
-}
-
-
-module.exports = {getSymbols, updateSymbols}
+module.exports = {addSymbol, deleteSymbols}
