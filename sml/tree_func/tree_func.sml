@@ -71,14 +71,14 @@
             List.filter(fn (sb,_) => not (List.exists(fn s => bad_sub(s,sequent))sb))sigcons
         end
 
-    fun get_premises_of(DevTree(id, _, _, []), sid) = []
-        | get_premises_of(DevTree(id, _, _, pq), sid) = 
-            if id = sid then List.map(fn DevTree(_, sq, _, _) => sq)pq
+    fun get_premises_of(Dat.DevTree(id, _, _, []), sid) = []
+        | get_premises_of(Dat.DevTree(id, _, _, pq), sid) = 
+            if id = sid then List.map(fn Dat.DevTree(_, sq, _, _) => sq)pq
             else if not (String.isPrefix id sid) then []
             else List.foldl(fn (branch, premises) => premises @ (get_premises_of(branch,sid)))([])pq
 
-    fun check_rule_of(DevTree(id, _, NoRule, pq), sid) = not (id = sid)
-        | check_rule_of(DevTree(id, _, rq, pq), sid) = if id = sid then true 
+    fun check_rule_of(Dat.DevTree(id, _, Dat.NoRule, pq), sid) = not (id = sid)
+        | check_rule_of(Dat.DevTree(id, _, rq, pq), sid) = if id = sid then true 
         else if not (String.isPrefix id sid) then true
         else List.foldl(fn (branch, bools) => bools andalso (check_rule_of(branch,sid)))(true)pq
 
@@ -163,7 +163,7 @@
                 [] => writeFile "sml/test.sml" "NOT APPLICABLE"
                 | x::rest => 
                     let val new_premises = List.map(fn (tr) => get_premises_of(tr,id)) filtered
-                        val new_premises_strings = List.map (fn pr_list => List.map (seq_toString) pr_list) new_premises
+                        val new_premises_strings = List.map (fn pr_list => List.map (Dat.seq_toString) pr_list) new_premises
                         val new_premises_strings2 = List.map (fn x => "{"^(List.foldl (fn (str1,str2) => str2^" ## "^str1) (List.hd(x)) (List.tl(x)))^"}") new_premises_strings
                         val final_form = "["^(List.foldl (fn (str1,str2) => str2^" && "^str1) (List.hd(new_premises_strings2)) (List.tl(new_premises_strings2)))^"]"
                     in 

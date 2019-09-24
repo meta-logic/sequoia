@@ -69,7 +69,7 @@ struct
 
 
   (*given a file with the starting facts, checks for a condition (defined in the starting facts)*)
-  fun main_check (file) = check ("python3 ../equiv/milp/milp.py "^file)
+  fun main_check (file) = check ("python3 sml/equiv/milp/milp.py "^file)
 
   (*can be used to test stuff*)
   val test = "currently unused"

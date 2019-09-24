@@ -20,6 +20,7 @@ struct
 
     val other_fresh = ref 1000000;
     val term_fresh = ref 10000;
+    val fresher = ref 52344;
 
     fun generic_seq( D.Seq(a, c, b)) = 
         let 
@@ -104,6 +105,31 @@ struct
             init_coh_aux(con_form, rulesR, rulesL, init_rule_ls)
         end
     *)
+    fun string_to_fresh(x) = 
+        let
+            val (x2,_) = (x^ (Int.toString(!fresher)),fresher:= !fresher + 1)
+        in
+            x2
+        end
+
+
+    fun form_to_fresh(D.Atom(x)) = D.Atom(string_to_fresh(x))
+        | form_to_fresh (D.AtomVar(x)) = D.AtomVar(string_to_fresh(x))
+        | form_to_fresh (D.FormVar(x)) = D.FormVar(string_to_fresh(x))
+        | form_to_fresh (D.Form(con,l)) = D.Form(con,List.map form_to_fresh l)
+
+
+    fun ctx_var_to_fresh(D.CtxVar(x)) = D.CtxVar(string_to_fresh(x))
+
+    fun ctx_to_fresh(D.Ctx(ctx_vars,forms)) = D.Ctx(List.map ctx_var_to_fresh ctx_vars,List.map form_to_fresh forms)
+
+    fun ctx_struct_to_fresh(D.Empty) = D.Empty
+        | ctx_struct_to_fresh (D.Single (ctx)) = D.Single(ctx_to_fresh(ctx))
+        | ctx_struct_to_fresh (D.Mult (con,ctx,ctx_struct)) = D.Mult(con,ctx_to_fresh(ctx),ctx_struct_to_fresh(ctx_struct))
+
+    fun seq_to_fresh(D.Seq(ctx_s,con,ctx_s2)) = D.Seq(ctx_struct_to_fresh(ctx_s),con,ctx_struct_to_fresh(ctx_s2))
+
+
     fun print_seq_list (nil) = print "\n_______________________________\n"
         | print_seq_list (x::L) = let
             val _ = print (D.seq_toString(x)^"\n")
@@ -129,6 +155,10 @@ struct
         |get_ctx_vars_from_constraints(x::L) = get_ctx_vars_from_constraint(x)@get_ctx_vars_from_constraints(L)
 
 
+    val last1 = ref (D.DevTree("",D.Seq(D.Empty,D.Con(""),D.Empty),D.NoRule,[]))
+    val last2 = ref (D.DevTree("",D.Seq(D.Empty,D.Con(""),D.Empty),D.NoRule,[]))
+
+
     fun check_premises'((cn1,dvt1),(cn2,dvt2)) =
         let 
             val D.DevTree(_,sq1,_,_) = dvt1
@@ -137,13 +167,15 @@ struct
             val t2_prems = List.map (fn (D.DevTree(_,seq,_,_)) => seq) (T.get_open_prems(dvt2))
             (*val goal = create_constraint(sq1,sq2)*)
             val constraints = cn1@cn2 
+            (*val _ = last1 := dvt1*)
+            (*val _ = last2 := dvt2*)
             val t1_vars = List.map (fn (D.CtxVar(x))=>x) (get_ctx_vars_dev_tree(dvt1)@get_ctx_vars_from_constraints(cn1))
             val t2_vars = List.map (fn (D.CtxVar(x))=>x) (get_ctx_vars_dev_tree(dvt2)@get_ctx_vars_from_constraints(cn2))
             val t1_vars = Set.listItems(Set.addList(Set.empty,t1_vars))
             val t2_vars = Set.listItems(Set.addList(Set.empty,t2_vars))
             val t1_vars = List.map (fn x => D.CtxVar(x)) t1_vars
             val t2_vars = List.map (fn x => D.CtxVar(x)) t2_vars
-            (*val _ = print_seq_list(t1_prems)
+(*            val _ = print_seq_list(t1_prems)
             val _ = print_seq_list(t2_prems)
             val _ = print ("\n\n\n")*)
             val res = E.check_premises(t1_prems,t2_prems,constraints,[],[],t1_vars,t2_vars)
@@ -190,12 +222,12 @@ struct
                 let 
                     fun filter_func (cn,dvt) = (T.get_tree_height(dvt) >1)
                     fun filter_short (s1,s2) = (List.filter filter_func s1,List.filter filter_func s2)
+
                     val set_base_pairs = ListPair.zip(opens1,opens2)
                     (*remove all trees where only 1 rule is applied*)
                     val set_base_pairs = List.map (filter_short) set_base_pairs
                     (*remove sets with no trees in set 1 or no trees in set 2*)
                     val set_base_pairs = List.filter (fn (y::_,x::_) => true | (_,_) => false) set_base_pairs
-
                     fun set_check (set1,set2)  = List.all(fn (cn1,dvt1) =>
                             List.exists(fn (cn2,dvt2) =>
                                 check_premises' ((cn1,dvt1),(cn2,dvt2))
@@ -211,7 +243,7 @@ struct
                 List.map (fn tree => 
                     let val temp = T.apply_rule_everywhere(([], [], tree), rule1)
                         val dvt_lst = List.concat(List.map(fn tree => 
-                                        T.apply_rule_all_ways(tree, rule2, true))temp)
+                                        T.apply_rule_all_ways(tree, rule2, true)) temp)
                         (*TODO: not sure what this line does*)
                         (*val final = List.concat(List.map(fn tree  => 
                                         List.concat(List.map(fn init_rule => 
@@ -222,7 +254,7 @@ struct
 
             val D.Rule(name1, side1, conc1, premises1) = rule1
             val D.Rule(name2, side2, conc2, premises2) = rule2 
-            val bases = List.map(fn conc => D.DevTree("0",conc,D.NoRule,[]))(create_base(rule1, rule2))
+            val bases = List.map(fn conc => D.DevTree("0",seq_to_fresh(conc),D.NoRule,[]))(create_base(rule1, rule2))
             val opens1 = stack_rules(bases, rule1, rule2, init_rule_ls)
             val opens2 = stack_rules(bases, rule2, rule1, init_rule_ls)
 

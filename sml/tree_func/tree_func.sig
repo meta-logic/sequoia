@@ -40,4 +40,4 @@ signature TREEFUNC = sig
         -> (form list * (ctx_var * ctx_var list * ctx_var list) list * dev_tree) 
             list
     val translate_premises : dev_tree * rule * string -> unit
-
+end
