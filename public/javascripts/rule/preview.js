@@ -130,6 +130,7 @@ function preview (opt) {
                             "<select class=\"ui search dropdown\" style=\"fixed\" id=\"select-sym\" ><option value=\"\">Type</option><option value=\"atom variable\">atom variable</option><option value=\"formula variable\">formula variable</option><option value=\"connective\">connective</option><option value=\"context variable\">context variable</option><option value=\"sequent sign\">sequent sign</option><option value=\"context separator\">context separator</option><option value=\"empty\">empty</option></select>"+
                             "<button class=\"ui right floated button primary\" onclick=\"add_symbol_toTable(\'rule\')\">Add Symbol</button>"+
                         "</td></tr></tbody></table><br><br>"
+        s = 0
         get_symbols_toTable("rule")
     })
 }

@@ -15,7 +15,7 @@ function build_proof_tree(branch_id, rule, derivations) {
 
     // getting the total number of branches to assign ids for the new branches
     var branch_count = parseInt(proof_tree.getAttribute("count"))
-    previous.unshift([branch_id, branch_count])
+    previous.unshift([branch_id,branch_count,seq_text])
     proof_tree.setAttribute("count", branch_count + derivations.length - 1)
 
     // retrieving the proof tree branch html

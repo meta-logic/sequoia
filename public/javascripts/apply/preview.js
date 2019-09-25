@@ -35,5 +35,6 @@ function preview() {
                         "<select class=\"ui search dropdown\" style=\"fixed\" id=\"select-sym\" ><option value=\"\">Type</option><option value=\"atom\">atom</option><option value=\"atom variable\">atom variable</option><option value=\"formula variable\">formula variable</option><option value=\"context variable\">context variable</option></select>"+
                         "<button class=\"ui right floated button primary\" onclick=\"add_symbol_toTable(\'seq\')\">Add Symbol</button>"+
                     "</td></tr></tbody></table><br><br>"
+    s = 0
     get_symbols_toTable("seq")
 }

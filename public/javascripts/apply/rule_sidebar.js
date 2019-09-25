@@ -2,9 +2,13 @@ var r = 0
 
 function get_rules_toPage() {
     var rules_container = document.getElementById("rules")
-    $.get("/api/get-rules", function (rls, status) {
-        r = 0
-        rules = rls
+    for (i = 0; i < r; i++) {
+        entry = document.getElementById("rule_card"+i)
+        if (entry != null) {
+            entry.remove()
+        }
+    }
+    $.get("/api/get-rules", function (rules, status) {
         for (var i = 0; i < rules.length; i++) {
             var fin_conc = rules[i].sml_conc.replace(/\\/g, "\\\\").replace(/'/g, "&apos;").replace(/"/g, "&quot;")
             var fin_prem = "["
@@ -16,9 +20,9 @@ function get_rules_toPage() {
             +"rule_name=\""+rules[i].rule+"\" conclusion=\""+fin_conc+"\" premises=\""+fin_prem+"\"></button><br><br></div>"
             var rule_container = document.getElementById(("r" + i.toString()))
             rule_container.innerHTML = "\\[\\frac{"+ rules[i].premises.join(" \\quad \\quad ")+"}{"+ rules[i].conclusion +"}"+rules[i].rule+"\\]"
-            r++
         }
         MathJax.Hub.Queue(["Typeset",MathJax.Hub,rules_container])
+        r = rules.length
     })
 }
 
@@ -28,14 +32,8 @@ function deleteRule (id) {
         type: "DELETE",
         data : { "id" : id },
         success: function(result) {
-            $.get("/api/get-rules", function (rls, status) {
-                rules = rls
-                for (i = 0; i < r; i++) {
-                    document.getElementById("rule_card"+i).remove()
-                }
-                get_rules_toPage()
-                console.log("Rule sucessfully deleted.")
-            })
+            get_rules_toPage()
+            console.log("Rule sucessfully deleted.")
         },
         error: function(result) {
             console.log("ERROR: rule could not be deleted.")

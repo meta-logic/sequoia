@@ -17,12 +17,15 @@ function showInfo (del, id, tbl, modal_num) {
 
 function get_symbols_toTable(tbl) {
     var req = "/api/get-symbols"
-    var other
     if (tbl == "seq")
         {req = "/api/get-seq_symbols"}
-    $.get(req, function(sb, status) {
-        s = 0
-        syms = sb
+    for (i = 0; i < s; i++) {
+        entry  = document.getElementById("row"+i)
+        if (entry != null) {
+            document.getElementById("table_head").removeChild(entry)
+        }
+    }
+    $.get(req, function(syms, status) {
         for (var i = 0; i < syms.length; i++) {
             symb = syms[i].symbol
             typ = syms[i].type
@@ -40,7 +43,7 @@ function get_symbols_toTable(tbl) {
             +"<button onclick=\""+button_action+"\" class=\"ui right floated circular red icon button\"><i class=\"icon close\"></i></button></td>"
             document.getElementById("table_head").insertBefore(row, document.getElementById("row"+(i-1)))
             MathJax.Hub.Queue(["Typeset",MathJax.Hub,symb])
-            s++
+            s = syms.length
         }
     })
 }
@@ -81,9 +84,6 @@ function add_symbol_toTable(tbl) {
                     }
                     else {
                         $.post("/api/symbols", {symbol : symb, type : typ, group : tbl}, function(data, status) {
-                            for (i = 0; i < s; i++) {
-                                document.getElementById("table_head").removeChild(document.getElementById("row"+i))
-                            }
                             get_symbols_toTable(tbl)
                         })
                     }
@@ -104,12 +104,6 @@ function delete_symbol_fromTable (val, tbl) {
         data : {"symbol" : symbol},
         success: function(result) {
             fixRules()
-            for (i = 0; i < s; i++) {
-                document.getElementById("table_head").removeChild(document.getElementById("row"+i))
-            }
-            for (i = 0; i < r; i++) {
-                document.getElementById("rule_card"+i).remove()
-            }
             get_rules_toPage()
             get_symbols_toTable(tbl)
             console.log("Symbol sucessfully deleted.")
@@ -130,13 +124,6 @@ function update_symbol_inTable (val, tbl) {
         success: function(result) {
             $.post("/api/symbols", {symbol : symb, type : typ, group : tbl}, function(data, status) {
                 fixRules()
-                for (i = 0; i < s; i++) {
-                    document.getElementById("table_head").removeChild(document.getElementById("row"+i))
-                }
-                for (i = 0; i < r; i++) {
-                    document.getElementById("rule_card"+i).remove()
-                }
-                get_rules_toPage()
                 get_symbols_toTable(tbl)
             })
             console.log("Symbol successfully updated.")
