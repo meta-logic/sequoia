@@ -21,22 +21,32 @@
 					</div>
 				</td>
 				<td id= "select_field" >
-					<select class="ui search dropdown" style="fixed" id="select-sym" ><option value="">Type</option><option value="atom">atom</option><option value="atom variable">atom variable</option><option value="formula variable">formula variable</option><option value="connective">connective</option><option value="context variable">context variable</option><option value="primary separator">primary separator</option><option value="context separator">separator</option><option value="empty">empty</option></select>
-					<button class="ui right floated button primary" onclick="add_symbol_toTable()">Add Symbol</button>
+					<select class="ui search dropdown" style="fixed" id="select-sym" ><option value="">Type</option><option value="atom variable">atom variable</option><option value="formula variable">formula variable</option><option value="connective">connective</option><option value="context variable">context variable</option><option value="sequent sign">sequent sign</option><option value="context separator">context separator</option><option value="empty">empty</option></select>
+					<button class="ui right floated button primary" onclick="add_symbol_toTable('rule')">Add Symbol</button>
 				</td>
 			</tr>
 		</tbody>
 	</table>
 
-	<div class="ui modal">
+	<div id ="modal1" class="ui special modal">
 		<div class="header">Rules Affected</div>
-			<div class="content">
-			<p>Updating or removing existing symbols may affect the parsing of the rules above. This can result in the update or deletion of certain rules.
-				Would you like to continue?</p>
-			</div>
+		<div id = "change warning" class="content">
+		<p>Updating or removing existing symbols may alter the parsing of the rules already defined. This can result in the update or deletion of certain rules.
+			Would you like to continue?</p>
+		</div>
 		<div class="actions">
-			<div id="yes_button" class="ui approve button">Yes</div>
-			<div id="no_button" class="ui cancel button">No</div>
+		<div id="yes_button" class="ui approve button">yes</div>
+		<div id="no_button" class="ui cancel button">No</div>
+		</div>
+	</div>
+
+	<div id ="modal2" class="ui special modal">
+		<div class="header">Symbol Used</div>
+		<div id = "change warning" class="content">
+		<p>This symbol already exists in the sequent symbols. Try using a differnt one.</p>
+		</div>
+		<div class="actions">
+		<div id="ok_button" class="ui cancel button">Okay</div>
 		</div>
 	</div>
 
