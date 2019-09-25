@@ -12,16 +12,19 @@ function placeRule(opt) {
 
     $.get("/api/get-symbols", function(sb, status) {
         syms = sb
+        syms = syms.sort(function(a, b){
+            return b.symbol.length - a.symbol.length
+        })
         for (var i = 0; i < syms.length; i++) {
             var symbol = syms[i].symbol
             var type = syms[i].type
             if (symbol.includes("\\")) {
                 symbol = "\\" + symbol
             }
-            if (type == "primary separator") {
+            if (type == "sequent sign") {
                 arrow += "/ \"" + symbol + "\" "
             }
-            else if (type == "separator") {
+            else if (type == "context separator") {
                 sep += "/ \"" + symbol + "\" "
             }
             else if (type == "connective") {
@@ -55,7 +58,7 @@ function parse_and_place(parser, opt) {
 
     var prem = []
     var parsed_prem = []
-    var rule = document.getElementById("rule_connective").value
+    var rule = document.getElementById("rule_name").value
     prem.push(document.getElementById("i0").value)
     for (var i = 1; i <= v; i++) {
         var p = document.getElementById("i" + i.toString()).value
