@@ -3,7 +3,7 @@ function applyRule(i) {
     var warning_text = "<div id=\"apply warning\"><div class=\"ui red negative message\">"+
     "<div class=\"header\">Rule and Premise Mismatch</div>"+
     "<p>This rule cannot be applied to the selected premise</p></div>"
-
+    
     if (leaf_id == "-1") {
         return
     }
@@ -11,18 +11,14 @@ function applyRule(i) {
     if (type == "conc") {
         return
     }
-    
     var ruletemp = document.getElementById("r"+i)
-    var name = ruletemp.getAttribute("rule_name")
+    var name = ruletemp.getAttribute("rule_name").replace(/\\/g, "\\\\")
     var side = ruletemp.getAttribute("rule_name")[-1]
     var conclusion = ruletemp.getAttribute("conclusion")
     var premises = ruletemp.getAttribute("premises")
     var rule_sml = "Rule(\""+name+"\",None,"+conclusion+","+premises+")"
     var sequent = parser.parse(seq_text).replace(/\\/g, "\\\\")
     var tree_sml = "DevTree(\""+leaf_id+"\","+sequent+", NoRule, [])"
-    
-    // console.log(rule_sml)
-    // console.log(tree_sml)
 
     $.post("/apply", { rule: rule_sml, tree: tree_sml, node_id: "\""+leaf_id+"\"" }, function(data, status) {
         var output = data.output.slice(1,-1).split("&&")
@@ -38,7 +34,6 @@ function applyRule(i) {
         for (k = 0; k < output.length; k++) {
             prem_set.push(output[k].trim().slice(1,-1).split("##"))
         }
-        console.log("HERE")
         if (prem_set.length == 1) {
             build_proof_tree(leaf_id, name, prem_set[0])
             $(".conc-temp").click(function() {
@@ -81,7 +76,12 @@ function applyRule(i) {
 
 function undo() {
     if (previous != []) {
-        var undo_id = previous.shift()
+        var undo_items = previous.shift()
+        console.log(undo_items)
+        var undo_id = undo_items[0] 
+        var undo_branch_count = undo_items[1] 
+        var proof_tree = $("#prooftree")[0]
+        proof_tree.setAttribute("count", undo_branch_count)
         var conclusion = $("#prooftree_" + undo_id + "_conc")[0]
         conclusion.setAttribute("class", "conc-temp")
         conclusion.removeAttribute("colspan")

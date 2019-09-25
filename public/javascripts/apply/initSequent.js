@@ -6,7 +6,6 @@ function clear() {
     document.getElementById("seq").remove()
     document.getElementById("apply").remove()
     document.getElementById("table").remove()
-    document.getElementById("first-modal").remove()
     document.getElementById("warning").innerHTML =""
 }
 

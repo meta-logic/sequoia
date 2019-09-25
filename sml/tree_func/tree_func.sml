@@ -44,8 +44,7 @@ structure treefuncImpl : TREEFUNC = struct
 
     fun filter_bad_subs(sigcons, sequent) =
         let 
-            fun bad_sub(CVs(_, Ctx([], [])), _) = true
-                | bad_sub(CVs(_, Ctx(vl, [])), _) = false
+            fun bad_sub(CVs(_, Ctx(vl, [])), _) = false
                 | bad_sub(CVs(v1, Ctx(_, fl)), sequent) = 
                     List.exists(fn v2 => ctx_var_eq(v1,v2))(get_ctx_vars sequent)
                 | bad_sub(Fs(a1,_), sequent) = 
@@ -153,5 +152,5 @@ structure treefuncImpl : TREEFUNC = struct
                         writeFile "sml/test.sml" final_form
                     end)
         end
-
+    
 end

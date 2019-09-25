@@ -1,6 +1,7 @@
 var previous = []
 var leaf_id = "-1"
 var seq_text = ""
+
 // A function to build on proof trees
 // Input:
 // - Proof tree html container ID (string)
@@ -14,6 +15,7 @@ function build_proof_tree(branch_id, rule, derivations) {
 
     // getting the total number of branches to assign ids for the new branches
     var branch_count = parseInt(proof_tree.getAttribute("count"))
+    previous.unshift([branch_id, branch_count])
     proof_tree.setAttribute("count", branch_count + derivations.length - 1)
 
     // retrieving the proof tree branch html
@@ -24,11 +26,11 @@ function build_proof_tree(branch_id, rule, derivations) {
     var conclusion = $("#prooftree_" + branch_id + "_conc")[0]
     conclusion.setAttribute("class", "conc")
     conclusion.setAttribute("colspan", derivations.length)
-
+    
     // creating the rule
-    var rule = "<td class=\"rulename\" rowspan=\"2\"><div class=\"rulename\">\\[" + rule + "\\]</div></td>"
+    var rule = "<td class=\"rulename\" rowspan=\"2\"><div class=\"rulename\">\\[" + rule.replace(/\\\\/g, "\\") + "\\]</div></td>"
 
-    var zan = "da man"
+    var zan = "da"
 
     // creating the new derivation branches
     var new_branches = ""
@@ -49,7 +51,6 @@ function build_proof_tree(branch_id, rule, derivations) {
 			"\\]</td></tr>\
         </table></td>"
     }
-    previous.unshift(branch_id)
     var row = "<tr id = delete_id"+ branch_id +" >" + new_branches + rule + "</tr>"
 
     // adding the derivations to the branch
