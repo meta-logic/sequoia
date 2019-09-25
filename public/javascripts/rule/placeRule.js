@@ -45,7 +45,7 @@ function placeRule(opt) {
         }
     extra_text = "\n" + arrow + "\n" + sep + "\n" + conn + "\n" + set + "\n" + form + "\n" + atom_var + "\n" + atom + "\n" 
     parser_text += extra_text
-    var parser = peg.generate(parser_text)    
+    var parser = peg.generate(parser_text)
     parse_and_place(parser, opt)
     })
 }
@@ -99,12 +99,23 @@ function parse_and_place(parser, opt) {
             parsed_conc : conc_final ,parsed_prem : JSON.stringify(parsed_prem)})
     }
     else if (opt == "Update") {
-        $.ajax({
-            url: "/api/rule",
-            type: "PUT",
-            data : { id : document.getElementById("id").innerHTML , rule : rule, 
-                conclusion : conc, premises : JSON.stringify(prem), parsed_conc : conc_final, 
-                parsed_prem : JSON.stringify(parsed_prem)}})
+        $.get("/api/get-rules", function (rules, status) {
+            still_exists = false
+            for (var i = 0; i < rules.length; i++) {
+                still_exists = document.getElementById("id").innerHTML == rules[i]._id
+            }
+            if (!still_exists) {
+                $.post("/api/rule", {rule : rule, conclusion : conc, premises : JSON.stringify(prem),
+                    parsed_conc : conc_final ,parsed_prem : JSON.stringify(parsed_prem)})
+            } else {
+                $.ajax({
+                    url: "/api/rule",
+                    type: "PUT",
+                    data : { id : document.getElementById("id").innerHTML , rule : rule, 
+                        conclusion : conc, premises : JSON.stringify(prem), parsed_conc : conc_final, 
+                        parsed_prem : JSON.stringify(parsed_prem)}})
+            }
+        })
     }
     window.location.href = "/"
 }
