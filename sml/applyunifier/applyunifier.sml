@@ -31,7 +31,7 @@ structure applyunifierImpl : APPLYUNIFIER = struct
                 val form_app = apply_formL_Unifier(fL, subs)
                 val (clist, flist) = ListPair.unzip(apply_ctx_varL_Unifier(cL, subs))
             in 
-                DAT.Single(DAT.Ctx(List.concat clist, form_app @ List.concat flist))
+                DAT.Single(DAT.Ctx(List.concat clist, List.concat flist @ form_app))
             end
         | apply_ctx_struct_Unifier (DAT.Mult(con, DAT.Ctx(cL, fL), ctxStruct), subs) = 
             let 
@@ -39,7 +39,7 @@ structure applyunifierImpl : APPLYUNIFIER = struct
                 val (clist, flist) = ListPair.unzip(apply_ctx_varL_Unifier(cL, subs))
                 val new_ctxStruct = apply_ctx_struct_Unifier (ctxStruct, subs)
             in 
-                DAT.Mult(con, DAT.Ctx(List.concat clist, form_app @ List.concat flist), new_ctxStruct)
+                DAT.Mult(con, DAT.Ctx(List.concat clist, List.concat flist @ form_app), new_ctxStruct)
             end
     fun apply_ctx_struct_allUnifiers (ctx_struct, []) = [ctx_struct]
         | apply_ctx_struct_allUnifiers (ctx_struct, subsL) = List.map(fn sb => apply_ctx_struct_Unifier(ctx_struct, sb))subsL
