@@ -69,17 +69,34 @@ app.get('/api/get-rules', function (req, res) {
 		}
 		return res.json(rules);
 	});
-
 });
 
 app.get('/api/get-symbols', function (req, res) {
-	var symbols = Symbols.find({}, function (err, symbols) {
+	var symbols = Symbols.find({group : "rule"}, function (err, symbols) {
 		if (err) {
 			console.log(err);
 		}
 		return res.json(symbols);
 	});
+});
 
+app.get('/api/get-seq_symbols', function (req, res) {
+	var symbols = Symbols.find({group : "seq"}, function (err, symbols) {
+		if (err) {
+			console.log(err);
+		}
+		return res.json(symbols);
+	});
+});
+
+app.get('/api/get-certain_symbols', function (req, res) {
+	var symbols = Symbols.find({$or:[{group: "seq"},{type : {$in: ["connective", "sequent sign", "context separator", "empty"]}}]}, 
+	function (err, symbols) {
+		if (err) {
+			console.log(err);
+		}
+		return res.json(symbols);
+	});
 });
 
 // app.get('/api/get-prooftree', function (req, res) {

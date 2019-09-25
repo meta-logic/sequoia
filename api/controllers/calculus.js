@@ -152,4 +152,5 @@ function getCalculuses (req, res) {
     })
 }
 
+
 module.exports = {createCalculus, getCalculus, updateCalculus, deleteCalculus, getCalculuses}
