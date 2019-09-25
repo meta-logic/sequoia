@@ -3,8 +3,6 @@ const cmd2 = require("child_process")
 const fs = require('fs')
 
 function applyRule(rule, tree, id, res) {
-    var val_name = "val temp"
-    var val_len = val_name.length
     var sml_command = "treefuncImpl.translate_premises("+tree+","+rule+","+id+");\n"
     const smlTerminalInput = 
     "CM.make \"sml/unify.cm\";\n"
@@ -12,7 +10,7 @@ function applyRule(rule, tree, id, res) {
     +"open datatypesImpl;\n"
     +sml_command
     +"OS.Process.exit(OS.Process.success);\n"
-
+    
     const processRef = cmd2.spawn("sml")
     processRef.stdin.write(smlTerminalInput)
     processRef.on('close', function (code) {
@@ -21,7 +19,6 @@ function applyRule(rule, tree, id, res) {
             var answer = data.toString()
             try {
                 fs.unlinkSync('sml/test.sml')
-                console.log(answer)
                 return res.status(200).json({
                     status: 'success',
                     output: answer
