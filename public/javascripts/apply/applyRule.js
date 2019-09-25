@@ -7,6 +7,7 @@ function applyRule(i) {
     if (leaf_id == "-1") {
         return
     }
+    console.log(leaf_id)
     var type = document.getElementById("prooftree_" + leaf_id + "_conc").getAttribute("class")
     if (type == "conc") {
         return
@@ -75,16 +76,24 @@ function applyRule(i) {
 
 
 function undo() {
-    if (previous != []) {
+    if (previous.length != 0) {
         var undo_items = previous.shift()
-        console.log(undo_items)
         var undo_id = undo_items[0] 
         var undo_branch_count = undo_items[1] 
+        var undo_seq = undo_items[2]
         var proof_tree = $("#prooftree")[0]
         proof_tree.setAttribute("count", undo_branch_count)
         var conclusion = $("#prooftree_" + undo_id + "_conc")[0]
         conclusion.setAttribute("class", "conc-temp")
+        $(".conc-temp").click(function() {
+            leaf_id = this.id.split("_")[1]
+            seq_text = $(this).find("script")[0].innerText
+            console.log(seq_text)
+            console.log(leaf_id)
+        })
         conclusion.removeAttribute("colspan")
         document.getElementById("delete_id"+undo_id).remove()
+        leaf_id = undo_id
+        seq_text = undo_seq
     }
 }
