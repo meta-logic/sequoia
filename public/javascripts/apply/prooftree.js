@@ -1,4 +1,5 @@
-var leaf_id = "0"
+var previous = []
+var leaf_id = "-1"
 var seq_text = ""
 // A function to build on proof trees
 // Input:
@@ -27,6 +28,8 @@ function build_proof_tree(branch_id, rule, derivations) {
     // creating the rule
     var rule = "<td class=\"rulename\" rowspan=\"2\"><div class=\"rulename\">\\[" + rule + "\\]</div></td>"
 
+    var zan = "da man"
+
     // creating the new derivation branches
     var new_branches = ""
     for (var i = 0; i < derivations.length; i++) {
@@ -46,8 +49,8 @@ function build_proof_tree(branch_id, rule, derivations) {
 			"\\]</td></tr>\
         </table></td>"
     }
-
-    var row = "<tr>" + new_branches + rule + "</tr>"
+    previous.unshift(branch_id)
+    var row = "<tr id = delete_id"+ branch_id +" >" + new_branches + rule + "</tr>"
 
     // adding the derivations to the branch
     proof_tree_branch.innerHTML = row + proof_tree_branch.innerHTML
@@ -55,8 +58,3 @@ function build_proof_tree(branch_id, rule, derivations) {
     //applying mathjax
     MathJax.Hub.Queue([ "Typeset", MathJax.Hub, proof_tree_branch.firstElementChild ])
 }
-
-// $(".conc-temp").click(function() {
-//     leaf_id = parseInt(this.id.split("_")[1])
-//     seq_text = $(this).find("script")[0].innerText
-// })

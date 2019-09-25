@@ -4,6 +4,14 @@ function applyRule(i) {
     "<div class=\"header\">Rule and Premise Mismatch</div>"+
     "<p>This rule cannot be applied to the selected premise</p></div>"
 
+    if (leaf_id == "-1") {
+        return
+    }
+    var type = document.getElementById("prooftree_" + leaf_id + "_conc").getAttribute("class")
+    if (type == "conc") {
+        return
+    }
+    
     var ruletemp = document.getElementById("r"+i)
     var name = ruletemp.getAttribute("rule_name")
     var side = ruletemp.getAttribute("rule_name")[-1]
@@ -12,7 +20,7 @@ function applyRule(i) {
     var rule_sml = "Rule(\""+name+"\",None,"+conclusion+","+premises+")"
     var sequent = parser.parse(seq_text).replace(/\\/g, "\\\\")
     var tree_sml = "DevTree(\""+leaf_id+"\","+sequent+", NoRule, [])"
-
+    
     // console.log(rule_sml)
     // console.log(tree_sml)
 
@@ -30,7 +38,7 @@ function applyRule(i) {
         for (k = 0; k < output.length; k++) {
             prem_set.push(output[k].trim().slice(1,-1).split("##"))
         }
-
+        console.log("HERE")
         if (prem_set.length == 1) {
             build_proof_tree(leaf_id, name, prem_set[0])
             $(".conc-temp").click(function() {
@@ -51,9 +59,9 @@ function applyRule(i) {
                 "</div><ul id = \"choice\" class=\"list\"></ul></div>"
             
             var choice = document.getElementById('choice')
-            for (i = 0; i < prem_set.length; i++) {
+            for (j = 0; j < prem_set.length; j++) {
                 var display_prem = prem_set[i].join("\\qquad")
-                choice.innerHTML += "<div id = \"select\" num = "+i+" class=\"ui attahced secondary basic button select\">$$"+display_prem+"$$</div>"
+                choice.innerHTML += "<div id = \"select\" num = "+j+" class=\"ui attahced secondary basic button select\">$$"+display_prem+"$$</div>"
             }
             MathJax.Hub.Queue([ "Typeset", MathJax.Hub, choice ])
             $(".select").click(function() {
@@ -70,3 +78,13 @@ function applyRule(i) {
     })
 }
 
+
+function undo() {
+    if (previous != []) {
+        var undo_id = previous.shift()
+        var conclusion = $("#prooftree_" + undo_id + "_conc")[0]
+        conclusion.setAttribute("class", "conc-temp")
+        conclusion.removeAttribute("colspan")
+        document.getElementById("delete_id"+undo_id).remove()
+    }
+}
