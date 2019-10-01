@@ -113,10 +113,7 @@ struct
         end
 
 
-    fun form_to_fresh(D.Atom(x)) = D.Atom(string_to_fresh(x))
-        | form_to_fresh (D.AtomVar(x)) = D.AtomVar(string_to_fresh(x))
-        | form_to_fresh (D.FormVar(x)) = D.FormVar(string_to_fresh(x))
-        | form_to_fresh (D.Form(con,l)) = D.Form(con,List.map form_to_fresh l)
+    fun form_to_fresh(x) = x
 
 
     fun ctx_var_to_fresh(D.CtxVar(x)) = D.CtxVar(string_to_fresh(x))
