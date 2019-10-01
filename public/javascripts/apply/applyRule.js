@@ -7,7 +7,6 @@ function applyRule(i) {
     if (leaf_id == "-1") {
         return
     }
-    console.log(leaf_id)
     var type = document.getElementById("prooftree_" + leaf_id + "_conc").getAttribute("class")
     if (type == "conc") {
         return
@@ -19,7 +18,7 @@ function applyRule(i) {
     var premises = ruletemp.getAttribute("premises")
     var rule_sml = "Rule(\""+name+"\",None,"+conclusion+","+premises+")"
     var sequent = parser.parse(seq_text).replace(/\\/g, "\\\\")
-    var tree_sml = "DevTree(\""+leaf_id+"\","+sequent+", NoRule, [])"
+    var tree_sml = "DerTree(\""+leaf_id+"\","+sequent+", NoRule, [])"
 
     $.post("/apply", { rule: rule_sml, tree: tree_sml, node_id: "\""+leaf_id+"\"" }, function(data, status) {
         var output = data.output.slice(1,-1).split("&&")

@@ -17,7 +17,7 @@ var symbolsRoutes  = require('./api/routes/symbols');
 // var treeRoutes     = require('./api/routes/prooftree');
 
 // testing
-var test_routes   = require('./routes/test/test');
+// var test_routes   = require('./routes/test/test');
 
 
 var morgan       = require('morgan');
@@ -29,6 +29,7 @@ var bodyParser   = require('body-parser');
 var database     = require('./config/db');
 var Rule         = require('./api/models/rule');
 var Symbols      = require('./api/models/symbols');
+var Calcs      = require('./api/models/calculus');
 // var ProofTree    = require('./api/models/prooftree');
 
 
@@ -58,7 +59,7 @@ app.use('/api', calculusRoutes);
 app.use('/api', ruleRoutes);
 app.use('/api', symbolsRoutes);
 // app.use('/api', treeRoutes);
-app.use('/', test_routes);
+// app.use('/', test_routes);
 app.use('/', home_routes);
 app.use('/', apply_routes);
 
@@ -96,6 +97,15 @@ app.get('/api/get-certain_symbols', function (req, res) {
 			console.log(err);
 		}
 		return res.json(symbols);
+	});
+});
+
+app.get('/api/get-calculi', function (req, res) {
+	var calcs = Calcs.find({}, function (err, calcs) {
+		if (err) {
+			console.log(err);
+		}
+		return res.json(calcs);
 	});
 });
 

@@ -53,7 +53,7 @@ router.get('/calculus', function (req, res) {
 			rule = getRule(calculuses[i]);
 			calc.push({id : i, _id : calculuses[i]._id, title : calculuses[i].title, description : calculuses[i].description, premises : rule.premises, conclusion : rule.conclusion, rule : rule.rule});
 		}
-		return res.render('calculus/index', { 'calculus' : calc, 'title' : 'Sequoia - calculus', 'layout' : 'add-calculus'});
+		return res.render('calculus/index', { 'calculus' : calc, 'title' : 'Sequoia - calculus', 'layout' : 'all-calculus'});
 
 	});
 
@@ -63,8 +63,8 @@ router.get('/add-rule', function (req, res) {
 	return res.render('rule/index', {'title' : 'Sequoia - add rule', 'layout' : 'rule'});
 });
 
-router.get('/add-calculus', function (req, res) {
-	return res.render('calculus/add', {'title' : 'Sequoia - add calculus', 'layout' : 'add-calculus'});
+router.get('/all-calculi', function (req, res) {
+	return res.render('calculus/index', {'title' : 'Sequoia - add calculus', 'layout' : 'all-calculi'});
 });
 
 router.get('/edit-rule/:id', function (req, res) {

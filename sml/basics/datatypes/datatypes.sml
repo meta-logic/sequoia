@@ -120,6 +120,6 @@ structure datatypesImpl : DATATYPES = struct
         | sub_prefix_eq (_, _) = false
 
     datatype rule_name = NoRule | RuleName of string
-    datatype dev_tree = DevTree of string * seq * rule_name * dev_tree list
+    datatype der_tree = DerTree of string * seq * rule_name * der_tree list
 
 end

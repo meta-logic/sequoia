@@ -51,11 +51,11 @@ structure applyunifierImpl : APPLYUNIFIER = struct
         | apply_seq_allUnifier (sequent, sub::subsL) = List.map(fn sb => apply_seq_Unifier(sequent, sb))subsL
 
 
-    type dev_tree = DAT.dev_tree
-    fun apply_dev_tree_Unifier(DAT.DevTree(id, sq, rq, pq), subs) = 
+    type der_tree = DAT.der_tree
+    fun apply_der_tree_Unifier(DAT.DerTree(id, sq, rq, pq), subs) = 
         let val new_sq = apply_seq_Unifier (sq, subs)
-            val new_pq = List.map(fn p => apply_dev_tree_Unifier(p, subs))pq
-        in DAT.DevTree(id, new_sq, rq, new_pq) end
+            val new_pq = List.map(fn p => apply_der_tree_Unifier(p, subs))pq
+        in DAT.DerTree(id, new_sq, rq, new_pq) end
 
 
     fun compose (DAT.Fs(a,b), sigma) = (DAT.Fs(a, apply_form_Unifier(b, sigma)), DAT.form_eq(a,b))

@@ -7,22 +7,12 @@ var router     = express.Router()
 var controller = require("../controllers/calculus")
 
 
-//calculus
-router.route("/calculus")
-
-//creating a calculus
-    .post(controller.createCalculus)
-
-//get calculus information
-    .get(controller.getCalculus)
-
-//update calculus information
-    .put(controller.updateCalculus)
-
-//delete a calculus
-    .delete(controller.deleteCalculus)
-
-router.get("/calculuses", controller.getCalculuses)
+//calculus routes
+router.post("/calculus", controller.createCalculus)
+router.put("/calculus", controller.updateCalculus)
+router.delete("/calculus", controller.deleteCalculus)
+router.get("/calculus/:id", controller.getCalculus)
+router.get("/calculi", controller.getCalculi)
 
 
 module.exports = router

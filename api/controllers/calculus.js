@@ -92,7 +92,6 @@ function deleteCalculus (req, res) {
                 "message" : "calculus does not exist"
             })
         }
- 
         //calculus deleted
         return res.status(200).json({
             "status"  : "success",
@@ -102,7 +101,7 @@ function deleteCalculus (req, res) {
 }
 
 
-function getCalculuses (req, res) {
+function getCalculi (req, res) {
     var grule
     //looking up the calculus
     Calculus.find({}, function (err, calculuses) {
@@ -153,4 +152,4 @@ function getCalculuses (req, res) {
 }
 
 
-module.exports = {createCalculus, getCalculus, updateCalculus, deleteCalculus, getCalculuses}
+module.exports = {createCalculus, getCalculus, updateCalculus, deleteCalculus, getCalculi}

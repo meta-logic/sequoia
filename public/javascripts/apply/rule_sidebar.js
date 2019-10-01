@@ -16,9 +16,9 @@ function get_rules_toPage() {
                 fin_prem += rules[i].sml_prem[j].replace(/\\/g, "\\\\").replace(/'/g, "&apos;").replace(/"/g, "&quot;") + ", "
             }
             fin_prem = fin_prem.slice(0,-2) + "]"
-            rules_container.innerHTML += "<div id=\"rule_card"+ i.toString()+"\"><button class=\"ui button basic black\" id=\"r"+ i.toString()+"\" onClick=\"applyRule("+i+")\""
+            rules_container.innerHTML += "<div id=\"rule_card"+ i+"\"><button class=\"ui button basic black\" id=\"r"+ i+"\" onClick=\"applyRule("+i+")\""
             +"rule_name=\""+rules[i].rule+"\" conclusion=\""+fin_conc+"\" premises=\""+fin_prem+"\"></button><br><br></div>"
-            var rule_container = document.getElementById(("r" + i.toString()))
+            var rule_container = document.getElementById(("r" + i))
             rule_container.innerHTML = "\\[\\frac{"+ rules[i].premises.join(" \\quad \\quad ")+"}{"+ rules[i].conclusion +"}"+rules[i].rule+"\\]"
         }
         MathJax.Hub.Queue(["Typeset",MathJax.Hub,rules_container])

@@ -11,9 +11,10 @@ function get_rules_toPage() {
     $.get("/api/get-rules", function (rules, status) {
         for (var i = 0; i < rules.length; i++) {
             var temp = "'" + rules[i]._id + "'"
-            rules_container.innerHTML += "<div id=\"rule_card"+ i.toString() +"\" class=\"four wide column\"><div class=\"ui card\" id=\"r"+ i.toString() +"\"></div></div>"
-            var rule_container = document.getElementById(("r" + i.toString()))
-            rule_container.innerHTML = "\\[\\frac{"+ rules[i].premises.join(" \\quad \\quad ")+"}{"+ rules[i].conclusion +"}"+rules[i].rule+"\\]" + "<div class=\"extra content\"><div class=\"ui two buttons\"><a class=\"ui basic blue button\" href=\"/edit-rule/"+ rules[i]._id +"\">Edit</a><a class=\"ui basic red button\" onClick=\"deleteRule("+ temp +")\">Delete</a></div></div>"
+            rules_container.innerHTML += "<div id=\"rule_card"+ i +"\" class=\"four wide column\"><div class=\"ui card\" id=\"r"+ i +"\"></div></div>"
+            var rule_container = document.getElementById(("r" + i))
+            rule_container.innerHTML = "\\[\\frac{"+ rules[i].premises.join(" \\quad \\quad ")+"}{"+ rules[i].conclusion +"}"+rules[i].rule+"\\]" + 
+            "<div class=\"extra content\"><div class=\"ui two buttons\"><a class=\"ui basic blue button\" href=\"/edit-rule/"+ rules[i]._id +"\">Edit</a><a class=\"ui basic red button\" onClick=\"deleteRule("+ temp +")\">Delete</a></div></div>"
         }
         MathJax.Hub.Queue(["Typeset",MathJax.Hub,rules_container])
         r = rules.length

@@ -30,8 +30,6 @@ function build_proof_tree(branch_id, rule, derivations) {
     // creating the rule
     var rule = "<td class=\"rulename\" rowspan=\"2\"><div class=\"rulename\">\\[" + rule.replace(/\\\\/g, "\\") + "\\]</div></td>"
 
-    var zan = "da"
-
     // creating the new derivation branches
     var new_branches = ""
     for (var i = 0; i < derivations.length; i++) {
