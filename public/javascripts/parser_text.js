@@ -63,8 +63,4 @@ ATOM = atom:Atom { return 'Atom ("' + atom + '")' }
 
 _ "whitespace"
   = [ ]*
-<<<<<<< HEAD:public/javascripts/parser_text.js
-
-=======
->>>>>>> datatypes:public/javascripts/parser_text.js
 `
