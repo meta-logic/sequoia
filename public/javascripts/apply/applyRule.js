@@ -3,7 +3,7 @@ function applyRule(i) {
     var warning_text = "<div id=\"apply warning\"><div class=\"ui red negative message\">"+
     "<div class=\"header\">Rule and Premise Mismatch</div>"+
     "<p>This rule cannot be applied to the selected premise</p></div>"
-    
+
     if (leaf_id == "-1") {
         return
     }

@@ -10,7 +10,7 @@ function applyRule(rule, tree, id, res) {
     +"open datatypesImpl;\n"
     +sml_command
     +"OS.Process.exit(OS.Process.success);\n"
-    
+    console.log(sml_command)
     const processRef = cmd2.spawn("sml")
     processRef.stdin.write(smlTerminalInput)
     processRef.on('close', function (code) {
