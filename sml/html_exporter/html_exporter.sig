@@ -1,7 +1,7 @@
 signature EXPORTHTML= sig
 
     structure Dat : DATATYPES
-    type dev_tree = Dat.dev_tree
-    val export_toHtml : string -> dev_tree -> unit
+    type der_tree = Dat.der_tree
+    val export_toHtml : string -> der_tree -> unit
 
 end

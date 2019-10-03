@@ -31,7 +31,7 @@ structure applyunifierImpl : APPLYUNIFIER = struct
                 val form_app = apply_formL_Unifier(fL, subs)
                 val (clist, flist) = ListPair.unzip(apply_ctx_varL_Unifier(cL, subs))
             in 
-                DAT.Single(DAT.Ctx(List.concat clist, form_app @ List.concat flist))
+                DAT.Single(DAT.Ctx(List.concat clist, List.concat flist @ form_app))
             end
         | apply_ctx_struct_Unifier (DAT.Mult(con, DAT.Ctx(cL, fL), ctxStruct), subs) = 
             let 
@@ -39,7 +39,7 @@ structure applyunifierImpl : APPLYUNIFIER = struct
                 val (clist, flist) = ListPair.unzip(apply_ctx_varL_Unifier(cL, subs))
                 val new_ctxStruct = apply_ctx_struct_Unifier (ctxStruct, subs)
             in 
-                DAT.Mult(con, DAT.Ctx(List.concat clist, form_app @ List.concat flist), new_ctxStruct)
+                DAT.Mult(con, DAT.Ctx(List.concat clist, List.concat flist @ form_app), new_ctxStruct)
             end
     fun apply_ctx_struct_allUnifiers (ctx_struct, []) = [ctx_struct]
         | apply_ctx_struct_allUnifiers (ctx_struct, subsL) = List.map(fn sb => apply_ctx_struct_Unifier(ctx_struct, sb))subsL
@@ -51,11 +51,11 @@ structure applyunifierImpl : APPLYUNIFIER = struct
         | apply_seq_allUnifier (sequent, sub::subsL) = List.map(fn sb => apply_seq_Unifier(sequent, sb))subsL
 
 
-    type dev_tree = DAT.dev_tree
-    fun apply_dev_tree_Unifier(DAT.DevTree(id, sq, rq, pq), subs) = 
+    type der_tree = DAT.der_tree
+    fun apply_der_tree_Unifier(DAT.DerTree(id, sq, rq, pq), subs) = 
         let val new_sq = apply_seq_Unifier (sq, subs)
-            val new_pq = List.map(fn p => apply_dev_tree_Unifier(p, subs))pq
-        in DAT.DevTree(id, new_sq, rq, new_pq) end
+            val new_pq = List.map(fn p => apply_der_tree_Unifier(p, subs))pq
+        in DAT.DerTree(id, new_sq, rq, new_pq) end
 
 
     fun compose (DAT.Fs(a,b), sigma) = (DAT.Fs(a, apply_form_Unifier(b, sigma)), DAT.form_eq(a,b))

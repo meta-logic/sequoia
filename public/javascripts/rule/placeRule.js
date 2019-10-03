@@ -12,16 +12,19 @@ function placeRule(opt) {
 
     $.get("/api/get-symbols", function(sb, status) {
         syms = sb
+        syms = syms.sort(function(a, b){
+            return b.symbol.length - a.symbol.length
+        })
         for (var i = 0; i < syms.length; i++) {
             var symbol = syms[i].symbol
             var type = syms[i].type
             if (symbol.includes("\\")) {
                 symbol = "\\" + symbol
             }
-            if (type == "primary separator") {
+            if (type == "sequent sign") {
                 arrow += "/ \"" + symbol + "\" "
             }
-            else if (type == "separator") {
+            else if (type == "context separator") {
                 sep += "/ \"" + symbol + "\" "
             }
             else if (type == "connective") {
@@ -42,7 +45,7 @@ function placeRule(opt) {
         }
     extra_text = "\n" + arrow + "\n" + sep + "\n" + conn + "\n" + set + "\n" + form + "\n" + atom_var + "\n" + atom + "\n" 
     parser_text += extra_text
-    var parser = peg.generate(parser_text)    
+    var parser = peg.generate(parser_text)
     parse_and_place(parser, opt)
     })
 }
@@ -55,7 +58,7 @@ function parse_and_place(parser, opt) {
 
     var prem = []
     var parsed_prem = []
-    var rule = document.getElementById("rule_connective").value
+    var rule = document.getElementById("rule_name").value
     prem.push(document.getElementById("i0").value)
     for (var i = 1; i <= v; i++) {
         var p = document.getElementById("i" + i.toString()).value
@@ -96,12 +99,23 @@ function parse_and_place(parser, opt) {
             parsed_conc : conc_final ,parsed_prem : JSON.stringify(parsed_prem)})
     }
     else if (opt == "Update") {
-        $.ajax({
-            url: "/api/rule",
-            type: "PUT",
-            data : { id : document.getElementById("id").innerHTML , rule : rule, 
-                conclusion : conc, premises : JSON.stringify(prem), parsed_conc : conc_final, 
-                parsed_prem : JSON.stringify(parsed_prem)}})
+        $.get("/api/get-rules", function (rules, status) {
+            still_exists = false
+            for (var i = 0; i < rules.length; i++) {
+                still_exists = document.getElementById("id").innerHTML == rules[i]._id
+            }
+            if (!still_exists) {
+                $.post("/api/rule", {rule : rule, conclusion : conc, premises : JSON.stringify(prem),
+                    parsed_conc : conc_final ,parsed_prem : JSON.stringify(parsed_prem)})
+            } else {
+                $.ajax({
+                    url: "/api/rule",
+                    type: "PUT",
+                    data : { id : document.getElementById("id").innerHTML , rule : rule, 
+                        conclusion : conc, premises : JSON.stringify(prem), parsed_conc : conc_final, 
+                        parsed_prem : JSON.stringify(parsed_prem)}})
+            }
+        })
     }
     window.location.href = "/"
 }

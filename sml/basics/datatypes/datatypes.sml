@@ -10,10 +10,21 @@ structure datatypesImpl : DATATYPES = struct
     fun form_toString (Atom (s)) = s 
         | form_toString (AtomVar(s)) = s 
         | form_toString (FormVar (s)) = s
-        | form_toString (Form (Con (c), fl)) = c ^ "(" ^ subforms_toString(fl) ^ ")"
-    and subforms_toString (nil) = ""
-        | subforms_toString ([x]) = form_toString(x)
-        | subforms_toString (x::l) = form_toString(x) ^ ", " ^ subforms_toString(l)
+        | form_toString (Form (Con (c), fl)) = subforms_toString(c, fl)
+    and subforms_toString (c, nil) = ""
+        | subforms_toString (c, [x]) = (case x of 
+            Form (Con (cn), fl) => c ^ "(" ^ form_toString(x) ^ ")"
+            | _ => c ^ form_toString(x))
+        | subforms_toString (c, [x,y]) = (case x of
+            Form (Con (cn), fl) => (case y of
+                Form (Con (cn), fl) =>  "(" ^ form_toString(x) ^ ") " ^ c ^ " (" ^ form_toString(y) ^ ")"
+                | _ => "(" ^ form_toString(x) ^ ") " ^ c ^ " " ^ form_toString(y))
+            | _ => (case y of
+                Form (Con (cn), fl) => form_toString(x) ^ " " ^ c ^ " (" ^ form_toString(y) ^ ")"
+                | _ => form_toString(x) ^ " " ^ c ^ " " ^ form_toString(y)))
+        | subforms_toString (c, x::l) = (case x of
+            Form (Con (cn), fl) => "(" ^ form_toString(x) ^ ") " ^ c ^ " " ^ subforms_toString(c, l)
+            | _ => form_toString(x) ^ " " ^ c ^ " " ^ subforms_toString(c, l))
     fun form_eq (Atom(a), Atom(b)) = a=b
         | form_eq (AtomVar(a), AtomVar(b)) = a=b
         | form_eq (FormVar(a), FormVar(b)) = a=b
@@ -109,6 +120,6 @@ structure datatypesImpl : DATATYPES = struct
         | sub_prefix_eq (_, _) = false
 
     datatype rule_name = NoRule | RuleName of string
-    datatype dev_tree = DevTree of string * seq * rule_name * dev_tree list
+    datatype der_tree = DerTree of string * seq * rule_name * der_tree list
 
 end

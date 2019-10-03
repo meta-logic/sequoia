@@ -1,15 +1,36 @@
-<div class="ui container">
+{{!-- Grid --}}
+<div class="ui middle aligned center aligned grid" style="margin-top: 35px">
+	{{!-- Container --}}
+	<div class="ui container">
+		{{!-- Rule Input --}}
+		<div class="row">
+			<div class="ui input">
+				<input id="title" type="text" placeholder="Title">
+			</div>
+		</div>
+		
+		<br>
+		
+		<div class="row">
+			<div class="ui fluid input">
+				<input id="description" type="text" placeholder="Description">
+			</div>
+		</div>
 
-	
-	{{!-- Cards --}}
-	<div class="ui grid cards" id="calculuses">
-	
-	
+		<br>
+
+		{{!-- Add Button --}}
+		<a class="ui button primary" onclick="addCalculus()" >
+			Add
+		</a>
+
+		<br><br>
+
+		{{!-- Cards --}}
+		<div class="ui grid cards" id="calculi">
+		</div>
+		<br>
+		
+
 	</div>
-	<br>
-	{{!-- End of Cards --}}
-	<a class="circular ui icon button green" href="/add-calculus">
-		<i class="icon add"></i>
-	</a>
 </div>
-

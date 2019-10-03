@@ -1,6 +1,6 @@
 
 function preview() {
-    var conc = document.getElementById("Sequent").value.replace(/\(/g, "").replace(/\)/g, "")
+    var conc = document.getElementById("Sequent").value.replace(/\(/g, " ( ").replace(/\)/g, " ) ")
     var applyButton = document.getElementById("apply")
     var table = document.getElementById("table")
     var init_sequent = document.getElementById("init sequent")
@@ -22,7 +22,7 @@ function preview() {
         symtbl.remove()
     }
     table.innerHTML =
-        "<table id=\"sym_table\" class= \"ui sortable fixed single line celled table\"> <thead> <tr><th>Symbols</th> <th>Types</th> </tr></thead>"+ 
+        "<table id=\"sym_table\" class= \"ui sortable fixed single line celled table\"> <thead> <tr><th>Sequent Term Symbols</th> <th>Types</th> </tr></thead>"+ 
             "<tbody id=\"init\"><tbody>"+
             "<tbody id=\"table_head\">"+ 
                 "<tr id = \"input_row\">"+
@@ -32,8 +32,9 @@ function preview() {
                         "</div>"+
                     "</td>"+
                     "<td id= \"select_field\" >"+
-                        "<select class=\"ui search dropdown\" style=\"fixed\" id=\"select-sym\" ><option value=\"\">Type</option><option value=\"atom\">atom</option><option value=\"atom variable\">atom variable</option><option value=\"formula variable\">formula variable</option><option value=\"connective\">connective</option><option value=\"context variable\">context variable</option><option value=\"primary separator\">primary separator</option><option value=\"context separator\">separator</option><option value=\"empty\">empty</option></select>"+
-                        "<button class=\"ui right floated button primary\" onclick=\"add_symbol_toTable()\">Add Symbol</button>"+
-                    "</td></tr></tbody></table>"
-    get_symbols_toTable()
+                        "<select class=\"ui search dropdown\" style=\"fixed\" id=\"select-sym\" ><option value=\"\">Type</option><option value=\"atom\">atom</option><option value=\"atom variable\">atom variable</option><option value=\"formula variable\">formula variable</option><option value=\"context variable\">context variable</option></select>"+
+                        "<button class=\"ui right floated button primary\" onclick=\"add_symbol_toTable(\'seq\')\">Add Symbol</button>"+
+                    "</td></tr></tbody></table><br><br>"
+    s = 0
+    get_symbols_toTable("seq")
 }

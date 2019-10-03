@@ -32,7 +32,7 @@ struct
                 let val () = () in other_fresh := !other_fresh + 1; 
                 D.Mult(con,D.Ctx([D.CtxVar ("Gamma_" ^ Int.toString(!other_fresh))],nil),gen_out rest) end
         in
-             D.Seq(gen_out a, c, gen_out b)
+            D.Seq(gen_out a, c, gen_out b)
         end
     (*
         fun weak_admissability(rules) = 
@@ -55,7 +55,7 @@ struct
                 fun check(rule, st, term) = (case st of NONE => false | SOME(start) =>
                     let 
                     val premises_ls = List.map (fn tree => get_open_prems tree)
-                        (apply_rule(([],[],D.DevTree("0",start,D.NoRule,[])), rule, "0"))
+                        (apply_rule(([],[],D.DerTree("0",start,D.NoRule,[])), rule, "0"))
                     val start_added = add_term_seq(start,term)
                     val s = List.map(fn nsq => get_start(rule, nsq))start_added
                     in
@@ -80,7 +80,7 @@ struct
                                 let val form_subs = List.map(fn frm => Fs(frm, con_form))(get_forms(conc_init))
                                     val new_sq = T.atomic_transform
                                     (App.apply_seq_Unifier(empty_out_seq conc_init, form_subs))
-                                in (D.DevTree("0",new_sq,D.NoRule,[])) end)init_rule_ls
+                                in (D.DerTree("0",new_sq,D.NoRule,[])) end)init_rule_ls
                     val fst_apply = 
                             List.foldl(fn (tree, ls) => 
                                 apply_multiple_rules_all_ways(([], [], tree), rules1) @ ls
@@ -142,9 +142,9 @@ struct
     
     fun get_ctx_var_seq ( D.Seq(A,_,B)) = get_ctx_var_ctx_struct(A)@get_ctx_var_ctx_struct(B)
 
-    fun get_ctx_vars_dev_tree (D.DevTree(_,S,_,L)) = get_ctx_var_seq(S)@get_ctx_vars_dev_tree_list(L)
-    and get_ctx_vars_dev_tree_list ([]) = []
-        |get_ctx_vars_dev_tree_list (D::L) = get_ctx_vars_dev_tree(D)@get_ctx_vars_dev_tree_list(L)
+    fun get_ctx_vars_der_tree (D.DerTree(_,S,_,L)) = get_ctx_var_seq(S)@get_ctx_vars_der_tree_list(L)
+    and get_ctx_vars_der_tree_list ([]) = []
+        |get_ctx_vars_der_tree_list (D::L) = get_ctx_vars_der_tree(D)@get_ctx_vars_der_tree_list(L)
 
     fun get_ctx_vars_from_constraint((_,A,B)) = A@B
 
@@ -152,22 +152,22 @@ struct
         |get_ctx_vars_from_constraints(x::L) = get_ctx_vars_from_constraint(x)@get_ctx_vars_from_constraints(L)
 
 
-    val last1 = ref (D.DevTree("",D.Seq(D.Empty,D.Con(""),D.Empty),D.NoRule,[]))
-    val last2 = ref (D.DevTree("",D.Seq(D.Empty,D.Con(""),D.Empty),D.NoRule,[]))
+    val last1 = ref (D.DerTree("",D.Seq(D.Empty,D.Con(""),D.Empty),D.NoRule,[]))
+    val last2 = ref (D.DerTree("",D.Seq(D.Empty,D.Con(""),D.Empty),D.NoRule,[]))
 
 
     fun check_premises'((cn1,dvt1),(cn2,dvt2)) =
         let 
-            val D.DevTree(_,sq1,_,_) = dvt1
-            val D.DevTree(_,sq2,_,_) = dvt2
-            val t1_prems = List.map (fn (D.DevTree(_,seq,_,_)) => seq) (T.get_open_prems(dvt1))
-            val t2_prems = List.map (fn (D.DevTree(_,seq,_,_)) => seq) (T.get_open_prems(dvt2))
+            val D.DerTree(_,sq1,_,_) = dvt1
+            val D.DerTree(_,sq2,_,_) = dvt2
+            val t1_prems = List.map (fn (D.DerTree(_,seq,_,_)) => seq) (T.get_open_prems(dvt1))
+            val t2_prems = List.map (fn (D.DerTree(_,seq,_,_)) => seq) (T.get_open_prems(dvt2))
             (*val goal = create_constraint(sq1,sq2)*)
             val constraints = cn1@cn2 
             (*val _ = last1 := dvt1*)
             (*val _ = last2 := dvt2*)
-            val t1_vars = List.map (fn (D.CtxVar(x))=>x) (get_ctx_vars_dev_tree(dvt1)@get_ctx_vars_from_constraints(cn1))
-            val t2_vars = List.map (fn (D.CtxVar(x))=>x) (get_ctx_vars_dev_tree(dvt2)@get_ctx_vars_from_constraints(cn2))
+            val t1_vars = List.map (fn (D.CtxVar(x))=>x) (get_ctx_vars_der_tree(dvt1)@get_ctx_vars_from_constraints(cn1))
+            val t2_vars = List.map (fn (D.CtxVar(x))=>x) (get_ctx_vars_der_tree(dvt2)@get_ctx_vars_from_constraints(cn2))
             val t1_vars = Set.listItems(Set.addList(Set.empty,t1_vars))
             val t2_vars = Set.listItems(Set.addList(Set.empty,t2_vars))
             val t1_vars = List.map (fn x => D.CtxVar(x)) t1_vars
@@ -251,7 +251,7 @@ struct
 
             val D.Rule(name1, side1, conc1, premises1) = rule1
             val D.Rule(name2, side2, conc2, premises2) = rule2 
-            val bases = List.map(fn conc => D.DevTree("0",seq_to_fresh(conc),D.NoRule,[]))(create_base(rule1, rule2))
+            val bases = List.map(fn conc => D.DerTree("0",seq_to_fresh(conc),D.NoRule,[]))(create_base(rule1, rule2))
             val opens1 = stack_rules(bases, rule1, rule2, init_rule_ls)
             val opens2 = stack_rules(bases, rule2, rule1, init_rule_ls)
 
@@ -260,9 +260,9 @@ struct
             check_premises(opens1,opens2,false,false)
             (*check_premises(opens1, opens2, false, false)*)
             (* List.map(fn (_,sls,s) => (List.map(seq_toString)sls, seq_toString s))(List.hd(opens1)) *)
-            (* List.map(fn t => dev_tree_toString t)bases *)
-            (* List.map(fn a => List.map(fn (_,_,t) => dev_tree_toString t)a)opens1 *)
-            (* List.map(fn t => dev_tree_toString t)opens1 *)
+            (* List.map(fn t => der_tree_toString t)bases *)
+            (* List.map(fn a => List.map(fn (_,_,t) => der_tree_toString t)a)opens1 *)
+            (* List.map(fn t => der_tree_toString t)opens1 *)
         end
 
 

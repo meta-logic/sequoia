@@ -10,6 +10,7 @@ function addSymbol (req, res) {
     var symbol = new Symbols()
     symbol.symbol     = req.body.symbol
     symbol.type       = req.body.type
+    symbol.group      = req.body.group
     symbol.save(function (err) {
 
         //if something went wrong while saving, return the error

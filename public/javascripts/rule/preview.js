@@ -51,7 +51,7 @@ function preview (opt) {
 
     $.get("/api/get-rules", function (rls, status) {
         var rule = document.getElementById("rule")
-        var rule_connective = document.getElementById("rule_connective").value
+        var rule_name = document.getElementById("rule_name").value
         var premises = document.getElementById("i0").value
         var conc = document.getElementById("Conclusion").value
         var warning = document.getElementById("warning")
@@ -63,7 +63,7 @@ function preview (opt) {
             parse_warning.remove()
         }
 
-        if (rule_connective == "") {
+        if (rule_name == "") {
             warning.innerHTML = warning_text_name
             return
         }
@@ -73,9 +73,15 @@ function preview (opt) {
         }
         rules = rls
         for (var i = 0; i < rules.length; i++) {
-            if (rule_connective == rules[i].rule && opt == "Add") {
-                warning.innerHTML = warning_text_red
-                return
+            if (rule_name == rules[i].rule) {
+                if (opt == "Add") {
+                    warning.innerHTML = warning_text_red
+                    return
+                }
+                else if (opt == "Update" && document.getElementById("id").value != rules[i]._id){
+                    warning.innerHTML = warning_text_red
+                    return
+                }
             } 
         }
         var redundant_warning = document.getElementById("redundant warning")
@@ -97,7 +103,7 @@ function preview (opt) {
         if (conclusion_warning != null){
             conclusion_warning.remove()
         }
-        rule.innerHTML = "\\[\\frac{"+premises+"}{"+conc+"}"+rule_connective+"\\]"
+        rule.innerHTML = "\\[\\frac{"+premises+"}{"+conc+"}"+rule_name+"\\]"
         MathJax.Hub.Queue(["Typeset",MathJax.Hub,rule])
 
         var sub = document.getElementById("submit")
@@ -121,9 +127,10 @@ function preview (opt) {
                             "</div>"+
                         "</td>"+
                         "<td id= \"select_field\" >"+
-                            "<select class=\"ui search dropdown\" style=\"fixed\" id=\"select-sym\" ><option value=\"\">Type</option><option value=\"atom\">atom</option><option value=\"atom variable\">atom variable</option><option value=\"formula variable\">formula variable</option><option value=\"connective\">connective</option><option value=\"context variable\">context variable</option><option value=\"primary separator\">primary separator</option><option value=\"context separator\">separator</option><option value=\"empty\">empty</option></select>"+
-                            "<button class=\"ui right floated button primary\" onclick=\"add_symbol_toTable()\">Add Symbol</button>"+
-                        "</td></tr></tbody></table>"
-        get_symbols_toTable()
+                            "<select class=\"ui search dropdown\" style=\"fixed\" id=\"select-sym\" ><option value=\"\">Type</option><option value=\"atom variable\">atom variable</option><option value=\"formula variable\">formula variable</option><option value=\"connective\">connective</option><option value=\"context variable\">context variable</option><option value=\"sequent sign\">sequent sign</option><option value=\"context separator\">context separator</option><option value=\"empty\">empty</option></select>"+
+                            "<button class=\"ui right floated button primary\" onclick=\"add_symbol_toTable(\'rule\')\">Add Symbol</button>"+
+                        "</td></tr></tbody></table><br><br>"
+        s = 0
+        get_symbols_toTable("rule")
     })
 }

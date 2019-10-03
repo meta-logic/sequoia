@@ -21,12 +21,12 @@ CTX
 CTX_LST
   = ctx_var:CTX_VAR _ "," _ ctx_lst:CTX_LST {
       var [ctx_vars, forms] = ctx_lst
-      ctx_vars.push(ctx_var)
+      ctx_vars.unshift(ctx_var)
       return [ctx_vars, forms]
     }
   / form:FORM _ "," _ ctx_lst:CTX_LST _ { 
       var [ctx_vars, forms] = ctx_lst
-      forms.push(form)
+      forms.unshift(form)
       return [ctx_vars, forms]
     }
   / ctx_var:CTX_VAR { return [[ctx_var], []] } 
@@ -37,7 +37,7 @@ FORM = BIFORM / GENFORM
 
 FORM_LIST 
   = _ form:FORM _ "," _ form_lst:FORM_LIST _ { 
-      form_lst.push(form)
+      form_lst.unshift(form)
       return form_lst 
     }
   / _ form:FORM _ { return [form] }
@@ -63,5 +63,8 @@ ATOM = atom:Atom { return 'Atom ("' + atom + '")' }
 
 _ "whitespace"
   = [ ]*
+<<<<<<< HEAD:public/javascripts/parser_text.js
 
+=======
+>>>>>>> datatypes:public/javascripts/parser_text.js
 `

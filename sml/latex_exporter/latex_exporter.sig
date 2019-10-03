@@ -1,7 +1,7 @@
 signature EXPORTLATEX = sig
 
-    structure Dat : DATATYPES
-    type dev_tree = Dat.dev_tree
-    val export_toLatex : string -> dev_tree -> unit
+    structure DAT : DATATYPES
+    type der_tree = DAT.der_tree
+    val export_toLatex : string -> der_tree -> unit
 
 end

@@ -1,5 +1,7 @@
-var leaf_id = "0"
+var previous = []
+var leaf_id = "-1"
 var seq_text = ""
+
 // A function to build on proof trees
 // Input:
 // - Proof tree html container ID (string)
@@ -13,6 +15,7 @@ function build_proof_tree(branch_id, rule, derivations) {
 
     // getting the total number of branches to assign ids for the new branches
     var branch_count = parseInt(proof_tree.getAttribute("count"))
+    previous.unshift([branch_id,branch_count,seq_text])
     proof_tree.setAttribute("count", branch_count + derivations.length - 1)
 
     // retrieving the proof tree branch html
@@ -23,9 +26,9 @@ function build_proof_tree(branch_id, rule, derivations) {
     var conclusion = $("#prooftree_" + branch_id + "_conc")[0]
     conclusion.setAttribute("class", "conc")
     conclusion.setAttribute("colspan", derivations.length)
-
+    
     // creating the rule
-    var rule = "<td class=\"rulename\" rowspan=\"2\"><div class=\"rulename\">\\[" + rule + "\\]</div></td>"
+    var rule = "<td class=\"rulename\" rowspan=\"2\"><div class=\"rulename\">\\[" + rule.replace(/\\\\/g, "\\") + "\\]</div></td>"
 
     // creating the new derivation branches
     var new_branches = ""
@@ -46,8 +49,7 @@ function build_proof_tree(branch_id, rule, derivations) {
 			"\\]</td></tr>\
         </table></td>"
     }
-
-    var row = "<tr>" + new_branches + rule + "</tr>"
+    var row = "<tr id = delete_id"+ branch_id +" >" + new_branches + rule + "</tr>"
 
     // adding the derivations to the branch
     proof_tree_branch.innerHTML = row + proof_tree_branch.innerHTML
@@ -55,8 +57,3 @@ function build_proof_tree(branch_id, rule, derivations) {
     //applying mathjax
     MathJax.Hub.Queue([ "Typeset", MathJax.Hub, proof_tree_branch.firstElementChild ])
 }
-
-// $(".conc-temp").click(function() {
-//     leaf_id = parseInt(this.id.split("_")[1])
-//     seq_text = $(this).find("script")[0].innerText
-// })
