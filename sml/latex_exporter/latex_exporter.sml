@@ -16,6 +16,24 @@ structure latexImpl : EXPORTLATEX = struct
                 val conclusion = "\\infer["^nm^"]{"^(D.seq_toString s)^"}"
             in conclusion^"{"^prem_latex^"}" end
 
+    fun export_string_toLatex filename str = 
+        let
+            val fd = TextIO.openOut filename
+            val packages = 
+            "\\documentclass[10pt]{article}\n"^
+            "\\usepackage{amsmath}\n"^
+            "\\usepackage{amsfonts}\n"^
+            "\\usepackage{amssymb}\n"^
+            "\\usepackage{proof}\n"^
+            "\\usepackage{latexsym}\n"
+            val document = "\\begin{document}\n\\begin{align*}\n"^
+            str^"\\end{align*}\n\\end{document}\n"
+            val _ = TextIO.output (fd, packages^document) handle e => (TextIO.closeOut fd; raise e)
+            val _ = TextIO.closeOut fd
+        in
+            ()
+        end
+
     fun export_toLatex filename tree =
         let val fd = TextIO.openOut filename
             val packages = 
@@ -23,7 +41,8 @@ structure latexImpl : EXPORTLATEX = struct
             "\\usepackage{amsmath}\n"^
             "\\usepackage{amsfonts}\n"^
             "\\usepackage{amssymb}\n"^
-            "\\usepackage{proof}\n"
+            "\\usepackage{proof}\n"^
+            "\\usepackage{latexsym}\n"
             val latex_tree = "\\begin{document}\n\\begin{align*}\n"^
                 (der_tree_toLatex tree)^"\\end{align*}\n\\end{document}\n"
             val _ = TextIO.output (fd, packages^latex_tree) handle e => (TextIO.closeOut fd; raise e)

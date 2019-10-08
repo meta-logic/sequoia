@@ -16,23 +16,25 @@ struct
     structure E = Equivalence
     structure Set = SplaySetFn(StringKey);
 
+    type constraint = D.ctx_var * (D.ctx_var list) * (D.ctx_var list)
+
 
 
     val other_fresh = ref 1000000;
     val term_fresh = ref 10000;
-    val fresher = ref 52344;
+    val fresher = ref 523;
 
     fun generic_seq( D.Seq(a, c, b)) = 
         let 
             fun gen_out(D.Empty) = D.Empty
                 | gen_out(D.Single(D.Ctx(vl,fl))) = 
                 let val () = () in other_fresh := !other_fresh + 1;
-                D.Single(D.Ctx([D.CtxVar ("Gamma_" ^ Int.toString(!other_fresh))],nil)) end
+                D.Single(D.Ctx([D.CtxVar ("Gamma_{" ^ Int.toString(!other_fresh)^"}")],nil)) end
                 | gen_out(D.Mult(con,D.Ctx(vl,fl),rest)) = 
                 let val () = () in other_fresh := !other_fresh + 1; 
-                D.Mult(con,D.Ctx([D.CtxVar ("Gamma_" ^ Int.toString(!other_fresh))],nil),gen_out rest) end
+                D.Mult(con,D.Ctx([D.CtxVar ("Gamma_{" ^ Int.toString(!other_fresh)^"}")],nil),gen_out rest) end
         in
-            D.Seq(gen_out a, c, gen_out b)
+             D.Seq(gen_out a, c, gen_out b)
         end
     (*
         fun weak_admissability(rules) = 
@@ -107,7 +109,7 @@ struct
     *)
     fun string_to_fresh(x) = 
         let
-            val (x2,_) = (x^ (Int.toString(!fresher)),fresher:= !fresher + 1)
+            val (x2,_) = (x^"_{"^ (Int.toString(!fresher))^"}",fresher:= !fresher + 1)
         in
             x2
         end
@@ -224,16 +226,25 @@ struct
                     (*remove all trees where only 1 rule is applied*)
                     val set_base_pairs = List.map (filter_short) set_base_pairs
                     (*remove sets with no trees in set 1 or no trees in set 2*)
-                    val set_base_pairs = List.filter (fn (y::_,x::_) => true | (_,_) => false) set_base_pairs
-                    fun set_check (set1,set2)  = List.all(fn (cn1,dvt1) =>
-                            List.exists(fn (cn2,dvt2) =>
+                    val set_base_pairs = List.filter (fn (y::_,x::_) => true | (_,_) => false) set_base_pairs 
+
+                    
+
+                    fun set_check (set1,set2)  = (List.map (fn (cn1,dvt1) =>
+                            ((List.find (fn (cn2,dvt2) =>
                                 check_premises' ((cn1,dvt1),(cn2,dvt2))
-                            )set2
-                        )set1
+                            )set2)   ,(cn1,dvt1))
+                        )set1,set2)
+
+                    fun seperate' ([],res) = res
+                        | seperate' ((SOME (_,y),(_,x))::L,(res1,res2)) = seperate'(L,((x,y)::res1,res2))
+                        | seperate' ((NONE,x)::L,(res1,res2)) = seperate'(L,(res1,x::res2))
+
+                    fun seperate (L) = seperate' (L,([],[]))
+
+                    val test_results = List.map (set_check) set_base_pairs
                 in
-                    case set_base_pairs of
-                        [] => NONE
-                        | _::_ => SOME (List.all (set_check) set_base_pairs)
+                    List.map (fn (x,y) => (seperate(x),y)) test_results
                 end
 
             fun stack_rules(bases, rule1, rule2, init_rule_ls) =
@@ -251,8 +262,10 @@ struct
 
             val D.Rule(name1, side1, conc1, premises1) = rule1
             val D.Rule(name2, side2, conc2, premises2) = rule2 
-            val bases = List.map(fn conc => D.DerTree("0",seq_to_fresh(conc),D.NoRule,[]))(create_base(rule1, rule2))
+            val bases = (create_base(rule1, rule2))
+            val bases = List.map(fn conc => D.DerTree("0",seq_to_fresh(conc),D.NoRule,[])) bases
             val opens1 = stack_rules(bases, rule1, rule2, init_rule_ls)
+            val bases = List.map(fn D.DerTree("0",conc,D.NoRule,[]) => D.DerTree("0",seq_to_fresh(conc),D.NoRule,[])) bases
             val opens2 = stack_rules(bases, rule2, rule1, init_rule_ls)
 
 

@@ -1,5 +1,6 @@
 Group is
   ../basics/basics.cm
   ../properties/properties.cm
+  ../latex_exporter/latex_exporter.cm
   constructive_logic.sml
   lin_logic.sml
