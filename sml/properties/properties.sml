@@ -7,6 +7,7 @@ end
 structure Properties : PROPERTIES = 
 struct
     structure D = datatypesImpl
+    structure Dat = D
     structure H = helpersImpl
 
     structure T = treefuncImpl
@@ -23,6 +24,7 @@ struct
     val other_fresh = ref 1000000;
     val term_fresh = ref 10000;
     val fresher = ref 523;
+    val rule_fresh = ref 1
 
     fun generic_seq( D.Seq(a, c, b)) = 
         let 
@@ -107,6 +109,31 @@ struct
             init_coh_aux(con_form, rulesR, rulesL, init_rule_ls)
         end
     *)
+
+
+
+    fun update_ctx_var (Dat.CtxVar(x)) = Dat.CtxVar(x^"_{r"^(Int.toString(!rule_fresh))^"}")
+
+    fun update_ctx (Dat.Ctx(ctx_vars,forms)) = Dat.Ctx(List.map update_ctx_var ctx_vars,forms)
+    
+    fun update_ctx_struct (Dat.Empty) = Dat.Empty
+        | update_ctx_struct (Dat.Single(ctx)) = Dat.Single(update_ctx(ctx))
+        | update_ctx_struct (Dat.Mult(conn,ctx,ctx_strct)) = Dat.Mult(conn,update_ctx(ctx), update_ctx_struct(ctx_strct))
+
+    fun update_seq (Dat.Seq(l,conn,r)) = Dat.Seq(update_ctx_struct(l),conn,update_ctx_struct(r))
+
+    fun update_rule (Dat.Rule(nm,side,conc,prems)) =
+        let
+            val new_conc = update_seq(conc)
+            val new_prems = List.map update_seq prems
+            val _ = rule_fresh := ((!rule_fresh) + 1)
+        in
+            Dat.Rule(nm,side,new_conc,new_prems)
+        end
+
+
+
+
     fun string_to_fresh(x) = 
         let
             val (x2,_) = (x^"_{"^ (Int.toString(!fresher))^"}",fresher:= !fresher + 1)
@@ -266,6 +293,8 @@ struct
             val bases = List.map(fn conc => D.DerTree("0",seq_to_fresh(conc),D.NoRule,[])) bases
             val opens1 = stack_rules(bases, rule1, rule2, init_rule_ls)
             val bases = List.map(fn D.DerTree("0",conc,D.NoRule,[]) => D.DerTree("0",seq_to_fresh(conc),D.NoRule,[])) bases
+            val rule1 = update_rule(rule1)
+            val rule2 = update_rule(rule2)
             val opens2 = stack_rules(bases, rule2, rule1, init_rule_ls)
 
 

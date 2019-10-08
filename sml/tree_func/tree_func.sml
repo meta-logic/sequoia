@@ -6,7 +6,7 @@
     structure App = applyunifierImpl
     structure U = unifyImpl
 
-    val rule_fresh = ref 1
+    
 
     type conn = Dat.conn
     type form = Dat.form
@@ -85,25 +85,6 @@
         else if not (String.isPrefix id sid) then true
         else List.foldl(fn (branch, bools) => bools andalso (check_rule_of(branch,sid)))(true)pq
 
-    fun update_ctx_var (Dat.CtxVar(x)) = Dat.CtxVar(x^"_{r"^(Int.toString(!rule_fresh))^"}")
-
-    fun update_ctx (Dat.Ctx(ctx_vars,forms)) = Dat.Ctx(List.map update_ctx_var ctx_vars,forms)
-    
-    fun update_ctx_struct (Dat.Empty) = Dat.Empty
-        | update_ctx_struct (Dat.Single(ctx)) = Dat.Single(update_ctx(ctx))
-        | update_ctx_struct (Dat.Mult(conn,ctx,ctx_strct)) = Dat.Mult(conn,update_ctx(ctx), update_ctx_struct(ctx_strct))
-
-    fun update_seq (Dat.Seq(l,conn,r)) = Dat.Seq(update_ctx_struct(l),conn,update_ctx_struct(r))
-
-    fun update_rule (Dat.Rule(nm,side,conc,prems)) =
-        let
-            val new_conc = update_seq(conc)
-            val new_prems = List.map update_seq prems
-            val _ = rule_fresh := ((!rule_fresh) + 1)
-        in
-            Dat.Rule(nm,side,new_conc,new_prems)
-        end
-
     fun apply_rule((forms, cons, dt), rule, sid) =
         let 
             fun apply_rule_aux( Dat.DerTree(id, sq,  Dat.NoRule, []), Dat.Rule(name, s, conc, premises), sid) =
@@ -133,8 +114,6 @@
                     else 
                         let val all_devs = apply_rule_aux( Dat.DerTree(id, sq, rq, pq), rule, sid)
                         in List.map(fn (frm, sgcn, dv) => (forms @ frm, sgcn, dv :: prems))all_devs end
-            val rule = update_rule(rule)
-
         in 
             List.map(fn (form, unif, dvt) => case unif of 
                 SOME((sg,cn)) => (form, cons @ cn, App.apply_der_tree_Unifier(dvt, sg))
