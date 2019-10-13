@@ -8,7 +8,7 @@ signature DATATYPES = sig
     datatype seq = Seq of ctx_struct * conn * ctx_struct
     datatype side = Left | Right | None
     datatype rule = Rule of string * side * seq * seq list
-    datatype sub = Fs of form * form | CVs of ctx_var * ctx
+    datatype sub = Fs of form * form | CTXs of ctx_var * ctx | CVs of ctx_var * ctx_var
     datatype rule_name = NoRule | RuleName of string
     datatype der_tree = DerTree of string * seq * rule_name * der_tree list
 

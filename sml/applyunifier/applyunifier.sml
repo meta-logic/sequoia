@@ -17,7 +17,7 @@ structure applyunifierImpl : APPLYUNIFIER = struct
 
     type ctx = DAT.ctx
     fun apply_ctx_var_Unifier (item, []) = ([item], [])
-        | apply_ctx_var_Unifier (item, DAT.CVs(f1,DAT.Ctx(a,b))::subs) = 
+        | apply_ctx_var_Unifier (item, DAT.CTXs(f1,DAT.Ctx(a,b))::subs) = 
             if DAT.ctx_var_eq(item, f1) then (a,b) else apply_ctx_var_Unifier (item, subs)
         | apply_ctx_var_Unifier (item, a::subs) = apply_ctx_var_Unifier (item, subs)
     fun apply_ctx_varL_Unifier (vl, subs) = List.map(fn item => apply_ctx_var_Unifier (item, subs))vl
@@ -59,10 +59,10 @@ structure applyunifierImpl : APPLYUNIFIER = struct
 
 
     fun compose (DAT.Fs(a,b), sigma) = (DAT.Fs(a, apply_form_Unifier(b, sigma)), DAT.form_eq(a,b))
-        | compose (DAT.CVs(a, DAT.Ctx(vls, fls)), sigma) =  let val fls1 = apply_formL_Unifier(fls, sigma)
+        | compose (DAT.CTXs(a, DAT.Ctx(vls, fls)), sigma) =  let val fls1 = apply_formL_Unifier(fls, sigma)
                                                         val (vls2, fls2) = ListPair.unzip(apply_ctx_varL_Unifier(vls, sigma))
                                                     in 
-                                                        (DAT.CVs(a, DAT.Ctx(List.concat vls2, fls1 @ List.concat fls2)), false)
+                                                        (DAT.CTXs(a, DAT.Ctx(List.concat vls2, fls1 @ List.concat fls2)), false)
                                                     end
     
     fun UnifierComposition' (sigma1, []) = sigma1

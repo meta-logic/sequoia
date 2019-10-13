@@ -18,7 +18,7 @@ structure unifyImpl : UNIFICATION = struct
             List.map(fn ls => 
                 List.map(fn sb => 
                     (case sb of DAT.Fs(a,b) => (DAT.form_toString a ^ " => " ^ DAT.form_toString b)
-                            |  DAT.CVs(a,b) =>  (DAT.ctx_var_toString a ^ " => " ^ DAT.ctx_toString b)
+                            |  DAT.CTXs(a,b) =>  (DAT.ctx_var_toString a ^ " => " ^ DAT.ctx_toString b)
                     ))ls)sigma
 
     fun printS ([]) = []
@@ -26,7 +26,7 @@ structure unifyImpl : UNIFICATION = struct
             List.map(fn ls => 
                 List.map(fn sb => 
                     (case sb of DAT.Fs(a,b) => (DAT.form_toString a ^ " => " ^ DAT.form_toString b)
-                            | DAT.CVs(a,b) => (DAT.ctx_var_toString a ^ " => " ^ DAT.ctx_toString b)
+                            | DAT.CTXs(a,b) => (DAT.ctx_var_toString a ^ " => " ^ DAT.ctx_toString b)
                     ))ls)sigma
 
     fun printC ([]) = []
@@ -128,7 +128,7 @@ structure unifyImpl : UNIFICATION = struct
                 let val () = () in init_fresh := !init_fresh + 1;
                 (DAT.CtxVar("Gamma_" ^ Int.toString(!init_fresh)), g1, g2) end
 
-            fun post_ctx (sigma) = List.concat(List.map(fn DAT.CVs(_, DAT.Ctx(cv, _)) => cv) sigma)
+            fun post_ctx (sigma) = List.concat(List.map(fn DAT.CTXs(_, DAT.Ctx(cv, _)) => cv) sigma)
 
             fun try_permutations (chosen_l1, chosen_l2) =
                 if List.length(chosen_l1) = 0 andalso List.length(chosen_l2) = 0 then [nil] else
@@ -151,11 +151,11 @@ structure unifyImpl : UNIFICATION = struct
                             List.map(fn pf =>
                                 List.map(fn (p,g) =>
                                     if List.length(p) = 0 then
-                                        if List.length(vl1) = 0 then DAT.CVs(g, DAT.Ctx([], []))
-                                        else DAT.CVs(g, DAT.Ctx([g], []))
+                                        if List.length(vl1) = 0 then DAT.CTXs(g, DAT.Ctx([], []))
+                                        else DAT.CTXs(g, DAT.Ctx([g], []))
                                     else 
-                                        if List.length(vl1) = 0 then DAT.CVs(g, DAT.Ctx([], p))
-                                        else DAT.CVs(g, DAT.Ctx([fresh(g)], p))
+                                        if List.length(vl1) = 0 then DAT.CTXs(g, DAT.Ctx([], p))
+                                        else DAT.CTXs(g, DAT.Ctx([fresh(g)], p))
                                 )(ListPair.zip(pf, vl2))
                             )part
                     in vl_sigmas end
@@ -175,18 +175,18 @@ structure unifyImpl : UNIFICATION = struct
                                     in 
                                         if List.length(set1) = 1 then
                                         (List.take(
-                                        APP.UnifierComposition(subs,[DAT.CVs(List.hd(set1),DAT.Ctx(set2,nil))]),
+                                        APP.UnifierComposition(subs,[DAT.CTXs(List.hd(set1),DAT.Ctx(set2,nil))]),
                                         List.length subs),[(fresh_g, set1, set2)])
                                         else if List.length(set2) = 1 then
                                         (List.take(
-                                        APP.UnifierComposition(subs,[DAT.CVs(List.hd(set2),DAT.Ctx(set1,nil))]),
+                                        APP.UnifierComposition(subs,[DAT.CTXs(List.hd(set2),DAT.Ctx(set1,nil))]),
                                         List.length subs),[(fresh_g, set1, set2)])
                                         else (subs, [(fresh_g, set1, set2)])
                                     end
                                 )sigma1
                             )sigma2)
                     in 
-                        List.map(fn (sb,c) => (List.filter(fn DAT.CVs(cx, DAT.Ctx(cxs, _)) => 
+                        List.map(fn (sb,c) => (List.filter(fn DAT.CTXs(cx, DAT.Ctx(cxs, _)) => 
                             not (List.length(cxs) = 1 andalso DAT.ctx_var_eq (List.hd cxs, cx)))sb, c))temp
                     end
                 end
@@ -290,4 +290,3 @@ structure unifyImpl : UNIFICATION = struct
                                 end))
 
 end
-

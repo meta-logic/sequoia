@@ -63,8 +63,8 @@
 
     fun filter_bad_subs(sigcons, sequent) =
         let 
-            fun bad_sub(Dat.CVs(_, Dat.Ctx(vl, [])), _) = false
-                | bad_sub(Dat.CVs(v1, Dat.Ctx(_, fl)), sequent) = 
+            fun bad_sub(Dat.CTXs(_, Dat.Ctx(vl, [])), _) = false
+                | bad_sub(Dat.CTXs(v1, Dat.Ctx(_, fl)), sequent) = 
                     List.exists(fn v2 => Dat.ctx_var_eq(v1,v2))(get_ctx_vars sequent)
                 | bad_sub(Dat.Fs(a1,_), sequent) = 
                     List.exists(fn a2 => Dat.form_eq(a1,a2))(get_forms sequent)

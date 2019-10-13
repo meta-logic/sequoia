@@ -19,7 +19,7 @@ function applyRule(i) {
     var rule_sml = "Rule(\""+name+"\",None,"+conclusion+","+premises+")"
     var sequent = parser.parse(seq_text).replace(/\\/g, "\\\\")
     var tree_sml = "DerTree(\""+leaf_id+"\","+sequent+", NoRule, [])"
-
+    
     $.post("/apply", { rule: rule_sml, tree: tree_sml, node_id: "\""+leaf_id+"\"" }, function(data, status) {
         var output = data.output.slice(1,-1).split("&&")
         if (data.output == "NOT APPLICABLE"){

@@ -111,12 +111,12 @@ structure datatypesImpl : DATATYPES = struct
         | rule_eq(_, _) = false
 
 
-    datatype sub = Fs of form * form | CVs of ctx_var * ctx
+    datatype sub = Fs of form * form | CTXs of ctx_var * ctx | CVs of ctx_var * ctx_var
     fun sub_eq (Fs(a1,b1), Fs(a2,b2)) = form_eq(a1,a2) andalso form_eq(b1,b2)
-        | sub_eq (CVs(a1,b1), CVs(a2,b2)) = ctx_var_eq(a1,a2) andalso ctx_eq(b1,b2) 
+        | sub_eq (CTXs(a1,b1), CTXs(a2,b2)) = ctx_var_eq(a1,a2) andalso ctx_eq(b1,b2) 
         | sub_eq (_, _) = false
     fun sub_prefix_eq (Fs(a,_), Fs(b,_)) = form_eq(a,b)
-        | sub_prefix_eq (CVs(a,_), CVs(b,_)) = ctx_var_eq(a,b)
+        | sub_prefix_eq (CTXs(a,_), CTXs(b,_)) = ctx_var_eq(a,b)
         | sub_prefix_eq (_, _) = false
 
     datatype rule_name = NoRule | RuleName of string
