@@ -13,12 +13,15 @@ structure unifyImpl : UNIFICATION = struct
 
     val init_fresh = ref 100;
 
+
+    (*TODO: remove duplicate or remove both*)
     fun printF (NONE) = []
         | printF (SOME(sigma)) = 
             List.map(fn ls => 
                 List.map(fn sb => 
                     (case sb of DAT.Fs(a,b) => (DAT.form_toString a ^ " => " ^ DAT.form_toString b)
                             |  DAT.CTXs(a,b) =>  (DAT.ctx_var_toString a ^ " => " ^ DAT.ctx_toString b)
+                            |  DAT.CVs(a,b) => (DAT.ctx_var_toString a ^ " => " ^ DAT.ctx_var_toString b)
                     ))ls)sigma
 
     fun printS ([]) = []
@@ -26,7 +29,8 @@ structure unifyImpl : UNIFICATION = struct
             List.map(fn ls => 
                 List.map(fn sb => 
                     (case sb of DAT.Fs(a,b) => (DAT.form_toString a ^ " => " ^ DAT.form_toString b)
-                            | DAT.CTXs(a,b) => (DAT.ctx_var_toString a ^ " => " ^ DAT.ctx_toString b)
+                            |  DAT.CTXs(a,b) => (DAT.ctx_var_toString a ^ " => " ^ DAT.ctx_toString b)
+                            |  DAT.CVs(a,b) => (DAT.ctx_var_toString a ^ " => " ^ DAT.ctx_var_toString b)
                     ))ls)sigma
 
     fun printC ([]) = []
@@ -128,18 +132,17 @@ structure unifyImpl : UNIFICATION = struct
                 let val () = () in init_fresh := !init_fresh + 1;
                 (DAT.CtxVar("Gamma_" ^ Int.toString(!init_fresh)), g1, g2) end
 
-            fun post_ctx (sigma) = List.concat(List.map(fn DAT.CTXs(_, DAT.Ctx(cv, _)) => cv) sigma)
+            fun post_ctx (sigma) = List.concat(List.map(fn DAT.CTXs(_, DAT.Ctx(cv, _)) => cv 
+                                                        | _ => raise Fail "post_ctx fun in Unify_ctx") sigma)
 
             fun try_permutations (chosen_l1, chosen_l2) =
                 if List.length(chosen_l1) = 0 andalso List.length(chosen_l2) = 0 then [nil] else
                 if not (List.length(chosen_l1) = List.length(chosen_l2))  then [] else
                     List.concat(
-                        List.map(fn SOME(s) => s)
-                            (List.filter(fn NONE => false | _ => true)
-                                (List.map(fn (perm_l1, perm_l2) => Unify_formL(perm_l1, perm_l2))
-                                    (List.map(fn p1 => (p1, chosen_l2))
-                                        (H.permutations(chosen_l1))
-                                    )
+                        List.mapPartial (fn x => x)
+                            (List.map(fn (perm_l1, perm_l2) => Unify_formL(perm_l1, perm_l2))
+                                (List.map(fn p1 => (p1, chosen_l2))
+                                    (H.permutations(chosen_l1))
                                 )
                             )
                         )
@@ -187,7 +190,8 @@ structure unifyImpl : UNIFICATION = struct
                             )sigma2)
                     in 
                         List.map(fn (sb,c) => (List.filter(fn DAT.CTXs(cx, DAT.Ctx(cxs, _)) => 
-                            not (List.length(cxs) = 1 andalso DAT.ctx_var_eq (List.hd cxs, cx)))sb, c))temp
+                            not (List.length(cxs) = 1 andalso DAT.ctx_var_eq (List.hd cxs, cx))
+                                                            | _ => raise Fail "try_partitions in Unify_ctx")sb, c))temp
                     end
                 end
 
@@ -253,8 +257,7 @@ structure unifyImpl : UNIFICATION = struct
                                                                     APP.apply_ctx_struct_allUnifiers(ctx_struct2,sigma1))
                                     val sigma2_const2 = List.map(fn (r1, r2) => Unify_ctx_struct(r1,r2))newStructPair
                                     val sigma_const_Pair = ListPair.zip(sigma1_const1, sigma2_const2)
-                                    val sc_list = List.map(fn (s, SOME(x)) => (s,x))
-                                                    (List.filter(fn (_, NONE) => false | (_,_) => true)sigma_const_Pair) 
+                                    val sc_list = List.mapPartial (fn (s,SOME x) => SOME (s,x) | (_,NONE) => NONE) sigma_const_Pair 
                                     val combo = List.concat(
                                                 List.map(fn ((sub1,con1), sc) => 
                                                     List.map(fn (subs,cons) => 
@@ -278,8 +281,7 @@ structure unifyImpl : UNIFICATION = struct
                                                                     APP.apply_ctx_struct_allUnifiers(r2,sigma1))
                                     val sigma2_const2 = List.map(fn (r1, r2) => Unify_ctx_struct(r1,r2))newStructPair
                                     val sigma_const_Pair = ListPair.zip(sigma1_const1, sigma2_const2)
-                                    val sc_list = List.map(fn (s, SOME(x)) => (s,x))
-                                                    (List.filter(fn (_, NONE) => false | (_,_) => true)sigma_const_Pair) 
+                                    val sc_list = List.mapPartial (fn (s,SOME x) => SOME (s,x) | (_,NONE) => NONE) sigma_const_Pair 
                                     val combo = List.concat(
                                                 List.map(fn ((sub1,con1), sc) => 
                                                     List.map(fn (subs,cons) => 
