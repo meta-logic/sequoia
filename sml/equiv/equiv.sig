@@ -7,18 +7,15 @@ sig
 	val seq_equiv : Dat.seq*Dat.seq -> bool
 	
 	val check_consistent : (Dat.ctx_var * Dat.ctx_var list * Dat.ctx_var list) list * 
-	(Dat.ctx_var * Dat.ctx_var list * Dat.ctx_var list) list
-	* Dat.ctx_var list * Dat.ctx_var list-> bool
+	 Dat.ctx_var list * Dat.ctx_var list-> bool
 
 	
 	val check_premises : (Dat.seq list * Dat.seq list * 
 	 (Dat.ctx_var * Dat.ctx_var list * Dat.ctx_var list) list*
-	 (Dat.ctx_var * Dat.ctx_var list * Dat.ctx_var list) list * bool list *
-	 Dat.ctx_var list * Dat.ctx_var list) -> bool
+	  Dat.ctx_var list * Dat.ctx_var list) -> bool
 	
 	val check_premises_wk : (Dat.seq list * Dat.seq list * 
 	 (Dat.ctx_var * Dat.ctx_var list * Dat.ctx_var list) list*
-	 (Dat.ctx_var * Dat.ctx_var list * Dat.ctx_var list) list *
-	 Dat.form* Dat.ctx_var list * Dat.ctx_var list) -> bool
+	  (bool list * bool list) *  Dat.ctx_var list * Dat.ctx_var list) -> bool
 
 end

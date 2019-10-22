@@ -38,7 +38,52 @@ struct
         in
              D.Seq(gen_out a, c, gen_out b)
         end
-    (*
+
+
+
+
+
+    fun string_to_fresh(x) = 
+        let
+            val (x2,_) = (x^"_{"^ (Int.toString(!fresher))^"}",fresher:= !fresher + 1)
+        in
+            x2
+        end
+
+    fun ctx_var_to_fresh(D.CtxVar(x)) = D.CtxVar(string_to_fresh(x))
+
+    fun ctx_to_fresh(D.Ctx(ctx_vars,forms)) = D.Ctx(List.map ctx_var_to_fresh ctx_vars,forms)
+
+    fun ctx_struct_to_fresh(D.Empty) = D.Empty
+        | ctx_struct_to_fresh (D.Single (ctx)) = D.Single(ctx_to_fresh(ctx))
+        | ctx_struct_to_fresh (D.Mult (con,ctx,ctx_struct)) = D.Mult(con,ctx_to_fresh(ctx),ctx_struct_to_fresh(ctx_struct))
+
+    fun seq_to_fresh(D.Seq(ctx_s,con,ctx_s2)) = D.Seq(ctx_struct_to_fresh(ctx_s),con,ctx_struct_to_fresh(ctx_s2))
+
+    fun update_ctx_var (Dat.CtxVar(x)) = Dat.CtxVar(x^"^{r"^(Int.toString(!rule_fresh))^"}")
+
+    fun update_ctx (Dat.Ctx(ctx_vars,forms)) = Dat.Ctx(List.map update_ctx_var ctx_vars,forms)
+    
+    fun update_ctx_struct (Dat.Empty) = Dat.Empty
+        | update_ctx_struct (Dat.Single(ctx)) = Dat.Single(update_ctx(ctx))
+        | update_ctx_struct (Dat.Mult(conn,ctx,ctx_strct)) = Dat.Mult(conn,update_ctx(ctx), update_ctx_struct(ctx_strct))
+
+    fun update_seq (Dat.Seq(l,conn,r)) = Dat.Seq(update_ctx_struct(l),conn,update_ctx_struct(r))
+
+    fun update_rule (Dat.Rule(nm,side,conc,prems)) =
+        let
+            val new_conc = update_seq(conc)
+            val new_prems = List.map update_seq prems
+            val _ = rule_fresh := ((!rule_fresh) + 1)
+        in
+            Dat.Rule(nm,side,new_conc,new_prems)
+        end
+
+
+
+
+
+(*     
         fun weak_admissability(rules) = 
             let val D.Rule(name, side, sequent, premises) = List.hd(rules)
                 val general = generic_seq sequent
@@ -68,16 +113,16 @@ struct
             in
             true
             end
-                    
+                     *)
+(* 
+    fun empty_out_ctx(D.Empty) = D.Empty
+        | empty_out_ctx(D.Single(D.Ctx(vl,fl))) = D.Single(D.Ctx(nil,fl))
+        | empty_out_ctx(D.Mult(con,D.Ctx(vl,fl),rest)) = D.Mult(con,D.Ctx(nil,fl),empty_out_ctx rest)
+
+    fun empty_out_seq( D.Seq(a, c, b)) =  D.Seq(empty_out_ctx a, c, empty_out_ctx b)
 
     fun init_coherence(con_form, rulesL, rulesR, init_rule_ls) =
         let 
-            fun empty_out_ctx(D.Empty) = D.Empty
-                | empty_out_ctx(D.Single(D.Ctx(vl,fl))) = D.Single(D.Ctx(nil,fl))
-                | empty_out_ctx(D.Mult(con,D.Ctx(vl,fl),rest)) = D.Mult(con,D.Ctx(nil,fl),empty_out_ctx rest)
-
-            fun empty_out_seq( D.Seq(a, c, b)) =  D.Seq(empty_out_ctx a, c, empty_out_ctx b)
-
             fun init_coh_aux(con_form, rules1, rules2, init_rule_ls) =
                 let val start_seqs = 
                             List.map(fn D.Rule(name_init, side_init, conc_init, premises_init) => 
@@ -107,54 +152,75 @@ struct
             init_coh_aux(con_form, rulesL, rulesR, init_rule_ls) 
             orelse 
             init_coh_aux(con_form, rulesR, rulesL, init_rule_ls)
+        end *)
+   
+    (* checks if the init coherence property holds for a specific connective, with specific left, right, and init rules*)
+    (*  *)
+
+
+    fun init_coherence_con (con_form:Dat.form, rulesL: Dat.rule list, rulesR: Dat.rule list, init_rule: Dat.rule)=
+        let
+            val Dat.Rule (_,_,init_conc,_) = init_rule
+            (* changing names of context variables in rule and conclusion of rule *)
+            val init_rule = update_rule(init_rule)
+            val init_conc = seq_to_fresh(init_conc)
+
+            (* changing forms of the init rule to con_form *)
+            fun replace_forms_ctx (Dat.Ctx(vars,forms)) = 
+                (case forms of
+                   [] => Dat.Ctx(vars,[])
+                 | [_] => Dat.Ctx(vars,[con_form])
+                 | _ => let val _ = print("init rule with multiple forms") in Dat.Ctx(vars,[con_form]) end)
+            fun replace_forms' (Dat.Empty) = Dat.Empty
+                | replace_forms' (Dat.Single(ctx)) = Dat.Single(replace_forms_ctx(ctx))
+                | replace_forms' (Dat.Mult(con,ctx,rest)) = Dat.Mult(con,replace_forms_ctx(ctx),replace_forms'(rest))
+
+            fun replace_forms(Dat.Seq(a,con,b)) = Dat.Seq(replace_forms'(a),con,replace_forms'(b))
+            val base = Dat.DerTree("0",replace_forms(init_conc),Dat.NoRule,[])
+
+            (* testing if init rule can be applied to base *)
+
+            (* val (_,_,test) = List.hd(T.apply_rule_everywhere(([],[],base),init_rule))
+            val _ = (case test of
+               Dat.DerTree(_,base,Dat.NoRule,_) => print("failed, base: "^ Dat.seq_toString(base) ^"\n")
+             | Dat.DerTree(_,base,_,_) => print("success, base: "^ Dat.seq_toString(base) ^"\n")) *)
+            
+            (* applying rules in either order *)
+            val res = []
+            fun stack (base,rules1,rules2,init) = 
+                let
+                  (* applying 1 rule from rule1 to base *)
+                  val r1 = List.map (fn x => T.apply_rule_everywhere(([],[],base),x)) rules1
+                  val r1 = List.concat r1
+                  (* applying every rule from rule 2 to each tree from r1 *)
+                  (* val r2 = List.foldl (fn (rule2,trees) => List.concat (List.map (fn x => T.apply_rule_all_ways(x,rule2,false)) trees)) r1 rules2  *)
+                  val r2 = List.concat (List.map (fn x => T.apply_multiple_rules_all_ways(x,rules2)) r1)
+
+                  val init_applied = List.concat (List.map (fn x => T.apply_rule_everywhere(x,init)) r2)
+                in
+                  List.map (fn (_,_,x) => x) init_applied
+                end
+
+            val rules_applied = stack(base,rulesL,rulesR,init_rule) @ stack(base,rulesR,rulesL,init_rule)
+            (* filtering out trees where only 1 rule applied, then trees with open premises*)
+
+
+
+            val both_applied = List.filter (fn x => T.get_tree_height(x) >1) rules_applied
+            val no_open_prems = List.filter (fn x => (case T.get_open_prems(x) of
+                                                    _::_ => false
+                                                  | _ => true)) both_applied
+            val res = no_open_prems
+            (*  *)
+        in
+            (* rules_applied *)
+            (case res of
+               _::_ => true
+             | _ => false)
         end
-    *)
 
 
-
-    fun update_ctx_var (Dat.CtxVar(x)) = Dat.CtxVar(x^"_{r"^(Int.toString(!rule_fresh))^"}")
-
-    fun update_ctx (Dat.Ctx(ctx_vars,forms)) = Dat.Ctx(List.map update_ctx_var ctx_vars,forms)
     
-    fun update_ctx_struct (Dat.Empty) = Dat.Empty
-        | update_ctx_struct (Dat.Single(ctx)) = Dat.Single(update_ctx(ctx))
-        | update_ctx_struct (Dat.Mult(conn,ctx,ctx_strct)) = Dat.Mult(conn,update_ctx(ctx), update_ctx_struct(ctx_strct))
-
-    fun update_seq (Dat.Seq(l,conn,r)) = Dat.Seq(update_ctx_struct(l),conn,update_ctx_struct(r))
-
-    fun update_rule (Dat.Rule(nm,side,conc,prems)) =
-        let
-            val new_conc = update_seq(conc)
-            val new_prems = List.map update_seq prems
-            val _ = rule_fresh := ((!rule_fresh) + 1)
-        in
-            Dat.Rule(nm,side,new_conc,new_prems)
-        end
-
-
-
-
-    fun string_to_fresh(x) = 
-        let
-            val (x2,_) = (x^"_{"^ (Int.toString(!fresher))^"}",fresher:= !fresher + 1)
-        in
-            x2
-        end
-
-
-    fun form_to_fresh(x) = x
-
-
-    fun ctx_var_to_fresh(D.CtxVar(x)) = D.CtxVar(string_to_fresh(x))
-
-    fun ctx_to_fresh(D.Ctx(ctx_vars,forms)) = D.Ctx(List.map ctx_var_to_fresh ctx_vars,List.map form_to_fresh forms)
-
-    fun ctx_struct_to_fresh(D.Empty) = D.Empty
-        | ctx_struct_to_fresh (D.Single (ctx)) = D.Single(ctx_to_fresh(ctx))
-        | ctx_struct_to_fresh (D.Mult (con,ctx,ctx_struct)) = D.Mult(con,ctx_to_fresh(ctx),ctx_struct_to_fresh(ctx_struct))
-
-    fun seq_to_fresh(D.Seq(ctx_s,con,ctx_s2)) = D.Seq(ctx_struct_to_fresh(ctx_s),con,ctx_struct_to_fresh(ctx_s2))
-
 
     fun print_seq_list (nil) = print "\n_______________________________\n"
         | print_seq_list (x::L) = let
@@ -185,7 +251,7 @@ struct
     val last2 = ref (D.DerTree("",D.Seq(D.Empty,D.Con(""),D.Empty),D.NoRule,[]))
 
 
-    fun check_premises'((cn1,dvt1),(cn2,dvt2)) =
+    fun check_premises'((cn1,dvt1),(cn2,dvt2),weak) =
         let 
             val D.DerTree(_,sq1,_,_) = dvt1
             val D.DerTree(_,sq2,_,_) = dvt2
@@ -204,7 +270,7 @@ struct
 (*            val _ = print_seq_list(t1_prems)
             val _ = print_seq_list(t2_prems)
             val _ = print ("\n\n\n")*)
-            val res = E.check_premises(t1_prems,t2_prems,constraints,[],[],t1_vars,t2_vars)
+            val res = E.check_premises_wk(t1_prems,t2_prems,constraints,weak,t1_vars,t2_vars)
             (*val _ = if res then print("true\n\n\n\n\n\n\n") else print("false\n\n\n\n\n\n\n")*)
         in
             res
@@ -213,7 +279,7 @@ struct
 
 
     (*TODO: if you can't apply a rule twice, should not return true*)
-    fun permutes(rule1, rule2, init_rule_ls, weak_left, weak_right) = 
+    fun permutes(rule1, rule2, init_rule_ls, weak) = 
         let 
             fun get_ctx_var(D.Empty,D.Empty) = 
                 let val () = () in other_fresh := !other_fresh + 1; 
@@ -244,7 +310,7 @@ struct
 
             fun create_constraint( D.Seq(l1,_,r1),  D.Seq(l2,_,r2)) =  get_ctx_var(l1,l2) @ get_ctx_var(r1,r2)
 
-            fun check_premises(opens1, opens2, weak_left, weak_right) =
+            fun check_premises(opens1, opens2, weak) =
                 let 
                     fun filter_func (cn,dvt) = (T.get_tree_height(dvt) >1)
                     fun filter_short (s1,s2) = (List.filter filter_func s1,List.filter filter_func s2)
@@ -259,7 +325,7 @@ struct
 
                     fun set_check (set1,set2)  = (List.map (fn (cn1,dvt1) =>
                             ((List.find (fn (cn2,dvt2) =>
-                                check_premises' ((cn1,dvt1),(cn2,dvt2))
+                                check_premises' ((cn1,dvt1),(cn2,dvt2),weak)
                             )set2)   ,(cn1,dvt1))
                         )set1,set2)
 
@@ -292,14 +358,14 @@ struct
             val bases = (create_base(rule1, rule2))
             val bases = List.map(fn conc => D.DerTree("0",seq_to_fresh(conc),D.NoRule,[])) bases
             val opens1 = stack_rules(bases, rule1, rule2, init_rule_ls)
-            val bases = List.map(fn D.DerTree("0",conc,D.NoRule,[]) => D.DerTree("0",seq_to_fresh(conc),D.NoRule,[])) bases
+            val bases = List.map(fn D.DerTree(_,conc,_,_) => D.DerTree("0",seq_to_fresh(conc),D.NoRule,[])) bases
             val rule1 = update_rule(rule1)
             val rule2 = update_rule(rule2)
             val opens2 = stack_rules(bases, rule2, rule1, init_rule_ls)
 
 
         in 
-            check_premises(opens1,opens2,false,false)
+            check_premises(opens1,opens2,weak)
             (*check_premises(opens1, opens2, false, false)*)
             (* List.map(fn (_,sls,s) => (List.map(seq_toString)sls, seq_toString s))(List.hd(opens1)) *)
             (* List.map(fn t => der_tree_toString t)bases *)
@@ -347,7 +413,7 @@ struct
 
         in 
         (* init_coherence(cf, [rl1], [rl2], [rl3]) *)
-        permutes(rl1, rl2, [rl3], false, false)
+        permutes(rl1, rl2, [rl3], ([],[]))
         end
 
     fun test_2() =
@@ -372,7 +438,7 @@ struct
 
         in 
         (* init_coherence(cf, [rl1], [rl2], [rl3]) *)
-        permutes(rl1, rl2, [rl3], false, false)
+        permutes(rl1, rl2, [rl3], ([],[]))
         end
 
     fun test_3() =
@@ -405,6 +471,6 @@ struct
 
         in 
         (* init_coherence(cf, [rl1, rl2], [rl3], [rl4]) *)
-        permutes(rl1, rl3, [rl4], false, false)
+        permutes(rl1, rl3, [rl4], ([],[]))
         end
 end

@@ -529,8 +529,8 @@ struct
 	(*for every rule, val <rule> = [<rule>()]*)
 
 	fun test'(R1,nil) = raise Fail "no R2"
-  		| test'(R1,[R2]) = P.permutes(R1,R2,[],false,false)
-  		| test'(R1,R2::rest) = P.permutes(R1,R2,[],false,false)
+  		| test'(R1,[R2]) = P.permutes(R1,R2,[],([],[]))
+  		| test'(R1,R2::rest) = P.permutes(R1,R2,[],([],[]))
   				(*case test'(R1,rest) of
   					SOME true => test'(R1,rest)
   					| result => result*)
