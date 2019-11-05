@@ -85,6 +85,7 @@
         else if not (String.isPrefix id sid) then true
         else List.foldl(fn (branch, bools) => bools andalso (check_rule_of(branch,sid)))(true)pq
 
+    (*  *)
     fun apply_rule((forms, cons, dt), rule, sid) =
         let 
             fun apply_rule_aux( Dat.DerTree(id, sq,  Dat.NoRule, []), Dat.Rule(name, s, conc, premises), sid) =
@@ -150,6 +151,15 @@
                 List.concat(List.map(fn tree => apply_rule_all_ways(tree, rule, false))tree_ls)
             )(apply_rule_all_ways(dt, List.hd perm, true))(List.tl perm))
         (H.permutations(rule_ls)))
+
+    fun writeFD fd content = 
+        let
+            val out = Posix.FileSys.wordToFD (Word32.fromInt(fd))
+            val text = Word8VectorSlice.full (Byte.stringToBytes(content))
+
+        in
+            Posix.IO.writeVec(out,text)
+        end
 
     (*taken from: https://stackoverflow.com/questions/33597175/how-to-write-to-a-file-in-sml*)
 	fun writeFile filename content =
