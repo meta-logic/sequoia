@@ -7,7 +7,18 @@ struct
 	structure H = helpersImpl
 	structure C = Check
 
+	type constraint = Dat.ctx_var * Dat.ctx_var list * Dat.ctx_var list
 
+	val fresh = ref 901
+
+	fun string_to_fresh(x) = 
+        let
+            val (x2,_) = (x^"_{e"^ (Int.toString(!fresh))^"}",fresh:= !fresh + 1)
+        in
+            x2
+        end
+
+    fun ctx_var_to_fresh(Dat.CtxVar(x)) = Dat.CtxVar(string_to_fresh(x))
 
 
 	(*given 2 sequents, check if they are equivalent*)
@@ -109,28 +120,35 @@ struct
 			result
 		end
 
+	fun pair_cons((a,b), (L1,L2)) = (a::L1,b::L2)
+
+	fun pair_append ( (L1,L2),(L1',L2')) = (L1@ L1', L2 @ L2') 
+
+	fun fresh_CtxVar () = ctx_var_to_fresh(Dat.CtxVar("e"))
 	
   
 	(* TODO:  a not empty*)
 	fun extract_constraints'' (Dat.Ctx (a,_), Dat.Ctx (b,_),wk) = 
-		(case (wk,a) of
-		   (true,[]) => (Dat.CtxVar("eq"),b,b)
-		 | _ => (Dat.CtxVar("eq"),a,b))
+		(case (wk) of
+		   (true) => let val A = fresh_CtxVar() in ((Dat.CtxVar("eq"),A::a,b),SOME A) end
+		 | (_) => ((Dat.CtxVar("eq"),a,b), NONE))
 
-	fun extract_constraints' (Dat.Empty,Dat.Empty,_) = []
+
+	fun extract_constraints' (Dat.Empty,Dat.Empty,_) : (constraint list * Dat.ctx_var option list) = ([],[])
 		| extract_constraints' (Dat.Single a, Dat.Single b,wk) = 
 			(case wk of
-			   [] => [extract_constraints'' (a,b,false)]
-			 | x::_ => [extract_constraints'' (a,b,x)])
+			   [] => pair_cons(extract_constraints'' (a,b,false),extract_constraints' (Dat.Empty,Dat.Empty,[]))
+			 | x::_ => pair_cons(extract_constraints'' (a,b,x),extract_constraints' (Dat.Empty,Dat.Empty,[])) )
 		| extract_constraints' (Dat.Mult(_,a,A),Dat.Mult(_,b,B),wk) = 
 			(case wk of
-			   [] => extract_constraints''(a,b,false)::extract_constraints'(A,B,[])
-			 | x::l => extract_constraints''(a,b,x)::extract_constraints'(A,B,l))
+			   [] => pair_cons(extract_constraints''(a,b,false) , extract_constraints'(A,B,[]))
+			 | x::l => pair_cons(extract_constraints''(a,b,x),extract_constraints'(A,B,l)))
     | extract_constraints' (_,_,_) = raise Fail "Ctx_structs don't match"
 
-	fun extract_constraints_wk (Dat.Seq(L1,_,R1),Dat.Seq(L2,_,R2),(wk_l,wk_r)) = extract_constraints'(L1,L2,wk_l) @ extract_constraints' (R1,R2,wk_r) 
+	fun extract_constraints_wk (Dat.Seq(L1,_,R1),Dat.Seq(L2,_,R2),(wk_l,wk_r)) = 
+		pair_append(extract_constraints'(L1,L2,wk_l) ,extract_constraints' (R1,R2,wk_r))
 
-	fun extract_constraints (A,B) = extract_constraints_wk(A,B,([],[]))
+	fun extract_constraints (A,B) = let val (res,_) = extract_constraints_wk(A,B,([],[])) in res end
 
 
 	(*check premises with an extra term that can be weakened*)
@@ -141,9 +159,10 @@ struct
 			fun find_match [] = false
 				| find_match (y::L) = 
 				let
-					val new_cons = extract_constraints_wk (y,x,weak) @ cons
+					val (new_cons,new_vars ) = extract_constraints_wk (y,x,weak)
+					val new_vars = List.mapPartial (fn x => x) new_vars
 				in
-					check_premises_wk (assumed_leaves,conc_leaves,new_cons,weak,t1_vars,t2_vars) orelse
+					check_premises_wk (assumed_leaves,conc_leaves, new_cons@cons,weak,t1_vars,new_vars@t2_vars) orelse
 					find_match L
 				end
 		in
@@ -166,10 +185,5 @@ struct
 			find_match possible_premises
 		end
 
-
-	
-
-	
-	(* Body *)
 end
 
