@@ -146,6 +146,15 @@ struct
   		D.Rule ("init",D.None,D.Seq(D.Single(D.Ctx(G,[P])),con,D.Single(D.Ctx([],[P]))),[])
   	end
 
+  fun id() =
+  	let
+  		val P = generic_form_A ()
+  		val G = gamma_ctx_var ()
+  	in
+  		D.Rule ("init",D.None,D.Seq(D.Single(D.Ctx(G,[P])),con,D.Single(D.Ctx([],[P]))),[])
+  	end
+
+
   fun trueR () =
   	let
   		val G = gamma_left_ctx ()
@@ -178,7 +187,7 @@ struct
   	val orL1 = [orL()] 
 
   	fun test([R1],nil) = raise Fail "no R2"
-  		| test([R1],[R2]) = P.permutes(R1,R2,[],false,false)
+  		| test([R1],[R2]) = P.permutes(R1,R2,[],([],[]))
   		
 
 

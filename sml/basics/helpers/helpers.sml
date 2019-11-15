@@ -14,6 +14,15 @@ structure helpersImpl : HELPERS = struct
             end
         | mset_eq _ = false
 
+    fun mset_subset ([],_,_) = true
+        | mset_subset (a::l1,l2,eq) = 
+        let val eq' = (fn x => eq(a,x))
+            val (a1,l1') = List.partition eq' (a::l1)
+            val (a2,l2') = List.partition eq' (l2)
+        in
+          (List.length(a1) <= List.length(a2)) andalso mset_subset(l1',l2',eq)
+        end
+
     fun chooseK (forms, k, cmpf) = 
         let
             fun set_chosen ([], cmpf) = []

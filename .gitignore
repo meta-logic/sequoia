@@ -67,4 +67,8 @@ sml/generated-sml/*.sml
 .DS_Store/
 
 # SML Compilation Manager files
-.cm/
+**/.cm/
+
+#log file for python Linear Program
+**/log.txt
+

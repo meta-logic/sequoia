@@ -7,11 +7,24 @@ struct
 	structure H = helpersImpl
 	structure C = Check
 
+	type constraint = Dat.ctx_var * Dat.ctx_var list * Dat.ctx_var list
+
+	val fresh = ref 901
+
+	fun string_to_fresh(x) = 
+        let
+            val (x2,_) = (x^"_{e"^ (Int.toString(!fresh))^"}",fresh:= !fresh + 1)
+        in
+            x2
+        end
+
+    fun ctx_var_to_fresh(Dat.CtxVar(x)) = Dat.CtxVar(string_to_fresh(x))
+
 
 	(*given 2 sequents, check if they are equivalent*)
 	fun ctx_struct_equiv (Dat.Empty,Dat.Empty):bool = true
 		|ctx_struct_equiv (Dat.Single (ctxA),Dat.Single(ctxB)) = ctx_equiv(ctxA,ctxB)
-		|ctx_struct_equiv (Dat.Mult (connA,ctxA,ctx_struct_A),Dat.Mult (connB,ctxB,ctx_struct_B)) = (connA=connB) 
+		|ctx_struct_equiv (Dat.Mult (connA,ctxA,ctx_struct_A),Dat.Mult (connB,ctxB,ctx_struct_B)) = Dat.conn_eq(connA,connB) 
 																							andalso ctx_equiv(ctxA,ctxB)
 																							andalso ctx_struct_equiv(ctx_struct_A,ctx_struct_B)
 		|ctx_struct_equiv (_,_) = false
@@ -20,8 +33,30 @@ struct
 	and forms_eq (forms_A, forms_B) = H.mset_eq(forms_B,forms_A,Dat.form_eq)
 	and ctx_vars_equiv (_,_) = true
 
-	fun seq_equiv (Dat.Seq(A1,con1,A2),Dat.Seq(B1,con2,B2)) = ctx_struct_equiv(A1,B1) andalso con1=con2 andalso ctx_struct_equiv(A2,B2)
+	fun seq_equiv (Dat.Seq(A1,con1,A2),Dat.Seq(B1,con2,B2)) = ctx_struct_equiv(A1,B1) andalso Dat.conn_eq(con1,con2) andalso ctx_struct_equiv(A2,B2)
 
+
+	fun ctx_equiv_wk (ctxA as Dat.Ctx(_,formsA),ctxB as Dat.Ctx(_,formsB),wk)=
+		case (wk) of
+			(true) => H.mset_subset(formsA,formsB,Dat.form_eq)
+			| (false) => H.mset_eq(formsA,formsB,Dat.form_eq)
+			
+
+	fun ctx_struct_equiv_wk (Dat.Empty,Dat.Empty,_) =true
+		|ctx_struct_equiv_wk (Dat.Single(ctxA),Dat.Single(ctxB),wk) = 
+			(case wk of
+			   [] => ctx_equiv_wk(ctxA,ctxB,false)
+			 |  x::_ => ctx_equiv_wk(ctxA,ctxB,x))
+		|ctx_struct_equiv_wk (Dat.Mult(connA,ctxA,ctx_structA),Dat.Mult(connB,ctxB,ctx_structB),wk)=
+		(case Dat.conn_eq(connA,connB) of
+		   false => false
+		 | true => (case wk of
+					  [] => ctx_equiv_wk(ctxA,ctxB,false) andalso ctx_struct_equiv_wk(ctx_structA,ctx_structB,[])
+		  			| x::l => ctx_equiv_wk(ctxA,ctxB,x) andalso ctx_struct_equiv_wk(ctx_structA,ctx_structB,l)))
+		|ctx_struct_equiv_wk (_,_,_) = false 
+
+	fun seq_equiv_wk (Dat.Seq (leftA,connA,rightA),Dat.Seq(leftB,connB,rightB),(wk_l: bool list , wk_r:bool list))=
+		Dat.conn_eq(connA,connB) andalso (ctx_struct_equiv_wk(leftA,leftB,wk_l)) andalso ctx_struct_equiv_wk(rightA,rightB,wk_r)
 	 
 
 	(*taken from: https://stackoverflow.com/questions/33597175/how-to-write-to-a-file-in-sml*)
@@ -68,9 +103,9 @@ struct
 		end
 
 	(*goal has atleast one constraint*)
-	fun check_consistent (constraints,goals,t1_vars,t2_vars) =
+	fun check_consistent (constraints,t1_vars,t2_vars) =
 		let
-			val new_cons = constraints@goals
+			val new_cons = constraints
 			val cons_len = List.length(new_cons)
 			val t1_var_num = List.length(t1_vars)
 			val var_num = t1_var_num + List.length(t2_vars)
@@ -85,80 +120,70 @@ struct
 			result
 		end
 
+	fun pair_cons((a,b), (L1,L2)) = (a::L1,b::L2)
+
+	fun pair_append ( (L1,L2),(L1',L2')) = (L1@ L1', L2 @ L2') 
+
+	fun fresh_CtxVar () = ctx_var_to_fresh(Dat.CtxVar("e"))
 	
   
+	(* TODO:  a not empty*)
+	fun extract_constraints'' (Dat.Ctx (a,_), Dat.Ctx (b,_),wk) = 
+		(case (wk) of
+		   (true) => let val A = fresh_CtxVar() in ((Dat.CtxVar("eq"),A::a,b),SOME A) end
+		 | (_) => ((Dat.CtxVar("eq"),a,b), NONE))
 
-	fun extract_constraints'' (Dat.Ctx (a,_), Dat.Ctx (b,_)) = (Dat.CtxVar("eq"),a,b)
 
-	fun extract_constraints' (Dat.Empty,Dat.Empty) = []
-		| extract_constraints' (Dat.Single a, Dat.Single b) = [extract_constraints'' (a,b)]
-		| extract_constraints' (Dat.Mult(_,a,A),Dat.Mult(_,b,B)) = extract_constraints''(a,b)::extract_constraints'(A,B)
-    | extract_constraints' (_,_) = raise Fail "Ctx_structs don't match"
+	fun extract_constraints' (Dat.Empty,Dat.Empty,_) : (constraint list * Dat.ctx_var option list) = ([],[])
+		| extract_constraints' (Dat.Single a, Dat.Single b,wk) = 
+			(case wk of
+			   [] => pair_cons(extract_constraints'' (a,b,false),extract_constraints' (Dat.Empty,Dat.Empty,[]))
+			 | x::_ => pair_cons(extract_constraints'' (a,b,x),extract_constraints' (Dat.Empty,Dat.Empty,[])) )
+		| extract_constraints' (Dat.Mult(_,a,A),Dat.Mult(_,b,B),wk) = 
+			(case wk of
+			   [] => pair_cons(extract_constraints''(a,b,false) , extract_constraints'(A,B,[]))
+			 | x::l => pair_cons(extract_constraints''(a,b,x),extract_constraints'(A,B,l)))
+    | extract_constraints' (_,_,_) = raise Fail "Ctx_structs don't match"
 
-	fun extract_constraints (Dat.Seq(A1,_,A2),Dat.Seq(B1,_,B2)) = extract_constraints'(A1,B1)@extract_constraints'(A2,B2)
+	fun extract_constraints_wk (Dat.Seq(L1,_,R1),Dat.Seq(L2,_,R2),(wk_l,wk_r)) = 
+		pair_append(extract_constraints'(L1,L2,wk_l) ,extract_constraints' (R1,R2,wk_r))
 
-	fun check_premises (_,[],constraints,goals,_,t1_vars,t2_vars) = check_consistent(constraints,goals,t1_vars,t2_vars)
-		| check_premises (assumed_leaves,x::conc_leaves,cons,goals,wkL,t1_vars,t2_vars) = 
-		let
-			val possible_premises = List.filter (fn y => seq_equiv (x,y)) assumed_leaves
-			fun find_match [] = false
-				| find_match (y::L) = 
-				let
-					val new_cons = extract_constraints (y,x) @ cons
-				in
-					check_premises (assumed_leaves,conc_leaves,new_cons,goals,wkL,t1_vars,t2_vars) orelse
-					find_match L
-				end
-		in
-			find_match possible_premises
-		end
-
-	fun ctx_equiv_wk (Dat.Ctx(_,formsA),Dat.Ctx(_,formsB),term,wk_used)=
-		case (wk_used,H.mset_eq(formsA,formsB,Dat.form_eq)) of
-			(true,true) => (true,true)
-			| (true,false) => (false,true)
-			| (false,true) => (true,false)
-			| (false,false) => if H.mset_eq(term::formsA,formsB,Dat.form_eq) then (true,true) else (false,false)
-
-	fun ctx_struct_equiv_wk (Dat.Empty,Dat.Empty,_,wk) =(true,wk)
-		|ctx_struct_equiv_wk (Dat.Single(ctxA),Dat.Single(ctxB),term,wk_used) = ctx_equiv_wk(ctxA,ctxB,term,wk_used)
-		|ctx_struct_equiv_wk (Dat.Mult(connA,ctxA,ctx_structA),Dat.Mult(connB,ctxB,ctx_structB),term,wk)=
-		let
-			val (ctx,wk_used) = ctx_equiv_wk(ctxA,ctxB,term,wk)
-			val (ctx_struct,wk_used2) = ctx_struct_equiv_wk (ctx_structA,ctx_structB,term,wk_used)
-		in
-			(ctx andalso ctx_struct andalso connA=connB,wk_used2)
-		end
-		|ctx_struct_equiv_wk (_,_,_,wk) = (false,wk) 
-
-	fun seq_equiv_wk (Dat.Seq (leftA,connA,rightA),Dat.Seq(leftB,connB,rightB),term)=
-		let
-			val (resA,used_Wk) = ctx_struct_equiv_wk(leftA,leftB,term,false)
-			val (resB,_) = ctx_struct_equiv_wk(rightA,rightB,term,used_Wk)
-		in
-			connA=connB andalso (resA andalso resB)
-		end
-	
+	fun extract_constraints (A,B) = let val (res,_) = extract_constraints_wk(A,B,([],[])) in res end
 
 
 	(*check premises with an extra term that can be weakened*)
-	fun check_premises_wk (_,[],constraints,goals,_,t1_vars,t2_vars) = check_consistent(constraints,goals,t1_vars,t2_vars)
-		|check_premises_wk (assumed_leaves,x::conc_leaves,cons,goals,term,t1_vars,t2_vars) = 
+	fun check_premises_wk (_,[],constraints,_,t1_vars,t2_vars) = check_consistent(constraints,t1_vars,t2_vars)
+		|check_premises_wk (assumed_leaves,x::conc_leaves,cons,weak,t1_vars,t2_vars) = 
 		let
-			val possible_premises = List.filter (fn y => seq_equiv_wk (y,x,term)) assumed_leaves
+			val possible_premises = List.filter (fn y => seq_equiv_wk (y,x,weak)) assumed_leaves
 			fun find_match [] = false
 				| find_match (y::L) = 
 				let
-					val new_cons = extract_constraints (y,x) @ cons
+					val (new_cons,new_vars ) = extract_constraints_wk (y,x,weak)
+					val new_vars = List.mapPartial (fn x => x) new_vars
 				in
-					check_premises_wk (assumed_leaves,conc_leaves,new_cons,goals,term,t1_vars,t2_vars) orelse
+					check_premises_wk (assumed_leaves,conc_leaves, new_cons@cons,weak,t1_vars,new_vars@t2_vars) orelse
 					find_match L
 				end
 		in
 			find_match possible_premises
 		end
 
-	
-	(* Body *)
+	fun check_premises (_,[],constraints,t1_vars,t2_vars) = check_consistent(constraints,t1_vars,t2_vars)
+		| check_premises (assumed_leaves,x::conc_leaves,cons,t1_vars,t2_vars) = 
+		let
+			val possible_premises = List.filter (fn y => seq_equiv (y,x)) assumed_leaves
+			fun find_match [] = false
+				| find_match (y::L) = 
+				let
+					val new_cons = extract_constraints (y,x) @ cons
+				in
+					check_premises (assumed_leaves,conc_leaves,new_cons,t1_vars,t2_vars) orelse
+					find_match L
+				end
+		in
+			find_match possible_premises
+		end
+
 end
 
