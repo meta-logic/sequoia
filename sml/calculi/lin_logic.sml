@@ -4,8 +4,11 @@ structure Linear_Logic =
 struct
   structure D = datatypesImpl
   structure P = Properties
+  structure Latex = latexImpl
 
-  val t = ref 01000000
+  val t = ref 01000
+
+  datatype result  = None | Some | True | False
 
  	val top = D.Atom("\\top")
 	val bot = D.Atom("\\bot")
@@ -49,41 +52,41 @@ struct
 
   fun generic_atom_P () = 
   	let
-  		val (name,_) = ("P"^ Int.toString(!t),t := !t + 1)
+  		val (name,_) = ("P_{"^ Int.toString(!t)^"}",t := !t + 1)
   	in
   		D.AtomVar(name)
   	end
 
   fun generic_form_A () = 
   	let
-  		val (name,_) = ("A_"^ Int.toString(!t),t := !t + 1)
+  		val (name,_) = ("A_{"^ Int.toString(!t)^"}",t := !t + 1)
   	in
   		D.FormVar(name)
   	end
 
   fun generic_form_B () = 
   	let
-  		val (name,_) = ("B_" ^ Int.toString(!t) , t:= !t +1)
+  		val (name,_) = ("B_{" ^ Int.toString(!t)^"}" , t:= !t +1)
   	in
   		D.FormVar(name)
   	end
 
   fun generic_form_C () = 
   	let
-  		val (name,_) = ("C_" ^ Int.toString(!t) , t:= !t +1)
+  		val (name,_) = ("C_{" ^ Int.toString(!t)^"}" , t:= !t +1)
   	in
   		D.FormVar(name)
   	end
 
   fun generic_ctx_var_G () = 
   	let
-  		val (name,_) = ("\\Gamma_" ^ Int.toString(!t) , t:= !t +1)
+  		val (name,_) = ("\\Gamma_{" ^ Int.toString(!t)^"}" , t:= !t +1)
   	in
   		D.CtxVar(name)
   	end
   fun generic_ctx_var_D () = 
   	let
-  		val (name,_) = ("\\Delta_" ^ Int.toString(!t) , t:= !t +1)
+  		val (name,_) = ("\\Delta_{" ^ Int.toString(!t)^"}" , t:= !t +1)
   	in
   		D.CtxVar(name)
   	end
@@ -171,7 +174,7 @@ struct
 			val prem1 = D.Seq(list_to_ctx([([G1],[]),L2]),con,list_to_ctx([R1,([D1],[A])]))
 			val prem2 = D.Seq(list_to_ctx([([G2],[]),L2]),con,list_to_ctx([R1,([D2],[B])]))
 		in
-			D.Rule(tensor_name^" L",D.Right,conc,[prem1,prem2])
+			D.Rule(tensor_name^" R",D.Right,conc,[prem1,prem2])
 		end
 		
 	fun tensorL () =
@@ -395,13 +398,13 @@ struct
 			val R = list_to_ctx([([generic_ctx_var_D()],[]),([generic_ctx_var_D()],[])])
 
 			val G = generic_ctx_var_G()
-			val Gb = ([generic_ctx_var_G()],[])
+			val Gb = ([generic_ctx_var_G()])
 
 			val B = generic_form_B()
 			val Bb = bang_form(B)
 
-			val conc = D.Seq(list_to_ctx([([G],[Bb]),Gb]),con,R)
-			val prem = D.Seq(list_to_ctx([([G],[B]),Gb]),con,R)
+			val conc = D.Seq(list_to_ctx([([G],[Bb]),(Gb,[])]),con,R)
+			val prem = D.Seq(list_to_ctx([([G],[]),(Gb,[Bb])]),con,R)
 		in
 			D.Rule(bang_name^" L1",D.Left,conc,[prem])
 		end
@@ -417,8 +420,8 @@ struct
 
 			val Gb = ([generic_ctx_var_G()],[Bb])
 
-			val conc = D.Seq(list_to_ctx([([G],[B]),Gb]),con,R)
-			val prem = D.Seq(list_to_ctx([([G],[]),Gb]),con,R)
+			val conc = D.Seq(list_to_ctx([([G],[]),Gb]),con,R)
+			val prem = D.Seq(list_to_ctx([([G],[B]),Gb]),con,R)
 		in
 			D.Rule(bang_name^" L2",D.Left,conc,[prem])
 		end
@@ -429,18 +432,18 @@ struct
 			val L = list_to_ctx([([generic_ctx_var_G()],[]),([generic_ctx_var_G()],[])])
 
 			val D = generic_ctx_var_D()
-			val Dq = ([generic_ctx_var_D()],[])
+			val Dq = [generic_ctx_var_D()]
 
 			val B = generic_form_B()
 			val Bq = quest_form(B)
 
-			val conc = D.Seq(L,con,list_to_ctx([Dq,([D],[Bq])]))
-			val prem = D.Seq(L,con,list_to_ctx([Dq,([D],[B])]))
+			val conc = D.Seq(L,con,list_to_ctx([(Dq,[]),([D],[Bq])]))
+			val prem = D.Seq(L,con,list_to_ctx([(Dq,[Bq]),([D],[])]))
 		in
-			D.Rule( ques_mark^" L1",D.Left,conc,[prem])
+			D.Rule( ques_mark^" R1",D.Left,conc,[prem])
 		end
 
-	fun quesR1 () = 
+	fun quesR2 () = 
 		let
 			val L = list_to_ctx([([generic_ctx_var_G()],[]),([generic_ctx_var_G()],[])])
 
@@ -455,7 +458,7 @@ struct
 			val conc = D.Seq(L,con,list_to_ctx([Dq,([D],[])]))
 			val prem = D.Seq(L,con,list_to_ctx([Dq,([D],[B])]))
 		in
-			D.Rule( ques_mark^" L2",D.Left,conc,[prem])
+			D.Rule( ques_mark^" R2",D.Left,conc,[prem])
 		end
 
 	fun quesL () = 
@@ -527,16 +530,48 @@ struct
 
 	fun test'(R1,nil) = raise Fail "no R2"
   		| test'(R1,[R2]) = P.permutes(R1,R2,[],false,false)
-  		| test'(R1,R2::rest) = 
-  				case test'(R1,rest) of
+  		| test'(R1,R2::rest) = P.permutes(R1,R2,[],false,false)
+  				(*case test'(R1,rest) of
   					SOME true => test'(R1,rest)
-  					| result => result
+  					| result => result*)
   
-  fun test ([],_) = SOME true
-  	| test  (x::L,r2) = 
-  	case test(L,r2) of
+  fun test ([],_) = []
+  	| test  (x::L,r2) = test'(x,r2)
+  	(*case test(L,r2) of
   		SOME true => test'(x,r2)
-  		| x => x
+  		| x => x*)
+
+  fun res_to_result ((ts,fs),set2) = 
+  	case (ts,fs) of
+  		([],[]) => None
+  		| (_::_,[]) => True
+  		| ([], _::_) => False
+  		| (_,_) => Some
+
+  fun process_result ((test:string,[])) = (test,NONE)
+  	| process_result ((test:string,x)) = (test,SOME (List.map res_to_result x))
+
+  fun latex_res (tree1,tree2) = "\\[\n"^
+  			Latex.der_tree_toLatex(tree1)^
+  			"\n\\]\n\n\n$\\leadsto$\n\n\n\\[\n"^
+  			Latex.der_tree_toLatex(tree2)^
+  			"\n\\]\n"
+
+  fun result_to_latex_strings (((true_list,fail_list),set2)) = 
+  	let
+  		val true_strings = List.map (latex_res) true_list
+  		val fail_strings = List.map (fn (_,dvt) => Latex.der_tree_toLatex(dvt)) fail_list
+  		val set2_strings = List.map (fn (_,dvt) => Latex.der_tree_toLatex(dvt)) set2
+  	in
+  		(true_strings,(fail_strings,set2_strings))
+  	end
+
+  fun string_result ((test:string,[])) = (test,NONE)
+  	| string_result ((test:string,x)) = (test,SOME (List.map result_to_latex_strings x))
+
+
+
+  fun inorder (x) = List.map process_result x
 
   val tensorR1 = [tensorR()]
   val tensorR2 = [tensorR()]
@@ -562,8 +597,13 @@ struct
   val par_L = [parL()]
 
   (*val bang*)
+  val bang_R = [bangR()]
+  val bang_L1 =[bangL1()]
+  val bang_L2 =[bangL2()]
 
-  (*val quest*)
+  val ques_R1 = [quesR1()]
+  val ques_R2 = [quesR2()]
+  val ques_L = [quesL()]
 
   val one_R = [oneR()]
 
@@ -585,27 +625,37 @@ struct
   val tensorL_withL = test(tensorL1,withL)
   val tensorL_parR = test(tensorL1,par_R)
   val tensorL_parL = test(tensorL1,par_L)
-
-
+  val tensorL_bangR = test(tensorL1,bang_R)
+  val tensorL_bangL1 = test(tensorL1,bang_L1)
+  val tensorL_bangL2 = test(tensorL1,bang_L2)
+  val tensorL_quesR1 = test(tensorL1,ques_R1)
+  val tensorL_quesR2 = test(tensorL1,ques_R2)
+  val tensorL_quesL = test(tensorL1,ques_L)
   val tensorL_oneR = test(tensorL1, one_R)
   val tensorL_oneL = test(tensorL1, one_L)
   val tensorL_botR = test(tensorL1, bot_R)
   val tensorL_botL = test(tensorL1, bot_L)
 
-  val tensorL_inorder = [tensorL_tensorR,
-  											 tensorL_tensorL,
-  											 tensorL_lolliR,
-  											 tensorL_lolliL,
-  											 tensorL_oplusR,
-  											 tensorL_oplusL,
-  											 tensorL_withR,
-  											 tensorL_withL,
-  											 tensorL_parR,
-												 tensorL_parL,
-  											 tensorL_oneR,
-  											 tensorL_oneL,
-  											 tensorL_botR,
-  											 tensorL_botL]
+  val tensorL_inorder = [("tensorL_tensorR",tensorL_tensorR),
+  											 ("tensorL_tensorL",tensorL_tensorL),
+  											 ("tensorL_lolliR",tensorL_lolliR),
+  											 ("tensorL_lolliL",tensorL_lolliL),
+  											 ("tensorL_oplusR",tensorL_oplusR),
+  											 ("tensorL_oplusL",tensorL_oplusL),
+  											 ("tensorL_withR",tensorL_withR),
+  											 ("tensorL_withL",tensorL_withL),
+  											 ("tensorL_parR",tensorL_parR),
+												 ("tensorL_parL",tensorL_parL),
+											   ("tensorL_bangR",tensorL_bangR), 
+												 ("tensorL_bangL1",tensorL_bangL1),
+												 ("tensorL_bangL2",tensorL_bangL2),
+												 ("tensorL_quesR1",tensorL_quesR1),
+												 ("tensorL_quesR2",tensorL_quesR2),
+												 ("tensorL_quesL",tensorL_quesL),
+  											 ("tensorL_oneR",tensorL_oneR),
+  											 ("tensorL_oneL",tensorL_oneL),
+  											 ("tensorL_botR",tensorL_botR),
+  											 ("tensorL_botL",tensorL_botL)]
 
   (*testing tensor R permutes up*)
 
@@ -619,26 +669,37 @@ struct
   val tensorR_withL = test(tensorR1,withL)
   val tensorR_parR = test(tensorR1,par_R)
   val tensorR_parL = test(tensorR1,par_L)
-
+  val tensorR_bangR = test(tensorR1,bang_R)
+  val tensorR_bangL1 = test(tensorR1,bang_L1)
+  val tensorR_bangL2 = test(tensorR1,bang_L2)
+  val tensorR_quesR1 = test(tensorR1,ques_R1)
+  val tensorR_quesR2 = test(tensorR1,ques_R2)
+  val tensorR_quesL = test(tensorR1,ques_L)
   val tensorR_oneR = test(tensorR1, one_R)
   val tensorR_oneL = test(tensorR1, one_L)
   val tensorR_botR = test(tensorR1, bot_R)
   val tensorR_botL = test(tensorR1, bot_L)
 
-  val tensorR_inorder = [tensorR_tensorR,
-  											 tensorR_tensorL,
-  											 tensorR_lolliR,
-  											 tensorR_lolliL,
-  											 tensorR_oplusR,
-  											 tensorR_oplusL,
-  											 tensorR_withR,
-  											 tensorR_withL,
-  											 tensorR_parR,
-  											 tensorR_parL,
-  											 tensorR_oneR,
-  											 tensorR_oneL,
-  											 tensorR_botR,
-  											 tensorR_botL]
+  val tensorR_inorder = [("tensorR_tensorR",tensorR_tensorR),
+  											 ("tensorR_tensorL",tensorR_tensorL),
+  											 ("tensorR_lolliR",tensorR_lolliR),
+  											 ("tensorR_lolliL",tensorR_lolliL),
+  											 ("tensorR_oplusR",tensorR_oplusR),
+  											 ("tensorR_oplusL",tensorR_oplusL),
+  											 ("tensorR_withR",tensorR_withR),
+  											 ("tensorR_withL",tensorR_withL),
+  											 ("tensorR_parR",tensorR_parR),
+												 ("tensorR_parL",tensorR_parL),
+											   ("tensorR_bangR",tensorR_bangR), 
+												 ("tensorR_bangL1",tensorR_bangL1),
+												 ("tensorR_bangL2",tensorR_bangL2),
+												 ("tensorR_quesR1",tensorR_quesR1),
+												 ("tensorR_quesR2",tensorR_quesR2),
+												 ("tensorR_quesL",tensorR_quesL),
+  											 ("tensorR_oneR",tensorR_oneR),
+  											 ("tensorR_oneL",tensorR_oneL),
+  											 ("tensorR_botR",tensorR_botR),
+  											 ("tensorR_botL",tensorR_botL)]
 
   (*testing plus R permutes up*)
   val oplusR_tensorR = test(oplusR1,tensorR1)
@@ -651,26 +712,37 @@ struct
   val oplusR_withL = test(oplusR1,withL)
   val oplusR_parR = test(oplusR1, par_R)
   val oplusR_parL = test(oplusR1, par_L)
-
+  val oplusR_bangR = test(oplusR1,bang_R)
+  val oplusR_bangL1 = test(oplusR1,bang_L1)
+  val oplusR_bangL2 = test(oplusR1,bang_L2)
+  val oplusR_quesR1 = test(oplusR1,ques_R1)
+  val oplusR_quesR2 = test(oplusR1,ques_R2)
+  val oplusR_quesL = test(oplusR1,ques_L)
   val oplusR_oneR = test(oplusR1, one_R)
   val oplusR_oneL = test(oplusR1, one_L)
   val oplusR_botR = test(oplusR1, bot_R)
   val oplusR_botL = test(oplusR1, bot_L)
 
-  val oplusR_inorder = [oplusR_tensorR,
-  											 oplusR_tensorL,
-  											 oplusR_lolliR,
-  											 oplusR_lolliL,
-  											 oplusR_oplusR,
-  											 oplusR_oplusL,
-  											 oplusR_withR,
-  											 oplusR_withL,
-  											 oplusR_parR,
-  											 oplusR_parL,
-  											 oplusR_oneR,
-  											 oplusR_oneL,
-  											 oplusR_botR,
-  											 oplusR_botL]
+  val oplusR_inorder =  [("oplusR_tensorR",oplusR_tensorR),
+                         ("oplusR_tensorL",oplusR_tensorL),
+                         ("oplusR_lolliR",oplusR_lolliR),
+                         ("oplusR_lolliL",oplusR_lolliL),
+                         ("oplusR_oplusR",oplusR_oplusR),
+                         ("oplusR_oplusL",oplusR_oplusL),
+                         ("oplusR_withR",oplusR_withR),
+                         ("oplusR_withL",oplusR_withL),
+                         ("oplusR_parR",oplusR_parR),
+                         ("oplusR_parL",oplusR_parL),
+                         ("oplusR_bangR",oplusR_bangR), 
+                         ("oplusR_bangL1",oplusR_bangL1),
+                         ("oplusR_bangL2",oplusR_bangL2),
+                         ("oplusR_quesR1",oplusR_quesR1),
+                         ("oplusR_quesR2",oplusR_quesR2),
+                         ("oplusR_quesL",oplusR_quesL),
+                         ("oplusR_oneR",oplusR_oneR),
+                         ("oplusR_oneL",oplusR_oneL),
+                         ("oplusR_botR",oplusR_botR),
+                         ("oplusR_botL",oplusR_botL)]
 
   (*testing with R permutes up*)
 
@@ -684,26 +756,38 @@ struct
   val withR_withL = test(withR1,withL)
   val withR_parR = test(withR1, par_R)
   val withR_parL = test(withR1, par_L)
-
+  val withR_bangR = test(withR1,bang_R)
+  val withR_bangL1 = test(withR1,bang_L1)
+  val withR_bangL2 = test(withR1,bang_L2)
+  val withR_quesR1 = test(withR1,ques_R1)
+  val withR_quesR2 = test(withR1,ques_R2)
+  val withR_quesL = test(withR1,ques_L)
   val withR_oneR = test(withR1, one_R)
   val withR_oneL = test(withR1, one_L)
   val withR_botR = test(withR1, bot_R)
   val withR_botL = test(withR1, bot_L)
 
-  val withR_inorder = [withR_tensorR,
-  											 withR_tensorL,
-  											 withR_lolliR,
-  											 withR_lolliL,
-  											 withR_oplusR,
-  											 withR_oplusL,
-  											 withR_withR,
-  											 withR_withL,
-  											 withR_parR,
-  											 withR_parL,
-  											 withR_oneR,
-  											 withR_oneL,
-  											 withR_botR,
-  											 withR_botL]
+  val withR_inorder =   [("withR_tensorR",withR_tensorR),
+                         ("withR_tensorL",withR_tensorL),
+                         ("withR_lolliR",withR_lolliR),
+                         ("withR_lolliL",withR_lolliL),
+                         ("withR_oplusR",withR_oplusR),
+                         ("withR_oplusL",withR_oplusL),
+                         ("withR_withR",withR_withR),
+                         ("withR_withL",withR_withL),
+                         ("withR_parR",withR_parR),
+                         ("withR_parL",withR_parL),
+                         ("withR_bangR",withR_bangR), 
+                         ("withR_bangL1",withR_bangL1),
+                         ("withR_bangL2",withR_bangL2),
+                         ("withR_quesR1",withR_quesR1),
+                         ("withR_quesR2",withR_quesR2),
+                         ("withR_quesL",withR_quesL),
+                         ("withR_oneR",withR_oneR),
+                         ("withR_oneL",withR_oneL),
+                         ("withR_botR",withR_botR),
+                         ("withR_botL",withR_botL)]
+
 
 
 

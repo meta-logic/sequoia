@@ -6,6 +6,7 @@
     structure App = applyunifierImpl
     structure U = unifyImpl
 
+    
 
     type conn = Dat.conn
     type form = Dat.form
@@ -18,6 +19,7 @@
     type sub = Dat.sub
     type rule_name = Dat.rule_name
     type der_tree = Dat.der_tree
+
 
 
     
@@ -170,6 +172,5 @@
                     in 
                         writeFile "sml/test.sml" final_form
                     end)
-        end
-    
+        end 
 end
