@@ -11,8 +11,8 @@ function addSymbol (req, res) {
     symbol.symbol     = req.body.symbol
     symbol.type       = req.body.type
     symbol.group      = req.body.group
+    symbol.calculus   = req.body.calculus
     symbol.save(function (err) {
-
         //if something went wrong while saving, return the error
         if (err) {
             return res.status(400).json({
@@ -31,9 +31,8 @@ function addSymbol (req, res) {
 
 
 //deleting a symbol
-function deleteSymbols (req, res) {
+function deleteSymbol (req, res) {
     //deleting a symbol
-
     Symbols.remove({symbol : req.body.symbol}, function (err, symbol) {
         //if the symbol does not exists
         if (err || symbol == null) {
@@ -52,4 +51,68 @@ function deleteSymbols (req, res) {
 }
 
 
-module.exports = {addSymbol, deleteSymbols}
+//fetching symbols
+function getRuleSymbols (req, res) {
+    //looking up the symbol
+    Symbols.find({ $and: [{'calculus': req.params.calc_id}, {group : "rule"}]}, 
+    function (err, symbols) {
+        //if the symbol does not exist
+        if (err || symbols == null) {
+            return res.status(400).json({
+                "status"  : "failure",
+                "message" : "symbol does not exist"
+            })
+        }
+        //return the symbol
+        return res.status(200).json({
+            "status" : "success",
+            "symbols"   : symbols
+        })
+    })
+}
+
+
+//fetching symbols
+function getSeqSymbols (req, res) {
+    //looking up the symbol
+    Symbols.find({ $and: [{'calculus': req.params.calc_id}, {group : "seq"}]}, 
+    function (err, symbols) {
+        //if the symbol does not exist
+        if (err || symbols == null) {
+            return res.status(400).json({
+                "status"  : "failure",
+                "message" : "symbol does not exist"
+            })
+        }
+        //return the symbol
+        return res.status(200).json({
+            "status"  : "success",
+            "symbols" : symbols
+        })
+    })
+}
+
+
+//fetching symbols
+function getCertainSymbols (req, res) {
+    //looking up the symbol
+    Symbols.find({ $and: [{'calculus': req.params.calc_id}, 
+    {$or:[{group: "seq"},{type : {$in: ["connective", "sequent sign", "context separator", "empty"]}}]}]}, 
+    function (err, symbols) {
+        //if the symbol does not exist
+        if (err || symbols == null) {
+            return res.status(400).json({
+                "status"  : "failure",
+                "message" : "symbol does not exist"
+            })
+        }
+        //return the symbol
+        return res.status(200).json({
+            "status"    : "success",
+            "symbols"   : symbols
+        })
+    })
+}
+
+
+module.exports = {addSymbol, deleteSymbol, getRuleSymbols, getSeqSymbols, getCertainSymbols}

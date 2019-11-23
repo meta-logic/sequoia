@@ -9,7 +9,10 @@ var controller = require("../controllers/symbols")
 
 //symbols routes
 router.post("/symbols", controller.addSymbol)
-router.delete("/symbols", controller.deleteSymbols)
+router.delete("/symbols", controller.deleteSymbol)
+router.get("/rule_symbols/:calc_id", controller.getRuleSymbols)
+router.get("/seq_symbols/:calc_id", controller.getSeqSymbols)
+router.get("/cert_symbols/:calc_id", controller.getCertainSymbols)
 
 
 module.exports = router
