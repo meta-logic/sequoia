@@ -24,6 +24,7 @@ signature DATATYPES = sig
     val ctx_var_toString : ctx_var -> string
     val ctx_var_eq : ctx_var * ctx_var -> bool
     val ctx_varL_toString : ctx_var list -> string
+    val const_toString : ctx_var * ctx_var list * ctx_var list -> string
 
     val ctx_toString : ctx -> string
     val ctx_eq : ctx * ctx -> bool

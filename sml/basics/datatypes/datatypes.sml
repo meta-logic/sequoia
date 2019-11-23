@@ -64,7 +64,10 @@ structure datatypesImpl : DATATYPES = struct
     fun ctx_varL_toString (nil) = ""
         | ctx_varL_toString ([x]) = ctx_var_toString(x)
         | ctx_varL_toString (x::l) = ctx_var_toString(x) ^ ", " ^ ctx_varL_toString (l)
-
+    fun const_toString (_,[],[]) = ""
+        | const_toString (_,y,[]) = ctx_varL_toString y ^" = "^ "EMPTY"
+        | const_toString (_,[],z) = ctx_varL_toString z ^" = "^ "EMPTY"
+        | const_toString (_,y,z) = ctx_varL_toString y ^" = "^ ctx_varL_toString z
 
     datatype ctx = Ctx of ctx_var list * form list
     fun ctx_toString (Ctx([],[])) = ""
