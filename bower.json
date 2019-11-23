@@ -3,7 +3,7 @@
   "description": "Sequent calculus proof construction tool",
   "main": "server.js",
   "authors": [
-    "AbdulRahman Alfayad"
+  "Giselle Reis"
   ],
   "license": "ISC",
   "homepage": "https://github.com/AboudFayad/sequoia",
@@ -16,7 +16,7 @@
   ],
   "dependencies": {
     "semantic": "^2.2.13",
-    "MathJax": "^2.7.1",
+    "MathJax": "^2.7.7",
     "async": "^2.5.0",
     "bootstrap": "^3.3.7",
     "pegjs": "^0.10.0"
