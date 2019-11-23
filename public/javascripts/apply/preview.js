@@ -1,17 +1,23 @@
 
 function preview() {
     var conc = document.getElementById("Sequent").value.replace(/\(/g, " ( ").replace(/\)/g, " ) ")
+    if (conc == "")
+        return
     var applyButton = document.getElementById("apply")
     var table = document.getElementById("table")
     var init_sequent = document.getElementById("init sequent")
 
     init_sequent.innerHTML =
-		"<div style=\"margin: 35px;\"><table id=\"prooftree\" count=\"1\" style=\"margin: auto;\"><tr><td class=\"conc-temp\" id=\"prooftree_0_conc\">\\[" +
-		conc +
-        "\\]</td></tr></table></p></div>"
+        "<div style=\"margin: 35px;\">"
+            +"<table id=\"prooftree\" count=\"1\" style=\"margin: auto;\">"
+                +"<tr><td class=\"conc-temp\" id=\"prooftree_0_conc\">"
+                    +"\\["+conc+"\\]"
+                +"</td></tr>"
+            +"</table>"
+        +"</div>"
     MathJax.Hub.Queue([ "Typeset", MathJax.Hub, init_sequent ])
 
-    applyButton.innerHTML = "<a id = \"submit\" class=\"ui fluid circular icon button teal\" onclick=\"useSequent()\">Start Building Tree</a>"
+    applyButton.innerHTML = "<a id = \"submit\" class=\"ui large teal fluid circular icon button\" onclick=\"useSequent()\">Start Building Tree</a>"
 
     var parse_warning = document.getElementById("parse warning")
     if (parse_warning != null){
@@ -33,7 +39,7 @@ function preview() {
                     "</td>"+
                     "<td id= \"select_field\" >"+
                         "<select class=\"ui search dropdown\" style=\"fixed\" id=\"select-sym\" ><option value=\"\">Type</option><option value=\"atom\">atom</option><option value=\"atom variable\">atom variable</option><option value=\"formula variable\">formula variable</option><option value=\"context variable\">context variable</option></select>"+
-                        "<button class=\"ui right floated button primary\" onclick=\"add_symbol_toTable(\'seq\')\">Add Symbol</button>"+
+                        "<button class=\"ui large teal right floated button\" onclick=\"add_symbol_toTable(\'seq\')\">Add Symbol</button>"+
                     "</td></tr></tbody></table><br><br>"
     s = 0
     get_symbols_toTable("seq")

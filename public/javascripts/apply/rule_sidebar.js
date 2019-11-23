@@ -2,13 +2,16 @@ var r = 0
 
 function get_rules_toPage() {
     var rules_container = document.getElementById("rules")
+    if (rules_container == null) { return }
     for (i = 0; i < r; i++) {
         entry = document.getElementById("rule_card"+i)
         if (entry != null) {
             entry.remove()
         }
     }
-    $.get("/api/get-rules", function (rules, status) {
+    var calc_id = document.getElementById("calc_id").innerHTML
+    $.get("/api/rules/"+calc_id, function (rls, status) {
+        var rules = rls.rules
         for (var i = 0; i < rules.length; i++) {
             var fin_conc = rules[i].sml_conc.replace(/\\/g, "\\\\").replace(/'/g, "&apos;").replace(/"/g, "&quot;")
             var fin_prem = "["
@@ -16,10 +19,13 @@ function get_rules_toPage() {
                 fin_prem += rules[i].sml_prem[j].replace(/\\/g, "\\\\").replace(/'/g, "&apos;").replace(/"/g, "&quot;") + ", "
             }
             fin_prem = fin_prem.slice(0,-2) + "]"
-            rules_container.innerHTML += "<div id=\"rule_card"+ i+"\"><button class=\"ui button basic black\" id=\"r"+ i+"\" onClick=\"applyRule("+i+")\""
-            +"rule_name=\""+rules[i].rule+"\" conclusion=\""+fin_conc+"\" premises=\""+fin_prem+"\"></button><br><br></div>"
-            var rule_container = document.getElementById(("r" + i))
-            rule_container.innerHTML = "\\[\\frac{"+ rules[i].premises.join(" \\quad \\quad ")+"}{"+ rules[i].conclusion +"}"+rules[i].rule+"\\]"
+            rules_container.innerHTML += 
+            '<div id="rule_card"'+i+'" class="card">'
+                +'<button class="ui button basic black" id="r'+i+'" onClick=applyRule("'+i+'") '
+                +'rule_name="'+rules[i].rule+'" conclusion="'+fin_conc+'" premises="'+fin_prem+'">'
+                    +'\\[\\frac{'+rules[i].premises.join(" \\quad \\quad ")+'}{'+rules[i].conclusion+'}'+rules[i].rule+'\\]'
+                +'</button>'
+            +'</div><br>'
         }
         MathJax.Hub.Queue(["Typeset",MathJax.Hub,rules_container])
         r = rules.length

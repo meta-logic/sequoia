@@ -9,9 +9,13 @@ function fixRules() {
     var form = "FormVar = \"NO-FORM\" "
     var atom_var = "AtomVar = \"NO-ATOMVAR\" "
     var atom = "Atom = \"NO-ATOM\" "
+    var calc_id = document.getElementById("calc_id").innerHTML
 
-    $.get("/api/get-symbols", function(sb, status) {
-        syms = sb
+    $.get("/api/rule_symbols/"+calc_id, function(sb, status) {
+        var syms = sb.symbols
+        syms = syms.sort(function(a, b){
+            return b.symbol.length - a.symbol.length
+        })
         for (var i = 0; i < syms.length; i++) {
             var symbol = syms[i].symbol
             var type = syms[i].type
@@ -43,8 +47,9 @@ function fixRules() {
     extra_text = "\n" + arrow + "\n" + sep + "\n" + conn + "\n" + set + "\n" + form + "\n" + atom_var + "\n" + atom + "\n" 
     parser_text += extra_text
     var parser = peg.generate(parser_text)
-        $.get("/api/get-rules", function (rls, status) {
-            rules = rls
+    var calc_id = document.getElementById("calc_id").innerHTML
+    $.get("/api/rules/"+calc_id, function (rls, status) {
+        var rules = rls.rules
             for (var i = 0; i < rules.length; i++) {
                 parse_and_fix(parser, rules[i])
             }
@@ -54,9 +59,9 @@ function fixRules() {
 
 
 function parse_and_fix(parser, rule) {
+    var calc_id = document.getElementById("calc_id")
     var prem = rule.premises
     var parsed_prem = []
-    console.log(rule.conclusion)
     if (prem[0] != ""){
         for (var i = 0; i < prem.length; i++) {
             try {
@@ -79,8 +84,8 @@ function parse_and_fix(parser, rule) {
     $.ajax({
         url: "/api/rule",
         type: "PUT",
-        data : { id : rule._id , rule : rule.rule, 
+        data : { id : rule._id, rule : rule.rule, 
             conclusion : conc, premises : JSON.stringify(prem), parsed_conc : conc_final, 
-            parsed_prem : JSON.stringify(parsed_prem)},
-        success : function(result) {get_rules_toPage()}})
+            parsed_prem : JSON.stringify(parsed_prem), calculus : calc_id}})
+    window.location.href = "/calculus/"+calc_id
 }

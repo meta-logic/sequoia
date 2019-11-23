@@ -34,20 +34,11 @@ function build_proof_tree(branch_id, rule, derivations) {
     var new_branches = ""
     for (var i = 0; i < derivations.length; i++) {
         new_branches +=
-			"<td><table id=\"" +
-			"prooftree" +
-			"_" +
-			branch_id + i +
-			"\"> \
-            <tr><td class=\"conc-temp\" id=\"" +
-			"prooftree" +
-			"_" +
-			branch_id + i +
-			"_conc" +
-			"\">\\[" +
-			derivations[i] +
-			"\\]</td></tr>\
-        </table></td>"
+		"<td><table id=\"prooftree_"+branch_id+i+"\">"+
+            "<tr><td class=\"conc-temp\" id=\"prooftree_"+branch_id+i+"_conc\">"+
+                "\\["+derivations[i]+"\\]"+
+            "</td></tr>"+
+        "</table></td>"
     }
     var row = "<tr id = delete_id"+ branch_id +" >" + new_branches + rule + "</tr>"
 
