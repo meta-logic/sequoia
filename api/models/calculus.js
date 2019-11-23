@@ -11,11 +11,7 @@ var calculusSchema = new Schema({
     title       : String,
     description : String, 
     rules       : [String], 
-    symbols     : [{
-        symbol     : String,
-        type       : String,
-        precedence : Number
-    }]
+    symbols     : [String]
 })
 
 module.exports = mongoose.model("Calculus", calculusSchema)
