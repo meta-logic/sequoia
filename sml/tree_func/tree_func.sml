@@ -6,7 +6,7 @@
     structure App = applyunifierImpl
     structure U = unifyImpl
 
-    
+
 
     type conn = Dat.conn
     type form = Dat.form
@@ -80,10 +80,10 @@
             else if not (String.isPrefix id sid) then []
             else List.foldl(fn (branch, premises) => premises @ (get_premises_of(branch,sid)))([])pq
 
-    fun check_rule_of(Dat.DerTree(id, _, Dat.NoRule, pq), sid) = not (id = sid)
-        | check_rule_of(Dat.DerTree(id, _, rq, pq), sid) = if id = sid then true 
+    fun check_rule_of(_,Dat.DerTree(id, _, Dat.NoRule, pq), sid) = not (id = sid)
+        | check_rule_of(cn, Dat.DerTree(id, _, rq, pq), sid) = if id = sid then true 
         else if not (String.isPrefix id sid) then true
-        else List.foldl(fn (branch, bools) => bools andalso (check_rule_of(branch,sid)))(true)pq
+        else List.foldl(fn (branch, bools) => bools andalso (check_rule_of(cn, branch,sid)))(true)pq
 
     (*  *)
     fun apply_rule((forms, cons, dt), rule, sid) =
@@ -154,12 +154,10 @@
 
     fun writeFD fd content = 
         let
-            val out = Posix.FileSys.wordToFD (Word32.fromInt(fd))
+            val out = Posix.FileSys.wordToFD (Word64.fromInt(fd))
             val text = Word8VectorSlice.full (Byte.stringToBytes(content))
-
-        in
-            Posix.IO.writeVec(out,text)
-        end
+            val _ = Posix.IO.writeVec(out,text)
+        in () end
 
     (*taken from: https://stackoverflow.com/questions/33597175/how-to-write-to-a-file-in-sml*)
 	fun writeFile filename content =
@@ -169,18 +167,22 @@
         in () end
 
     fun translate_premises(tree,rule,id) = 
-        let val new_trees = List.map(fn (_,_,tr) => tr)(apply_rule(([],[],tree),rule,id))
-            val filtered = List.filter(fn (tr) => check_rule_of(tr,id))new_trees
+        let val new_trees = List.map(fn (_,cn,tr) => (cn, tr))(apply_rule(([],[],tree),rule,id))
+            val filtered = List.filter(fn (cn, tr) => check_rule_of(cn,tr,id))new_trees
         in
             (case filtered of 
-                [] => writeFile "sml/test.sml" "NOT APPLICABLE"
+                [] => writeFD 3 "NOT APPLICABLE"
                 | x::rest => 
-                    let val new_premises = List.map(fn (tr) => get_premises_of(tr,id)) filtered
-                        val new_premises_strings = List.map (fn pr_list => List.map (Dat.seq_toString) pr_list) new_premises
-                        val new_premises_strings2 = List.map (fn x => "{"^(List.foldl (fn (str1,str2) => str2^" ## "^str1) (List.hd(x)) (List.tl(x)))^"}") new_premises_strings
-                        val final_form = "["^(List.foldl (fn (str1,str2) => str2^" && "^str1) (List.hd(new_premises_strings2)) (List.tl(new_premises_strings2)))^"]"
+                    let val new_premises = List.map(fn (cn, tr) => (cn, get_premises_of(tr,id))) filtered
+                        val new_premises_strings = List.map (fn (cn_list, pr_list) => 
+                            (List.map (Dat.const_toString) cn_list, List.map (Dat.seq_toString) pr_list)) new_premises
+                        val new_premises_strings2 = List.map (fn (c, p) => 
+                                "{"^(List.foldl (fn (str1,str2) => str2^"##"^str1) (List.hd(c)) (List.tl(c)))^"}@@"^
+                                "{"^(List.foldl (fn (str1,str2) => str2^"##"^str1) (List.hd(p)) (List.tl(p)))^"}"
+                                )new_premises_strings
+                        val final_form = "["^(List.foldl (fn (str1,str2) => str1^" && "^str2) (List.hd(new_premises_strings2)) (List.tl(new_premises_strings2)))^"]"
                     in 
-                        writeFile "sml/test.sml" final_form
+                        writeFD 3 final_form
                     end)
         end 
 end

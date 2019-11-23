@@ -1,3 +1,4 @@
+var constraint_history = []
 
 function applyRule(i) {
     var warning_text = "<div id=\"apply warning\"><div class=\"ui red negative message\">"+
@@ -13,12 +14,12 @@ function applyRule(i) {
     }
     var ruletemp = document.getElementById("r"+i)
     var name = ruletemp.getAttribute("rule_name").replace(/\\/g, "\\\\")
-    var side = ruletemp.getAttribute("rule_name")[-1]
     var conclusion = ruletemp.getAttribute("conclusion")
     var premises = ruletemp.getAttribute("premises")
     var rule_sml = "Rule(\""+name+"\",None,"+conclusion+","+premises+")"
     var sequent = parser.parse(seq_text).replace(/\\/g, "\\\\")
     var tree_sml = "DerTree(\""+leaf_id+"\","+sequent+", NoRule, [])"
+    
     
     $.post("/apply", { rule: rule_sml, tree: tree_sml, node_id: "\""+leaf_id+"\"" }, function(data, status) {
         var output = data.output.slice(1,-1).split("&&")
@@ -31,8 +32,11 @@ function applyRule(i) {
             apply_warning.remove()
         }
         var prem_set = []
+        var cons_set = []
         for (k = 0; k < output.length; k++) {
-            prem_set.push(output[k].trim().slice(1,-1).split("##"))
+            prems_cons = output[k].split("@@")
+            prem_set.push(prems_cons[1].trim().slice(1,-1).split("##"))
+            cons_set.push(prems_cons[0].trim().slice(1,-1).split("##"))
         }
         if (prem_set.length == 1) {
             build_proof_tree(leaf_id, name, prem_set[0])
@@ -43,20 +47,19 @@ function applyRule(i) {
             })
         }
         else {
-            var index
             var message = document.getElementById('info_prems')
             message.innerHTML = 
             "<div class=\"ui info message\">"+
                 "<div class=\"header\">Multiple Applications</div>"+
                 "<div class=\"content\">"+
-                    "<p>The rule can be applied to a the selected sequent in more than one way."+ 
-                    "Select the set of premises on how you would like to build the tree from the selected sequent.</p>"+
+                    "<p>The rule can be applied to a the selected sequent in more than one way. "+ 
+                    "Select the set of premises for which you would like to use to continue building the tree on the selected sequent.</p>"+
                 "</div><ul id = \"choice\" class=\"list\"></ul></div>"
             
             var choice = document.getElementById('choice')
-            for (j = 0; j < prem_set.length; j++) {
-                var display_prem = prem_set[i].join("\\qquad")
-                choice.innerHTML += "<div id = \"select\" num = "+j+" class=\"ui attahced secondary basic button select\">$$"+display_prem+"$$</div>"
+            for (i = 0; i < prem_set.length; i++) {
+                var display_prem = prem_set[i].join("\\qquad ")
+                choice.innerHTML += "<div id = \"select\" num = "+i+" class=\"ui attahced secondary basic button select\">$$"+display_prem+"$$</div>"
             }
             MathJax.Hub.Queue([ "Typeset", MathJax.Hub, choice ])
             $(".select").click(function() {
@@ -68,6 +71,16 @@ function applyRule(i) {
                     seq_text = $(this).find("script")[0].innerText
                     console.log(seq_text)
                 })
+                var constraints = document.getElementById('side_menu_L')
+                constraint_history.push(cons_set[index])
+                var the_constraints = constraint_history.flat()
+                constraints.innerHTML = ""
+                for (i = 0; i < the_constraints.length; i++) {
+                    if (the_constraints[i] != "") {
+                        constraints.innerHTML += '<div class="item">$$'+the_constraints[i]+'$$</div>'
+                    }
+                }
+                MathJax.Hub.Queue([ "Typeset", MathJax.Hub, constraints ])
             })
         }
     })
@@ -94,5 +107,15 @@ function undo() {
         document.getElementById("delete_id"+undo_id).remove()
         leaf_id = undo_id
         seq_text = undo_seq
+
+        var constraints = document.getElementById('side_menu_L')
+        constraint_history.pop()
+        var the_constraints = constraint_history.flat()
+        for (i = 0; i < the_constraints.length; i++) {
+            if (the_constraints[i] != "") {
+                constraints.innerHTML += '<div class="item">$$'+the_constraints[i]+'$$</div>'
+            }
+        }
+        MathJax.Hub.Queue([ "Typeset", MathJax.Hub, constraints ])
     }
 }
