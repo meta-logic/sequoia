@@ -2,23 +2,22 @@
 <html>
   <head>
     <title>{{title}}</title>
-    <link rel="stylesheet" type="text/css" href="bower/semantic/dist/semantic.min.css">
+    <link rel="stylesheet" type="text/css" href="/bower/semantic/dist/semantic.min.css">
   </head>
   <body>
   	{{> navbar}}
 	{{{body}}}
-  	<script type="text/javascript" src="bower/MathJax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-	<script type="text/javascript" src="bower/jquery/dist/jquery.min.js"></script>
-	<script type="text/javascript" src="bower/pegjs/peg-0.10.0.min.js"></script>
-	<script type="text/javascript" src="bower/semantic/dist/semantic.min.js"></script>
-	{{!-- <script type="text/javascript" src="static/javascripts/rule/tablesort.js"></script>
-	<script type="text/javascript" src="static/javascripts/rule/addPremise.js"></script>
-	<script type="text/javascript" src="static/javascripts/rule/table.js"></script> --}}
-	<script type="text/javascript" src="static/javascripts/rule/preview.js"></script>
-	<script type="text/javascript" src="static/javascripts/parser_text.js"></script>
-	<script type="text/javascript" src="static/javascripts/rule/placeRule.js"></script>
-	<script type="text/javascript" src="static/javascripts/rule/symbols_table.js"></script>
-	<script type="text/javascript" src="static/javascripts/rule/rules_cards.js"></script>
-	<script type="text/javascript" src="static/javascripts/rule/fixRules.js"></script>
+	{{!-- <script type="text/javascript" id="MathJax" async src="/bower/MathJax/es5/tex-chtml.js"></script> --}}
+  	<script type="text/javascript" src="/bower/MathJax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+	<script type="text/javascript" src="/bower/jquery/dist/jquery.min.js"></script>
+	<script type="text/javascript" src="/bower/pegjs/peg-0.10.0.min.js"></script>
+	<script type="text/javascript" src="/bower/semantic/dist/semantic.min.js"></script>
+	<script type="text/javascript" src="/static/javascripts/rule/preview.js"></script>
+	<script type="text/javascript" src="/static/javascripts/parser_text.js"></script>
+	<script type="text/javascript" src="/static/javascripts/rule/getRule.js"></script>	
+	<script type="text/javascript" src="/static/javascripts/rule/placeRule.js"></script>
+	<script type="text/javascript" src="/static/javascripts/rule/symbols_table.js"></script>
+	<script type="text/javascript" src="/static/javascripts/rule/rules_cards.js"></script>
+	<script type="text/javascript" src="/static/javascripts/rule/fixRules.js"></script>
   </body>
 </html>
