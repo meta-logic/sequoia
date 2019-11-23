@@ -11,7 +11,7 @@ struct
     structure H = helpersImpl
 
     structure T = treefuncImpl
-
+    structure Latex = latexImpl
     structure App = applyunifierImpl
     structure U = unifyImpl
     structure E = Equivalence
@@ -85,6 +85,7 @@ struct
         in
             Dat.Rule(nm,side,new_conc,new_prems)
         end
+    
 
 
 
@@ -179,12 +180,17 @@ struct
 
     fun atomize_rule (Dat.Rule(name,side,conc,prems)) = Dat.Rule(name,side,atomize_seq(conc),List.map atomize_seq prems)
 
+
+    fun subformula (A, D.Form(_,subforms) ) = List.exists (fn x => D.form_eq(A,x) orelse subformula(A,x)) subforms
+        | subformula (_,_) = false
+
+    (* check which formula  *)
     fun init_coherence_con ((con_form:Dat.form, rulesL: Dat.rule list, rulesR: Dat.rule list), init_rule: Dat.rule, axioms: Dat.rule list)=
         let
             val Dat.Rule (_,_,init_conc,_) = init_rule
             (* changing names of context variables in rule and conclusion of rule *)
             val init_rule = update_rule(init_rule)
-            val init_rule = atomize_rule(init_rule)
+            (* val init_rule = atomize_rule(init_rule) *)
 
 
 
@@ -237,9 +243,10 @@ struct
                0 => rules_applied
              | _ => List.concat (List.map (fn x => T.apply_multiple_rules_all_ways(x,axioms)) rules_applied))
             
-            val init_applied = List.concat (List.map (fn x => T.apply_rule_everywhere(x,init_rule)) axioms_applied)
+            val init_applied = List.concat (List.map (fn (_,_,x) => T.apply_rule_everywhere(([],[],x),init_rule) ) axioms_applied)
 
-            val init_applied_trees = List.map (fn (_,_,x) => x) init_applied
+            val init_applied_trees = List.filter (fn (forms,_,_)=> List.all (fn x => subformula (x,con_form) ) forms )  (init_applied)
+            val init_applied_trees = List.map (fn (_,_,x) => x) init_applied_trees
 
             val both_applied = List.filter (fn x => T.get_tree_height(x) >1) init_applied_trees
             val no_open_prems = List.filter (fn x => (case T.get_open_prems(x) of
@@ -267,6 +274,7 @@ struct
         end
 
 
+    (*  *)
     fun weakening_rule_context (rule: (Dat.rule) , (side,context_num) : Dat.side * int):bool = 
         let
 
@@ -306,7 +314,7 @@ struct
                  | Dat.Right => check_in_ctx(R,context_num)
                  | _ => false)
 
-            fun check_leaves (l) = List.all check_in_seq (List.map (fn Dat.DerTree(_,seq,_,_) => seq) l)
+            fun check_leaves (l) = List.exists check_in_seq (List.map (fn Dat.DerTree(_,seq,_,_) => seq) l)
 
             val Dat.Rule(_,_,base,_) = rule
             val rule = update_rule(rule)
@@ -434,14 +442,14 @@ struct
 
 
 
-                    fun set_check (set1,set2)  = (List.map (fn (cn1,dvt1) =>
+                    fun set_check (set1,set2)  = ( List.map (fn (cn1,dvt1) =>
                             ((List.find (fn (cn2,dvt2) =>
                                 check_premises' ((cn1,dvt1),(cn2,dvt2),weak)
                             )set2)   ,(cn1,dvt1))
-                        )set1,set2)
+                        ) set1 , set2)
 
                     fun seperate' ([],res) = res
-                        | seperate' ((SOME (_,y),(_,x))::L,(res1,res2)) = seperate'(L,((x,y)::res1,res2))
+                        | seperate' ((SOME y,x)::L,(res1,res2)) = seperate'(L,((x,y)::res1,res2))
                         | seperate' ((NONE,x)::L,(res1,res2)) = seperate'(L,(res1,x::res2))
 
                     fun seperate (L) = seperate' (L,([],[]))
@@ -484,11 +492,50 @@ struct
             (* List.map(fn t => der_tree_toString t)opens1 *)
         end
 
+    fun latex_res ((_,tree1),(_,tree2)) = 
+            "$$"^Latex.der_tree_toLatex2(tree1)^"$$"
+            ^"$$ \\leadsto $$"
+            ^"$$"^Latex.der_tree_toLatex2(tree2)^"$$"
+            (* ^"$$ \\leadsto $$"
+            ^"$$\\cfrac{\\overset{\\#}{\\Gamma_{r2} \\vdash A} \\quad \\quad \\cfrac{\\Gamma_{r1}, A, B \\vdash B}{\\Gamma_{r2}', A \\wedge B \\vdash B} \\wedge_L}{\\Gamma_{525}, A \\wedge B \\vdash A \\wedge B} \\wedge_r$$" *)
+            (* ^"$$\\cfrac{\\Gamma_{r2} \\vdash A \\quad \\quad \\Gamma_{r2}', A \\wedge B \\vdash B}{\\Gamma_{523}, A \\wedge B \\vdash A \\wedge B} \\wedge_r$$" *)
 
-    (* fun permutabilty(rule1, other_rules, init_rule_ls, weak_left, weak_right) =
-        List.all(fn (rule2, valid) =>
-            permutes(rule1, rule2, init_rule_ls, weak_left, weak_right))other_rules *)
 
+  fun result_to_latex_strings ((true_list,fail_list)) = 
+  	let
+        val connector = "#@#"
+  		val true_strings = List.map (latex_res) true_list
+  		val fail_strings = List.map (fn (_,dvt) => "$$"^Latex.der_tree_toLatex2(dvt)^"$$") fail_list
+        val true_string = List.foldr (fn (x,y) => x^connector^y) "" true_strings
+        val fail_string = List.foldr (fn (x,y) => x^connector^y) "" fail_strings
+  	in
+  		true_string^"&*&"^fail_string
+  	end
+
+    fun permute_res ((right,wrong)) = 
+        (case (List.length(right),List.length(wrong)) of
+           ( 0 , 0 ) => "N/A@@@N/A"
+         | (_ , 0) => "The Rule Permutes@@@The first rule always permutes down the second. Permutations for the trees below are shown."
+         | (0,_) => "The Rule Does Not Permutes@@@The first rule never permutes down the second. No permutations for the trees below were found."
+         | (_,_) => "The Rule Permutes Sometimes@@@The first rule sometimes permutes down the second. Permutations for some of trees below are shown while there are no permutations for the other trees.")
+    
+    fun permute_res_to_string (res) = 
+        let
+            val remove_set2 = List.map (fn ((a,b),c) => (a,b)) res
+            val union = List.foldr (fn ((a,b),(c,d)) => (a@c,b@d)) ([],[]) remove_set2
+        in
+            permute_res(union)^"%%%"^result_to_latex_strings(union)
+        end
+    
+    fun writeFD fd content = 
+        let
+            val out = Posix.FileSys.wordToFD (Word64.fromInt(fd))
+            val text = Word8VectorSlice.full (Byte.stringToBytes(content))
+            val _ = Posix.IO.writeVec(out,text)
+        in () end
+
+    fun permute_final A = writeFD 3 (permute_res_to_string(permutes(A)))
+    
 
 
 
