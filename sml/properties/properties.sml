@@ -45,7 +45,7 @@ struct
 
     fun string_to_fresh(x) =
         let
-            val (x2,_) = (x^"_{"^ (Int.toString(!fresher))^"}",fresher:= !fresher + 1)
+            val (x2,_) = (x^"^{"^ (Int.toString(!fresher))^"}",fresher:= !fresher + 1)
         in
             x2
         end
@@ -497,9 +497,7 @@ struct
             ^"$$ \\leadsto $$"
             ^"$$"^Latex.der_tree_toLatex2(tree2)^"$$"
             (* ^"$$ \\leadsto $$"
-            ^"$$\\cfrac{\\overset{\\#}{\\Gamma_{r2} \\vdash A} \\quad \\quad \\cfrac{\\Gamma_{r1}, A, B \\vdash B}{\\Gamma_{r2}', A \\wedge B \\vdash B} \\wedge_L}{\\Gamma_{525}, A \\wedge B \\vdash A \\wedge B} \\wedge_r$$" *)
-            (* ^"$$\\cfrac{\\Gamma_{r2} \\vdash A \\quad \\quad \\Gamma_{r2}', A \\wedge B \\vdash B}{\\Gamma_{523}, A \\wedge B \\vdash A \\wedge B} \\wedge_r$$" *)
-
+            ^"$$\\cfrac{\\cfrac{\\cfrac{000}{\\Gamma_{r1}, A, B \\vdash A} }{\\Gamma1_{r2}', A \\wedge B \\vdash A} \\wedge_L \\quad \\quad \\cfrac{01}{\\Gamma2_{r2} \\vdash B} }{\\Gamma_{524}, A \\wedge B \\vdash A \\wedge B} \\wedge_r$$" *)
 
   fun result_to_latex_strings ((true_list,fail_list)) = 
   	let

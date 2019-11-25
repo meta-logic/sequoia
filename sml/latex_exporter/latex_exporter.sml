@@ -16,8 +16,8 @@ structure latexImpl : EXPORTLATEX = struct
                 val conclusion = "\\infer["^nm^"]{"^(D.seq_toString s)^"}"
             in conclusion^"{"^prem_latex^"}" end
 
-    fun der_tree_toLatex2 (D.DerTree(id, s, D.NoRule, pq)) = (D.seq_toString s)
-        | der_tree_toLatex2 (D.DerTree(id, s, D.RuleName nm, [])) = "\\cfrac{"^id^"}{"^(D.seq_toString s)^"} "^nm
+    fun der_tree_toLatex2 (D.DerTree(id, s, D.NoRule, pq)) = "\\cfrac{"^id^"}{"^(D.seq_toString s)^"} "
+        | der_tree_toLatex2 (D.DerTree(id, s, D.RuleName nm, [])) = "\\cfrac{}{"^(D.seq_toString s)^"} "^nm
         | der_tree_toLatex2 (D.DerTree(id, s, D.RuleName nm, pq)) = 
             let val fst = der_tree_toLatex2 (List.hd pq)
                 val rest = List.tl(pq)
