@@ -88,6 +88,56 @@ struct
     
 
 
+    fun print_seq_list (nil) = print "\n_______________________________\n"
+        | print_seq_list (x::L) = let
+            val _ = print (D.seq_toString(x)^"\n")
+        in
+            print_seq_list(L)
+        end
+
+    fun get_ctx_var_ctx (D.Ctx(A,_)) = A
+
+    fun get_ctx_var_ctx_struct (D.Empty) = []
+        | get_ctx_var_ctx_struct (D.Single (ctx)) = get_ctx_var_ctx ctx
+        | get_ctx_var_ctx_struct (D.Mult (_,ctx,ctx_struct)) = get_ctx_var_ctx(ctx)@get_ctx_var_ctx_struct(ctx_struct)
+
+    fun get_ctx_var_seq ( D.Seq(A,_,B)) = get_ctx_var_ctx_struct(A)@get_ctx_var_ctx_struct(B)
+
+    fun get_ctx_vars_der_tree (D.DerTree(_,S,_,L)) = get_ctx_var_seq(S)@get_ctx_vars_der_tree_list(L)
+    and get_ctx_vars_der_tree_list ([]) = []
+        |get_ctx_vars_der_tree_list (D::L) = get_ctx_vars_der_tree(D)@get_ctx_vars_der_tree_list(L)
+
+    fun get_ctx_vars_from_constraint((_,A,B)) = A@B
+
+    fun get_ctx_vars_from_constraints(nil) = []
+        |get_ctx_vars_from_constraints(x::L) = get_ctx_vars_from_constraint(x)@get_ctx_vars_from_constraints(L)
+
+
+
+    fun check_premises'((cn1,dvt1),(cn2,dvt2),weak) =
+        let
+            val D.DerTree(_,sq1,_,_) = dvt1
+            val D.DerTree(_,sq2,_,_) = dvt2
+            val t1_prems = List.map (fn (D.DerTree(_,seq,_,_)) => seq) (T.get_open_prems(dvt1))
+            val t2_prems = List.map (fn (D.DerTree(_,seq,_,_)) => seq) (T.get_open_prems(dvt2))
+            (*val goal = create_constraint(sq1,sq2)*)
+            val constraints = cn1@cn2
+            (*val _ = last1 := dvt1*)
+            (*val _ = last2 := dvt2*)
+            val t1_vars = List.map (fn (D.CtxVar(x))=>x) (get_ctx_vars_der_tree(dvt1)@get_ctx_vars_from_constraints(cn1))
+            val t2_vars = List.map (fn (D.CtxVar(x))=>x) (get_ctx_vars_der_tree(dvt2)@get_ctx_vars_from_constraints(cn2))
+            val t1_vars = Set.listItems(Set.addList(Set.empty,t1_vars))
+            val t2_vars = Set.listItems(Set.addList(Set.empty,t2_vars))
+            val t1_vars = List.map (fn x => D.CtxVar(x)) t1_vars
+            val t2_vars = List.map (fn x => D.CtxVar(x)) t2_vars
+(*            val _ = print_seq_list(t1_prems)
+            val _ = print_seq_list(t2_prems)
+            val _ = print ("\n\n\n")*)
+            val res = E.check_premises_wk(t1_prems,t2_prems,constraints,weak,t1_vars,t2_vars)
+            (*val _ = if res then print("true\n\n\n\n\n\n\n") else print("false\n\n\n\n\n\n\n")*)
+        in
+            res
+        end
 
 
 
@@ -184,6 +234,8 @@ struct
     fun subformula (A, D.Form(_,subforms) ) = List.exists (fn x => D.form_eq(A,x) orelse subformula(A,x)) subforms
         | subformula (_,_) = false
 
+
+
     (* check which formula  *)
     fun init_coherence_con ((con_form:Dat.form, rulesL: Dat.rule list, rulesR: Dat.rule list), init_rule: Dat.rule, axioms: Dat.rule list)=
         let
@@ -274,6 +326,13 @@ struct
         end
 
 
+        
+
+    
+
+
+
+
     (*  *)
     fun weakening_rule_context (rule: (Dat.rule) , (side,context_num) : Dat.side * int):bool = 
         let
@@ -297,33 +356,27 @@ struct
                  | Dat.Right => Dat.Seq(L,con,add_to_ctx(R,context_num))
                  | _ => s)
 
-            fun check (l) = List.exists (fn x => Dat.form_eq(x,weak_form)) l
+            fun make_weak_bool (side,context_num) = 
+                let
+                    
+                    fun add_false (1,list) = list
+                        | add_false (n , list) = (case Int.compare(n,1) of GREATER => add_false(n-1,false::list) | _ => [])
+                    val res = add_false(context_num,[true]) 
+                in
+                    (case side of D.Right => ([],res) | D.Left => (res,[]) | _ => ([],[]))
+                end
 
-            fun check_in_ctx(Dat.Empty,1) = false
-                | check_in_ctx(Dat.Single(Dat.Ctx(_,forms)),1) = check(forms)
-                | check_in_ctx(Dat.Mult(_,Dat.Ctx(_,forms),rest),index) = 
-                    (case Int.compare(index,1) of
-                        EQUAL => check(forms)
-                        | GREATER => check_in_ctx(rest,index-1)
-                        | LESS => false)
-                | check_in_ctx _ = false
+
             
-            fun check_in_seq (Dat.Seq(L,_,R)) =
-                (case side of
-                   Dat.Left => check_in_ctx(L,context_num)
-                 | Dat.Right => check_in_ctx(R,context_num)
-                 | _ => false)
-
-            fun check_leaves (l) = List.exists check_in_seq (List.map (fn Dat.DerTree(_,seq,_,_) => seq) l)
-
             val Dat.Rule(_,_,base,_) = rule
             val rule = update_rule(rule)
-            val base = add_to_seq(base)
-
-            val rule_applied_list = List.map (fn (_,_,tree) => tree) (T.apply_rule(([],[],D.DerTree("0",base,Dat.NoRule,[])),rule,"0"))
+            val base2 = add_to_seq(base)
+            val rule_applied_list = List.map (fn (_,cons,tree) => (cons,tree)) (T.apply_rule(([],[],D.DerTree("0",base,Dat.NoRule,[])),rule,"0"))
+            val rule_applied_list_weak = List.map (fn (_,cons,tree) => (cons,tree)) (T.apply_rule(([],[],D.DerTree("0",base2,Dat.NoRule,[])),rule,"0"))
+            val res = List.all (fn (t1) => List.exists (fn (t2) => check_premises'(t1,t2,make_weak_bool(side,context_num)) ) rule_applied_list_weak ) rule_applied_list
 
         in
-          List.exists (fn Dat.DerTree(_,_,Dat.NoRule,_)=> false | Dat.DerTree(_,seq,_,prems) => check_in_seq(seq) andalso check_leaves(prems) ) rule_applied_list
+          res
         end
 
     
@@ -345,57 +398,8 @@ struct
             (List.map test l_ctx, List.map test r_ctx)
         end
 
-        
 
-    fun print_seq_list (nil) = print "\n_______________________________\n"
-        | print_seq_list (x::L) = let
-            val _ = print (D.seq_toString(x)^"\n")
-        in
-            print_seq_list(L)
-        end
-
-    fun get_ctx_var_ctx (D.Ctx(A,_)) = A
-
-    fun get_ctx_var_ctx_struct (D.Empty) = []
-        | get_ctx_var_ctx_struct (D.Single (ctx)) = get_ctx_var_ctx ctx
-        | get_ctx_var_ctx_struct (D.Mult (_,ctx,ctx_struct)) = get_ctx_var_ctx(ctx)@get_ctx_var_ctx_struct(ctx_struct)
-
-    fun get_ctx_var_seq ( D.Seq(A,_,B)) = get_ctx_var_ctx_struct(A)@get_ctx_var_ctx_struct(B)
-
-    fun get_ctx_vars_der_tree (D.DerTree(_,S,_,L)) = get_ctx_var_seq(S)@get_ctx_vars_der_tree_list(L)
-    and get_ctx_vars_der_tree_list ([]) = []
-        |get_ctx_vars_der_tree_list (D::L) = get_ctx_vars_der_tree(D)@get_ctx_vars_der_tree_list(L)
-
-    fun get_ctx_vars_from_constraint((_,A,B)) = A@B
-
-    fun get_ctx_vars_from_constraints(nil) = []
-        |get_ctx_vars_from_constraints(x::L) = get_ctx_vars_from_constraint(x)@get_ctx_vars_from_constraints(L)
-
-
-    fun check_premises'((cn1,dvt1),(cn2,dvt2),weak) =
-        let
-            val D.DerTree(_,sq1,_,_) = dvt1
-            val D.DerTree(_,sq2,_,_) = dvt2
-            val t1_prems = List.map (fn (D.DerTree(_,seq,_,_)) => seq) (T.get_open_prems(dvt1))
-            val t2_prems = List.map (fn (D.DerTree(_,seq,_,_)) => seq) (T.get_open_prems(dvt2))
-            (*val goal = create_constraint(sq1,sq2)*)
-            val constraints = cn1@cn2
-            (*val _ = last1 := dvt1*)
-            (*val _ = last2 := dvt2*)
-            val t1_vars = List.map (fn (D.CtxVar(x))=>x) (get_ctx_vars_der_tree(dvt1)@get_ctx_vars_from_constraints(cn1))
-            val t2_vars = List.map (fn (D.CtxVar(x))=>x) (get_ctx_vars_der_tree(dvt2)@get_ctx_vars_from_constraints(cn2))
-            val t1_vars = Set.listItems(Set.addList(Set.empty,t1_vars))
-            val t2_vars = Set.listItems(Set.addList(Set.empty,t2_vars))
-            val t1_vars = List.map (fn x => D.CtxVar(x)) t1_vars
-            val t2_vars = List.map (fn x => D.CtxVar(x)) t2_vars
-(*            val _ = print_seq_list(t1_prems)
-            val _ = print_seq_list(t2_prems)
-            val _ = print ("\n\n\n")*)
-            val res = E.check_premises_wk(t1_prems,t2_prems,constraints,weak,t1_vars,t2_vars)
-            (*val _ = if res then print("true\n\n\n\n\n\n\n") else print("false\n\n\n\n\n\n\n")*)
-        in
-            res
-        end
+    
 
     (*TODO: if you can't apply a rule twice, should not return true*)
     fun permutes(rule1, rule2, init_rule_ls, weak) =
@@ -474,13 +478,19 @@ struct
 
             val D.Rule(name1, side1, conc1, premises1) = rule1
             val D.Rule(name2, side2, conc2, premises2) = rule2
+            
             val bases = (create_base(rule1, rule2))
-            val bases = List.map(fn conc => D.DerTree("0",seq_to_fresh(conc),D.NoRule,[])) bases
-            val opens1 = stack_rules(bases, rule1, rule2, init_rule_ls)
-            val bases = List.map(fn D.DerTree(_,conc,_,_) => D.DerTree("0",seq_to_fresh(conc),D.NoRule,[])) bases
-            val rule1 = update_rule(rule1)
-            val rule2 = update_rule(rule2)
-            val opens2 = stack_rules(bases, rule2, rule1, init_rule_ls)
+            val bases_pairs = List.map (fn conc => (D.DerTree("0",seq_to_fresh(conc),D.NoRule,[]),D.DerTree("0",seq_to_fresh(conc),D.NoRule,[]))) bases
+            val (bases1 , bases2 ) = ListPair.unzip(bases_pairs)
+            val rule1' = update_rule(rule1)
+            val rule2' = update_rule(rule2)
+
+            
+            val opens1 = stack_rules(bases1, rule1', rule2', init_rule_ls)
+            
+            val rule1' = update_rule(rule1)
+            val rule2' = update_rule(rule2)
+            val opens2 = stack_rules(bases2, rule2', rule1', init_rule_ls)
 
 
         in
