@@ -3,41 +3,41 @@ struct
   structure D = datatypesImpl
   structure P = Properties
 
-  val t = ref 1000000000
+  val t = ref 3
 
   val ptrue = D.Atom("\\top")
   val pfalse = D.Atom("\\bot")
 
   fun generic_atom_P () = 
   	let
-  		val (name,_) = ("P"^ Int.toString(!t),t := !t + 1)
+  		val (name) = ("P_{"^ Int.toString(!t)^"}" ) before ( t:= !t +1)
   	in
   		D.AtomVar(name)
   	end
   fun generic_form_A () = 
   	let
-  		val (name,_) = ("A"^ Int.toString(!t),t := !t + 1)
+  		val (name) = ("A_{"^ Int.toString(!t)^"}" ) before ( t:= !t +1)
   	in
   		D.FormVar(name)
   	end
 
   fun generic_form_B () = 
   	let
-  		val (name,_) = ("B" ^ Int.toString(!t) , t:= !t +1)
+  		val (name) = ("B_{" ^ Int.toString(!t)^"}" ) before ( t:= !t +1)
   	in
   		D.FormVar(name)
   	end
 
   fun generic_form_C () = 
   	let
-  		val (name,_) = ("C" ^ Int.toString(!t) , t:= !t +1)
+  		val (name) = ("C_{" ^ Int.toString(!t)^"}" ) before ( t:= !t +1)
   	in
   		D.FormVar(name)
   	end
 
   fun generic_ctx_var () = 
   	let
-  		val (name,_) = ("\\Gamma" ^ Int.toString(!t) , t:= !t +1)
+  		val name = ("\\Gamma_{"^ Int.toString(!t)^"}" ) before ( t:= !t +1)
   	in
   		D.CtxVar(name)
   	end
@@ -185,87 +185,118 @@ struct
   	val orR = [orR1()]
 
   	val orL1 = [orL()] 
+	
+	val A = generic_atom_P()
+	val B = generic_atom_P()
 
+	val weak_rule_list =  [andR(),andL(),impR(),impL(),orR1(),orR2(),orL(),trueR(), falseL(), id(), init()]
+	val init_rule_list = [id()]
+	val rule_pairs_no_init = [(andForm(A,B),[andR()],[andL()]),(impForm(A,B),[impR()],[impL()]),(orForm(A,B),[orR1(),orR2()],[orL()])]
+	val axiom_list = [trueR(), falseL()]
+
+	fun weak_test  () = P.weakening(weak_rule_list)
+
+	fun init_coherence_test () = P.init_coherence(rule_pairs_no_init,init_rule_list,axiom_list)
+
+	val weak: (bool list * bool list) option ref = ref NONE
   	fun test([R1],nil) = raise Fail "no R2"
-  		| test([R1],[R2]) = P.permutes(R1,R2,[],([],[]))
+  		| test([R1],[R2]) = 
+			let
+			  	val () = (case (!weak) of NONE => ignore (weak:= SOME (weak_test())) | _ => ())
+				val weak_res = Option.valOf(!weak);
+			in
+			  P.permute_final(R1,R2,[],weak_res)
+			end 
   		
 
 
   	(*imp L as R1:*)
- (* 	val impL_impL = test(impL1,impL2)
-  	val impL_impR = test(impL1,impR1)
-  	val impL_andL = test(impL1,andL1)
-  	val impL_andR = test(impL1,andR1)
-  	val impL_orL = test(impL1,orL1)
-  	val impL_orR = test(impL1,orR)*)
+	fun impL_permutes () = 
+		let
+			val impL_impL = test(impL1,impL2)
+			val impL_impR = test(impL1,impR1)
+			val impL_andL = test(impL1,andL1)
+			val impL_andR = test(impL1,andR1)
+			val impL_orL = test(impL1,orL1)
+			val impL_orR = test(impL1,orR)
 
-  	(*val SOME false = impL_andL*)
+			
 
- (* 	val impL_inorder = [impL_impL,
-  											impL_impR,
-  											impL_andL,
-  											impL_andR,
-  											impL_orL,
-  											impL_orR]*)
+			val impL_inorder = [impL_impL,
+													impL_impR,
+													impL_andL,
+													impL_andR,
+													impL_orL,
+													impL_orR]
+			in 
+			impL_inorder
+		end
 
 		(*imp R as R1:*)
-(*  	val impR_impL = test(impR1,impL1)
-  	val impR_impR = test(impR1,impR2)
-  	val impR_andL = test(impR1,andL1)
-  	val impR_andR = test(impR1,andR1)
-  	val impR_orL = test(impR1,orL1)
-  	val impR_orR = test(impR1,orR)*)
+	fun impR_permutes () = 
+		let
+			val impR_impL = test(impR1,impL1)
+			val impR_impR = test(impR1,impR2)
+			val impR_andL = test(impR1,andL1)
+			val impR_andR = test(impR1,andR1)
+			val impR_orL = test(impR1,orL1)
+			val impR_orR = test(impR1,orR)
 
-  	(*val NONE = impR_impR
-  	val NONE = impR_andR
-  	val NONE = impR_orR*)
 
-  	(*val SOME false = impR_impL*)
-(*
-  	val impR_inorder = [impR_impL,
-  											impR_impR,
-  											impR_andL,
-  											impR_andR,
-  											impR_orL,
-  											impR_orR]*)
+			val impR_inorder = [impR_impL,
+													impR_impR,
+													impR_andL,
+													impR_andR,
+													impR_orL,
+													impR_orR]
+		in 
+			impR_inorder
+		end
 
 
   	(*and L as R1:*)
-(*  	val andL_impL = test(andL1,impL1)
-  	val andL_impR = test(andL1,impR1)
-  	val andL_andL = test(andL1,andL2)
-  	val andL_andR = test(andL1,andR1)
-  	val andL_orL = test(andL1,orL1)
-  	val andL_orR = test(andL1,orR)
-*)
-  	
-(*
-  	val andL_inorder = [andL_impL,
-  											andL_impR,
-  											andL_andL,
-  											andL_andR,
-  											andL_orL,
-  											andL_orR]*)
+	fun andL_permutes () = 
+		let
+			val andL_impL = test(andL1,impL1)
+			val andL_impR = test(andL1,impR1)
+			val andL_andL = test(andL1,andL2)
+			val andL_andR = test(andL1,andR1)
+			val andL_orL = test(andL1,orL1)
+			val andL_orR = test(andL1,orR)
+
+			
+
+			val andL_inorder = [andL_impL,
+													andL_impR,
+													andL_andL,
+													andL_andR,
+													andL_orL,
+													andL_orR]
+		in
+			andL_inorder
+		end
+
 
 		(*and R as R1:*)
-(*  	val andR_impL = test(andR1,impL1)
-  	val andR_impR = test(andR1,impR1)
-  	val andR_andL = test(andR1,andL1)
-  	val andR_andR = test(andR1,andR2)
-  	val andR_orL = test(andR1,orL1)
-  	val andR_orR = test(andR1,orR)
-*)
-  	(*val NONE = andR_impR
-  	val NONE = andR_andR
-  	val NONE = andR_orR
-*)
-(*  	val andR_inorder = [andR_impL,
-  											andR_impR,
-  											andR_andL,
-  											andR_andR,
-  											andR_orL,
-  											andR_orR]
-*)
+	fun andR_permutes () =
+		let
+			val andR_impL = test(andR1,impL1)
+			val andR_impR = test(andR1,impR1)
+			val andR_andL = test(andR1,andL1)
+			val andR_andR = test(andR1,andR2)
+			val andR_orL = test(andR1,orL1)
+			val andR_orR = test(andR1,orR)
+
+
+			val andR_inorder = [andR_impL,
+													andR_impR,
+													andR_andL,
+													andR_andR,
+													andR_orL,
+													andR_orR]
+		in
+			andR_inorder
+		end
 
 
 end
