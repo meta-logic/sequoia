@@ -10,34 +10,34 @@ struct
 
   fun generic_atom_P () = 
   	let
-  		val (name) = ("P^{"^ Int.toString(!t)^"}" ) before ( t:= !t +1)
+  		val (name) = ("P_{"^ Int.toString(!t)^"}" ) before ( t:= !t +1)
   	in
   		D.AtomVar(name)
   	end
   fun generic_form_A () = 
   	let
-  		val (name) = ("A^{"^ Int.toString(!t)^"}" ) before ( t:= !t +1)
+  		val (name) = ("A_{"^ Int.toString(!t)^"}" ) before ( t:= !t +1)
   	in
   		D.FormVar(name)
   	end
 
   fun generic_form_B () = 
   	let
-  		val (name) = ("B^{" ^ Int.toString(!t)^"}" ) before ( t:= !t +1)
+  		val (name) = ("B_{" ^ Int.toString(!t)^"}" ) before ( t:= !t +1)
   	in
   		D.FormVar(name)
   	end
 
   fun generic_form_C () = 
   	let
-  		val (name) = ("C^{" ^ Int.toString(!t)^"}" ) before ( t:= !t +1)
+  		val (name) = ("C_{" ^ Int.toString(!t)^"}" ) before ( t:= !t +1)
   	in
   		D.FormVar(name)
   	end
 
   fun generic_ctx_var () = 
   	let
-  		val name = ("\\Gamma^{"^ Int.toString(!t)^"}" ) before ( t:= !t +1)
+  		val name = ("\\Gamma_{"^ Int.toString(!t)^"}" ) before ( t:= !t +1)
   	in
   		D.CtxVar(name)
   	end

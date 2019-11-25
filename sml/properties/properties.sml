@@ -45,7 +45,7 @@ struct
 
     fun string_to_fresh(x) =
         let
-            val (x2,_) = (x^"_{"^ (Int.toString(!fresher))^"}",fresher:= !fresher + 1)
+            val (x2,_) = (x^"^{"^ (Int.toString(!fresher))^"}",fresher:= !fresher + 1)
         in
             x2
         end
@@ -478,13 +478,19 @@ struct
 
             val D.Rule(name1, side1, conc1, premises1) = rule1
             val D.Rule(name2, side2, conc2, premises2) = rule2
+            
             val bases = (create_base(rule1, rule2))
-            val bases = List.map(fn conc => D.DerTree("0",seq_to_fresh(conc),D.NoRule,[])) bases
-            val opens1 = stack_rules(bases, rule1, rule2, init_rule_ls)
-            val bases = List.map(fn D.DerTree(_,conc,_,_) => D.DerTree("0",seq_to_fresh(conc),D.NoRule,[])) bases
-            val rule1 = update_rule(rule1)
-            val rule2 = update_rule(rule2)
-            val opens2 = stack_rules(bases, rule2, rule1, init_rule_ls)
+            val bases_pairs = List.map (fn conc => (D.DerTree("0",seq_to_fresh(conc),D.NoRule,[]),D.DerTree("0",seq_to_fresh(conc),D.NoRule,[]))) bases
+            val (bases1 , bases2 ) = ListPair.unzip(bases_pairs)
+            val rule1' = update_rule(rule1)
+            val rule2' = update_rule(rule2)
+
+            
+            val opens1 = stack_rules(bases1, rule1', rule2', init_rule_ls)
+            
+            val rule1' = update_rule(rule1)
+            val rule2' = update_rule(rule2)
+            val opens2 = stack_rules(bases2, rule2', rule1', init_rule_ls)
 
 
         in
@@ -504,9 +510,9 @@ struct
 
   fun result_to_latex_strings ((true_list,fail_list)) = 
   	let
-        val connector = "\n\\newline\n"
+        val connector = "\n\n"
   		val true_strings = List.map (latex_res) true_list
-  		val fail_strings = List.map (fn (_,dvt) => Latex.der_tree_toLatex(dvt)) fail_list
+  		val fail_strings = List.map (fn (_,dvt) => "\\[\n"^Latex.der_tree_toLatex(dvt)^"\n\\]") fail_list
         val true_string = List.foldr (fn (x,y) => x^connector^y) "" true_strings
         val fail_string = List.foldr (fn (x,y) => x^connector^y) "" fail_strings
   		(* val set2_strings = List.map (fn (_,dvt) => Latex.der_tree_toLatex(dvt)) set2 *)
