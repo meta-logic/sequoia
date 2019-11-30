@@ -23,8 +23,9 @@ struct
 
     val other_fresh = ref 1000000;
     val term_fresh = ref 10000;
-    val fresher = ref 523;
-    val rule_fresh = ref 1
+    val fresher = ref 1;
+    val rule_fresh = fresher
+    val var_index = fresher
 
     fun generic_seq( D.Seq(a, c, b)) =
         let
@@ -41,16 +42,22 @@ struct
 
 
 
+    fun fresh'(x:string):string = (x ^"^{p"^ (Int.toString(!var_index)) ^"}")
 
+    val hat::_ = String.explode("^")
 
-    fun string_to_fresh(x) =
-        let
-            val (x2,_) = (x^"^{"^ (Int.toString(!fresher))^"}",fresher:= !fresher + 1)
-        in
-            x2
-        end
+    fun remove_hat' (nil) = nil
+        |remove_hat' (x::L) = (case (x=hat) of true => [] | false => x::remove_hat'(L))
 
-    fun ctx_var_to_fresh(D.CtxVar(x)) = D.CtxVar(string_to_fresh(x))
+    fun remove_hat (x) = String.implode(remove_hat'(String.explode(x)))
+    (* nuke version *)
+    fun fresh(x:string):string = fresh'(remove_hat(x))
+
+    fun string_to_fresh(x) = fresh(x)
+
+    fun update_string (x) = string_to_fresh(x)
+
+    fun ctx_var_to_fresh(D.CtxVar(x)) = D.CtxVar(string_to_fresh(x)) before (fresher := !fresher + 1)
 
     fun ctx_to_fresh(D.Ctx(ctx_vars,forms)) = D.Ctx(List.map ctx_var_to_fresh ctx_vars,forms)
 
@@ -60,7 +67,7 @@ struct
 
     fun seq_to_fresh(D.Seq(ctx_s,con,ctx_s2)) = D.Seq(ctx_struct_to_fresh(ctx_s),con,ctx_struct_to_fresh(ctx_s2))
 
-    fun update_string (x) = x^"^{r"^(Int.toString(!rule_fresh))^"}"
+    
 
     fun update_ctx_var (Dat.CtxVar(x)) = Dat.CtxVar(update_string(x))
 
@@ -334,11 +341,11 @@ struct
 
 
     (*  *)
-    fun weakening_rule_context (rule: (Dat.rule) , (side,context_num) : Dat.side * int):bool = 
+    fun weakening_rule_context (rule: (Dat.rule) , (side,context_num) : Dat.side * int) = 
         let
 
             val res = false
-            val weak_form = Dat.Form(Dat.Con("weakening"),[])
+            val weak_form = Dat.Atom "weakening"
 
             fun add_to_ctx(Dat.Empty,1) = Dat.Empty
                 | add_to_ctx(Dat.Single(Dat.Ctx(vars,forms)),1) = Dat.Single(Dat.Ctx(vars,weak_form::forms))
@@ -369,18 +376,31 @@ struct
 
             
             val Dat.Rule(_,_,base,_) = rule
+            val base = atomize_seq(base)
             val rule = update_rule(rule)
             val base2 = add_to_seq(base)
             val rule_applied_list = List.map (fn (_,cons,tree) => (cons,tree)) (T.apply_rule(([],[],D.DerTree("0",base,Dat.NoRule,[])),rule,"0"))
             val rule_applied_list_weak = List.map (fn (_,cons,tree) => (cons,tree)) (T.apply_rule(([],[],D.DerTree("0",base2,Dat.NoRule,[])),rule,"0"))
-            val res = List.all (fn (t1) => List.exists (fn (t2) => check_premises'(t1,t2,make_weak_bool(side,context_num)) ) rule_applied_list_weak ) rule_applied_list
+            val res2 = List.map (fn (t1) => (t1,List.find (fn (t2) => check_premises'(t1,t2,make_weak_bool(side,context_num)) ) rule_applied_list_weak ) ) rule_applied_list
+            
+            val res = List.all (fn (_,r) => Option.isSome(r)) res2
 
+            val res2 = List.mapPartial (fn (_,NONE) => NONE | (t1,SOME t2) => SOME (t1,t2) ) res2
+            
         in
-          res
+          (res,res2)
         end
 
     
-    fun weakening_context (rules,ctx) = List.all (fn rule => weakening_rule_context(rule,ctx)) rules
+    fun weakening_context (rules,ctx) = 
+        let
+            val tests = List.map (fn rule => weakening_rule_context(rule,ctx)) rules
+            val (bools,proofs) = ListPair.unzip tests
+            val res = List.all (fn x => x) bools
+            val res2 = List.concat proofs
+        in
+            (res,res2)
+        end
 
     fun count_contexts (ctx_struct,index) = 
         (case ctx_struct of
@@ -393,7 +413,7 @@ struct
             val Dat.Seq(L,_,R) = conc
             val (l_num,r_num) = (count_contexts(L,1), count_contexts (R,1))
             val (l_ctx,r_ctx) = (List.tabulate (l_num,fn i => (Dat.Left,i+1)) , List.tabulate (r_num,fn i => (Dat.Right,i+1)) )
-            fun test x = weakening_context(rules,x)
+            fun test x = let val (res,_) = weakening_context(rules,x) in res end
         in
             (List.map test l_ctx, List.map test r_ctx)
         end
@@ -481,15 +501,18 @@ struct
             
             val bases = (create_base(rule1, rule2))
             val bases_pairs = List.map (fn conc => (D.DerTree("0",seq_to_fresh(conc),D.NoRule,[]),D.DerTree("0",seq_to_fresh(conc),D.NoRule,[]))) bases
-            val (bases1 , bases2 ) = ListPair.unzip(bases_pairs)
-            val rule1' = update_rule(rule1)
-            val rule2' = update_rule(rule2)
 
-            
+            val rule1' = rule1
+            val rule2' = rule2
+
+            val (bases1 , bases2 ) = ListPair.unzip(bases_pairs)
+            (* val rule1' = update_rule(rule1)
+            val rule2' = update_rule(rule2) *)
+
             val opens1 = stack_rules(bases1, rule1', rule2', init_rule_ls)
-            
-            val rule1' = update_rule(rule1)
-            val rule2' = update_rule(rule2)
+
+            (* val rule1' = update_rule(rule1)
+            val rule2' = update_rule(rule2) *)
             val opens2 = stack_rules(bases2, rule2', rule1', init_rule_ls)
 
 
