@@ -14,8 +14,8 @@ sig
 	(* checks if init_coherence_con is true for all connectives for each init rule *)
 	val init_coherence : ((D.form * D.rule list * D.rule list) list * D.rule list* D.rule list) -> bool list
 	
-	val weakening_rule_context : (D.rule * (D.side * int)) -> bool
-	val weakening_context : (D.rule list * (D.side * int)) -> bool
+	val weakening_rule_context : (D.rule * (D.side * int)) -> bool * ((constraint list * D.der_tree) * (constraint list * D.der_tree)) list
+	val weakening_context : (D.rule list * (D.side * int)) -> bool * ((constraint list * D.der_tree) * (constraint list * D.der_tree)) list
 	val weakening : D.rule list -> (bool list) * (bool list)
 	val weakening_print : D.rule list -> unit
 

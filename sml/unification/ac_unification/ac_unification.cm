@@ -1,0 +1,7 @@
+Group
+  signature ACUNIFICATION
+  structure ACUnify
+is
+  ../../basics/basics.cm
+  ac_unification.sig
+  ac_unification.sml

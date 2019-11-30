@@ -154,7 +154,7 @@
 
     fun writeFD fd content = 
         let
-            val out = Posix.FileSys.wordToFD (Word64.fromInt(fd))
+            val out = Posix.FileSys.wordToFD (SysWord.fromInt(fd))
             val text = Word8VectorSlice.full (Byte.stringToBytes(content))
             val _ = Posix.IO.writeVec(out,text)
         in () end
