@@ -13,6 +13,23 @@ structure unifyImpl : UNIFICATION = struct
 
     val init_fresh = ref 100;
 
+    val var_index = ref 1;
+
+    fun change_index (x:int): unit = ignore (var_index := x)
+
+    fun get_index ():int = !var_index
+
+    fun fresh'(x:string):string = (x ^"^{"^ (Int.toString(!var_index)) ^"}") before (var_index := !var_index + 1)
+
+    val hat::_ = String.explode("^")
+
+    fun remove_hat' (nil) = nil
+        |remove_hat' (x::L) = (case (x=hat) of true => [] | false => x::remove_hat'(L))
+
+    fun remove_hat (x) = String.implode(remove_hat'(String.explode(x)))
+    (* nuke version *)
+    fun fresh(x:string):string = fresh'(remove_hat(x))
+
 
     (*TODO: remove duplicate or remove both*)
     fun printF (NONE) = []
@@ -126,7 +143,9 @@ structure unifyImpl : UNIFICATION = struct
 
     fun Unify_ctx (DAT.Ctx(vl1, fl1), DAT.Ctx(vl2, fl2)) =
         let
-            fun fresh(DAT.CtxVar(x)) = DAT.CtxVar(x ^ "'")
+            
+
+            fun update_ctx_var (DAT.CtxVar(x)) = DAT.CtxVar(fresh(x))
 
             fun get_constraint (g1, g2) = 
                 let val () = () in init_fresh := !init_fresh + 1;
@@ -155,14 +174,15 @@ structure unifyImpl : UNIFICATION = struct
                                 List.map(fn (p,g) =>
                                     if List.length(p) = 0 then
                                         if List.length(vl1) = 0 then DAT.CTXs(g, DAT.Ctx([], []))
-                                        else DAT.CTXs(g, DAT.Ctx([g], []))
+                                        else DAT.CTXs(g, DAT.Ctx([update_ctx_var(g)], [])) 
                                     else 
                                         if List.length(vl1) = 0 then DAT.CTXs(g, DAT.Ctx([], p))
-                                        else DAT.CTXs(g, DAT.Ctx([fresh(g)], p))
+                                        else DAT.CTXs(g, DAT.Ctx([update_ctx_var(g)], p))
                                 )(ListPair.zip(pf, vl2))
                             )part
                     in vl_sigmas end
 
+            (* form_list1, variable_list1, form_list2, var_list2 ??? *)
             fun try_partitions (fl1, vl1, fl2, vl2) =
                 let val sigma1 = part (vl1, fl1, vl2)
                     val sigma2 = part (vl2, fl2, vl1)
