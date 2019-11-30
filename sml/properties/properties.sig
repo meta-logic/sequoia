@@ -17,9 +17,10 @@ sig
 	val weakening_rule_context : (D.rule * (D.side * int)) -> bool
 	val weakening_context : (D.rule list * (D.side * int)) -> bool
 	val weakening : D.rule list -> (bool list) * (bool list)
+	val weakening_print : D.rule list -> unit
 
 	val check_premises' : (constraint list * D.der_tree)*(constraint list * D.der_tree) * (bool list * bool list) -> bool
 	val permutes : D.rule * D.rule * D.rule list * (bool list * bool list) -> (((((constraint list * D.der_tree) * (constraint list * D.der_tree)) list) * ((constraint list * D.der_tree) list)) * (constraint list * D.der_tree) list) list
-	val permute_final : D.rule * D.rule * D.rule list * (bool list * bool list) -> unit
+	val permute_print : D.rule * D.rule * D.rule list * (bool list * bool list) -> unit
 end
 

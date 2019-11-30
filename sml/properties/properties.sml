@@ -26,6 +26,13 @@ struct
     val fresher = ref 523;
     val rule_fresh = ref 1
 
+    fun writeFD fd content = 
+        let
+            val out = Posix.FileSys.wordToFD (Word64.fromInt(fd))
+            val text = Word8VectorSlice.full (Byte.stringToBytes(content))
+            val _ = Posix.IO.writeVec(out,text)
+        in () end
+
     fun generic_seq( D.Seq(a, c, b)) =
         let
             fun gen_out(D.Empty) = D.Empty
@@ -36,7 +43,7 @@ struct
                 let val () = () in other_fresh := !other_fresh + 1;
                 D.Mult(con,D.Ctx([D.CtxVar ("Gamma_{" ^ Int.toString(!other_fresh)^"}")],nil),gen_out rest) end
         in
-             D.Seq(gen_out a, c, gen_out b)
+            D.Seq(gen_out a, c, gen_out b)
         end
 
 
@@ -141,79 +148,6 @@ struct
 
 
 
-(*
-        fun weak_admissability(rules) =
-            let val D.Rule(name, side, sequent, premises) = List.hd(rules)
-                val general = generic_seq sequent
-                val term = let val () = () in term_fresh := !term_fresh + 1;
-                        D.Form(Int.toString !term_fresh) end
-                fun add_term_ctx_struct(D.Empty, term) = [D.Empty]
-                    | add_term_ctx_struct(D.Single(D.Ctx(vl,fl)), term) = [D.Single(D.Ctx(vl,fl@term))]
-                    | add_term_ctx_struct(D.Mult(con,D.Ctx(vl,fl),rest), term) =
-                        let val beginning = D.Mult(con,D.Ctx(vl,fl@term),rest)
-                            val ladder = List.map(fn r =>  D.Mult(con,D.Ctx(vl,fl), r))(add_term_ctx_struct rest)
-                        in beginning :: ladder end
-                fun add_term_seq( D.Seq(l,c,r), term) =
-                    List.map(fn strct =>  D.Seq(strct,c,r))(add_term_ctx_struct(l,term))
-                    @ List.map(fn strct =>  D.Seq(l,c,strct))(add_term_ctx_struct(r,term))
-                fun get_start(D.Rule(nm, sd, sq, pm), gen) =
-                    (case U.Unify_seq(gen, sq) of NONE => NONE
-                    | SOME(sgcn) => SOME(List.hd(List.map(fn (sg,cn) => App.apply_seq_Unifier(gen,sg))sgcn)))
-                fun check(rule, st, term) = (case st of NONE => false | SOME(start) =>
-                    let
-                    val premises_ls = List.map (fn tree => get_open_prems tree)
-                        (apply_rule(([],[],D.DerTree("0",start,D.NoRule,[])), rule, "0"))
-                    val start_added = add_term_seq(start,term)
-                    val s = List.map(fn nsq => get_start(rule, nsq))start_added
-                    in
-                    s
-                    end)
-            in
-            true
-            end
-                     *)
-(*
-    fun empty_out_ctx(D.Empty) = D.Empty
-        | empty_out_ctx(D.Single(D.Ctx(vl,fl))) = D.Single(D.Ctx(nil,fl))
-        | empty_out_ctx(D.Mult(con,D.Ctx(vl,fl),rest)) = D.Mult(con,D.Ctx(nil,fl),empty_out_ctx rest)
-
-    fun empty_out_seq( D.Seq(a, c, b)) =  D.Seq(empty_out_ctx a, c, empty_out_ctx b)
-
-    fun init_coherence(con_form, rulesL, rulesR, init_rule_ls) =
-        let
-            fun init_coh_aux(con_form, rules1, rules2, init_rule_ls) =
-                let val start_seqs =
-                            List.map(fn D.Rule(name_init, side_init, conc_init, premises_init) =>
-                                let val form_subs = List.map(fn frm => Fs(frm, con_form))(get_forms(conc_init))
-                                    val new_sq = T.atomic_transform
-                                    (App.apply_seq_Unifier(empty_out_seq conc_init, form_subs))
-                                in (D.DerTree("0",new_sq,D.NoRule,[])) end)init_rule_ls
-                    val fst_apply =
-                            List.foldl(fn (tree, ls) =>
-                                apply_multiple_rules_all_ways(([], [], tree), rules1) @ ls
-                            )([])start_seqs
-                    val snd_apply =
-                            List.foldl(fn ((_, constraints, tree), ls) =>
-                                apply_multiple_rules_all_ways(([], constraints, tree), rules2) @ ls
-                            )([])fst_apply
-                    val init_apply =
-                            List.foldl(fn ((_, constraints, tree), ls) =>
-                                apply_multiple_rules_all_ways(([], constraints, tree), init_rule_ls) @ ls
-                            )([])snd_apply
-                in
-                    List.exists(fn (fm,_,dt) => closed_tree dt
-                    andalso
-                    List.all(fn f => form_larger(con_form, f))fm)init_apply
-
-                end
-        in
-            init_coh_aux(con_form, rulesL, rulesR, init_rule_ls)
-            orelse
-            init_coh_aux(con_form, rulesR, rulesL, init_rule_ls)
-        end *)
-
-    (* checks if the init coherence property holds for a specific connective, with specific left, right, and init rules*)
-    (*  *)
 
     fun atomize(Dat.Atom(x)) = Dat.Atom(x)
       | atomize(Dat.AtomVar(x)) = Dat.Atom(x)
@@ -326,7 +260,7 @@ struct
         end
 
 
-        
+    (* fun init_coherence_print  *)
 
     
 
@@ -398,8 +332,13 @@ struct
             (List.map test l_ctx, List.map test r_ctx)
         end
 
-
-    
+    fun weakening_print rules = 
+        let 
+            val (L,R) = weakening(rules)
+            val pL = List.foldr (fn (a,b) => if a then "T$$$"^b  else "F$$$"^b) "" L
+            val pR = List.foldr (fn (a,b) => if a then "T$$$"^b  else "F$$$"^b) "" R
+            val pLR = pL ^ "###" ^ pR
+        in writeFD 3 pLR end
 
     (*TODO: if you can't apply a rule twice, should not return true*)
     fun permutes(rule1, rule2, init_rule_ls, weak) =
@@ -506,8 +445,6 @@ struct
             "$$"^Latex.der_tree_toLatex2(tree1)^"$$"
             ^"$$ \\leadsto $$"
             ^"$$"^Latex.der_tree_toLatex2(tree2)^"$$"
-            (* ^"$$ \\leadsto $$"
-            ^"$$\\cfrac{\\cfrac{\\cfrac{000}{\\Gamma_{r1}, A, B \\vdash A} }{\\Gamma1_{r2}', A \\wedge B \\vdash A} \\wedge_L \\quad \\quad \\cfrac{01}{\\Gamma2_{r2} \\vdash B} }{\\Gamma_{524}, A \\wedge B \\vdash A \\wedge B} \\wedge_r$$" *)
 
   fun result_to_latex_strings ((true_list,fail_list)) = 
   	let
@@ -534,15 +471,8 @@ struct
         in
             permute_res(union)^"%%%"^result_to_latex_strings(union)
         end
-    
-    fun writeFD fd content = 
-        let
-            val out = Posix.FileSys.wordToFD (Word64.fromInt(fd))
-            val text = Word8VectorSlice.full (Byte.stringToBytes(content))
-            val _ = Posix.IO.writeVec(out,text)
-        in () end
 
-    fun permute_final A = writeFD 3 (permute_res_to_string(permutes(A)))
+    fun permute_print A = writeFD 3 (permute_res_to_string(permutes(A)))
     
 
 
