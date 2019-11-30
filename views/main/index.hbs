@@ -3,50 +3,48 @@
 <div id="user_id" hidden>TEMP</div>
 <div id="section" class="ui middle aligned center aligned teal huge header">Calculi</div>
 
-<div class="ui middle aligned center aligned grid" style="margin-top: 35px">
-	{{!-- Container --}}
-	
-	<div class="ui container">
-		{{!-- Rule Input --}}
-		<div class="row">
-			<div class="ui input">
-				<input id="title" type="text" placeholder="Title">
-			</div>
+{{!-- Container --}}
+
+<div class="ui container">
+	{{!-- Rule Input --}}
+	<div class="row">
+		<div class="ui input">
+			<input id="title" type="text" placeholder="Title">
 		</div>
-		
-		<br>
-		
-		<div class="row">
-			<div class="ui fluid input">
-				<input id="description" type="text" placeholder="Description">
-			</div>
-		</div>
-
-		<br>
-
-		{{!-- Add Button --}}
-		<a class="ui large green button" onclick="addCalculus()" >
-			Add Calculus
-		</a>
-
-		<br><br><br><br>
-
-		{{!-- Cards --}}
-		<div class="ui grid cards" id="calculi">
-		</div>
-		<br>
-		
-		<div id ="modal1" class="ui special modal">
-			<div class="header">Calculus Deletion</div>
-			<div id = "change warning" class="content">
-				<p>If you delete this calculus all the rules and symbols of the calculus will 
-					also be deleted. Are you sure you want to delete this calculus?</p>
-			</div>
-			<div class="actions">
-				<div id="yes_button" class="ui approve button">yes</div>
-				<div id="no_button" class="ui cancel button">No</div>
-			</div>
-		</div>
-
 	</div>
+	
+	<br>
+	
+	<div class="row">
+		<div class="ui fluid input">
+			<input id="description" type="text" placeholder="Description">
+		</div>
+	</div>
+
+	<br>
+
+	{{!-- Add Button --}}
+	<a class="ui large green button" onclick="addCalculus()" >
+		Add Calculus
+	</a>
+
+	<br><br><br><br>
+
+	{{!-- Cards --}}
+	<div class="ui grid cards" id="calculi">
+	</div>
+	<br>
+	
+	<div id ="modal1" class="ui special modal">
+		<div class="header">Calculus Deletion</div>
+		<div id = "change warning" class="content">
+			<p>If you delete this calculus all the rules and symbols of the calculus will 
+				also be deleted. Are you sure you want to delete this calculus?</p>
+		</div>
+		<div class="actions">
+			<div id="yes_button" class="ui approve button">yes</div>
+			<div id="no_button" class="ui cancel button">No</div>
+		</div>
+	</div>
+
 </div>
