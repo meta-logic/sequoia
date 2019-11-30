@@ -52,6 +52,9 @@ function get_symbols_toTable(tbl) {
 
 
 function add_symbol_toTable(tbl) {
+    var warning_text_super = "<div id=\"super warning\"><div class=\"ui red negative message\">"+
+    "<div class=\"header\">Invalid Character</div>"+
+    "<p>Please do not use superscripts when naming variables</p></div></div>"
     var req = "/api/rule_symbols/"
     var other_req = "/api/seq_symbols/"
     if (tbl == "seq") {
@@ -59,6 +62,13 @@ function add_symbol_toTable(tbl) {
         other_req = "/api/rule_symbols/"
     }
     symb = document.getElementById("sym").value
+    if (symb.includes("^") || symb.includes("'") || symb.includes('"') || symb.includes('*')) {
+        document.getElementById("warning").innerHTML = warning_text_super
+        return
+    }
+    if (document.getElementById("super warning") != null) {
+        document.getElementById("super warning").remove()
+    }
     typ = document.getElementById("select-sym").value
 
     var calc_id = document.getElementById("calc_id").innerHTML
