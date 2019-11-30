@@ -15,8 +15,8 @@ var port = 3000;
 
 
 //loading local files ===============================================
-var home_routes    = require('./routes/home');
-// var apply_routes   = require('./routes/main/apply');
+var page_routes    = require('./routes/home');
+var userRoutes = require('./api/routes/user');
 var calculusRoutes = require('./api/routes/calculus');
 var ruleRoutes     = require('./api/routes/rule');
 var symbolsRoutes  = require('./api/routes/symbols');
@@ -46,11 +46,11 @@ mongoose.connect(database.local, {useNewUrlParser: true});
 
 
 //Routers ===========================================================
+app.use('/api', userRoutes);
 app.use('/api', calculusRoutes);
 app.use('/api', ruleRoutes);
 app.use('/api', symbolsRoutes);
-app.use('/', home_routes);
-// app.use('/', apply_routes);
+app.use('/', page_routes);
 
 
 global.__basedir = __dirname;

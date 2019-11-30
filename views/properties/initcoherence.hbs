@@ -1,21 +1,25 @@
 <div id="calc_id" hidden>{{calc_id}}</div>
 <div id="title" class="ui middle aligned center aligned huge teal header">Initial Coherence
 	<div id="description" class="sub header">
-		Select the left and right rules for a connective to check </div>
+		Check if your calculus exhibits initial coherence </div>
 </div>
 <div id="property" hidden>Initial Coherence</div>
 
 <br><br>
 
-<div id="info_answer"></div>
-
 <div class="ui container">
-	<div class="ui grid cards" id="rules"></div>
+	<div id="init_button" class="ui teal large button" onclick="initCoh()">
+        Perform Check
+    </div>
+
+	<br><br><br>
+
+	<div id="info_answer"></div>
 
 	<br>
 
-	<div id="perm_button" class="ui disabled teal large button" onclick="permRules()">
-        Initial Coherence
-    </div>
+	<div class="ui special cards" id="good_connectives"></div>
+	<div class="ui divider"></div>
+	<div class="ui special cards" id="bad_connectives"></div>
 
 </div>
