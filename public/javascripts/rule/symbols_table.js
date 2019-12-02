@@ -138,7 +138,7 @@ function update_symbol_inTable (val, tbl) {
         type: "DELETE",
         data : {"symbol" : symbol},
         success: function(result) {
-            $.post("/api/symbols", {symbol : symb, type : typ, group : tbl, calc_id}, 
+            $.post("/api/symbols", {symbol : symb, type : typ, group : tbl, calculus : calc_id}, 
             function(data, status) {
                 fixRules()
                 get_symbols_toTable(tbl)

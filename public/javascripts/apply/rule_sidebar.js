@@ -13,19 +13,21 @@ function get_rules_toPage() {
     $.get("/api/rules/"+calc_id, function (rls, status) {
         var rules = rls.rules
         for (var i = 0; i < rules.length; i++) {
-            var fin_conc = rules[i].sml_conc.replace(/\\/g, "\\\\").replace(/'/g, "&apos;").replace(/"/g, "&quot;")
-            var fin_prem = "["
+            var fin_conc = rules[i].sml_conc.replace(/\\/g, "\\\\")
+            .replace(/'/g, "&apos;").replace(/"/g, "&quot;")
+            var fin_prem = ""
             for (var j = 0; j < rules[i].sml_prem.length; j++) {
-                fin_prem += rules[i].sml_prem[j].replace(/\\/g, "\\\\").replace(/'/g, "&apos;").replace(/"/g, "&quot;") + ", "
+                fin_prem += rules[i].sml_prem[j].replace(/\\/g, "\\\\")
+                .replace(/'/g, "&apos;").replace(/"/g, "&quot;") + ", "
             }
-            fin_prem = fin_prem.slice(0,-2) + "]"
+            fin_prem = "[" + fin_prem.slice(0,-2) + "]"
             rules_container.innerHTML += 
             '<div id="rule_card"'+i+'" class="card">'
                 +'<button class="ui button basic black" id="r'+i+'" onClick=applyRule("'+i+'") '
                 +'rule_name="'+rules[i].rule+'" conclusion="'+fin_conc+'" premises="'+fin_prem+'">'
                     +'\\[\\frac{'+rules[i].premises.join(" \\quad \\quad ")+'}{'+rules[i].conclusion+'}'+rules[i].rule+'\\]'
                 +'</button>'
-            +'</div><br>'
+            +'</div>'
         }
         MathJax.Hub.Queue(["Typeset",MathJax.Hub,rules_container])
         r = rules.length

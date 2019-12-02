@@ -17,10 +17,10 @@ function applyRule(i) {
     var conclusion = ruletemp.getAttribute("conclusion")
     var premises = ruletemp.getAttribute("premises")
     var rule_sml = "Rule(\""+name+"\",None,"+conclusion+","+premises+")"
+    //ADD THE NEW THINGS TO PARSER
     var sequent = parser.parse(seq_text).replace(/\\/g, "\\\\")
     var tree_sml = "DerTree(\""+leaf_id+"\","+sequent+", NoRule, [])"
-    
-    
+
     $.post("/apply", { rule: rule_sml, tree: tree_sml, node_id: "\""+leaf_id+"\"" }, function(data, status) {
         var output = data.output.slice(1,-1).split("&&")
         if (data.output == "NOT APPLICABLE"){
@@ -101,7 +101,6 @@ function undo() {
             leaf_id = this.id.split("_")[1]
             seq_text = $(this).find("script")[0].innerText
             console.log(seq_text)
-            console.log(leaf_id)
         })
         conclusion.removeAttribute("colspan")
         document.getElementById("delete_id"+undo_id).remove()

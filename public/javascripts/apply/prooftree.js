@@ -28,7 +28,7 @@ function build_proof_tree(branch_id, rule, derivations) {
     conclusion.setAttribute("colspan", derivations.length)
     
     // creating the rule
-    var rule = "<td class=\"rulename\" rowspan=\"2\"><div class=\"rulename\">\\[" + rule.replace(/\\\\/g, "\\") + "\\]</div></td>"
+    var rule = "<td class=\"rulename\" rowspan=\"2\"><div class=\"rulename\">\\[\\scriptsize{" + rule.replace(/\\\\/g, "\\") + "}\\]</div></td>"
 
     // creating the new derivation branches
     var new_branches = ""

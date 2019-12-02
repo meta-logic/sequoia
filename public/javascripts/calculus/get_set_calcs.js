@@ -34,6 +34,7 @@ function get_calculi_toPage() {
                 +'<div class="ui red bottom attached button" onClick=deleteCalculus("'+calculi[i]._id+'")>'
                     +'<i class="close icon"></i>Delete'
                 +'</div>'
+            +'</div>'
             }
         MathJax.Hub.Queue(["Typeset",MathJax.Hub,calculi_container])
         c = calculi.length

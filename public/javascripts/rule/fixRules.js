@@ -59,7 +59,7 @@ function fixRules() {
 
 
 function parse_and_fix(parser, rule) {
-    var calc_id = document.getElementById("calc_id")
+    var calc_id = document.getElementById("calc_id").innerHTML
     var prem = rule.premises
     var parsed_prem = []
     if (prem[0] != ""){
@@ -86,6 +86,8 @@ function parse_and_fix(parser, rule) {
         type: "PUT",
         data : { id : rule._id, rule : rule.rule, 
             conclusion : conc, premises : JSON.stringify(prem), parsed_conc : conc_final, 
-            parsed_prem : JSON.stringify(parsed_prem), calculus : calc_id}})
+            parsed_prem : JSON.stringify(parsed_prem), calculus : calc_id, 
+            connective : rule.connective, side : rule.side, function(data) {}}})
+
     window.location.href = "/calculus/"+calc_id
 }
