@@ -6,6 +6,7 @@ var express    = require('express');
 var router     = express.Router();
 var sml_apply        = require('../sml/applyRule');
 var sml_permute      = require('../sml/permuteRules');
+var sml_weaken       = require('../sml/weakenSides');
 
 
 router.get('/', function (req, res) {
@@ -63,7 +64,7 @@ router.get('/calculus/:calc_id/properties/weak_admissability', function (req, re
 });
 
 router.post('/weakenSides', function (req, res) {
-	var result = sml_permute.weakenSides(req.body.rules, res);
+	var result = sml_weaken.weakenSides(req.body.rules, res);
 });
 
 module.exports = router;
