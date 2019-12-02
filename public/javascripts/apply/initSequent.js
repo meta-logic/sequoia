@@ -18,9 +18,10 @@ function useSequent() {
     var form = "FormVar = \"NO-FORM\" "
     var atom_var = "AtomVar = \"NO-ATOMVAR\" "
     var atom = "Atom = \"NO-ATOM\" "
+    var calc_id = document.getElementById("calc_id").innerHTML
 
-    $.get("/api/get-certain_symbols", function(sb, status) {
-        syms = sb
+    $.get("/api/cert_symbols/"+calc_id, function(sb, status) {
+        var syms = sb.symbols
         syms = syms.sort(function(a, b){
             return b.symbol.length - a.symbol.length
         })
@@ -66,6 +67,7 @@ function parse_and_use(temp_parser) {
     "<p>All symbols used in calculus should be inputted to table</p></div>"
     
     var sequent = document.getElementById("Sequent").value.replace(/\(/g, " ( ").replace(/\)/g, " ) ")
+    document.getElementById("Sequent").innerHTML += " \\quad "
     try {
         var sequent_final = temp_parser.parse(sequent).replace(/\\/g, "\\\\")
     }   
@@ -84,7 +86,8 @@ function parse_and_use(temp_parser) {
         console.log(seq_text)
     })
     document.getElementById("style").innerHTML = 
-    "<style> td {text-align:center;height: 1em;vertical-align:bottom;}"+
-        "td.conc {border-top: solid 1px;} div.rulename {margin-top:-2em;}"+
-        "td.prem {}.MJXc-display, .MathJax_Display {margin:0px !important;} </style>"
+        "<style> table { border-spacing: 12px 0;}"+
+            "td {text-align:center;height: 1em;vertical-align:bottom;}"+
+            "td.conc {border-top: solid 1px;} div.rulename {margin-top:-2em;}"+
+            "td.prem {}.MJXc-display, .MathJax_Display {margin:0px !important;} </style>"
 }

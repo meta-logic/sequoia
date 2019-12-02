@@ -1,5 +1,6 @@
 var v = 0
 
+
 function addPremise() {
     var premises = ""
     var value = ""
@@ -9,7 +10,7 @@ function addPremise() {
     // adding a premise input
     for (var i = 0; i < v; i++) {
         value = document.getElementById("i" + i.toString()).value
-        premises += "<input type=\"text\" id=\"i" + i.toString() + "\" placeholder=\"Premise\" value=\""+ value +"\"><button onclick=\"removePremise(" + i.toString()+ ")\" class=\"ui circular icon button\"><i class=\"icon close\"></i></button><p style=\"color: white\">s</p>"
+        premises += "<input type=\"text\" id=\"i" + i.toString() + "\" placeholder=\"Premise\" value=\""+ value +"\"><button onclick=\"removePremise(" + i.toString()+ ")\" class=\"ui circular icon button red\"><i class=\"icon close\"></i></button><p style=\"color: white\">s</p>"
     }
     premises += "<input type=\"text\" id=\"i" + v.toString() + "\" placeholder=\"Premise\"><button onclick=\"addPremise()\" class=\"ui circular icon button green\"><i class=\"icon add\"></i></button><p style=\"color: white\">s</p>"
     div.innerHTML = premises
@@ -24,12 +25,12 @@ function removePremise(index) {
     // adding a premise input
     for (var i = 0; i < index; i++) {
         value = document.getElementById("i" + i.toString()).value
-        premises += "<input type=\"text\" id=\"i" + i.toString() + "\" placeholder=\"Premise\" value=\""+ value +"\"><button onclick=\"removePremise(" + i.toString()+ ")\" class=\"ui circular icon button\"><i class=\"icon close\"></i></button><p style=\"color: white\">s</p>"
+        premises += "<input type=\"text\" id=\"i" + i.toString() + "\" placeholder=\"Premise\" value=\""+ value +"\"><button onclick=\"removePremise(" + i.toString()+ ")\" class=\"ui circular icon button red\"><i class=\"icon close\"></i></button><p style=\"color: white\">s</p>"
     }
 
     for (i = index + 1; i < v; i++) {
         value = document.getElementById("i" + i.toString()).value
-        premises += "<input type=\"text\" id=\"i" + (i-1).toString() + "\" placeholder=\"Premise\" value=\""+ value +"\"><button onclick=\"removePremise(" + (i-1).toString()+ ")\" class=\"ui circular icon button\"><i class=\"icon close\"></i></button><p style=\"color: white\">s</p>"
+        premises += "<input type=\"text\" id=\"i" + (i-1).toString() + "\" placeholder=\"Premise\" value=\""+ value +"\"><button onclick=\"removePremise(" + (i-1).toString()+ ")\" class=\"ui circular icon button red\"><i class=\"icon close\"></i></button><p style=\"color: white\">s</p>"
     }
     value = document.getElementById("i" + v.toString()).value
     v--
@@ -48,45 +49,72 @@ function preview (opt) {
     var warning_text_name = "<div id=\"name warning\"><div class=\"ui red negative message\">"+
     "<div class=\"header\">Missing Rule Name</div>"+
     "<p>Rules must be given name</p></div></div>"
+    var warning_text_side = "<div id=\"side warning\"><div class=\"ui red negative message\">"+
+    "<div class=\"header\">Missing Side</div>"+
+    "<p>Rules must be clearly associated with either a side or with none</p></div></div>"
+    var warning_text_connective = "<div id=\"connective warning\"><div class=\"ui red negative message\">"+
+    "<div class=\"header\">Missing Main Connective</div>"+
+    "<p>Rules must be associated with a main connective</p></div></div>"
+    var calc_id = document.getElementById("calc_id").innerHTML
 
-    $.get("/api/get-rules", function (rls, status) {
+    $.get("/api/rules/"+calc_id, function (rls, status) {
+        var rules = rls.rules
+
         var rule = document.getElementById("rule")
         var rule_name = document.getElementById("rule_name").value
         var premises = document.getElementById("i0").value
         var conc = document.getElementById("Conclusion").value
+        var connective  = document.getElementById("connective").value
+        var side = document.getElementById("side").value
         var warning = document.getElementById("warning")
         var addButton = document.getElementById("add")
         var table = document.getElementById("table")
 
-        var parse_warning = document.getElementById("parse warning")
-        if (parse_warning != null){
-            parse_warning.remove()
+        if (document.getElementById("parse warning") != null){
+            document.getElementById("parse warning").remove()
         }
-
         if (rule_name == "") {
             warning.innerHTML = warning_text_name
             return
         }
-        var name_warning = document.getElementById("name warning")
-        if (name_warning != null){
-            name_warning.remove()
+        if (document.getElementById("name warning") != null){
+            document.getElementById("name warning").remove()
         }
-        rules = rls
+        if (side == "") {
+            warning.innerHTML = warning_text_side
+            return
+        }
+        if (document.getElementById("side warning") != null){
+            document.getElementById("side warning").remove()
+        }
+        if (connective == "" && side != "None") {
+            warning.innerHTML = warning_text_connective
+            return
+        }
+        if (document.getElementById("connective warning") != null){
+            document.getElementById("connective warning").remove()
+        }
         for (var i = 0; i < rules.length; i++) {
             if (rule_name == rules[i].rule) {
                 if (opt == "Add") {
                     warning.innerHTML = warning_text_red
                     return
                 }
-                else if (opt == "Update" && document.getElementById("id").value != rules[i]._id){
+                else if (opt == "Update" && document.getElementById("rule_id").value != rules[i]._id){
                     warning.innerHTML = warning_text_red
                     return
                 }
             } 
         }
-        var redundant_warning = document.getElementById("redundant warning")
-        if (redundant_warning != null){
-            redundant_warning.remove()
+        if (document.getElementById("redundant warning") != null){
+            document.getElementById("redundant warning").remove()
+        }
+        if (conc.trim() == "") {
+            warning.innerHTML = warning_text_conc
+            return
+        }
+        if (document.getElementById("conclusion warning") != null){
+            document.getElementById("conclusion warning").remove()
         }
 
         premises.replace(/\s\s+/g, " ")
@@ -95,26 +123,16 @@ function preview (opt) {
                 premises += " \\quad \\quad " + document.getElementById("i" + i.toString()).value
             }
         }
-        if (conc.trim() == "") {
-            warning.innerHTML = warning_text_conc
-            return
-        }
-        var conclusion_warning = document.getElementById("conclusion warning")
-        if (conclusion_warning != null){
-            conclusion_warning.remove()
-        }
         rule.innerHTML = "\\[\\frac{"+premises+"}{"+conc+"}"+rule_name+"\\]"
         MathJax.Hub.Queue(["Typeset",MathJax.Hub,rule])
 
-        var sub = document.getElementById("submit")
-        if (sub != null) {
-            sub.remove()
+        if (document.getElementById("submit") != null) {
+            document.getElementById("submit").remove()
         }
-        addButton.innerHTML = "<a id = \"submit\" class=\"ui fluid circular icon button green\" onclick=\"placeRule("+"\'"+opt+"\'"+")\">"+opt+" This Rule</a>"
+        addButton.innerHTML = "<a id = \"submit\" class=\"ui fluid large circular icon button green\" onclick=\"placeRule("+"\'"+opt+"\'"+")\">"+opt+" This Rule</a>"
 
-        var symtbl = document.getElementById("sym_table")
-        if (symtbl != null) {
-            symtbl.remove()
+        if (document.getElementById("sym_table") != null) {
+            document.getElementById("sym_table").remove()
         }
         table.innerHTML =
             "<table id=\"sym_table\" class= \"ui sortable fixed single line celled table\"> <thead> <tr><th>Symbols</th> <th>Types</th> </tr></thead>"+ 

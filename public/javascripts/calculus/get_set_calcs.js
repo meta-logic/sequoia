@@ -1,11 +1,17 @@
 var c = 0
 
-function addCalculus() {
-    var title = document.getElementById("title").value
-    var description = document.getElementById("description").value
-    $.post("/api/calculus", { title : title, description : description}, function(data, status){
-        get_calculi_toPage()
+function showInfo ( modal_num) {
+    $('#modal'+modal_num).modal({
+        onApprove: function(){
+            if (del == true) {
+                delete_symbol_fromTable(id, tbl)
+            } else {
+                update_symbol_inTable(id, tbl)
+            }
+        }
     })
+    .modal('setting', 'closable', false)
+    .modal('show')
 }
 
 function get_calculi_toPage() {
@@ -16,33 +22,55 @@ function get_calculi_toPage() {
             entry.remove()
         }
     }
-    $.get("/api/get-calculi", function (calculi, status) {
+    $.get("/api/calculi", function (calcs, status) {
+        var calculi = calcs.calculi
         for (var i = 0; i < calculi.length; i++) {
-            var temp = "'" + calculi[i]._id + "'"
-            calculi_container.innerHTML += "<div id=\"calc_card"+ i +"\" class=\"four wide column\"><div class=\"ui card\" id=\"c"+ i +"\"></div></div>"
-            var calc_container = document.getElementById(("c" + i))
-            calc_container.innerHTML = calculi[i].title 
-            + "<br><br><div class=\"extra content\"><div class=\"ui two buttons\"><a class=\"ui green button\" onClick=\"onClick=\"goToCalculus("+ temp +")\">GO</a><a class=\"ui red button\" onClick=\"deleteCalculus("+ temp +")\">Delete</a></div></div>"
-        }
+            calculi_container.innerHTML +=
+            '<div id="calc_card'+i+'" class="card">'
+                +'<a class="content" href=calculus/'+calculi[i]._id+'>'
+                    +'<div class="header">'+calculi[i].title+'</div>'
+                    +'<div class="description">'+calculi[i].description+'</div>'
+                +'</a>'
+                +'<div class="ui red bottom attached button" onClick=deleteCalculus("'+calculi[i]._id+'")>'
+                    +'<i class="close icon"></i>Delete'
+                +'</div>'
+            }
         MathJax.Hub.Queue(["Typeset",MathJax.Hub,calculi_container])
         c = calculi.length
     })
 }
 
-function deleteCalculus(id) {
-    $.ajax({
-        url: "/api/calculus",
-        type: "DELETE",
-        data : { "id" : id },
-        success: function(result) {
+function addCalculus() {
+    var title = document.getElementById("title").value
+    var description = document.getElementById("description").value
+    if (title != "" && description != "") {
+        $.post("/api/calculus", { title : title, description : description}, function(data, status){
+            document.getElementById("title").value = ""
+            document.getElementById("description").value = ""
             get_calculi_toPage()
-            console.log("Calc sucessfully deleted.")
-            
-        },
-        error: function(result) {
-            console.log("ERROR: Calc could not be deleted.")
         }
-    })
+    )}
 }
 
-function goToCalculus(id) {return}
+function deleteCalculus(id) {
+    $('#modal1').modal({
+        onApprove: function(){
+            $.ajax({
+                url: "/api/calculus",
+                type: "DELETE",
+                data : { "id" : id },
+                success: function(result) {
+                    get_calculi_toPage()
+                    console.log("Calculus sucessfully deleted.")
+                },
+                error: function(result) {
+                    console.log("ERROR: Calculus could not be deleted.")
+                }
+            })
+        }
+    })
+    .modal('setting', 'closable', false)
+    .modal('show')
+
+    
+}

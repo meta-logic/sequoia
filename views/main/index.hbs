@@ -1,53 +1,52 @@
-<div class="ui container">
+{{!-- Grid --}}
 
-	{{!-- Cards --}}
-	<div class="ui grid cards" id="rules">
+<div id="user_id" hidden>TEMP</div>
+<div id="section" class="ui middle aligned center aligned teal huge header">Calculi</div>
+
+<div class="ui middle aligned center aligned grid" style="margin-top: 35px">
+	{{!-- Container --}}
+	
+	<div class="ui container">
+		{{!-- Rule Input --}}
+		<div class="row">
+			<div class="ui input">
+				<input id="title" type="text" placeholder="Title">
+			</div>
+		</div>
+		
+		<br>
+		
+		<div class="row">
+			<div class="ui fluid input">
+				<input id="description" type="text" placeholder="Description">
+			</div>
+		</div>
+
+		<br>
+
+		{{!-- Add Button --}}
+		<a class="ui large green button" onclick="addCalculus()" >
+			Add Calculus
+		</a>
+
+		<br><br><br><br>
+
+		{{!-- Cards --}}
+		<div class="ui grid cards" id="calculi">
+		</div>
+		<br>
+		
+		<div id ="modal1" class="ui special modal">
+			<div class="header">Calculus Deletion</div>
+			<div id = "change warning" class="content">
+				<p>If you delete this calculus all the rules and symbols of the calculus will 
+					also be deleted. Are you sure you want to delete this calculus?</p>
+			</div>
+			<div class="actions">
+				<div id="yes_button" class="ui approve button">yes</div>
+				<div id="no_button" class="ui cancel button">No</div>
+			</div>
+		</div>
 
 	</div>
-	<br><br>
-	{{!-- End of Cards --}}
-	<a class="ui large button positive" href="/add-rule">Add Rule</a>
-
-	<br><br><br><br>
-
-	{{!-- Table container --}}
-	<table id="sym_table" class= "ui sortable fixed single line celled table"> <thead> <tr><th>Symbols</th> <th>Types</th> </tr></thead> 
-		<tbody id="init"><tbody> 
-		<tbody id="table_head"> 
-			<tr id = "input_row">
-				<td id= "input_field" style="text-align:center">
-					<div class="ui input focus">
-						<input id="sym" type="text" placeholder="Symbol Here">
-					</div>
-				</td>
-				<td id= "select_field" >
-					<select class="ui search dropdown" style="fixed" id="select-sym" ><option value="">Type</option><option value="atom variable">atom variable</option><option value="formula variable">formula variable</option><option value="connective">connective</option><option value="context variable">context variable</option><option value="sequent sign">sequent sign</option><option value="context separator">context separator</option><option value="empty">empty</option></select>
-					<button class="ui right floated button primary" onclick="add_symbol_toTable('rule')">Add Symbol</button>
-				</td>
-			</tr>
-		</tbody>
-	</table>
-
-	<div id ="modal1" class="ui special modal">
-		<div class="header">Rules Affected</div>
-		<div id = "change warning" class="content">
-		<p>Updating or removing existing symbols may alter the parsing of the rules already defined. This can result in the update or deletion of certain rules.
-			Would you like to continue?</p>
-		</div>
-		<div class="actions">
-		<div id="yes_button" class="ui approve button">yes</div>
-		<div id="no_button" class="ui cancel button">No</div>
-		</div>
-	</div>
-
-	<div id ="modal2" class="ui special modal">
-		<div class="header">Symbol Used</div>
-		<div id = "change warning" class="content">
-		<p>This symbol already exists in the sequent symbols. Try using a differnt one.</p>
-		</div>
-		<div class="actions">
-		<div id="ok_button" class="ui cancel button">Okay</div>
-		</div>
-	</div>
-
 </div>

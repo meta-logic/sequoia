@@ -20,29 +20,19 @@ function get_rules_toPage() {
             }
             fin_prem = fin_prem.slice(0,-2) + "]"
             rules_container.innerHTML += 
-            '<div id="rule_card"'+i+'" class="card">'
-                +'<button class="ui button basic black" id="r'+i+'" onClick=applyRule("'+i+'") '
-                +'rule_name="'+rules[i].rule+'" conclusion="'+fin_conc+'" premises="'+fin_prem+'">'
-                    +'\\[\\frac{'+rules[i].premises.join(" \\quad \\quad ")+'}{'+rules[i].conclusion+'}'+rules[i].rule+'\\]'
-                +'</button>'
-            +'</div><br>'
+            '<div id="rule_card'+i+'" class="ui card">'
+                +'<div class="content" id="r'+i+'"'
+                +'rule_name="'+rules[i].rule+'" conclusion="'+fin_conc+'" premises="'+fin_prem+'" ' 
+                +'conn="'+rules[i].connective+'" side="'+rules[i].side+'">'
+                    +'\\[\\frac{'+rules[i].premises.join(" \\quad \\quad ")+'}{'+rules[i].conclusion+'}'+rules[i].rule+'\\]' 
+                +'</div>'
+                +'<div class="ui bottom attached button" id="b'+i+'" onClick=selectRule("true","'+i+'")>'
+                    +'<i id="i'+i+'" class="add icon"></i>'
+                +'</div>'
+            +'</div>'
         }
         MathJax.Hub.Queue(["Typeset",MathJax.Hub,rules_container])
         r = rules.length
     })
 }
 
-function deleteRule (id) {
-    $.ajax({
-        url: "/api/rule",
-        type: "DELETE",
-        data : { "id" : id },
-        success: function(result) {
-            get_rules_toPage()
-            console.log("Rule sucessfully deleted.")
-        },
-        error: function(result) {
-            console.log("ERROR: rule could not be deleted.")
-        }
-    })
-}

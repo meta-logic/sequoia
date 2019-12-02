@@ -9,9 +9,10 @@ function placeRule(opt) {
     var form = "FormVar = \"NO-FORM\" "
     var atom_var = "AtomVar = \"NO-ATOMVAR\" "
     var atom = "Atom = \"NO-ATOM\" "
+    var calc_id = document.getElementById("calc_id").innerHTML
 
-    $.get("/api/get-symbols", function(sb, status) {
-        syms = sb
+    $.get("/api/rule_symbols/"+calc_id, function(sb, status) {
+        var syms = sb.symbols
         syms = syms.sort(function(a, b){
             return b.symbol.length - a.symbol.length
         })
@@ -52,13 +53,17 @@ function placeRule(opt) {
 
 
 function parse_and_place(parser, opt) {
-    var warning_text = "<div id=\"parse warning\"><div class=\"ui red negative message\">"+
+    var warning_text_symb = "<div id=\"parse warning\"><div class=\"ui red negative message\">"+
     "<div class=\"header\">Unrecognized Symbols</div>"+
     "<p>All symbols used in calculus should be inputted to table</p></div>"
-
+    var calc_id = document.getElementById("calc_id").innerHTML
     var prem = []
     var parsed_prem = []
-    var rule = document.getElementById("rule_name").value
+    var rule_name = document.getElementById("rule_name").value
+    var connective = document.getElementById("connective").value
+    var side = document.getElementById("side").value
+    var warning = document.getElementById("warning")
+
     prem.push(document.getElementById("i0").value)
     for (var i = 1; i <= v; i++) {
         var p = document.getElementById("i" + i.toString()).value
@@ -77,8 +82,7 @@ function parse_and_place(parser, opt) {
                 parsed_prem.push(parser.parse(prem[i]))
             }   
             catch(error) {
-                var warning = document.getElementById("warning")
-                warning.innerHTML = warning_text
+                warning.innerHTML = warning_text_symb
                 return
             }
         }
@@ -89,33 +93,40 @@ function parse_and_place(parser, opt) {
         var conc_final = parser.parse(conc)
     }   
     catch(error) {
-        var warning = document.getElementById("warning")
         warning.innerHTML = warning_text
         return
     }
 
-    if (opt == "Add") {
-        $.post("/api/rule", {rule : rule, conclusion : conc, premises : JSON.stringify(prem),
-            parsed_conc : conc_final ,parsed_prem : JSON.stringify(parsed_prem)})
+    if (document.getElementById("parse warning") != null){
+        document.getElementById("parse warning").remove()
     }
-    else if (opt == "Update") {
-        $.get("/api/get-rules", function (rules, status) {
-            still_exists = false
+
+    if (opt == "Add") {
+        $.post("/api/rule", {rule : rule_name, conclusion : conc, premises : JSON.stringify(prem),
+            parsed_conc : conc_final ,parsed_prem : JSON.stringify(parsed_prem) , calculus : calc_id,
+            connective : connective, side : side})
+    } else if (opt == "Update") {
+        var rule_id = document.getElementById("rule_id").innerHTML
+        $.get("/api/rules/"+calc_id, function (rls, status) {
+            var rules = rls.rules
+            var still_exists = false
             for (var i = 0; i < rules.length; i++) {
-                still_exists = document.getElementById("id").innerHTML == rules[i]._id
+                still_exists = rule_id == rules[i]._id
             }
             if (!still_exists) {
-                $.post("/api/rule", {rule : rule, conclusion : conc, premises : JSON.stringify(prem),
-                    parsed_conc : conc_final ,parsed_prem : JSON.stringify(parsed_prem)})
+                $.post("/api/rule", {rule : rule_name, conclusion : conc, premises : JSON.stringify(prem),
+                    parsed_conc : conc_final ,parsed_prem : JSON.stringify(parsed_prem) , calculus : calc_id, 
+                    connective : connective, side : side})
             } else {
                 $.ajax({
                     url: "/api/rule",
                     type: "PUT",
-                    data : { id : document.getElementById("id").innerHTML , rule : rule, 
+                    data : { id : rule_id, rule : rule_name, 
                         conclusion : conc, premises : JSON.stringify(prem), parsed_conc : conc_final, 
-                        parsed_prem : JSON.stringify(parsed_prem)}})
+                        parsed_prem : JSON.stringify(parsed_prem), calculus : calc_id, 
+                        connective : connective, side : side}, function(data) {}})
             }
         })
     }
-    window.location.href = "/"
+    window.location.href = "/calculus/"+calc_id
 }

@@ -8,11 +8,14 @@ var Schema   = mongoose.Schema
 
 //defining the rule schema
 var ruleSchema = new Schema({
-    rule       : String,
-    premises   : [String],
-    conclusion : String,
-    sml_prem   : [String],
-    sml_conc   : String
+    rule        : String,
+    premises    : [String],
+    conclusion  : String,
+    sml_prem    : [String],
+    sml_conc    : String,
+    calculus    : String,
+    connective : String,
+    side : String
 })
 
 module.exports = mongoose.model("Rule", ruleSchema)

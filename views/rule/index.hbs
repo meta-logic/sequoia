@@ -1,11 +1,25 @@
 {{!-- Grid --}}
+
+<div id="calc_id" hidden>{{calc_id}}</div>
+<div id="rule_id" hidden>{{rule_id}}</div>
+<div id="page" hidden>{{page}}</div>
+
 <div class="ui middle aligned center aligned grid" style="margin-top: 35px">
 	{{!-- Container --}}
 	<div class="ui container">
 		{{!-- Rule Input --}}
 		<div class="row">
 			<div class="ui input">
-				<input id="rule_name" type="text" placeholder="Rule">
+				<input id="rule_name" type="text" placeholder="Rule Name">
+			</div>
+			<select class="ui search dropdown" id="side" >
+				<option value="">Side</option>
+				<option value="Left">Left</option>
+				<option value="Right">Right</option>
+				<option value="None">None</option>
+			</select>
+			<div class="ui input">
+				<input id="connective" type="text" placeholder="Main Connective">
 			</div>
 		</div>
 		
@@ -37,7 +51,7 @@
 		<br>
 		
 		{{!-- Preview Button --}}
-		<button class="ui button primary" onclick="preview('Add')">
+		<button id="prev button" class="ui large green button" onclick="preview('Add')">
 			Preview
 		</button>
 		<br><br><br>
@@ -72,6 +86,6 @@
 			<div id="ok_button" class="ui cancel button">Okay</div>
 			</div>
 		</div>
-		
+
 	</div>
 </div>

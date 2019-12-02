@@ -8,17 +8,18 @@ var Rule = require("../models/rule")
 //creating a rule
 function createRule (req, res) {
     var rule = new Rule()
-
     //populating the rule model with sequents and their connectives
     rule.rule      = req.body.rule
     rule.premises  = JSON.parse(req.body.premises)
     rule.conclusion = req.body.conclusion
     rule.sml_prem = JSON.parse(req.body.parsed_prem)
     rule.sml_conc = req.body.parsed_conc
-
+    rule.calculus = req.body.calculus
+    rule.connective = req.body.connective
+    rule.side = req.body.side
+    
     //saving the rule in the database
     rule.save(function (err) {
-
         //if something went wrong while saving, return the error
         if (err) {
             return res.status(400).json({
@@ -44,9 +45,11 @@ function updateRule (req, res) {
             premises : JSON.parse(req.body.premises), 
             conclusion : req.body.conclusion, 
             sml_prem : JSON.parse(req.body.parsed_prem),
-            sml_conc : req.body.parsed_conc
-        }, 
-        { new : true}, 
+            sml_conc : req.body.parsed_conc,
+            calculus : req.body.calculus,
+            connective : req.body.connective,
+            side : req.body.side
+        }, { new : true}, 
         function (err, rule) {
             //if the rule does not exist
             if (err || rule == null) {
@@ -88,9 +91,7 @@ function deleteRule (req, res) {
 //fetching a rule
 function getRule (req, res) {
     //looking up the rule
-    console.log(req.params.id)
-    Rule.findById(req.params.id, function (err, rule) {
-
+    Rule.findById(req.params.rule_id, function (err, rule) {
         //if the rule does not exist
         if (err || rule == null) {
             return res.status(400).json({
@@ -98,7 +99,6 @@ function getRule (req, res) {
                 "message" : "rule does not exist"
             })
         }
-
         //return the rule 
         return res.status(200).json({
             "status" : "success",
@@ -108,4 +108,24 @@ function getRule (req, res) {
 }
 
 
-module.exports = {createRule, updateRule, deleteRule, getRule}
+//fetching rules of calc
+function getRules (req, res) {
+    //looking up the rules
+    Rule.find({'calculus': req.params.calc_id}, function (err, rules) {
+        //if the rules do not exist
+        if (err || rules == null) {
+            return res.status(400).json({
+                "status"  : "failure",
+                "message" : "rules do not exist"
+            })
+        }
+        //return the rules 
+        return res.status(200).json({
+            "status" : "success",
+            "rules"   : rules
+        })
+    })
+}
+
+
+module.exports = {createRule, updateRule, deleteRule, getRule, getRules}

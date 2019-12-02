@@ -22,7 +22,7 @@ signature TREEFUNC = sig
     val get_ctx_vars : seq -> ctx_var list
     val filter_bad_subs : (sub list * 'a) list * seq -> (sub list * 'a) list
     val get_premises_of : der_tree * string -> seq list
-    val check_rule_of : der_tree * string -> bool
+    val check_rule_of : (ctx_var * ctx_var list * ctx_var list) list * der_tree * string -> bool
     val apply_rule : (form list * (ctx_var * ctx_var list * ctx_var list) list * der_tree) * 
         rule * string
         -> (form list * (ctx_var * ctx_var list * ctx_var list) list * der_tree) 

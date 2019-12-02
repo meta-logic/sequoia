@@ -16,16 +16,18 @@ function showInfo (del, id, tbl, modal_num) {
 
 
 function get_symbols_toTable(tbl) {
-    var req = "/api/get-symbols"
+    var req = "/api/rule_symbols/"
     if (tbl == "seq")
-        {req = "/api/get-seq_symbols"}
+        {req = "/api/seq_symbols/"}
     for (i = 0; i < s; i++) {
         entry  = document.getElementById("row"+i)
         if (entry != null) {
             document.getElementById("table_head").removeChild(entry)
         }
     }
-    $.get(req, function(syms, status) {
+    var calc_id = document.getElementById("calc_id").innerHTML
+    $.get(req+calc_id, function(sb, status) {
+        var syms = sb.symbols
         for (var i = 0; i < syms.length; i++) {
             symb = syms[i].symbol
             typ = syms[i].type
@@ -50,18 +52,20 @@ function get_symbols_toTable(tbl) {
 
 
 function add_symbol_toTable(tbl) {
-    var req = "/api/get-symbols"
-    var other_req = "/api/get-seq_symbols"
+    var req = "/api/rule_symbols/"
+    var other_req = "/api/seq_symbols/"
     if (tbl == "seq") {
-        req = "/api/get-seq_symbols"
-        other_req = "/api/get-symbols"
+        req = "/api/seq_symbols/"
+        other_req = "/api/rule_symbols/"
     }
     symb = document.getElementById("sym").value
     typ = document.getElementById("select-sym").value
-    
+
+    var calc_id = document.getElementById("calc_id").innerHTML
     if (symb.replace(/\s/g, '').length > 0 && typ != "") {
-        $.get(req, function(sb, status) {
-            syms = sb; ind = -1
+        $.get(req+calc_id, function(sb, status) {
+            var syms = sb.symbols 
+            ind = -1
             for (var i = 0; i < syms.length; i++) {
                 if (symb == syms[i].symbol) {
                     ind = i
@@ -72,8 +76,9 @@ function add_symbol_toTable(tbl) {
             } else if (ind != -1 && tbl == "seq"){
                 update_symbol_inTable(ind, tbl)
             } else {
-                $.get(other_req, function(sb, status) {
-                    syms = sb; ind = -1
+                $.get(other_req+calc_id, function(sb, status) {
+                    var syms = sb.symbols
+                    ind = -1
                     for (var i = 0; i < syms.length; i++) {
                         if (symb == syms[i].symbol) {
                             ind = i
@@ -83,7 +88,8 @@ function add_symbol_toTable(tbl) {
                         showInfo(false,ind,tbl,2)
                     }
                     else {
-                        $.post("/api/symbols", {symbol : symb, type : typ, group : tbl}, function(data, status) {
+                        $.post("/api/symbols", {symbol : symb, type : typ, group : tbl, calculus : calc_id}, 
+                        function(data, status) {
                             get_symbols_toTable(tbl)
                         })
                     }
@@ -122,7 +128,8 @@ function update_symbol_inTable (val, tbl) {
         type: "DELETE",
         data : {"symbol" : symbol},
         success: function(result) {
-            $.post("/api/symbols", {symbol : symb, type : typ, group : tbl}, function(data, status) {
+            $.post("/api/symbols", {symbol : symb, type : typ, group : tbl, calc_id}, 
+            function(data, status) {
                 fixRules()
                 get_symbols_toTable(tbl)
             })

@@ -4,7 +4,11 @@
     <title>{{title}}</title>
     <link rel="stylesheet" type="text/css" href="/bower/semantic/dist/semantic.min.css">
     <div id = "style">
-    <style> td {
+    <style> 
+            table { 
+                border-spacing: 12px 0;
+            }
+            td {
                 text-align:center;
                 height: 1em;
                 vertical-align:bottom;
@@ -16,15 +20,15 @@
                 margin-top:-2em;
             }
             td.prem {}
-            .MJXc-display, .MathJax_Display {
-            }
+            .MJXc-display, .MathJax_Display {}
     </style>
     </div>
   </head>
   <body>
     {{> navbar}}
   {{{body}}}
-    <script type="text/javascript" src="/bower/MathJax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  {{!-- <script type="text/javascript" id="MathJax" async src="/bower/MathJax/es5/tex-chtml.js"></script> --}}
+  <script type="text/javascript" src="/bower/MathJax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
   <script type="text/javascript" src="/bower/jquery/dist/jquery.min.js"></script>
   <script type="text/javascript" src="/bower/pegjs/peg-0.10.0.min.js"></script>
   <script type="text/javascript" src="/bower/semantic/dist/semantic.min.js"></script>
@@ -37,7 +41,7 @@
   <script type="text/javascript" src="/static/javascripts/apply/initSequent.js"></script>
   <script type="text/javascript" src="/static/javascripts/apply/rule_sidebar.js"></script>
   <script type="text/javascript" src="/static/javascripts/apply/preview.js"></script>
-  <script type="text/javascript" src="static/javascripts/rule/fixRules.js"></script>
-  <script type="text/javascript" src="static/javascripts/apply/setupItems.js"></script>
+  <script type="text/javascript" src="/static/javascripts/rule/fixRules.js"></script>
+  <script type="text/javascript" src="/static/javascripts/apply/setupItems.js"></script>
   </body>
 </html>

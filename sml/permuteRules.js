@@ -1,8 +1,8 @@
 var cmd = require("node-cmd")
 const cmd2 = require("child_process")
 
-function applyRule(rule, tree, id, res) {
-    var sml_command = "treefuncImpl.translate_premises("+tree+","+rule+","+id+");\n"
+function permuteRules(rule1, rule2, init_rules, res) {
+    var sml_command = "Properties.permute_final("+rule1+","+rule2+","+init_rules+",([],[]));\n"
     const smlTerminalInput = 
     "CM.make \"sml/unify.cm\";\n"
     +"Control.Print.printDepth :=100;\n"
@@ -30,4 +30,4 @@ function applyRule(rule, tree, id, res) {
 }
 
 
-module.exports = { applyRule }
+module.exports = {  permuteRules }

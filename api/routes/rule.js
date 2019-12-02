@@ -11,7 +11,8 @@ var controller = require("../controllers/rule")
 router.post("/rule", controller.createRule)
 router.put("/rule", controller.updateRule)
 router.delete("/rule", controller.deleteRule)
-router.get("/rule/:id", controller.getRule)
+router.get("/rule/:rule_id", controller.getRule)
+router.get("/rules/:calc_id", controller.getRules)
 
 
 module.exports = router

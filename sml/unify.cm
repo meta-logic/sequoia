@@ -6,3 +6,4 @@ Group is
   unification/unification.cm
   applyunifier/applyunifier.cm
   tree_func/tree_func.cm
+  properties/properties.cm
