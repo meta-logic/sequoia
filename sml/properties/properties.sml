@@ -273,12 +273,8 @@ struct
 
             (* testing if init rule can be applied to base *)
 
-            (* val (_,_,test) = List.hd(T.apply_rule_everywhere(([],[],base),init_rule))
-            val _ = (case test of
-               Dat.DerTree(_,base,Dat.NoRule,_) => print("failed, base: "^ Dat.seq_toString(base) ^"\n")
-             | Dat.DerTree(_,base,_,_) => print("success, base: "^ Dat.seq_toString(base) ^"\n")) *)
-
-            (* applying rules in either order *)
+            val (_,_,test) = List.hd(T.apply_rule_everywhere(([],[],base),init_rule))
+            
             val res = []
             fun stack (base,rules1,rules2,init) =
                 let
@@ -305,10 +301,10 @@ struct
             val init_applied = List.concat (List.map (fn (_,_,x) => T.apply_rule_everywhere(([],[],x),init_rule) ) axioms_applied)
 
             val init_applied_trees = List.filter (fn (forms,_,_)=> List.all (fn x => subformula (x,con_form) ) forms )  (init_applied)
-            val init_applied_trees = List.map (fn (_,_,x) => x) init_applied_trees
+            val init_applied_trees = List.map (fn (_,cons,tree) => (cons,tree)) init_applied_trees
 
-            val both_applied = List.filter (fn x => T.get_tree_height(x) >1) init_applied_trees
-            val no_open_prems = List.filter (fn x => (case T.get_open_prems(x) of
+            val both_applied = List.filter (fn (_,x) => T.get_tree_height(x) >1) init_applied_trees
+            val no_open_prems = List.filter (fn (_,x) => (case T.get_open_prems(x) of
                                                     _::_ => false
                                                   | _ => true)) both_applied
             val res = no_open_prems
@@ -316,20 +312,26 @@ struct
         in
             (* rules_applied *)
             (case res of
-               _::_ => true
-             | _ => false)
+               x::_ => (true,(test, SOME x))
+             | _ => (false,(test, NONE)))
         end
 
-    fun init_coherence_mult_init ((forms,rulesL,rulesR), init_rules, axioms) = List.map (fn rule => init_coherence_con((forms,rulesL,rulesR),rule,axioms)) init_rules
-
-    fun init_coherence (_: (Dat.form *Dat.rule list * Dat.rule list) list,[]: Dat.rule list,_: Dat.rule list):bool list = []
-      | init_coherence (con_list,init::L,axioms) = 
+    fun init_coherence_mult_init ((forms,rulesL,rulesR), init_rules, axioms) = 
         let
-            val rest = init_coherence(con_list,L,axioms)
-            val res_list = List.map (fn x => init_coherence_con(x,init,axioms)) con_list
-            val result = List.all (fn x => x) res_list
+            val results = List.map (fn rule => init_coherence_con((forms,rulesL,rulesR),rule,axioms)) init_rules
         in
-          result::rest
+            (case List.find (fn (x,_) => x) results of
+               SOME x => x
+             | NONE => List.hd(results) )
+        end
+
+    fun init_coherence ([]: (Dat.form *Dat.rule list * Dat.rule list) list,_: Dat.rule list,_: Dat.rule list):bool = true
+      | init_coherence (first_con::con_list,init_rules,axioms) = 
+        let
+            val rest = init_coherence(con_list,init_rules,axioms)
+            val (result,_) = init_coherence_mult_init(first_con,init_rules,axioms) 
+        in
+          result andalso rest
         end
 
 
@@ -385,7 +387,7 @@ struct
             
             val res = List.all (fn (_,r) => Option.isSome(r)) res2
 
-            val res2 = List.mapPartial (fn (_,NONE) => NONE | (t1,SOME t2) => SOME (t1,t2) ) res2
+            val res2 = if res then res2 else List.filter (fn (_,r) => false = Option.isSome(r)) res2
             
         in
           (res,res2)
