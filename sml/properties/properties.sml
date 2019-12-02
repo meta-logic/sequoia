@@ -18,6 +18,8 @@ struct
     structure Set = SplaySetFn(StringKey);
 
     type constraint = D.ctx_var * (D.ctx_var list) * (D.ctx_var list)
+    type tree = constraint list * D.der_tree
+	type proof = tree * (tree option)
 
 
 
@@ -273,7 +275,8 @@ struct
 
             (* testing if init rule can be applied to base *)
 
-            val (_,_,test) = List.hd(T.apply_rule_everywhere(([],[],base),init_rule))
+            val (_,test_con,test) = List.hd(T.apply_rule_everywhere(([],[],base),init_rule))
+            val test = (test_con, test)
             
             val res = []
             fun stack (base,rules1,rules2,init) =
@@ -325,13 +328,13 @@ struct
              | NONE => List.hd(results) )
         end
 
-    fun init_coherence ([]: (Dat.form *Dat.rule list * Dat.rule list) list,_: Dat.rule list,_: Dat.rule list):bool = true
+    fun init_coherence ([]: (Dat.form *Dat.rule list * Dat.rule list) list,_: Dat.rule list,_: Dat.rule list) = (true , [])
       | init_coherence (first_con::con_list,init_rules,axioms) = 
         let
-            val rest = init_coherence(con_list,init_rules,axioms)
-            val (result,_) = init_coherence_mult_init(first_con,init_rules,axioms) 
+            val (rest,proofs) = init_coherence(con_list,init_rules,axioms)
+            val res as (result,_) = init_coherence_mult_init(first_con,init_rules,axioms) 
         in
-          result andalso rest
+          (rest andalso result , res::proofs)
         end
 
     (*  *)
@@ -379,7 +382,7 @@ struct
             
             val res = List.all (fn (_,r) => Option.isSome(r)) res2
 
-            val res2 = if res then res2 else List.filter (fn (_,r) => false = Option.isSome(r)) res2
+            (* val res2 = if res then res2 else List.filter (fn (_,r) => false = Option.isSome(r)) res2 *)
             
         in
           (res,res2)
@@ -401,15 +404,23 @@ struct
            Dat.Mult(_,_,rest) => count_contexts(rest,index+1)
          | _ => index)
 
-    fun weakening ([]) = ([],[])
-        | weakening (rules as Dat.Rule(_,_,conc,_)::_) = 
+    fun weakening_proofs ([]) = ([],[])
+        | weakening_proofs (rules as Dat.Rule(_,_,conc,_)::_) = 
         let
             val Dat.Seq(L,_,R) = conc
             val (l_num,r_num) = (count_contexts(L,1), count_contexts (R,1))
             val (l_ctx,r_ctx) = (List.tabulate (l_num,fn i => (Dat.Left,i+1)) , List.tabulate (r_num,fn i => (Dat.Right,i+1)) )
-            fun test x = let val (res,_) = weakening_context(rules,x) in res end
+            fun test x = weakening_context(rules,x) 
         in
             (List.map test l_ctx, List.map test r_ctx)
+        end
+    
+    fun weakening (rules) = 
+        let
+            val (left,right) = weakening_proofs(rules)
+            val res_map = List.map (fn (bool,_) => bool)
+        in
+            (res_map left, res_map right)
         end
 
 
