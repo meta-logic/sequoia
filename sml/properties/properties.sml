@@ -18,6 +18,8 @@ struct
     structure Set = SplaySetFn(StringKey);
 
     type constraint = D.ctx_var * (D.ctx_var list) * (D.ctx_var list)
+    type tree = constraint list * D.der_tree
+	type proof = tree * (tree option)
 
 
 
@@ -207,12 +209,9 @@ struct
 
             (* testing if init rule can be applied to base *)
 
-            (* val (_,_,test) = List.hd(T.apply_rule_everywhere(([],[],base),init_rule))
-            val _ = (case test of
-               Dat.DerTree(_,base,Dat.NoRule,_) => print("failed, base: "^ Dat.seq_toString(base) ^"\n")
-             | Dat.DerTree(_,base,_,_) => print("success, base: "^ Dat.seq_toString(base) ^"\n")) *)
-
-            (* applying rules in either order *)
+            val (_,test_con,test) = List.hd(T.apply_rule_everywhere(([],[],base),init_rule))
+            val test = (test_con, test)
+            
             val res = []
             fun stack (base,rules1,rules2,init) =
                 let
@@ -239,10 +238,10 @@ struct
             val init_applied = List.concat (List.map (fn (_,_,x) => T.apply_rule_everywhere(([],[],x),init_rule) ) axioms_applied)
 
             val init_applied_trees = List.filter (fn (forms,_,_)=> List.all (fn x => subformula (x,con_form) ) forms )  (init_applied)
-            val init_applied_trees = List.map (fn (_,_,x) => x) init_applied_trees
+            val init_applied_trees = List.map (fn (_,cons,tree) => (cons,tree)) init_applied_trees
 
-            val both_applied = List.filter (fn x => T.get_tree_height(x) >1) init_applied_trees
-            val no_open_prems = List.filter (fn x => (case T.get_open_prems(x) of
+            val both_applied = List.filter (fn (_,x) => T.get_tree_height(x) >1) init_applied_trees
+            val no_open_prems = List.filter (fn (_,x) => (case T.get_open_prems(x) of
                                                     _::_ => false
                                                   | _ => true)) both_applied
             val res = no_open_prems
@@ -250,29 +249,27 @@ struct
         in
             (* rules_applied *)
             (case res of
-               _::_ => true
-             | _ => false)
+               x::_ => (true,(test, SOME x))
+             | _ => (false,(test, NONE)))
         end
 
-    fun init_coherence_mult_init ((forms,rulesL,rulesR), init_rules, axioms) = List.map (fn rule => init_coherence_con((forms,rulesL,rulesR),rule,axioms)) init_rules
-
-    fun init_coherence (_: (Dat.form *Dat.rule list * Dat.rule list) list,[]: Dat.rule list,_: Dat.rule list):bool list = []
-      | init_coherence (con_list,init::L,axioms) = 
+    fun init_coherence_mult_init ((forms,rulesL,rulesR), init_rules, axioms) = 
         let
-            val rest = init_coherence(con_list,L,axioms)
-            val res_list = List.map (fn x => init_coherence_con(x,init,axioms)) con_list
-            val result = List.all (fn x => x) res_list
+            val results = List.map (fn rule => init_coherence_con((forms,rulesL,rulesR),rule,axioms)) init_rules
         in
-          result::rest
+            (case List.find (fn (x,_) => x) results of
+               SOME x => x
+             | NONE => List.hd(results) )
         end
 
-
-    (* fun init_coherence_print  *)
-
-    
-
-
-
+    fun init_coherence ([]: (Dat.form *Dat.rule list * Dat.rule list) list,_: Dat.rule list,_: Dat.rule list) = (true , [])
+      | init_coherence (first_con::con_list,init_rules,axioms) = 
+        let
+            val (rest,proofs) = init_coherence(con_list,init_rules,axioms)
+            val res as (result,_) = init_coherence_mult_init(first_con,init_rules,axioms) 
+        in
+          (rest andalso result , res::proofs)
+        end
 
     (*  *)
     fun weakening_rule_context (rule: (Dat.rule) , (side,context_num) : Dat.side * int) = 
@@ -319,7 +316,7 @@ struct
             
             val res = List.all (fn (_,r) => Option.isSome(r)) res2
 
-            val res2 = List.mapPartial (fn (_,NONE) => NONE | (t1,SOME t2) => SOME (t1,t2) ) res2
+            (* val res2 = if res then res2 else List.filter (fn (_,r) => false = Option.isSome(r)) res2 *)
             
         in
           (res,res2)
@@ -341,16 +338,23 @@ struct
            Dat.Mult(_,_,rest) => count_contexts(rest,index+1)
          | _ => index)
 
-    fun weakening ([]) = ([],[])
-        | weakening (rules as Dat.Rule(_,_,conc,_)::_) = 
+    fun weakening_proofs ([]) = ([],[])
+        | weakening_proofs (rules as Dat.Rule(_,_,conc,_)::_) = 
         let
             val Dat.Seq(L,_,R) = conc
             val (l_num,r_num) = (count_contexts(L,1), count_contexts (R,1))
             val (l_ctx,r_ctx) = (List.tabulate (l_num,fn i => (Dat.Left,i+1)) , List.tabulate (r_num,fn i => (Dat.Right,i+1)) )
-            val tl = List.map (fn x => weakening_context(rules, x)) l_ctx
-            val tr = List.map (fn x => weakening_context (rules, x)) r_ctx
+            fun test x = weakening_context(rules,x) 
         in
             (tl, tr)
+        end
+    
+    fun weakening (rules) = 
+        let
+            val (left,right) = weakening_proofs(rules)
+            val res_map = List.map (fn (bool,_) => bool)
+        in
+            (res_map left, res_map right)
         end
 
     fun print_helper((_, tree1),(_,tree2)) = 
@@ -360,7 +364,7 @@ struct
 
     fun weakening_print rules = 
         let 
-            val (L,R) = weakening(rules)
+            val (L,R) = weakening_proofs(rules)
             val tL = List.map(fn (bl,pfs) => if bl 
                     then "T###"^(List.foldr (fn (a,b) => print_helper(a)^"&&&"^b) "" pfs)
                     else "F###"^(List.foldr (fn (a,b) => print_helper(a)^"&&&"^b) "" pfs)) L
@@ -476,15 +480,15 @@ struct
             (* List.map(fn t => der_tree_toString t)opens1 *)
         end
 
-    (* fun latex_res ((_,tree1),(_,tree2)) = 
+    fun latex_res ((_,tree1),(_,tree2)) = 
             "$$"^Latex.der_tree_toLatex2(tree1)^"$$"
             ^"$$ \\leadsto $$"
-            ^"$$"^Latex.der_tree_toLatex2(tree2)^"$$" *)
+            ^"$$"^Latex.der_tree_toLatex2(tree2)^"$$"
 
   fun result_to_latex_strings ((true_list,fail_list)) = 
   	let
         val connector = "#@#"
-  		val true_strings = List.map (print_helper) true_list
+  		val true_strings = List.map (latex_res) true_list
   		val fail_strings = List.map (fn (_,dvt) => "$$"^Latex.der_tree_toLatex2(dvt)^"$$") fail_list
         val true_string = List.foldr (fn (x,y) => x^connector^y) "" true_strings
         val fail_string = List.foldr (fn (x,y) => x^connector^y) "" fail_strings

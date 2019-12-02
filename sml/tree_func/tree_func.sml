@@ -70,8 +70,30 @@
                     List.exists(fn v2 => Dat.ctx_var_eq(v1,v2))(get_ctx_vars sequent)
                 | bad_sub(Dat.Fs(a1,_), sequent) = 
                     List.exists(fn a2 => Dat.form_eq(a1,a2))(get_forms sequent)
+                | bad_sub _ = false
         in 
             List.filter(fn (sb,_) => not (List.exists(fn s => bad_sub(s,sequent))sb))sigcons
+        end
+    
+    fun add_constraints(sigcons, sequent) = 
+        let
+            
+            fun remove (_,[]) = []
+                |remove (x,y::L) = if Dat.ctx_var_eq(x,y) then remove(x,L) else y::remove(x,L)
+            fun unique ([]) = []
+                |unique (x::L) = x::remove(x,L)
+            val ctx_vars = unique(get_ctx_vars sequent)
+            fun update_cons (subs,cons) = 
+                let
+                    val subs_for_each_var = List.concat (List.map (fn (var) => List.filter 
+                                                                (fn (Dat.CTXs(sub_var,_)) => Dat.ctx_var_eq(var,sub_var) 
+                                                                | _ => false) subs) ctx_vars)
+                    val new_cons = List.map (fn (Dat.CTXs(var,Dat.Ctx(vars,_))) => (var,[var],vars) | _ => raise Fail "") subs_for_each_var
+                in
+                    (subs,new_cons@cons)
+                end
+        in
+            List.map update_cons sigcons
         end
 
     fun get_premises_of(Dat.DerTree(id, _, _, []), sid) = []
@@ -92,8 +114,8 @@
                     if id <> sid then [(forms,NONE, Dat.DerTree(id, sq,  Dat.NoRule, []))] else 
                     (case U.Unify_seq(conc, sq) of
                         SOME(sigscons) => 
-                            let val formulas = get_forms(conc)
-                                val new_sigscons = filter_bad_subs(sigscons,sq)
+                            let val new_sigscons = filter_bad_subs(sigscons,sq)
+                                val new_sigscons = add_constraints(sigscons,sq)
                                 val next_ids = List.tabulate(List.length(premises), fn i => Int.toString(i))
                                 val prems_ids = ListPair.zip(premises, next_ids)
                                 val new_prems = List.map(fn (p, i) => Dat.DerTree(id^i,p, Dat.NoRule,[]))prems_ids
@@ -115,10 +137,11 @@
                     else 
                         let val all_devs = apply_rule_aux( Dat.DerTree(id, sq, rq, pq), rule, sid)
                         in List.map(fn (frm, sgcn, dv) => (forms @ frm, sgcn, dv :: prems))all_devs end
+            (* fun print_seq (Dat.DerTree(_,sq,_,_)) = print(Dat.seq_toString(sq)) *)
         in 
-            List.map(fn (form, unif, dvt) => case unif of 
-                SOME((sg,cn)) => (form, cons @ cn, App.apply_der_tree_Unifier(dvt, sg))
-                | NONE => (form, cons, dvt))(apply_rule_aux(dt, rule, sid))
+            List.map   (fn (form, unif, dvt) => case unif of 
+                SOME((sg,cn)) => (form, cons @ cn, (App.apply_der_tree_Unifier(dvt, sg)))
+                | NONE => (form, cons, dvt))   (apply_rule_aux(dt, rule, sid))
         end
 
     fun apply_rule_everywhere((fm,cn,dt), rule) = 

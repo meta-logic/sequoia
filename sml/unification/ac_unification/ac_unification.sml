@@ -6,11 +6,14 @@ struct
     
     structure H = helpersImpl
 
-    val start_index = ref 99
     type constraint = (D.ctx_var * D.ctx_var list * D.ctx_var list)
+
+    val start_index = ref 1
+
 
     (* changes the start index (for variable naming purposes)*)
     fun change_start_index( x: int) : unit = ignore (start_index := x)
+    fun get_fresh_var () = (D.CtxVar("\\Theta^{"^ (Int.toString(!start_index)) ^"}")) before (start_index := !start_index +1)
 
     fun constraint_to_equation' ([],[]) = (([],[]),([],[]))
        |constraint_to_equation' (left,right) = 
@@ -94,10 +97,23 @@ struct
             end) 
 
     (* used incase we transform the equation to an injective one *)
+    (* placeholder *)
     fun expand_solutions _ = raise Fail "unimplemented"
 
+
+    fun add_to_sub(_,sub,0) = sub
+        |add_to_sub (var,D.CTXs(x,D.Ctx(vars,forms)),n) = add_to_sub (var,D.CTXs(x,D.Ctx(var::vars,forms)),n-1)
+        |add_to_sub _ = raise Fail "add_to_sub case 3"
+
     (* maps the set of solutions to a substitution that corresponds to the MGU for the constraint*)
-    fun solutions_to_MGU _ = raise Fail "unimplemented"
+    fun solutions_to_MGU (variables, solutions as []) = List.map (fn x => D.CTXs(x,D.Ctx([],[]))) variables
+        | solutions_to_MGU (variables, sol::solutions) = 
+            let
+                val subs = solutions_to_MGU(variables,solutions)
+                val this_var = get_fresh_var()
+            in
+                ListPair.map (fn (sub,num) => add_to_sub(this_var,sub,num)) (subs,sol)
+            end
 
     (* given a constraint, return the most general unifier *)
     fun solve_constraint A = 
@@ -106,11 +122,14 @@ struct
             val (left_e,right_e) = equations_to_vectors (value_l,value_r)
             val (bool,check,set,(cur_l,cur_r),min_n,max_n) = vectors_to_graph (left_e,right_e)
             val solution = find_solutions (check,set,min_n,max_n,left_e,right_e,bool,0,cur_l,cur_r,0,0)
+            val names = name_l @ name_r
+            val solution = List.map (fn (x,y) => let val app = V.concat ([x,y]) in List.tabulate (V.length(app),(fn i => V.sub(app,i))) end ) solution
         in
-            ((name_l,name_r),solution)
+            solutions_to_MGU(names,solution)
         end
 
     (* given a list of constraints, return the most general unifier *)
+    (* solves constraints one by one, and in the end creates a unifier that only has mappings from variables that are originally in the problem *)
     fun solve_constraints _ = raise Fail "unimplemented"
 
     val cons1 = (D.CtxVar("lol"), [D.CtxVar("E"), D.CtxVar("E"), D.CtxVar("B"), D.CtxVar("C")], [D.CtxVar("A"), D.CtxVar("A"), D.CtxVar("D")])
