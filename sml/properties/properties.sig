@@ -20,10 +20,6 @@ sig
 
 	val check_premises' : (constraint list * D.der_tree)*(constraint list * D.der_tree) * (bool list * bool list) -> bool
 	val permutes : D.rule * D.rule * D.rule list * (bool list * bool list) -> (((((constraint list * D.der_tree) * (constraint list * D.der_tree)) list) * ((constraint list * D.der_tree) list)) * (constraint list * D.der_tree) list) list
-<<<<<<< HEAD
-	val permute_final : D.rule * D.rule * D.rule list * (bool list * bool list) -> string * string
-=======
 	val permute_final : D.rule * D.rule * D.rule list * (bool list * bool list) -> unit
->>>>>>> datatypes
 end
 
