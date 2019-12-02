@@ -279,7 +279,7 @@ struct
         let
 
             val res = false
-            val weak_form = Dat.Atom "weakening"
+            val weak_form = Dat.Atom "W^*"
 
             fun add_to_ctx(Dat.Empty,1) = Dat.Empty
                 | add_to_ctx(Dat.Single(Dat.Ctx(vars,forms)),1) = Dat.Single(Dat.Ctx(vars,weak_form::forms))
@@ -347,17 +347,29 @@ struct
             val Dat.Seq(L,_,R) = conc
             val (l_num,r_num) = (count_contexts(L,1), count_contexts (R,1))
             val (l_ctx,r_ctx) = (List.tabulate (l_num,fn i => (Dat.Left,i+1)) , List.tabulate (r_num,fn i => (Dat.Right,i+1)) )
-            fun test x = let val (res,_) = weakening_context(rules,x) in res end
+            val tl = List.map (fn x => weakening_context(rules, x)) l_ctx
+            val tr = List.map (fn x => weakening_context (rules, x)) r_ctx
         in
-            (List.map test l_ctx, List.map test r_ctx)
+            (tl, tr)
         end
+
+    fun print_helper((_, tree1),(_,tree2)) = 
+        "$$"^Latex.der_tree_toLatex2(tree1)^"$$"
+        ^"$$ \\leadsto $$"
+        ^"$$"^Latex.der_tree_toLatex2(tree2)^"$$"
 
     fun weakening_print rules = 
         let 
             val (L,R) = weakening(rules)
-            val pL = List.foldr (fn (a,b) => if a then "T$$$"^b  else "F$$$"^b) "" L
-            val pR = List.foldr (fn (a,b) => if a then "T$$$"^b  else "F$$$"^b) "" R
-            val pLR = pL ^ "###" ^ pR
+            val tL = List.map(fn (bl,pfs) => if bl 
+                    then "T###"^(List.foldr (fn (a,b) => print_helper(a)^"&&&"^b) "" pfs)
+                    else "F###"^(List.foldr (fn (a,b) => print_helper(a)^"&&&"^b) "" pfs)) L
+            val tR = List.map(fn (bl,pfs) => if bl 
+                    then "T###"^(List.foldr (fn (a,b) => print_helper(a)^"&&&"^b) "" pfs)
+                    else "F###"^(List.foldr (fn (a,b) => print_helper(a)^"&&&"^b) "" pfs)) R
+            val pL = List.foldr (fn (a,b) => a^"@@@"^b) "" tL
+            val pR = List.foldr (fn (a,b) => a^"@@@"^b) "" tR
+            val pLR = pL ^ "%%%" ^ pR
         in writeFD 3 pLR end
 
     (*TODO: if you can't apply a rule twice, should not return true*)
@@ -464,15 +476,15 @@ struct
             (* List.map(fn t => der_tree_toString t)opens1 *)
         end
 
-    fun latex_res ((_,tree1),(_,tree2)) = 
+    (* fun latex_res ((_,tree1),(_,tree2)) = 
             "$$"^Latex.der_tree_toLatex2(tree1)^"$$"
             ^"$$ \\leadsto $$"
-            ^"$$"^Latex.der_tree_toLatex2(tree2)^"$$"
+            ^"$$"^Latex.der_tree_toLatex2(tree2)^"$$" *)
 
   fun result_to_latex_strings ((true_list,fail_list)) = 
   	let
         val connector = "#@#"
-  		val true_strings = List.map (latex_res) true_list
+  		val true_strings = List.map (print_helper) true_list
   		val fail_strings = List.map (fn (_,dvt) => "$$"^Latex.der_tree_toLatex2(dvt)^"$$") fail_list
         val true_string = List.foldr (fn (x,y) => x^connector^y) "" true_strings
         val fail_string = List.foldr (fn (x,y) => x^connector^y) "" fail_strings
