@@ -10,7 +10,8 @@ var controller = require("../controllers/user")
 //user routes
 router.post("/user", controller.createUser)
 router.delete("/user", controller.deleteUser)
-router.get("/user", controller.getUser)
+router.get("/user/:user_id", controller.getUser)
+router.get("/users/:username", controller.checkUser)
 
 
 module.exports = router
