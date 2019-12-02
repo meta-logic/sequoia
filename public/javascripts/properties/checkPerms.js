@@ -30,6 +30,10 @@ function selectRule(bl, i) {
 }
 
 function permRules() {
+    document.getElementById('info_answer').innerHTML = ""
+    document.getElementById("good_trees").innerHTML = ""
+    document.getElementById("bad_trees").innerHTML = ""
+
     warning_init = '<div id="init warning" class="ui red negative message">'
         +'<div class="header">Not Permutable</div>'
             +'<p>Please select rules that are not axioms or init rules</p>'
@@ -49,7 +53,7 @@ function permRules() {
     var premises2 = ruletemp2.getAttribute("premises")
     var rule_sml2 = "Rule(\""+name2+"\",None,"+conclusion2+","+premises2+")"
 
-    var message = document.getElementById('warning')
+    var message = document.getElementById('info_answer')
 
     if (side1 == "None" || side2 == "None") {
         message.innerHTML = warning_init
@@ -79,10 +83,10 @@ function permRules() {
         var goodtrees = trees[0].split("#@#")
         var badtrees = trees[1].split("#@#")
         var message = document.getElementById('info_answer')
-                message.innerHTML = '<div id="answer" class="ui info message">'
-                    +'<div class="header">'+answer[0]+'</div>'
-                        +'<p>'+answer[1]+'</p>'
-                    +'</div>'
+        message.innerHTML = '<div id="answer" class="ui info message">'
+            +'<div class="header">'+answer[0]+'</div>'
+                +'<p>'+answer[1]+'</p>'
+            +'</div>'
 
         if (goodtrees.length > 1) {
             var gtrees = document.getElementById("good_trees")
@@ -90,7 +94,7 @@ function permRules() {
                 if (goodtrees[i] != "") {
                     gtrees.innerHTML += 
                         '<div id="gtree_card'+i+'" class="ui green card">'
-                            +'<div class="content">'+goodtrees[i]+'</div>'
+                            +'<div class="content">'+goodtrees[i]+'</div></div>'
                 }
             }
         }
