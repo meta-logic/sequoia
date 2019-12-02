@@ -194,7 +194,7 @@ structure unifyImpl : UNIFICATION = struct
                             List.map(fn s1 => 
                                 List.map(fn s2 => 
                                     let val (subs, (fresh_g, set1, set2)) = 
-                                        (s1 @ s2, get_constraint(post_ctx s1, post_ctx s2)) 
+                                        (s1 @ s2, get_constraint(post_ctx s1, post_ctx s2))
                                     in 
                                         if List.length(set1) = 1 then
                                         (List.take(

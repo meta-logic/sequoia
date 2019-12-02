@@ -92,15 +92,15 @@
                     if id <> sid then [(forms,NONE, Dat.DerTree(id, sq,  Dat.NoRule, []))] else 
                     (case U.Unify_seq(conc, sq) of
                         SOME(sigscons) => 
-                            let val new_sigscons = filter_bad_subs(sigscons,sq)
+                            let val formulas = get_forms(conc)
+                                val new_sigscons = filter_bad_subs(sigscons,sq)
                                 val next_ids = List.tabulate(List.length(premises), fn i => Int.toString(i))
-                                val formulas = get_forms(conc)
                                 val prems_ids = ListPair.zip(premises, next_ids)
-                                val new_prems = List.map(fn (p, i) =>  Dat.DerTree(id^i,p, Dat.NoRule,[]))prems_ids
+                                val new_prems = List.map(fn (p, i) => Dat.DerTree(id^i,p, Dat.NoRule,[]))prems_ids
                             in
                                 if List.length(new_sigscons) = 0 then [(forms,NONE, Dat.DerTree(id,sq, Dat.NoRule,[]))] else
                                 List.map(fn (sg,cn) => let val frm = App.apply_formL_Unifier(formulas,sg) in
-                                (forms @ frm,SOME(sg,cn),  Dat.DerTree(id,sq,Dat.RuleName(name),new_prems)) end)new_sigscons
+                                (forms @ frm,SOME(sg,cn), Dat.DerTree(id,sq,Dat.RuleName(name),new_prems)) end)new_sigscons
                             end
                         | NONE => [(forms,NONE, Dat.DerTree(id, sq,  Dat.NoRule, []))])
                 | apply_rule_aux( Dat.DerTree(id, sq, rq, pq), rule, sid) =
@@ -171,18 +171,25 @@
             val filtered = List.filter(fn (cn, tr) => check_rule_of(cn,tr,id))new_trees
         in
             (case filtered of 
-                [] => writeFD 3 "NOT APPLICABLE"
-                | x::rest => 
-                    let val new_premises = List.map(fn (cn, tr) => (cn, get_premises_of(tr,id))) filtered
-                        val new_premises_strings = List.map (fn (cn_list, pr_list) => 
-                            (List.map (Dat.const_toString) cn_list, List.map (Dat.seq_toString) pr_list)) new_premises
-                        val new_premises_strings2 = List.map (fn (c, p) => 
-                                "{"^(List.foldl (fn (str1,str2) => str2^"##"^str1) (List.hd(c)) (List.tl(c)))^"}@@"^
-                                "{"^(List.foldl (fn (str1,str2) => str2^"##"^str1) (List.hd(p)) (List.tl(p)))^"}"
-                                )new_premises_strings
-                        val final_form = "["^(List.foldl (fn (str1,str2) => str1^" && "^str2) (List.hd(new_premises_strings2)) (List.tl(new_premises_strings2)))^"]"
-                    in 
-                        writeFD 3 final_form
-                    end)
+            [] => writeFD 3 "NOT APPLICABLE"
+            | _ => 
+                let val new_premises = List.map(fn (cn, tr) => (cn, get_premises_of(tr,id))) filtered 
+                in
+                    (case new_premises of 
+                    [(_,[])] => writeFD 3 "[{}@@{}]"
+                    | _ => 
+                        let val new_premises_strings = List.map (fn (cn_list, pr_list) => 
+                                (List.map (Dat.const_toString) cn_list, List.map (Dat.seq_toString) pr_list)) new_premises
+                            val new_premises_strings2 = List.map (fn (c, p) => 
+                                    "{"^(List.foldl (fn (str1,str2) => str2^"##"^str1) (List.hd(c)) (List.tl(c)))^"}@@"^
+                                    "{"^(List.foldl (fn (str1,str2) => str2^"##"^str1) (List.hd(p)) (List.tl(p)))^"}"
+                                    )new_premises_strings
+                            val final_form = "["^(List.foldl (fn (str1,str2) => str1^" && "^str2) (List.hd(new_premises_strings2)) (List.tl(new_premises_strings2)))^"]"
+                        in 
+                            writeFD 3 final_form
+                        end)
+                end)
         end 
 end
+
+
