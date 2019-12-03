@@ -8,12 +8,11 @@ function addUser() {
             if (data.status != "success") {
                 $.post("/api/user", { username : username, password : password, 
                     email : email, occupation : occupation}, function(data, status){
-                    window.location.href = "/login"
-                })
+                    window.location.href = "/login"})
             } else {
                 document.getElementById("warning").innerHTML =
-                "<div class=\"ui red negative message\">"+
-                "<p>Username already exists</p></div>"
+                "<div class=\"ui red negative message\">"
+                +"<p>Username already exists</p></div>"
             }
         })
     }

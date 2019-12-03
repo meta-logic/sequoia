@@ -3,6 +3,7 @@
 
 //Loading Dependencies =============================================
 var express      = require('express');
+var session      = require('express-session')
 var path         = require('path');
 var helmet       = require('helmet');
 var mongoose     = require('mongoose');
@@ -10,17 +11,21 @@ var morgan       = require('morgan');
 var bodyParser   = require('body-parser');
 var hbs          = require('express-handlebars');
 var cookieParser = require('cookie-parser');
+var passport     = require('passport')
+require('dotenv').config()
 var app = express();
 var port = 3000;
 
 
 //loading local files ===============================================
 var page_routes    = require('./routes/home');
-var userRoutes = require('./api/routes/user');
+var userRoutes     = require('./api/routes/user');
 var calculusRoutes = require('./api/routes/calculus');
 var ruleRoutes     = require('./api/routes/rule');
 var symbolsRoutes  = require('./api/routes/symbols');
 var database       = require('./config/db');
+// var initPassport   = require('/routes/passport-config')
+// initPassport(passport, userRoutes)
 
 
 //Configurations =====================================================
@@ -29,6 +34,13 @@ app.use(morgan('dev')); // log every request to the console
 app.use(cookieParser()); // read cookies (needed for auth)
 app.use(bodyParser.json()); // get information from html forms
 app.use(bodyParser.urlencoded({extended: false})); // get information from html forms
+// app.use(session({
+//     secret: process.env.SESSION_SECRET,
+//     resave: false,
+//     saveUninitialized: false
+// }))
+// app.use(passport.initialize())
+// app.use(passport.session())
 
 
 
