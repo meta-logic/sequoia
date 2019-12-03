@@ -79,9 +79,9 @@ function permRules() {
     $.post("/permute", { rule1: rule_sml1, rule2: rule_sml2, init_rules: init_list }, function(data, status) {
         var output = data.output.split("%%%")
         var answer = output[0].split("@@@")
-        var trees = output[1].split("&*&")
-        var goodtrees = trees[0].split("#@#")
-        var badtrees = trees[1].split("#@#")
+        var trees = output[1].split("&&&")
+        var goodtrees = trees[0].split("###")
+        var badtrees = trees[1].split("###")
         var message = document.getElementById('info_answer')
         message.innerHTML = '<div id="answer" class="ui info message">'
             +'<div class="header">'+answer[0]+'</div>'

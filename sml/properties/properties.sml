@@ -271,6 +271,24 @@ struct
           (rest andalso result , res::proofs)
         end
 
+    fun init_coherence_print (a,b,c) = 
+        let
+            fun print_helper((_,tree1),SOME((_,tree2))) = 
+                "$$"^Latex.der_tree_toLatex2(tree1)^"$$"
+                ^"$$ \\leadsto $$"
+                ^"$$"^Latex.der_tree_toLatex2(tree2)^"$$"
+            | print_helper((_,tree1),NONE) = 
+                "$$"^Latex.der_tree_toLatex2(tree1)^"$$"
+        in
+            let val (bol, out) = init_coherence(a,b,c)
+                val t = List.map(fn (bl,pf) => if bl 
+                    then "T###"^print_helper(pf) else "F###"^print_helper(pf)) out
+                val p = List.foldr (fn (a,b) => a^"@@@"^b) "" t
+                val b = if bol then "T" else "F"
+                val bp = b^"%%%"^p
+            in writeFD 3 bp end
+        end
+
     (*  *)
     fun weakening_rule_context (rule: (Dat.rule) , (side,context_num) : Dat.side * int) = 
         let
@@ -346,7 +364,7 @@ struct
             val (l_ctx,r_ctx) = (List.tabulate (l_num,fn i => (Dat.Left,i+1)) , List.tabulate (r_num,fn i => (Dat.Right,i+1)) )
             fun test x = weakening_context(rules,x) 
         in
-            (tl, tr)
+            (List.map test l_ctx, List.map test r_ctx)
         end
     
     fun weakening (rules) = 
@@ -357,24 +375,28 @@ struct
             (res_map left, res_map right)
         end
 
-    fun print_helper((_, tree1),(_,tree2)) = 
-        "$$"^Latex.der_tree_toLatex2(tree1)^"$$"
-        ^"$$ \\leadsto $$"
-        ^"$$"^Latex.der_tree_toLatex2(tree2)^"$$"
 
     fun weakening_print rules = 
         let 
-            val (L,R) = weakening_proofs(rules)
-            val tL = List.map(fn (bl,pfs) => if bl 
-                    then "T###"^(List.foldr (fn (a,b) => print_helper(a)^"&&&"^b) "" pfs)
-                    else "F###"^(List.foldr (fn (a,b) => print_helper(a)^"&&&"^b) "" pfs)) L
-            val tR = List.map(fn (bl,pfs) => if bl 
-                    then "T###"^(List.foldr (fn (a,b) => print_helper(a)^"&&&"^b) "" pfs)
-                    else "F###"^(List.foldr (fn (a,b) => print_helper(a)^"&&&"^b) "" pfs)) R
-            val pL = List.foldr (fn (a,b) => a^"@@@"^b) "" tL
-            val pR = List.foldr (fn (a,b) => a^"@@@"^b) "" tR
-            val pLR = pL ^ "%%%" ^ pR
-        in writeFD 3 pLR end
+            fun print_helper((_,tree1),SOME((_,tree2))) = 
+                    "$$"^Latex.der_tree_toLatex2(tree1)^"$$"
+                    ^"$$ \\leadsto $$"
+                    ^"$$"^Latex.der_tree_toLatex2(tree2)^"$$"
+                | print_helper((_,tree1),NONE) = 
+                    "$$"^Latex.der_tree_toLatex2(tree1)^"$$"
+        in
+            let val (L,R) = weakening_proofs(rules)
+                val tL = List.map(fn (bl,pfs) => if bl 
+                        then "T###"^(List.foldr (fn (a,b) => print_helper(a)^"&&&"^b) "" pfs)
+                        else "F###"^(List.foldr (fn (a,b) => print_helper(a)^"&&&"^b) "" pfs)) L
+                val tR = List.map(fn (bl,pfs) => if bl 
+                        then "T###"^(List.foldr (fn (a,b) => print_helper(a)^"&&&"^b) "" pfs)
+                        else "F###"^(List.foldr (fn (a,b) => print_helper(a)^"&&&"^b) "" pfs)) R
+                val pL = List.foldr (fn (a,b) => a^"@@@"^b) "" tL
+                val pR = List.foldr (fn (a,b) => a^"@@@"^b) "" tR
+                val pLR = pL ^ "%%%" ^ pR
+            in writeFD 3 pLR end
+        end
 
     (*TODO: if you can't apply a rule twice, should not return true*)
     fun permutes(rule1, rule2, init_rule_ls, weak) =
@@ -480,21 +502,21 @@ struct
             (* List.map(fn t => der_tree_toString t)opens1 *)
         end
 
-    fun latex_res ((_,tree1),(_,tree2)) = 
-            "$$"^Latex.der_tree_toLatex2(tree1)^"$$"
-            ^"$$ \\leadsto $$"
-            ^"$$"^Latex.der_tree_toLatex2(tree2)^"$$"
 
-  fun result_to_latex_strings ((true_list,fail_list)) = 
-  	let
-        val connector = "#@#"
-  		val true_strings = List.map (latex_res) true_list
-  		val fail_strings = List.map (fn (_,dvt) => "$$"^Latex.der_tree_toLatex2(dvt)^"$$") fail_list
-        val true_string = List.foldr (fn (x,y) => x^connector^y) "" true_strings
-        val fail_string = List.foldr (fn (x,y) => x^connector^y) "" fail_strings
-  	in
-  		true_string^"&*&"^fail_string
-  	end
+
+    fun result_to_latex_strings ((true_list,fail_list)) = 
+        let 
+            fun latex_res ((_,tree1),(_,tree2)) = 
+                "$$"^Latex.der_tree_toLatex2(tree1)^"\\leadsto "
+                ^""
+                ^Latex.der_tree_toLatex2(tree2)^"$$"
+        in
+            let val true_strings = List.map (latex_res) true_list
+                val fail_strings = List.map (fn (_,dvt) => "$$"^Latex.der_tree_toLatex2(dvt)^"$$") fail_list
+                val true_string = List.foldr (fn (x,y) => x^"###"^y) "" true_strings
+                val fail_string = List.foldr (fn (x,y) => x^"###"^y) "" fail_strings
+            in true_string^"&&&"^fail_string end
+        end
 
     fun permute_res ((right,wrong)) = 
         (case (List.length(right),List.length(wrong)) of

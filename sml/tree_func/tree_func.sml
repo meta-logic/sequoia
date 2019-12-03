@@ -114,7 +114,8 @@
                     if id <> sid then [(forms,NONE, Dat.DerTree(id, sq,  Dat.NoRule, []))] else 
                     (case U.Unify_seq(conc, sq) of
                         SOME(sigscons) => 
-                            let val new_sigscons = filter_bad_subs(sigscons,sq)
+                            let val formulas = get_forms(conc)
+                                val new_sigscons = filter_bad_subs(sigscons,sq)
                                 val new_sigscons = add_constraints(sigscons,sq)
                                 val next_ids = List.tabulate(List.length(premises), fn i => Int.toString(i))
                                 val prems_ids = ListPair.zip(premises, next_ids)

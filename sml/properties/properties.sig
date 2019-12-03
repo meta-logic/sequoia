@@ -15,16 +15,16 @@ sig
 
 	(* checks if init_coherence_con is true for all connectives for each init rule *)
 	val init_coherence : ((D.form * D.rule list * D.rule list) list * D.rule list* D.rule list) -> bool * (bool * proof) list
-	val init_coherence_final : ((D.form * D.rule list * D.rule list) list * D.rule list* D.rule list) -> unit
+	val init_coherence_print : ((D.form * D.rule list * D.rule list) list * D.rule list* D.rule list) -> unit
 	
 	val weakening_rule_context : (D.rule * (D.side * int)) -> bool * proof list
 	val weakening_context : (D.rule list * (D.side * int)) -> bool * proof list
 	val weakening_proofs : D.rule list -> ((bool * proof list) list) * ((bool * proof list) list)
 	val weakening : D.rule list -> (bool list) * (bool list)
-	val weakening_final : D.rule list -> unit
+	val weakening_print : D.rule list -> unit
 
 	val check_premises' : (constraint list * D.der_tree)*(constraint list * D.der_tree) * (bool list * bool list) -> bool
 	val permutes : D.rule * D.rule * D.rule list * (bool list * bool list) -> (((((constraint list * D.der_tree) * (constraint list * D.der_tree)) list) * ((constraint list * D.der_tree) list)) * (constraint list * D.der_tree) list) list
-	val permute_final : D.rule * D.rule * D.rule list * (bool list * bool list) -> unit
+	val permute_print : D.rule * D.rule * D.rule list * (bool list * bool list) -> unit
 end
 

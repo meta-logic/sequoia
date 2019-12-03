@@ -1,5 +1,3 @@
-var left_proofs = []
-var right_proofs = []
 
 function showProof(side, index, on) {
     console.log("HERE")
@@ -40,32 +38,6 @@ function showProof(side, index, on) {
     document.getElementById(side+index).setAttribute("onClick", "showProof(\""+side+"\","+index+",\"yes\")")
 }
 
-function setLabel(left_bools, right_bools, index, side) {
-    var label_string = ""
-    for (var j = 0; j < left_bools.length -1; j++) {
-        space = "\\_"
-        if (side == "L") {
-            space = "\\Gamma"
-        } 
-        if (j == left_bools.length-2) {
-            label_string += space+" \\vdash"
-        } else {
-            label_string += space+","
-        }
-    }
-    for (var j = 0; j < right_bools.length -1; j++) {
-        space = "\\_"
-        if (side == "R") {
-            space = "\\Gamma"
-        } 
-        if (j == right_bools.length-2) {
-            label_string += " "+space
-        } else {
-            label_string += space+","
-        }
-    }
-    return "$$" + label_string + "$$"
-}
 
 function checkWeak() {
     $.get("/api/rules/"+calc_id, function (rls, status) { 
