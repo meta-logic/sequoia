@@ -147,7 +147,7 @@ structure unifyImpl : UNIFICATION = struct
 
             fun update_ctx_var (DAT.CtxVar(x)) = DAT.CtxVar(fresh(x))
 
-            fun get_constraint (g1, g2) = 
+            fun get_constraint (g1, g2) =
                 let val () = () in init_fresh := !init_fresh + 1;
                 (DAT.CtxVar("Gamma_" ^ Int.toString(!init_fresh)), g1, g2) end
 
@@ -196,15 +196,15 @@ structure unifyImpl : UNIFICATION = struct
                                     let val (subs, (fresh_g, set1, set2)) = 
                                         (s1 @ s2, get_constraint(post_ctx s1, post_ctx s2))
                                     in 
-                                        if List.length(set1) = 1 then
-                                        (List.take(
+                                        (case (List.length(set1),List.length(set2)) of
+                                           (0,0) => (subs, [])
+                                         | (1,_) => (List.take(
                                         APP.UnifierComposition(subs,[DAT.CTXs(List.hd(set1),DAT.Ctx(set2,nil))]),
-                                        List.length subs),[(fresh_g, set1, set2)])
-                                        else if List.length(set2) = 1 then
-                                        (List.take(
+                                        List.length subs),[])
+                                         | (_,1) => (List.take(
                                         APP.UnifierComposition(subs,[DAT.CTXs(List.hd(set2),DAT.Ctx(set1,nil))]),
-                                        List.length subs),[(fresh_g, set1, set2)])
-                                        else (subs, [(fresh_g, set1, set2)])
+                                        List.length subs),[])
+                                         | _ => (subs, [(fresh_g, set1, set2)]))
                                     end
                                 )sigma1
                             )sigma2)
@@ -240,7 +240,7 @@ structure unifyImpl : UNIFICATION = struct
 
             fun Unify_ctx_AUX (DAT.Ctx([], fl1), DAT.Ctx([], fl2)) = 
                     let val subs = try_permutations (fl1, fl2)
-                        val cons = List.map(fn (s) => [get_constraint ([], [])])subs
+                        val cons = List.map(fn (s) => [])subs
                     in if List.length(subs) = 0 then NONE
                     else SOME(ListPair.zip(subs, cons)) end
                 | Unify_ctx_AUX (DAT.Ctx(vl1, fl1), DAT.Ctx([], fl2)) = 

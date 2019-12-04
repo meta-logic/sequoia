@@ -73,7 +73,7 @@ function permRules() {
             init_list += rule_smlInit + ","
         }
     }
-    init_list = init_list.slice(0,init_list.length-1) + "]"
+    init_list = init_list.slice(0,Math.max(1,init_list.length-1)) + "]"
 
 
     $.post("/permute", { rule1: rule_sml1, rule2: rule_sml2, init_rules: init_list }, function(data, status) {
