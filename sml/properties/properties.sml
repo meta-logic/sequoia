@@ -508,8 +508,7 @@ struct
         let 
             fun latex_res ((_,tree1),(_,tree2)) = 
                 "$$"^Latex.der_tree_toLatex2(tree1)^"\\leadsto "
-                ^""
-                ^Latex.der_tree_toLatex2(tree2)^"$$"
+                ^""^Latex.der_tree_toLatex2(tree2)^"$$"
         in
             let val true_strings = List.map (latex_res) true_list
                 val fail_strings = List.map (fn (_,dvt) => "$$"^Latex.der_tree_toLatex2(dvt)^"$$") fail_list
