@@ -8,6 +8,9 @@ signature UNIFICATION = sig
     type ctx = DAT.ctx
     type seq = DAT.seq
 
+    val get_index : unit -> int
+    val change_index : int -> unit
+
     val Unify_form : form * form -> sub list list option
     val Unify_formL : form list * form list -> sub list list option
     val Unify_ctx : ctx * ctx
