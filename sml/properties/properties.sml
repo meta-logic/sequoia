@@ -146,11 +146,11 @@ struct
             val t2_vars = Set.listItems(Set.addList(Set.empty,t2_vars))
             val t1_vars = List.map (fn x => D.CtxVar(x)) t1_vars
             val t2_vars = List.map (fn x => D.CtxVar(x)) t2_vars
-(*            val _ = print_seq_list(t1_prems)
+            (* val _ = print_seq_list(t1_prems)
             val _ = print_seq_list(t2_prems)
-            val _ = print ("\n\n\n")*)
+            val _ = print ("\n\n\n") *)
             val res = E.check_premises_wk(t1_prems,t2_prems,constraints,weak,t1_vars,t2_vars)
-            (*val _ = if res then print("true\n\n\n\n\n\n\n") else print("false\n\n\n\n\n\n\n")*)
+            (* val _ = if res then print("true\n\n\n\n\n\n\n") else print("false\n\n\n\n\n\n\n") *)
         in
             res
         end
@@ -466,16 +466,18 @@ struct
                         val dvt_lst = List.concat(List.map(fn tree =>
                                         T.apply_rule_all_ways(tree, rule2, true)) temp)
                         (*TODO: not sure what this line does*)
-                        (*val final = List.concat(List.map(fn tree  =>
-                                        List.concat(List.map(fn init_rule =>
-                                        T.apply_rule_everywhere(tree, init_rule))init_rule_ls))dvt_lst)*)
+                        val final = List.concat (List.map (fn tree => T.apply_multiple_rules_all_ways(tree,init_rule_ls)) dvt_lst)
+                        (* val _ = List.app (fn (_,_,t) => List.app (fn (D.DerTree(_,seq,_,_)) => print (D.seq_toString(seq)^"\n")) (T.get_open_prems(t))) final
+                        val _ = print "\n\n\n____\n\n\n" *)
                     in
-                        List.map(fn(_,cn,ft) => (cn,ft)) dvt_lst
+                        List.map(fn(_,cn,ft) => (cn,ft)) final
                     end) bases
 
             val D.Rule(name1, side1, conc1, premises1) = rule1
             val D.Rule(name2, side2, conc2, premises2) = rule2
-            
+            val rule1 = update_rule(rule1)
+            val rule2 = update_rule(rule2)
+
             val bases = (create_base(rule1, rule2))
             val bases_pairs = List.map (fn conc => (D.DerTree("0",seq_to_fresh(conc),D.NoRule,[]),D.DerTree("0",seq_to_fresh(conc),D.NoRule,[]))) bases
 
