@@ -151,6 +151,8 @@ struct
 	fun extract_constraints (A,B) = let val (res,_) = extract_constraints_wk(A,B,([],[])) in res end
 
 
+	fun set_leaves () = ()
+
 	(*check premises with an extra term that can be weakened*)
 	fun check_premises_wk (_,[],constraints,_,t1_vars,t2_vars) = check_consistent(constraints,t1_vars,t2_vars)
 		|check_premises_wk (assumed_leaves,x::conc_leaves,cons,weak,t1_vars,t2_vars) = 
@@ -169,8 +171,10 @@ struct
 			find_match possible_premises
 		end
 
-	fun check_premises (_,[],constraints,t1_vars,t2_vars) = check_consistent(constraints,t1_vars,t2_vars)
-		| check_premises (assumed_leaves,x::conc_leaves,cons,t1_vars,t2_vars) = 
+	fun check_premises (assumed,conc,cons,t1_vars,t2_vars) = 
+		check_premises_wk(assumed,conc,cons,([],[]),t1_vars,t2_vars)
+	(* check_consistent(constraints,t1_vars,t2_vars) *)
+		(* | check_premises (assumed_leaves,x::conc_leaves,cons,t1_vars,t2_vars) = 
 		let
 			val possible_premises = List.filter (fn y => seq_equiv (y,x)) assumed_leaves
 			fun find_match [] = false
@@ -183,7 +187,7 @@ struct
 				end
 		in
 			find_match possible_premises
-		end
+		end *)
 
 end
 

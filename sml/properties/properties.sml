@@ -29,6 +29,7 @@ struct
     val rule_fresh = fresher
     val var_index = fresher
 
+
     fun writeFD fd content = 
         let
             val out = Posix.FileSys.wordToFD (SysWord.fromInt(fd))
@@ -128,7 +129,14 @@ struct
     fun get_ctx_vars_from_constraints(nil) = []
         |get_ctx_vars_from_constraints(x::L) = get_ctx_vars_from_constraint(x)@get_ctx_vars_from_constraints(L)
 
+    fun generate_leaf_name (name_ref) = ("\\mathcal{"^(Char.toString(!name_ref))^"}") before (name_ref := Char.succ(!name_ref))
 
+    fun rename_ids_h (D.DerTree(id,seq,rule,prems),name_ref) = 
+        (case List.length(prems) of
+           0 => D.DerTree (generate_leaf_name(name_ref),seq,rule,prems)
+         | _ => D.DerTree (id,seq,rule, List.map (fn prem => rename_ids_h (prem,name_ref)) prems))
+
+    fun rename_ids (cons,dvt) = (cons,rename_ids_h(dvt,ref (#"D")))
 
     fun check_premises'((cn1,dvt1),(cn2,dvt2),weak) =
         let
@@ -441,7 +449,7 @@ struct
                     (*remove sets with no trees in set 1 or no trees in set 2*)
                     val set_base_pairs = List.filter (fn (y::_,x::_) => true | (_,_) => false) set_base_pairs
 
-
+                    val set_base_pairs = List.map (fn (x,y) => ( List.map (fn (tree) => rename_ids(tree)) x ,y)) set_base_pairs
 
                     fun set_check (set1,set2)  = ( List.map (fn (cn1,dvt1) =>
                             ((List.find (fn (cn2,dvt2) =>
