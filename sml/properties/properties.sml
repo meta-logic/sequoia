@@ -142,8 +142,8 @@ struct
         let
             val D.DerTree(_,sq1,_,_) = dvt1
             val D.DerTree(_,sq2,_,_) = dvt2
-            val t1_prems = List.map (fn (D.DerTree(_,seq,_,_)) => seq) (T.get_open_prems(dvt1))
-            val t2_prems = List.map (fn (D.DerTree(_,seq,_,_)) => seq) (T.get_open_prems(dvt2))
+            val t1_prems = List.map (fn (D.DerTree(id,seq,_,_)) => (id,seq)) (T.get_open_prems(dvt1))
+            
             (*val goal = create_constraint(sq1,sq2)*)
             val constraints = cn1@cn2
             (*val _ = last1 := dvt1*)
@@ -157,10 +157,10 @@ struct
             (* val _ = print_seq_list(t1_prems)
             val _ = print_seq_list(t2_prems)
             val _ = print ("\n\n\n") *)
-            val res = E.check_premises_wk(t1_prems,t2_prems,constraints,weak,t1_vars,t2_vars)
+            val res = E.check_premises_wk(t1_prems,dvt2,constraints,weak,t1_vars,t2_vars)
             (* val _ = if res then print("true\n\n\n\n\n\n\n") else print("false\n\n\n\n\n\n\n") *)
         in
-            res
+            Option.map (fn x => (cn2,x)) res
         end
 
 
@@ -338,8 +338,11 @@ struct
             val base2 = add_to_seq(base)
             val rule_applied_list = List.map (fn (_,cons,tree) => (cons,tree)) (T.apply_rule(([],[],D.DerTree("0",base,Dat.NoRule,[])),rule,"0"))
             val rule_applied_list_weak = List.map (fn (_,cons,tree) => (cons,tree)) (T.apply_rule(([],[],D.DerTree("0",base2,Dat.NoRule,[])),rule,"0"))
-            val res2 = List.map (fn (t1) => (t1,List.find (fn (t2) => check_premises'(t1,t2,make_weak_bool(side,context_num)) ) rule_applied_list_weak ) ) rule_applied_list
+
+            val res2 = List.map (fn (t1) => (t1,List.mapPartial (fn (t2) => check_premises'(t1,t2,make_weak_bool(side,context_num)) ) rule_applied_list_weak ) ) rule_applied_list
             
+            val res2 = List.map (fn (t1,[]) => (t1,NONE) | (t1,x::_) => (t1,SOME x)) res2
+
             val res = List.all (fn (_,r) => Option.isSome(r)) res2
 
             (* val res2 = if res then res2 else List.filter (fn (_,r) => false = Option.isSome(r)) res2 *)
@@ -451,15 +454,15 @@ struct
 
                     val set_base_pairs = List.map (fn (x,y) => ( List.map (fn (tree) => rename_ids(tree)) x ,y)) set_base_pairs
 
-                    fun set_check (set1,set2)  = ( List.map (fn (cn1,dvt1) =>
-                            ((List.find (fn (cn2,dvt2) =>
-                                check_premises' ((cn1,dvt1),(cn2,dvt2),weak)
-                            )set2)   ,(cn1,dvt1))
+                    fun find (tree1,t2s,weak) = List.find (fn x => true) (List.mapPartial (fn (tree2) => check_premises'(tree1,tree2,weak)) t2s )
+
+                    fun set_check (set1,set2)  = ( List.map (fn tree1 =>
+                            ((tree1,find(tree1,set2,weak)))
                         ) set1 , set2)
 
                     fun seperate' ([],res) = res
-                        | seperate' ((SOME y,x)::L,(res1,res2)) = seperate'(L,((x,y)::res1,res2))
-                        | seperate' ((NONE,x)::L,(res1,res2)) = seperate'(L,(res1,x::res2))
+                        | seperate' ((x,SOME y)::L,(res1,res2)) = seperate'(L,((x,y)::res1,res2))
+                        | seperate' ((x,NONE)::L,(res1,res2)) = seperate'(L,(res1,x::res2))
 
                     fun seperate (L) = seperate' (L,([],[]))
 
