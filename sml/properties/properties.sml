@@ -23,11 +23,13 @@ struct
 
 
 
-    val other_fresh = ref 1000000;
-    val term_fresh = ref 10000;
+    val other_fresh = ref 1;
+    val term_fresh = ref 1;
     val fresher = ref 1;
     val rule_fresh = fresher
     val var_index = fresher
+
+    exception Arity
 
 
     fun writeFD fd content = 
@@ -42,10 +44,10 @@ struct
             fun gen_out(D.Empty) = D.Empty
                 | gen_out(D.Single(D.Ctx(vl,fl))) =
                 let val () = () in other_fresh := !other_fresh + 1;
-                D.Single(D.Ctx([D.CtxVar ("Gamma_{" ^ Int.toString(!other_fresh)^"}")],nil)) end
+                D.Single(D.Ctx([D.CtxVar ("\\Gamma_{" ^ Int.toString(!other_fresh)^"}")],nil)) end
                 | gen_out(D.Mult(con,D.Ctx(vl,fl),rest)) =
                 let val () = () in other_fresh := !other_fresh + 1;
-                D.Mult(con,D.Ctx([D.CtxVar ("Gamma_{" ^ Int.toString(!other_fresh)^"}")],nil),gen_out rest) end
+                D.Mult(con,D.Ctx([D.CtxVar ("\\Gamma_{" ^ Int.toString(!other_fresh)^"}")],nil),gen_out rest) end
         in
             D.Seq(gen_out a, c, gen_out b)
         end
@@ -185,21 +187,72 @@ struct
     fun subformula (A, D.Form(_,subforms) ) = List.exists (fn x => D.form_eq(A,x) orelse subformula(A,x)) subforms
         | subformula (_,_) = false
 
+    fun find_arity_ctx (con, Dat.Ctx(_,forms)) = 
+        Option.map 
+        (fn Dat.Form(_,l) => List.length(l) | _ => raise Fail "find_arity_ctx Option.map") 
+        (List.find (fn (Dat.Form(c,_)) => Dat.conn_eq(c,con) | _ => false ) forms)
 
+    fun find_arity_ctx_struct (_ , Dat.Empty) = NONE
+        | find_arity_ctx_struct (con, Dat.Single (ctx) ) = find_arity_ctx(con,ctx)
+        | find_arity_ctx_struct (con, Dat.Mult (_,ctx,rest)) = 
+            (case find_arity_ctx(con,ctx) of
+               NONE => find_arity_ctx_struct(con,rest)
+             | a => a)
+
+    fun find_arity (con: Dat.conn, Dat.Seq(L,_,R): Dat.seq) = case find_arity_ctx_struct(con,L) of
+       NONE => find_arity_ctx_struct(con,R)
+     | a => a
+
+    fun check_arity_ctx (con,arity,Dat.Ctx(_,forms)) = 
+        let
+            val relevant = List.mapPartial 
+            (fn (Dat.Form(c,l)) => (if Dat.conn_eq(con,c) then SOME(List.length(l)) else NONE) 
+            | _ => NONE) forms
+        in
+            List.all (fn x => arity=x) relevant        
+        end
+
+    fun check_arity_ctx_struct (_,_,Dat.Empty) = true
+        |check_arity_ctx_struct (con,arity,Dat.Single(ctx)) = check_arity_ctx(con,arity,ctx)
+        |check_arity_ctx_struct (con,arity,Dat.Mult(_,ctx,rest)) =
+        check_arity_ctx(con,arity,ctx) andalso check_arity_ctx_struct(con,arity,rest)
+
+    fun check_arity(con: Dat.conn, arity: int, Dat.Rule(_,_,Dat.Seq(L,_,R),_)) = 
+    check_arity_ctx_struct(con,arity,L) andalso check_arity_ctx_struct(con,arity,R)
 
     (* check which formula  *)
-    fun init_coherence_con ((con_form:Dat.form, rulesL: Dat.rule list, rulesR: Dat.rule list), init_rule: Dat.rule, axioms: Dat.rule list)=
+    fun init_coherence_con ((con:Dat.conn, rulesL: Dat.rule list, rulesR: Dat.rule list), init_rule: Dat.rule, axioms: Dat.rule list)=
         let
             val Dat.Rule (_,_,init_conc,_) = init_rule
             (* changing names of context variables in rule and conclusion of rule *)
             val init_rule = update_rule(init_rule)
             (* val init_rule = atomize_rule(init_rule) *)
 
+            val Dat.Rule (_,_,check_rule,_) = 
+            (case (rulesL,rulesR) of
+               (x::_,_) => x
+             | (_,x::_) => x
+             | _ => raise Arity)
+            
+
+            val arity = 
+            (case find_arity(con,check_rule) of
+               NONE => raise Arity
+             | SOME(x) => x)
+
+            fun check_all (rules) = List.all (fn x => check_arity(con,arity,x)) rules
+
+            val _ = (case (check_all rulesL, check_all rulesR)  of
+                        (false,_) => raise Arity
+                      | (_,false) => raise Arity
+                      | _ => ())
+
+            val chars = Char.ord #"A"
+
+            val con_form = Dat.Form(con,List.tabulate(arity,(fn i => Dat.Atom(Char.toString(Char.chr(chars+i))))))
 
 
             val init_conc = seq_to_fresh(init_conc)
-
-            val con_form = atomize(con_form)
 
             (* changing forms of the init rule to con_form *)
             fun replace_forms_ctx (Dat.Ctx(vars,forms)) =
@@ -270,7 +323,7 @@ struct
              | NONE => List.hd(results) )
         end
 
-    fun init_coherence ([]: (Dat.form *Dat.rule list * Dat.rule list) list,_: Dat.rule list,_: Dat.rule list) = (true , [])
+    fun init_coherence ([]: (Dat.conn *Dat.rule list * Dat.rule list) list,_: Dat.rule list,_: Dat.rule list) = (true , [])
       | init_coherence (first_con::con_list,init_rules,axioms) = 
         let
             val (rest,proofs) = init_coherence(con_list,init_rules,axioms)
@@ -280,7 +333,7 @@ struct
         end
 
     fun init_coherence_print (a,b,c) = 
-        let
+        (let
             fun print_helper((_,tree1),SOME((_,tree2))) = 
                 "$$"^Latex.der_tree_toLatex2(tree1)^"$$"
                 ^"$$ \\leadsto $$"
@@ -295,7 +348,9 @@ struct
                 val b = if bol then "T" else "F"
                 val bp = b^"%%%"^p
             in writeFD 3 bp end
-        end
+        end)
+        handle (Arity) => writeFD 3 "Arity problem"
+        
 
     (*  *)
     fun weakening_rule_context (rule: (Dat.rule) , (side,context_num) : Dat.side * int) = 
@@ -339,8 +394,12 @@ struct
             val rule_applied_list = List.map (fn (_,cons,tree) => (cons,tree)) (T.apply_rule(([],[],D.DerTree("0",base,Dat.NoRule,[])),rule,"0"))
             val rule_applied_list_weak = List.map (fn (_,cons,tree) => (cons,tree)) (T.apply_rule(([],[],D.DerTree("0",base2,Dat.NoRule,[])),rule,"0"))
 
+            val rule_applied_list = List.map (fn tree => rename_ids(tree)) rule_applied_list
+
             val res2 = List.map (fn (t1) => (t1,List.mapPartial (fn (t2) => check_premises'(t1,t2,make_weak_bool(side,context_num)) ) rule_applied_list_weak ) ) rule_applied_list
             
+
+
             val res2 = List.map (fn (t1,[]) => (t1,NONE) | (t1,x::_) => (t1,SOME x)) res2
 
             val res = List.all (fn (_,r) => Option.isSome(r)) res2
@@ -544,6 +603,8 @@ struct
         in
             permute_res(union)^"%%%"^result_to_latex_strings(union)
         end
+
+    fun permute_final A = permute_res_to_string(permutes(A))
 
     fun permute_print A = writeFD 3 (permute_res_to_string(permutes(A)))
     

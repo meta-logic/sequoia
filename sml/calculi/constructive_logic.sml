@@ -191,7 +191,7 @@ struct
 
 	val weak_rule_list =  [andR(),andL(),impR(),impL(),orR1(),orR2(),orL(),trueR(), falseL(), id(), init()]
 	val init_rule_list = [id()]
-	val rule_pairs_no_init = [(andForm(A,B),[andR()],[andL()]),(impForm(A,B),[impR()],[impL()]),(orForm(A,B),[orR1(),orR2()],[orL()])]
+	val rule_pairs_no_init = [(andCon,[andR()],[andL()]),(impCon,[impR()],[impL()]),(orCon,[orR1(),orR2()],[orL()])]
 	val axiom_list = [trueR(), falseL()]
 
 	fun weak_test  () = P.weakening(weak_rule_list)
