@@ -10,12 +10,12 @@ sig
 	 Dat.ctx_var list * Dat.ctx_var list-> bool
 
 	
-	val check_premises : (Dat.seq list * Dat.seq list * 
+	val check_premises : ((string * Dat.seq) list * Dat.der_tree * 
 	 (Dat.ctx_var * Dat.ctx_var list * Dat.ctx_var list) list*
-	  Dat.ctx_var list * Dat.ctx_var list) -> bool
+	  Dat.ctx_var list * Dat.ctx_var list) -> Dat.der_tree option
 	
-	val check_premises_wk : (Dat.seq list * Dat.seq list * 
+	val check_premises_wk : ((string * Dat.seq) list * Dat.der_tree * 
 	 (Dat.ctx_var * Dat.ctx_var list * Dat.ctx_var list) list*
-	  (bool list * bool list) *  Dat.ctx_var list * Dat.ctx_var list) -> bool
+	  (bool list * bool list) *  Dat.ctx_var list * Dat.ctx_var list) -> Dat.der_tree option
 
 end

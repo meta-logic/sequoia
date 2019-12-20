@@ -115,8 +115,8 @@
             List.filter(fn (sb,_) => not (List.exists(fn s => bad_sub(s,sequent))sb))sigcons
         end
     
-    fun add_constraints(sigcons, sequent) = 
-        let
+    fun add_constraints(sigcons, sequent) = sigcons
+        (* let
             
             fun remove (_,[]) = []
                 |remove (x,y::L) = if Dat.ctx_var_eq(x,y) then remove(x,L) else y::remove(x,L)
@@ -134,7 +134,7 @@
                 end
         in
             List.map update_cons sigcons
-        end
+        end *)
 
     fun get_premises_of(Dat.DerTree(id, _, _, []), sid) = []
         | get_premises_of(Dat.DerTree(id, _, _, pq), sid) = 
@@ -157,7 +157,9 @@
                         SOME(sigscons) => 
                             let val formulas = get_forms(conc)
                                 val new_sigscons = filter_bad_subs(sigscons,sq)
-                                val new_sigscons = add_constraints(sigscons,sq)
+                                (* val _ = print ((Int.toString (List.length(sigscons)))^" to "^(Int.toString (List.length(new_sigscons)))^"\n") *)
+                                val new_sigscons = add_constraints(new_sigscons,sq)
+                                
                                 val next_ids = List.tabulate(List.length(premises), fn i => Int.toString(i))
                                 val prems_ids = ListPair.zip(premises, next_ids)
                                 val new_prems = List.map(fn (p, i) => Dat.DerTree(id^i,p, Dat.NoRule,[]))prems_ids
@@ -210,7 +212,8 @@
                         ([(fm,cn,dt)])id_set)(id_sets))
         end
 
-    fun apply_multiple_rules_all_ways(dt, rule_ls) = 
+    fun apply_multiple_rules_all_ways(dt, []) = [dt]
+        | apply_multiple_rules_all_ways(dt, rule_ls) = 
         List.concat (List.map(fn perm => 
             List.foldl(fn (rule, tree_ls) => 
                 List.concat(List.map(fn tree => apply_rule_all_ways(tree, rule, false))tree_ls)

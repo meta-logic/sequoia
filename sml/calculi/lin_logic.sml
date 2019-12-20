@@ -631,15 +631,13 @@ struct
 	
 	
 	val init_rule_list = [id()]
-	val rule_pairs_no_init = [(tensor_form(A,B),[tensorR()],[tensorL()]),
-							  (lolli_form(A,B),[lolliR()],[lolliL()]),
-							  (plus_form(A,B),[plusR1(),plusR2()],[plusL()]),
-							  (with_form(A,B),[withR()],[withL1(),withL2()]),
-							  (par_form(A,B),[parR()],[parL()]),
-							  (bang_form(A),[bangR()],[bangL1(),bangL2()]),
-							  (quest_form(A),[quesR1(),quesR2()],[quesL()]),
-							  (one,[oneR()],[oneL()]),
-							  (bot,[botR()],[botL()])]
+	val rule_pairs_no_init = [(tensor_connective,[tensorR()],[tensorL()]),
+							  (lolli_connective,[lolliR()],[lolliL()]),
+							  (plus_connective,[plusR1(),plusR2()],[plusL()]),
+							  (with_connective,[withR()],[withL1(),withL2()]),
+							  (par_connective,[parR()],[parL()]),
+							  (bang_connective,[bangR()],[bangL1(),bangL2()]),
+							  (ques_connective,[quesR1(),quesR2()],[quesL()])]
 
 	val axiom_list = [oneR(), botL()]
 

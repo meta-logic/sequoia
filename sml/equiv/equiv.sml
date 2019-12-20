@@ -150,9 +150,50 @@ struct
 
 	fun extract_constraints (A,B) = let val (res,_) = extract_constraints_wk(A,B,([],[])) in res end
 
+	fun get_combination ([]) = []
+		| get_combination ([l]) = List.map (fn (prem,new) => ([prem],new)) l
+		| get_combination (l::rest) = 
+			let
+				val rest_combination = get_combination(rest)
+				val combination = List.map (fn (prem,(cons,vars)) => 
+								  List.map (fn (other_prems,(o_cons,o_vars)) => (prem::other_prems,(cons@o_cons,vars@o_vars)) ) rest_combination) l
+        val combination = if List.null(rest_combination) orelse List.null(l)
+                          then [] else combination
+			in
+				List.concat combination
+			end
+
+	(* returns : (tree,constraint,new_vars) list *)
+	fun set_leaves (assumed_leaves, tree, weak) = 
+		(case tree of
+		   Dat.DerTree (_,seq,Dat.NoRule,[]) => 
+		   					(let
+								val possible_premises = List.filter (fn (_,y) => seq_equiv_wk (y,seq,weak)) assumed_leaves
+								val options = List.map (fn (name,seq2) => (Dat.DerTree(name,seq,Dat.NoRule,[]),extract_constraints_wk(seq2,seq,weak))) possible_premises
+							in 
+								options
+							end)
+		 | tree as Dat.DerTree (_,_,rule,[]) => [(tree,([],[]))]
+		 | Dat.DerTree(id,seq,rule,prems) => 
+		 					(let
+							 	val new_prem_options = List.map (fn prem => set_leaves(assumed_leaves,prem,weak)) prems
+								val new_prem_combinations = get_combination(new_prem_options)
+								val new_trees = List.map (fn (prem_combo,new_stuff) => (Dat.DerTree(id,seq,rule,prem_combo),new_stuff)) new_prem_combinations
+							in
+								new_trees
+							end) )
 
 	(*check premises with an extra term that can be weakened*)
-	fun check_premises_wk (_,[],constraints,_,t1_vars,t2_vars) = check_consistent(constraints,t1_vars,t2_vars)
+
+	fun check_premises_wk (assumed_leaves,conc,cons,weak,t1_vars,t2_vars) =
+		let
+			val new_trees = set_leaves (assumed_leaves,conc,weak)
+			val result = List.find (fn (_,(new_cons,new_vars)) => check_consistent(new_cons@cons,t1_vars,(List.mapPartial (fn x => x) new_vars)@t2_vars)) new_trees
+		in
+			Option.map (fn (tree,_) => tree ) result
+		end
+
+	(* fun check_premises_wk (_,[],constraints,_,t1_vars,t2_vars) = check_consistent(constraints,t1_vars,t2_vars)
 		|check_premises_wk (assumed_leaves,x::conc_leaves,cons,weak,t1_vars,t2_vars) = 
 		let
 			val possible_premises = List.filter (fn y => seq_equiv_wk (y,x,weak)) assumed_leaves
@@ -167,10 +208,12 @@ struct
 				end
 		in
 			find_match possible_premises
-		end
+		end *)
 
-	fun check_premises (_,[],constraints,t1_vars,t2_vars) = check_consistent(constraints,t1_vars,t2_vars)
-		| check_premises (assumed_leaves,x::conc_leaves,cons,t1_vars,t2_vars) = 
+	fun check_premises (assumed,conc,cons,t1_vars,t2_vars) = 
+		check_premises_wk(assumed,conc,cons,([],[]),t1_vars,t2_vars)
+	(* check_consistent(constraints,t1_vars,t2_vars) *)
+		(* | check_premises (assumed_leaves,x::conc_leaves,cons,t1_vars,t2_vars) = 
 		let
 			val possible_premises = List.filter (fn y => seq_equiv (y,x)) assumed_leaves
 			fun find_match [] = false
@@ -183,7 +226,7 @@ struct
 				end
 		in
 			find_match possible_premises
-		end
+		end *)
 
 end
 

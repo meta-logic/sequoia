@@ -147,9 +147,14 @@ structure unifyImpl : UNIFICATION = struct
 
             fun update_ctx_var (DAT.CtxVar(x)) = DAT.CtxVar(fresh(x))
 
+            
+
             fun get_constraint (g1, g2) =
                 let val () = () in init_fresh := !init_fresh + 1;
                 (DAT.CtxVar("Gamma_" ^ Int.toString(!init_fresh)), g1, g2) end
+
+            (* update variables in vl1 and vl2. Then, create an initial sub/constraint for that change *)
+            
 
             fun post_ctx (sigma) = List.concat(List.map(fn DAT.CTXs(_, DAT.Ctx(cv, _)) => cv 
                                                         | _ => raise Fail "post_ctx fun in Unify_ctx") sigma)
@@ -174,7 +179,7 @@ structure unifyImpl : UNIFICATION = struct
                                 List.map(fn (p,g) =>
                                     if List.length(p) = 0 then
                                         if List.length(vl1) = 0 then DAT.CTXs(g, DAT.Ctx([], []))
-                                        else DAT.CTXs(g, DAT.Ctx([update_ctx_var(g)], [])) 
+                                        else DAT.CTXs(g, DAT.Ctx([g], [])) 
                                     else 
                                         if List.length(vl1) = 0 then DAT.CTXs(g, DAT.Ctx([], p))
                                         else DAT.CTXs(g, DAT.Ctx([update_ctx_var(g)], p))
@@ -254,12 +259,30 @@ structure unifyImpl : UNIFICATION = struct
                         val sc = List.concat(List.tabulate(minforms+1, fn i => 
                                             unify_specific_k(vl1, fl1, vl2, fl2, i)))
                     in SOME(sc) end
+            val (fl1,fl2) = H.remove_similar (fl1, fl2, DAT.form_eq)
+
+            val base_subs = List.map (fn (var) => DAT.CTXs(var,DAT.Ctx([update_ctx_var(var)],[]))) (vl1@vl2)
+            (* fun remove_base_subs (sub) = let val (subs,_) = H.remove_similar(sub,base_subs,DAT.sub_eq) in subs end *)
+
+
+            fun sub_update f = Option.map (List.map (fn (subs,cons)=> (f subs,cons)))
+            fun cons_update f = Option.map (List.map (fn (subs,cons)=> (subs,f cons)))
+            val unification_result = Unify_ctx_AUX(DAT.Ctx(vl1, fl1), DAT.Ctx(vl2, fl2))
+
+            val update_vars = (fn sub => APP.UnifierComposition(sub,base_subs))
+
+            fun update_var_list l = List.map (fn (vars,_) => List.hd(vars)) (APP.apply_ctx_varL_Unifier(l,base_subs))
+            fun update_con_vars (name,l1,l2) = (name, update_var_list l1, update_var_list l2)
+            fun update_cons_vars cons = List.map update_con_vars cons
+
+            val unification_result = sub_update update_vars unification_result
+            val unification_result = cons_update update_cons_vars unification_result
+            (* val unification_result = sub_update remove_base_subs unification_result *)
+
+
+
         in
-            let val (fl1,fl2) = H.remove_similar (fl1, fl2, DAT.form_eq) in
-                case Unify_ctx_AUX(DAT.Ctx(vl1, fl1), DAT.Ctx(vl2, fl2)) of
-                    NONE => NONE
-                    | SOME(sb) => SOME(H.remove_duplicates (sb, DAT.sub_eq))
-            end
+            Option.map (fn sb => H.remove_duplicates (sb, DAT.sub_eq)) unification_result
         end
 
 

@@ -57,8 +57,8 @@ structure applyunifierImpl : APPLYUNIFIER = struct
             val new_pq = List.map(fn p => apply_der_tree_Unifier(p, subs))pq
         in DAT.DerTree(id, new_sq, rq, new_pq) end
 
-
-    fun compose (DAT.Fs(a,b), sigma) = (DAT.Fs(a, apply_form_Unifier(b, sigma)), DAT.form_eq(a,b))
+    
+    fun compose (DAT.Fs(a,b), sigma) = (DAT.Fs(a, apply_form_Unifier(b, sigma)), DAT.form_eq(a,apply_form_Unifier(b, sigma)))
         | compose (DAT.CTXs(a, DAT.Ctx(vls, fls)), sigma) =  let val fls1 = apply_formL_Unifier(fls, sigma)
                                                         val (vls2, fls2) = ListPair.unzip(apply_ctx_varL_Unifier(vls, sigma))
                                                     in 

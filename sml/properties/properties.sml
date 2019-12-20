@@ -23,11 +23,14 @@ struct
 
 
 
-    val other_fresh = ref 1000000;
-    val term_fresh = ref 10000;
+    val other_fresh = ref 1;
+    val term_fresh = ref 1;
     val fresher = ref 1;
     val rule_fresh = fresher
     val var_index = fresher
+
+    exception Arity
+
 
     fun writeFD fd content = 
         let
@@ -41,10 +44,10 @@ struct
             fun gen_out(D.Empty) = D.Empty
                 | gen_out(D.Single(D.Ctx(vl,fl))) =
                 let val () = () in other_fresh := !other_fresh + 1;
-                D.Single(D.Ctx([D.CtxVar ("Gamma_{" ^ Int.toString(!other_fresh)^"}")],nil)) end
+                D.Single(D.Ctx([D.CtxVar ("\\Gamma_{" ^ Int.toString(!other_fresh)^"}")],nil)) end
                 | gen_out(D.Mult(con,D.Ctx(vl,fl),rest)) =
                 let val () = () in other_fresh := !other_fresh + 1;
-                D.Mult(con,D.Ctx([D.CtxVar ("Gamma_{" ^ Int.toString(!other_fresh)^"}")],nil),gen_out rest) end
+                D.Mult(con,D.Ctx([D.CtxVar ("\\Gamma_{" ^ Int.toString(!other_fresh)^"}")],nil),gen_out rest) end
         in
             D.Seq(gen_out a, c, gen_out b)
         end
@@ -128,14 +131,21 @@ struct
     fun get_ctx_vars_from_constraints(nil) = []
         |get_ctx_vars_from_constraints(x::L) = get_ctx_vars_from_constraint(x)@get_ctx_vars_from_constraints(L)
 
+    fun generate_leaf_name (name_ref) = ("\\mathcal{"^(Char.toString(!name_ref))^"}") before (name_ref := Char.succ(!name_ref))
 
+    fun rename_ids_h (D.DerTree(id,seq,rule,prems),name_ref) = 
+        (case List.length(prems) of
+           0 => D.DerTree (generate_leaf_name(name_ref),seq,rule,prems)
+         | _ => D.DerTree (id,seq,rule, List.map (fn prem => rename_ids_h (prem,name_ref)) prems))
+
+    fun rename_ids (cons,dvt) = (cons,rename_ids_h(dvt,ref (#"D")))
 
     fun check_premises'((cn1,dvt1),(cn2,dvt2),weak) =
         let
             val D.DerTree(_,sq1,_,_) = dvt1
             val D.DerTree(_,sq2,_,_) = dvt2
-            val t1_prems = List.map (fn (D.DerTree(_,seq,_,_)) => seq) (T.get_open_prems(dvt1))
-            val t2_prems = List.map (fn (D.DerTree(_,seq,_,_)) => seq) (T.get_open_prems(dvt2))
+            val t1_prems = List.map (fn (D.DerTree(id,seq,_,_)) => (id,seq)) (T.get_open_prems(dvt1))
+            
             (*val goal = create_constraint(sq1,sq2)*)
             val constraints = cn1@cn2
             (*val _ = last1 := dvt1*)
@@ -146,13 +156,13 @@ struct
             val t2_vars = Set.listItems(Set.addList(Set.empty,t2_vars))
             val t1_vars = List.map (fn x => D.CtxVar(x)) t1_vars
             val t2_vars = List.map (fn x => D.CtxVar(x)) t2_vars
-(*            val _ = print_seq_list(t1_prems)
+            (* val _ = print_seq_list(t1_prems)
             val _ = print_seq_list(t2_prems)
-            val _ = print ("\n\n\n")*)
-            val res = E.check_premises_wk(t1_prems,t2_prems,constraints,weak,t1_vars,t2_vars)
-            (*val _ = if res then print("true\n\n\n\n\n\n\n") else print("false\n\n\n\n\n\n\n")*)
+            val _ = print ("\n\n\n") *)
+            val res = E.check_premises_wk(t1_prems,dvt2,constraints,weak,t1_vars,t2_vars)
+            (* val _ = if res then print("true\n\n\n\n\n\n\n") else print("false\n\n\n\n\n\n\n") *)
         in
-            res
+            Option.map (fn x => (cn2,x)) res
         end
 
 
@@ -177,21 +187,72 @@ struct
     fun subformula (A, D.Form(_,subforms) ) = List.exists (fn x => D.form_eq(A,x) orelse subformula(A,x)) subforms
         | subformula (_,_) = false
 
+    fun find_arity_ctx (con, Dat.Ctx(_,forms)) = 
+        Option.map 
+        (fn Dat.Form(_,l) => List.length(l) | _ => raise Fail "find_arity_ctx Option.map") 
+        (List.find (fn (Dat.Form(c,_)) => Dat.conn_eq(c,con) | _ => false ) forms)
 
+    fun find_arity_ctx_struct (_ , Dat.Empty) = NONE
+        | find_arity_ctx_struct (con, Dat.Single (ctx) ) = find_arity_ctx(con,ctx)
+        | find_arity_ctx_struct (con, Dat.Mult (_,ctx,rest)) = 
+            (case find_arity_ctx(con,ctx) of
+               NONE => find_arity_ctx_struct(con,rest)
+             | a => a)
+
+    fun find_arity (con: Dat.conn, Dat.Seq(L,_,R): Dat.seq) = case find_arity_ctx_struct(con,L) of
+       NONE => find_arity_ctx_struct(con,R)
+     | a => a
+
+    fun check_arity_ctx (con,arity,Dat.Ctx(_,forms)) = 
+        let
+            val relevant = List.mapPartial 
+            (fn (Dat.Form(c,l)) => (if Dat.conn_eq(con,c) then SOME(List.length(l)) else NONE) 
+            | _ => NONE) forms
+        in
+            List.all (fn x => arity=x) relevant        
+        end
+
+    fun check_arity_ctx_struct (_,_,Dat.Empty) = true
+        |check_arity_ctx_struct (con,arity,Dat.Single(ctx)) = check_arity_ctx(con,arity,ctx)
+        |check_arity_ctx_struct (con,arity,Dat.Mult(_,ctx,rest)) =
+        check_arity_ctx(con,arity,ctx) andalso check_arity_ctx_struct(con,arity,rest)
+
+    fun check_arity(con: Dat.conn, arity: int, Dat.Rule(_,_,Dat.Seq(L,_,R),_)) = 
+    check_arity_ctx_struct(con,arity,L) andalso check_arity_ctx_struct(con,arity,R)
 
     (* check which formula  *)
-    fun init_coherence_con ((con_form:Dat.form, rulesL: Dat.rule list, rulesR: Dat.rule list), init_rule: Dat.rule, axioms: Dat.rule list)=
+    fun init_coherence_con ((con:Dat.conn, rulesL: Dat.rule list, rulesR: Dat.rule list), init_rule: Dat.rule, axioms: Dat.rule list)=
         let
             val Dat.Rule (_,_,init_conc,_) = init_rule
             (* changing names of context variables in rule and conclusion of rule *)
             val init_rule = update_rule(init_rule)
             (* val init_rule = atomize_rule(init_rule) *)
 
+            val Dat.Rule (_,_,check_rule,_) = 
+            (case (rulesL,rulesR) of
+               (x::_,_) => x
+             | (_,x::_) => x
+             | _ => raise Arity)
+            
+
+            val arity = 
+            (case find_arity(con,check_rule) of
+               NONE => raise Arity
+             | SOME(x) => x)
+
+            fun check_all (rules) = List.all (fn x => check_arity(con,arity,x)) rules
+
+            val _ = (case (check_all rulesL, check_all rulesR)  of
+                        (false,_) => raise Arity
+                      | (_,false) => raise Arity
+                      | _ => ())
+
+            val chars = Char.ord #"A"
+
+            val con_form = Dat.Form(con,List.tabulate(arity,(fn i => Dat.Atom(Char.toString(Char.chr(chars+i))))))
 
 
             val init_conc = seq_to_fresh(init_conc)
-
-            val con_form = atomize(con_form)
 
             (* changing forms of the init rule to con_form *)
             fun replace_forms_ctx (Dat.Ctx(vars,forms)) =
@@ -262,7 +323,7 @@ struct
              | NONE => List.hd(results) )
         end
 
-    fun init_coherence ([]: (Dat.form *Dat.rule list * Dat.rule list) list,_: Dat.rule list,_: Dat.rule list) = (true , [])
+    fun init_coherence ([]: (Dat.conn *Dat.rule list * Dat.rule list) list,_: Dat.rule list,_: Dat.rule list) = (true , [])
       | init_coherence (first_con::con_list,init_rules,axioms) = 
         let
             val (rest,proofs) = init_coherence(con_list,init_rules,axioms)
@@ -272,7 +333,7 @@ struct
         end
 
     fun init_coherence_print (a,b,c) = 
-        let
+        (let
             fun print_helper((_,tree1),SOME((_,tree2))) = 
                 "$$"^Latex.der_tree_toLatex2(tree1)^"$$"
                 ^"$$ \\leadsto $$"
@@ -287,7 +348,9 @@ struct
                 val b = if bol then "T" else "F"
                 val bp = b^"%%%"^p
             in writeFD 3 bp end
-        end
+        end)
+        handle (Arity) => writeFD 3 "Arity problem"
+        
 
     (*  *)
     fun weakening_rule_context (rule: (Dat.rule) , (side,context_num) : Dat.side * int) = 
@@ -330,8 +393,15 @@ struct
             val base2 = add_to_seq(base)
             val rule_applied_list = List.map (fn (_,cons,tree) => (cons,tree)) (T.apply_rule(([],[],D.DerTree("0",base,Dat.NoRule,[])),rule,"0"))
             val rule_applied_list_weak = List.map (fn (_,cons,tree) => (cons,tree)) (T.apply_rule(([],[],D.DerTree("0",base2,Dat.NoRule,[])),rule,"0"))
-            val res2 = List.map (fn (t1) => (t1,List.find (fn (t2) => check_premises'(t1,t2,make_weak_bool(side,context_num)) ) rule_applied_list_weak ) ) rule_applied_list
+
+            val rule_applied_list = List.map (fn tree => rename_ids(tree)) rule_applied_list
+
+            val res2 = List.map (fn (t1) => (t1,List.mapPartial (fn (t2) => check_premises'(t1,t2,make_weak_bool(side,context_num)) ) rule_applied_list_weak ) ) rule_applied_list
             
+
+
+            val res2 = List.map (fn (t1,[]) => (t1,NONE) | (t1,x::_) => (t1,SOME x)) res2
+
             val res = List.all (fn (_,r) => Option.isSome(r)) res2
 
             (* val res2 = if res then res2 else List.filter (fn (_,r) => false = Option.isSome(r)) res2 *)
@@ -441,17 +511,17 @@ struct
                     (*remove sets with no trees in set 1 or no trees in set 2*)
                     val set_base_pairs = List.filter (fn (y::_,x::_) => true | (_,_) => false) set_base_pairs
 
+                    val set_base_pairs = List.map (fn (x,y) => ( List.map (fn (tree) => rename_ids(tree)) x ,y)) set_base_pairs
 
+                    fun find (tree1,t2s,weak) = List.find (fn x => true) (List.mapPartial (fn (tree2) => check_premises'(tree1,tree2,weak)) t2s )
 
-                    fun set_check (set1,set2)  = ( List.map (fn (cn1,dvt1) =>
-                            ((List.find (fn (cn2,dvt2) =>
-                                check_premises' ((cn1,dvt1),(cn2,dvt2),weak)
-                            )set2)   ,(cn1,dvt1))
+                    fun set_check (set1,set2)  = ( List.map (fn tree1 =>
+                            ((tree1,find(tree1,set2,weak)))
                         ) set1 , set2)
 
                     fun seperate' ([],res) = res
-                        | seperate' ((SOME y,x)::L,(res1,res2)) = seperate'(L,((x,y)::res1,res2))
-                        | seperate' ((NONE,x)::L,(res1,res2)) = seperate'(L,(res1,x::res2))
+                        | seperate' ((x,SOME y)::L,(res1,res2)) = seperate'(L,((x,y)::res1,res2))
+                        | seperate' ((x,NONE)::L,(res1,res2)) = seperate'(L,(res1,x::res2))
 
                     fun seperate (L) = seperate' (L,([],[]))
 
@@ -466,16 +536,18 @@ struct
                         val dvt_lst = List.concat(List.map(fn tree =>
                                         T.apply_rule_all_ways(tree, rule2, true)) temp)
                         (*TODO: not sure what this line does*)
-                        (*val final = List.concat(List.map(fn tree  =>
-                                        List.concat(List.map(fn init_rule =>
-                                        T.apply_rule_everywhere(tree, init_rule))init_rule_ls))dvt_lst)*)
+                        val final = List.concat (List.map (fn tree => T.apply_multiple_rules_all_ways(tree,init_rule_ls)) dvt_lst)
+                        (* val _ = List.app (fn (_,_,t) => List.app (fn (D.DerTree(_,seq,_,_)) => print (D.seq_toString(seq)^"\n")) (T.get_open_prems(t))) final
+                        val _ = print "\n\n\n____\n\n\n" *)
                     in
-                        List.map(fn(_,cn,ft) => (cn,ft)) dvt_lst
+                        List.map(fn(_,cn,ft) => (cn,ft)) final
                     end) bases
 
             val D.Rule(name1, side1, conc1, premises1) = rule1
             val D.Rule(name2, side2, conc2, premises2) = rule2
-            
+            val rule1 = update_rule(rule1)
+            val rule2 = update_rule(rule2)
+
             val bases = (create_base(rule1, rule2))
             val bases_pairs = List.map (fn conc => (D.DerTree("0",seq_to_fresh(conc),D.NoRule,[]),D.DerTree("0",seq_to_fresh(conc),D.NoRule,[]))) bases
 
@@ -531,6 +603,8 @@ struct
         in
             permute_res(union)^"%%%"^result_to_latex_strings(union)
         end
+
+    fun permute_final A = permute_res_to_string(permutes(A))
 
     fun permute_print A = writeFD 3 (permute_res_to_string(permutes(A)))
     
