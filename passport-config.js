@@ -3,25 +3,19 @@ var bcrypt = require('bcrypt')
 
 function initialize(passport, User) {
     const authenticate = (username, password, done) => {
-        var warning_user = "<div id=\"username warning\"><div class=\"ui red negative message\">"+
-        "<div class=\"header\">Username does not exist</div></div>"
-        var warning_pass = "<div id=\"password warning\"><div class=\"ui red negative message\">"+
-        "<div class=\"header\">Password for username incorrect</div></div>"
         User.findOne({ 'username': username }, async function (err, user) {
             if (err) { return done(err); }
             if (!user) {
-                document.getElementById("warning").innerHTML = warning_user
-                return done(null, false)
+                return done(null, false, { message: 'Incorrect username or password' })
             }
             try {
                 if (await bcrypt.compare(password, user.password)) {
                     return done(null, user) 
                 } else {
-                    document.getElementById("warning").innerHTML = warning_pass
-                    return done(null, false)
+                    return done(null, false, { message: 'Incorrect username or password' })
                 }
             } catch(e) {
-                done(e)
+                return done(e)
             }
         })
     }
