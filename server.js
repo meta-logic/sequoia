@@ -151,6 +151,9 @@ app.post('/weakenSides', checkAuthenticated, function (req, res) {
 	var result = sml_weaken.weakenSides(req.body.rules, res);
 });
 
+app.get('/calculus/:calc_id/properties/cut_admissability', checkAuthenticated, function (req, res) {
+	return res.render('temporary/index', {'title' : 'Sequoia', 'layout' : 'temporary'});
+});
 
 function checkAuthenticated (req, res, next) {
     if (req.isAuthenticated()) {
