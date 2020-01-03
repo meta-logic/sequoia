@@ -67,6 +67,7 @@ function setLabel(left_bools, right_bools, index, side) {
 }
 
 function checkWeak() {
+    document.getElementById("loading").setAttribute("class", "ui active inverted dimmer")
     $.get("/api/rules/"+calc_id, function (rls, status) { 
         var rules = rls.rules
         var rule_list = []
@@ -118,7 +119,6 @@ function checkWeak() {
                     }
                 }
             }
-            MathJax.Hub.Queue(["Typeset",MathJax.Hub,lt])
             if (right_bools.length > 1) {
                 var rt = document.getElementById("right_sides")
                 for (var i = 0; i < right_bools.length; i++) {
@@ -144,7 +144,11 @@ function checkWeak() {
                     }
                 }
             }
-            MathJax.Hub.Queue(["Typeset",MathJax.Hub,rt])
+            MathJax.Hub.Queue(["Typeset",MathJax.Hub,lt], function () { 
+                MathJax.Hub.Queue(["Typeset",MathJax.Hub,rt], function () {
+                    document.getElementById("loading").setAttribute("class", "ui inactive inverted dimmer")
+                })
+            })
         })
     })
 }

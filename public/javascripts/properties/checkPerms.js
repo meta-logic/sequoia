@@ -30,6 +30,7 @@ function selectRule(bl, i) {
 }
 
 function permRules() {
+    document.getElementById("loading").setAttribute("class", "ui active inverted dimmer")
     document.getElementById('info_answer').innerHTML = ""
     document.getElementById("good_trees").innerHTML = ""
     document.getElementById("bad_trees").innerHTML = ""
@@ -98,7 +99,6 @@ function permRules() {
                 }
             }
         }
-        MathJax.Hub.Queue(["Typeset",MathJax.Hub,gtrees])
         if (badtrees.length > 1) {
             var btrees = document.getElementById("bad_trees")
             for (var i = 0; i < badtrees.length; i++) {
@@ -109,7 +109,6 @@ function permRules() {
                 }
             }
         }
-        MathJax.Hub.Queue(["Typeset",MathJax.Hub,btrees])
         var r1 = rule1[1]
         document.getElementById("rule_card"+r1).setAttribute("class", "ui card")
         document.getElementById("b"+r1).setAttribute("class", "ui bottom attached button")
@@ -126,5 +125,10 @@ function permRules() {
         rule1 = ""
         rule2 = ""
 
+        MathJax.Hub.Queue(["Typeset",MathJax.Hub,gtrees], function () { 
+            MathJax.Hub.Queue(["Typeset",MathJax.Hub,btrees], function () {
+                document.getElementById("loading").setAttribute("class", "ui inactive inverted dimmer")
+            })
+        })
     })
 }

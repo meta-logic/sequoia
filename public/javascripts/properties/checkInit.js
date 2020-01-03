@@ -28,6 +28,7 @@ function list_to_string(rule_list) {
 }
 
 function checkInit() {
+    document.getElementById("loading").setAttribute("class", "ui active inverted dimmer")
     $.get("/api/rules/"+calc_id, function (rls, status) { 
         var rules = rls.rules
         var other_rules = []
@@ -110,7 +111,9 @@ function checkInit() {
                     }
                 }
             }
-            MathJax.Hub.Queue(["Typeset",MathJax.Hub,cp])
+            MathJax.Hub.Queue(["Typeset",MathJax.Hub,cp], function () {
+                document.getElementById("loading").setAttribute("class", "ui inactive inverted dimmer")
+            })
         })
     })
 }
