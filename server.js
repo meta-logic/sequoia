@@ -7,6 +7,7 @@ var express      = require('express');
 var app = express();
 var passport     = require('passport')
 var session      = require('express-session')
+var flash        = require('express-flash')
 var path         = require('path');
 var helmet       = require('helmet');
 var mongoose     = require('mongoose');
@@ -24,8 +25,11 @@ var database       = require('./config/db');
 var sml_apply      = require('./sml/applyRule');
 var sml_permute    = require('./sml/permuteRules');
 var sml_weaken     = require('./sml/weakenSides');
-var initPassport   = require('./passport-config')
-initPassport(passport, userRoutes)
+var sml_init       = require('./sml/initCohRules');
+var initPassport   = require('./passport-config');
+var userModel      = require('./api/models/user');
+var calculusModel  = require('./api/models/calculus');
+initPassport(passport, userModel)
 
 
 // view engine setup
@@ -43,6 +47,7 @@ app.use(helmet()); // configuring headers to be secure
 app.use(morgan('dev')); // log every request to the console
 app.use(bodyParser.json()); // get information from html forms
 app.use(bodyParser.urlencoded({extended: false})); // get information from html forms
+app.use(flash())
 app.use(session({
     secret: process.env.SESSION_SECRET,
     resave: false,
@@ -65,30 +70,34 @@ app.use('/api', symbolsRoutes);
 
 
 
-
-
-
 //Page Routes ===========================================================
 app.get('/', checkAuthenticated, function (req, res) {
 	return res.render('main/index', {'title' : 'Sequoia','layout' : 'main', 'user_id' : req.user._id, 'username' : req.user.username});
 });
 
-app.get('/login', checkNotAuthenticated, function (req, res) {
+app.get('/login', function (req, res) {
+	if (req.isAuthenticated()) {
+		return res.redirect('/')
+	}
+	if (req.flash('error').length > 0) {
+		return res.render('login/fail', {'title' : 'Sequoia - login','layout' : 'login'});
+	}
 	return res.render('login/index', {'title' : 'Sequoia - login','layout' : 'login'});
 });
 
 app.post('/login', checkNotAuthenticated, passport.authenticate('local', {
+	session: true,
 	successRedirect: '/',
 	failureRedirect : '/login',
-	failureFlash : false}
+	failureFlash : true}
 ));
 
 app.get('/logout', checkAuthenticated, function(req, res) {
-    req.logout()
-    res.redirect('/')
+	req.logout()
+    res.redirect('/login')
 });
 
-app.get('/register', checkNotAuthenticated, function (req, res) {
+app.get('/register', function (req, res) {
 	return res.render('login/register', {'title' : 'Sequoia - register','layout' : 'login'});
 });
 
@@ -130,6 +139,10 @@ app.get('/calculus/:calc_id/properties/init_coherence', checkAuthenticated, func
 	return res.render('properties/initcoherence', {'title' : 'Sequoia - properties', 'layout' : 'initcoherence', 'calc_id' : req.params.calc_id});
 });
 
+app.post('/initRules', checkAuthenticated, function (req, res) {
+	var result = sml_init.initRules(req.body.first, req.body.second, req.body.third, res);
+});
+
 app.get('/calculus/:calc_id/properties/weak_admissability', checkAuthenticated, function (req, res) {
 	return res.render('properties/weakadmiss', {'title' : 'Sequoia - properties', 'layout' : 'weakadmiss', 'calc_id' : req.params.calc_id});
 });
@@ -139,17 +152,26 @@ app.post('/weakenSides', checkAuthenticated, function (req, res) {
 });
 
 
-function checkAuthenticated (res, req, next) {
+function checkAuthenticated (req, res, next) {
     if (req.isAuthenticated()) {
+		if (req.params.calc_id != null) {
+			calculusModel.find({_id : req.params.calc_id, user : req.user._id}, function (err, calculus) {
+				if (err || calculus.length == 0) {
+					console.log("yo")
+					return res.status(403).json();
+				}
+			})
+		}
         return next()
     }
-    req.redirect('/login')
+    res.redirect('/login')
 }
-function checkNotAuthenticated (res, req, next) {
-    if (req.isAuthenticated()) {
-        return req.redirect('/login')
-    }
-    next()
+
+function checkNotAuthenticated (req, res, next) {
+	if (!req.isAuthenticated()) {
+		return next()
+	}
+	res.redirect('/login')
 }
 
 
