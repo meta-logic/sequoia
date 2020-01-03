@@ -335,9 +335,9 @@ struct
     fun init_coherence_print (a,b,c) = 
         (let
             fun print_helper((_,tree1),SOME((_,tree2))) = 
-                "$$"^Latex.der_tree_toLatex2(tree1)^"$$"
-                ^"$$ \\leadsto $$"
-                ^"$$"^Latex.der_tree_toLatex2(tree2)^"$$"
+                "$$"^Latex.der_tree_toLatex2(tree1)
+                ^" \\leadsto "
+                ^Latex.der_tree_toLatex2(tree2)^"$$"
             | print_helper((_,tree1),NONE) = 
                 "$$"^Latex.der_tree_toLatex2(tree1)^"$$"
         in
