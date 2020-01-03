@@ -12,7 +12,7 @@ router.post("/calculus", controller.createCalculus)
 router.put("/calculus", controller.updateCalculus)
 router.delete("/calculus", controller.deleteCalculus)
 router.get("/calculus/:calc_id", controller.getCalculus)
-router.get("/calculi", controller.getCalculi)
+router.get("/calculi/:user_id", controller.getCalculi)
 
 
 module.exports = router
