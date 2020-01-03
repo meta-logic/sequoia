@@ -1,8 +1,8 @@
 var cmd = require("node-cmd")
 const cmd2 = require("child_process")
 
-function weakenSides(rules, res) {
-    var sml_command = "Properties.weakening_print("+rules+");\n"
+function initRules(connective_rules, init_rules, axiom_rules, res) {
+    var sml_command = "Properties.init_coherence_print("+connective_rules+","+init_rules+","+axiom_rules+");\n"
     const smlTerminalInput = 
     "CM.make \"sml/unify.cm\";\n"
     +"Control.Print.printDepth :=100;\n"
@@ -30,4 +30,4 @@ function weakenSides(rules, res) {
 }
 
 
-module.exports = { weakenSides }
+module.exports = { initRules }
