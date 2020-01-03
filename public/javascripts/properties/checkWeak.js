@@ -2,7 +2,6 @@ var left_proofs = []
 var right_proofs = []
 
 function showProof(side, index, on) {
-    console.log("HERE")
     if (on == "yes") {
         if (side == "L") {
             pfid = "lproof"+index
@@ -80,7 +79,7 @@ function checkWeak() {
                 .replace(/\\/g, "\\\\")+","
             }
             fin_prem = "[" + fin_prem.slice(0,-1) + "]"
-            var rule_sml = "Rule(\""+rules[i].rule.replace(/\\/g, "\\\\")+"\",None,"+fin_conc+","+fin_prem+")"
+            var rule_sml = "Rule(\""+rules[i].rule.replace(/\\/g, "\\\\")+"\","+rules[i].side+","+fin_conc+","+fin_prem+")"
             rule_list.push(rule_sml)
         }
         var rule_strings = ""
