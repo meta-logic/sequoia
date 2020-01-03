@@ -22,7 +22,8 @@ function get_calculi_toPage() {
             entry.remove()
         }
     }
-    $.get("/api/calculi", function (calcs, status) {
+    var user_id = document.getElementById("user_id").innerHTML
+    $.get("/api/calculi/"+user_id, function (calcs, status) {
         var calculi = calcs.calculi
         for (var i = 0; i < calculi.length; i++) {
             calculi_container.innerHTML +=
@@ -44,8 +45,10 @@ function get_calculi_toPage() {
 function addCalculus() {
     var title = document.getElementById("title").value
     var description = document.getElementById("description").value
+    var user_id = document.getElementById("user_id").innerHTML
+    console.log(user_id)
     if (title != "" && description != "") {
-        $.post("/api/calculus", { title : title, description : description}, function(data, status){
+        $.post("/api/calculus", {title : title, description : description, user : user_id}, function(data, status){
             document.getElementById("title").value = ""
             document.getElementById("description").value = ""
             get_calculi_toPage()
