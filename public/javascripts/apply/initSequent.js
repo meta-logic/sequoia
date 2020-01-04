@@ -63,7 +63,7 @@ function useSequent() {
 function parse_and_use(temp_parser) {
     var warning_text = "<div id=\"parse warning\"><div class=\"ui red negative message\">"+
     "<div class=\"header\">Parsing Error</div>"+
-    "<p>Sequent must be structurally valid sequent and contain term symbols from the sequent term symbols table</p></div>"
+    "<p>Sequent must be a structurally valid sequent and contain term symbols from the sequent term symbols table</p></div>"
     var sequent = document.getElementById("Sequent").value.replace(/\(/g, " ( ").replace(/\)/g, " ) ")
     document.getElementById("Sequent").innerHTML += " \\quad "
     try {
