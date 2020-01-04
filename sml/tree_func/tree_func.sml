@@ -234,23 +234,30 @@
             val _ = TextIO.closeOut fd
         in () end
 
-    fun translate_premises(tree,rule,id) = 
-        let val new_trees = List.map(fn (_,cn,tr) => (cn, tr))(apply_rule(([],[],tree),rule,id))
+    fun translate_premises(tree,rule,id, index) = 
+        let val () = change_index(index)
+            val new_trees = List.map(fn (_,cn,tr) => (cn, tr))(apply_rule(([],[],tree),rule,id))
             val filtered = List.filter(fn (cn, tr) => check_rule_of(cn,tr,id))new_trees
+            
         in
             (case filtered of 
             [] => writeFD 3 "NOT APPLICABLE"
             | _ => 
                 let val new_premises = List.map(fn (cn, tr) => (cn, get_premises_of(tr,id))) filtered 
+                    fun prems_to_vars prems = List.map (fn Dat.CtxVar(x) => x) (List.concat (List.map get_ctx_vars prems))
+                    fun hd (l) = List.hd(l) handle (List.Empty) => ""
+                    fun tl (l) = List.tl(l) handle (List.Empty) => []
                 in
                     (case new_premises of 
                     [(_,[])] => writeFD 3 "[{}@@{}]"
                     | _ => 
                         let val new_premises_strings = List.map (fn (cn_list, pr_list) => 
-                                (List.map (Dat.const_toString) cn_list, List.map (Dat.seq_toString) pr_list)) new_premises
-                            val new_premises_strings2 = List.map (fn (c, p) => 
-                                    "{"^(List.foldl (fn (str1,str2) => str2^"##"^str1) (List.hd(c)) (List.tl(c)))^"}@@"^
-                                    "{"^(List.foldl (fn (str1,str2) => str2^"##"^str1) (List.hd(p)) (List.tl(p)))^"}"
+                                (List.map (Dat.const_toString) cn_list, List.map (Dat.seq_toString) pr_list, prems_to_vars(pr_list) )) new_premises
+                            val new_premises_strings2 = List.map (fn (c, p, v): (string list * string list * string list) => 
+                                    "{"^(List.foldl (fn (str1,str2) => str2^"##"^str1) (hd(c)) (tl(c)))^"}@@"^
+                                    "{"^(List.foldl (fn (str1,str2) => str2^"##"^str1) (hd(p)) (tl(p)))^"}@@"^
+                                    "{"^(List.foldl (fn (str1,str2) => str2^"##"^str1) (hd(v)) (tl(v)))^"}@@"^
+                                    "{"^(Int.toString(get_index()))^"}"
                                     )new_premises_strings
                             val final_form = "["^(List.foldl (fn (str1,str2) => str1^" && "^str2) (List.hd(new_premises_strings2)) (List.tl(new_premises_strings2)))^"]"
                         in 
