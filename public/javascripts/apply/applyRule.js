@@ -40,7 +40,9 @@ function applyRule(i) {
                 prem_set.push(prems_cons[1].trim().slice(1,-1).split("##"))
                 fresh_list = prems_cons[2].trim().slice(1,-1).split("##")
                 for (var y = 0; y < fresh_list.length; y++) {
-                    fresh_symbols[fresh_list[y]] = fresh_list[y]
+                    if (fresh_list[y].length != 0) {
+                        fresh_symbols[fresh_list[y]] = fresh_list[y]
+                    }
                 }
                 rng_index = prems_cons[3].trim().slice(1,-1).split("##")[0]
             }
