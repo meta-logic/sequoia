@@ -196,6 +196,9 @@
                     apply_rule(tree, rule, sid))tree_list))([(fm,cn,dt)])ids
         end
 
+
+    
+    
     fun apply_rule_all_ways((fm,cn,dt), rule, at_least_once) = 
         let val ids = List.map(fn  Dat.DerTree(id,_,_,_)=> id)(get_open_prems dt)
             val num = if at_least_once then 1 else 0
@@ -204,12 +207,26 @@
                 ListPair.unzip (List.concat(
                 List.tabulate(List.length(ids)+rng, fn i => 
                 H.chooseK (ids,i+num,fn(a,b)=>a=b))))
+            (* val _ = print "\n___________________________________________________\n\n\n"
+            val _ = print ("ids: "^(ListFormat.listToString (fn x => x) (ids))^"________\n" ) *)
+
+            fun check_applied (ids_needed, tree) = 
+                let
+                    val tree_open_ids = List.map(fn  Dat.DerTree(id,_,_,_)=> id) (get_open_prems tree)
+                    val res = true
+                    val res = List.all (fn id => not (List.exists (fn tree_id => id=tree_id) tree_open_ids)) ids_needed
+                in
+                    res
+                end
+            
         in
-            List.concat(List.map(fn id_set => 
-                List.foldl(fn (sid, tree_list) => 
+            List.concat(List.map (fn id_set =>  
+                List.filter 
+                (fn (_,_,tree) => check_applied(id_set,tree))
+                (List.foldl(fn (sid, tree_list) => 
                     List.concat(List.map(fn tree =>
                         apply_rule(tree, rule, sid))tree_list))
-                        ([(fm,cn,dt)])id_set)(id_sets))
+                        ([(fm,cn,dt)])id_set) )  (id_sets) )
         end
 
     fun apply_multiple_rules_all_ways(dt, []) = [dt]
