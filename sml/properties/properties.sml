@@ -52,6 +52,18 @@ struct
             D.Seq(gen_out a, c, gen_out b)
         end
 
+    fun generic_ctx_var( D.Seq(a, c, b)) =
+        let
+            fun gen_out(D.Empty) = D.Empty
+                | gen_out(D.Single(D.Ctx(vl,fl))) =
+                let val () = () in other_fresh := !other_fresh + 1;
+                D.Single(D.Ctx([D.CtxVar ("\\Gamma_{" ^ Int.toString(!other_fresh)^"}")],fl)) end
+                | gen_out(D.Mult(con,D.Ctx(vl,fl),rest)) =
+                let val () = () in other_fresh := !other_fresh + 1;
+                D.Mult(con,D.Ctx([D.CtxVar ("\\Gamma_{" ^ Int.toString(!other_fresh)^"}")],fl),gen_out rest) end
+        in
+            D.Seq(gen_out a, c, gen_out b)
+        end
 
 
     fun fresh'(x:string):string = (x ^"^{p"^ (Int.toString(!var_index)) ^"}")
@@ -487,14 +499,18 @@ struct
                 let val D.Rule(name1, side1, sq1, premises1) = rule1
                     val D.Rule(name2, side2, sq2, premises2) = rule2
                     val start = generic_seq sq1
+                    val sq1 = generic_ctx_var sq1
+                    val sq2 = generic_ctx_var sq2
                     val sb1 = (case U.Unify_seq(start, sq1) of
                         SOME(sigscons1) =>
-                            List.map(fn (sg, cn) => App.apply_seq_Unifier(start,sg))sigscons1
+                            List.map(fn (sg, cn) => App.apply_seq_Unifier(start,sg)) sigscons1
                         | NONE => [])
+                    val sb1 = List.map generic_ctx_var sb1
                     val sb2 = List.concat(List.map(fn s1 => (case U.Unify_seq(s1, sq2) of
                         SOME(sigscons2) =>
                             List.map(fn (sg, cn) => App.apply_seq_Unifier(s1,sg))sigscons2
                         | NONE => []))sb1)
+                    val sb2 = List.map generic_ctx_var sb2
                     val atom_seqs = List.map T.atomic_transform sb2
                 in atom_seqs end
             
