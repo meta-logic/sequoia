@@ -497,6 +497,8 @@ struct
                         | NONE => []))sb1)
                     val atom_seqs = List.map T.atomic_transform sb2
                 in atom_seqs end
+            
+            
 
             fun create_constraint( D.Seq(l1,_,r1),  D.Seq(l2,_,r2)) =  get_ctx_var(l1,l2) @ get_ctx_var(r1,r2)
 
@@ -533,12 +535,24 @@ struct
             fun stack_rules(bases, rule1, rule2, init_rule_ls) =
                 List.map (fn tree =>
                     let val temp = T.apply_rule_everywhere(([], [], tree), rule1)
-                        val dvt_lst = List.concat(List.map(fn tree =>
+                        (* val _ = print ("\n ________ temp len : " ^ (Int.toString(List.length(temp))) ^ "________\n") *)
+                        val dvr_lst = List.concat(List.map(fn tree =>
                                         T.apply_rule_all_ways(tree, rule2, true)) temp)
+                        (* val _ = print ("\n ________ dvr len : " ^ (Int.toString(List.length(dvr_lst))) ^ "________\n") *)
                         (*TODO: not sure what this line does*)
-                        val final = List.concat (List.map (fn tree => T.apply_multiple_rules_all_ways(tree,init_rule_ls)) dvt_lst)
+                        
+
+
+                        fun apply_init_rule_all_trees (rule,trees) = List.concat (List.map (fn (tree) =>
+                                                             T.apply_rule_everywhere(tree,rule)) trees)
+
+
+
+                        val final = List.foldr apply_init_rule_all_trees dvr_lst init_rule_ls
+                        
                         (* val _ = List.app (fn (_,_,t) => List.app (fn (D.DerTree(_,seq,_,_)) => print (D.seq_toString(seq)^"\n")) (T.get_open_prems(t))) final
                         val _ = print "\n\n\n____\n\n\n" *)
+                        (* val _ = print ("\n ________ final len : " ^ (Int.toString(List.length(final))) ^ "________\n") *)
                     in
                         List.map(fn(_,cn,ft) => (cn,ft)) final
                     end) bases
@@ -549,8 +563,9 @@ struct
             val rule2 = update_rule(rule2)
 
             val bases = (create_base(rule1, rule2))
+            (* val _ = print("\n ________base : || " ^ (Dat.seq_toString(List.hd(bases))) ^ " || ___________\n") *)
             val bases_pairs = List.map (fn conc => (D.DerTree("0",seq_to_fresh(conc),D.NoRule,[]),D.DerTree("0",seq_to_fresh(conc),D.NoRule,[]))) bases
-
+            (* val _ = print ("\n________ number of bases : "^ (Int.toString(List.length(bases_pairs))) ^"_______\n") *)
             val rule1' = rule1
             val rule2' = rule2
 
@@ -560,9 +575,12 @@ struct
 
             val opens1 = stack_rules(bases1, rule1', rule2', init_rule_ls)
 
+            (* val _ = print ("\n__________ opens1 bases 1 length: "^ (Int.toString(List.length(List.hd(opens1))))^ "_______\n") *)
+
             (* val rule1' = update_rule(rule1)
             val rule2' = update_rule(rule2) *)
             val opens2 = stack_rules(bases2, rule2', rule1', init_rule_ls)
+            (* val _ = print ("\n__________ opens2 bases 1 length: "^ (Int.toString(List.length(List.hd(opens2))))^ "_______\n") *)
 
 
         in
