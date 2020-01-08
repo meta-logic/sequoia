@@ -81,6 +81,10 @@ function parse_and_use(temp_parser) {
     $(".conc-temp").click(function() {
         leaf_id = this.id.split("_")[1]
         seq_text = $(this).find("script")[0].innerText
+        var apply_warning = document.getElementById("apply warning")
+        if (apply_warning != null) {
+            apply_warning.remove()
+        }
         console.log(seq_text)
     })
     document.getElementById("style").innerHTML = 

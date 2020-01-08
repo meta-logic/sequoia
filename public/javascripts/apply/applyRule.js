@@ -24,13 +24,9 @@ function applyRule(i) {
         var tree_sml = "DerTree(\""+leaf_id+"\","+sequent+", NoRule, [])"
         $.post("/apply", { rule: rule_sml, tree: tree_sml, node_id: "\""+leaf_id+"\"", index : rng_index }, function(data, status) {
             var output = data.output.slice(1,-1).split("&&")
-            if (data.output == "NOT APPLICABLE"){
+            if (data.output == "NOT APPLICABLE") {
                 document.getElementById("warning").innerHTML = warning_text
                 return
-            }
-            var apply_warning = document.getElementById("apply warning")
-            if (apply_warning != null){
-                apply_warning.remove()
             }
             var prem_set = []
             var cons_set = []
@@ -52,10 +48,15 @@ function applyRule(i) {
                 $(".conc-temp").click(function() {
                     leaf_id = this.id.split("_")[1]
                     seq_text = $(this).find("script")[0].innerText
+                    var apply_warning = document.getElementById("apply warning")
+                    if (apply_warning != null) {
+                        apply_warning.remove()
+                    }
                     console.log(seq_text)
                 })
                 var constraints = document.getElementById('side_menu_L')
                 constraint_history.push(cons_set[index])
+                console.log(constraint_history)
                 var the_constraints = constraint_history.flat()
                 constraints.innerHTML = ""
                 for (i = 0; i < the_constraints.length; i++) {
@@ -88,10 +89,15 @@ function applyRule(i) {
                     $(".conc-temp").click(function() {
                         leaf_id = this.id.split("_")[1]
                         seq_text = $(this).find("script")[0].innerText
+                        var apply_warning = document.getElementById("apply warning")
+                        if (apply_warning != null) {
+                            apply_warning.remove()
+                        }
                         console.log(seq_text)
                     })
                     var constraints = document.getElementById('side_menu_L')
                     constraint_history.push(cons_set[index])
+                    console.log(constraint_history)
                     var the_constraints = constraint_history.flat()
                     constraints.innerHTML = ""
                     for (i = 0; i < the_constraints.length; i++) {
@@ -104,7 +110,6 @@ function applyRule(i) {
             }
         })
     })
-    console.log(constraint_history)
 }
 
 
@@ -121,6 +126,10 @@ function undo() {
         $(".conc-temp").click(function() {
             leaf_id = this.id.split("_")[1]
             seq_text = $(this).find("script")[0].innerText
+            var apply_warning = document.getElementById("apply warning")
+            if (apply_warning != null) {
+                apply_warning.remove()
+            }
             console.log(seq_text)
         })
         conclusion.removeAttribute("colspan")
@@ -130,7 +139,9 @@ function undo() {
 
         var constraints = document.getElementById('side_menu_L')
         constraint_history.pop()
+        console.log(constraint_history)
         var the_constraints = constraint_history.flat()
+        constraints.innerHTML = ""
         for (i = 0; i < the_constraints.length; i++) {
             if (the_constraints[i] != "") {
                 constraints.innerHTML += '<div class="item">$$'+the_constraints[i]+'$$</div>'
@@ -138,5 +149,4 @@ function undo() {
         }
         MathJax.Hub.Queue([ "Typeset", MathJax.Hub, constraints ])
     }
-    console.log(constraint_history)
 }
