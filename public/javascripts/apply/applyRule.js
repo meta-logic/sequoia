@@ -56,7 +56,7 @@ function applyRule(i) {
                 })
                 var constraints = document.getElementById('side_menu_L')
                 constraint_history.push(cons_set[index])
-                console.log(constraint_history)
+                // console.log(constraint_history)
                 var the_constraints = constraint_history.flat()
                 constraints.innerHTML = ""
                 for (i = 0; i < the_constraints.length; i++) {
@@ -97,7 +97,7 @@ function applyRule(i) {
                     })
                     var constraints = document.getElementById('side_menu_L')
                     constraint_history.push(cons_set[index])
-                    console.log(constraint_history)
+                    // console.log(constraint_history)
                     var the_constraints = constraint_history.flat()
                     constraints.innerHTML = ""
                     for (i = 0; i < the_constraints.length; i++) {
@@ -139,7 +139,7 @@ function undo() {
 
         var constraints = document.getElementById('side_menu_L')
         constraint_history.pop()
-        console.log(constraint_history)
+        // console.log(constraint_history)
         var the_constraints = constraint_history.flat()
         constraints.innerHTML = ""
         for (i = 0; i < the_constraints.length; i++) {
