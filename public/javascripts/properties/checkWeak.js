@@ -2,7 +2,6 @@ var left_proofs = []
 var right_proofs = []
 
 function showProof(side, index, on) {
-    console.log("HERE")
     if (on == "yes") {
         if (side == "L") {
             pfid = "lproof"+index
@@ -68,6 +67,7 @@ function setLabel(left_bools, right_bools, index, side) {
 }
 
 function checkWeak() {
+    document.getElementById("loading").setAttribute("class", "ui active inverted dimmer")
     $.get("/api/rules/"+calc_id, function (rls, status) { 
         var rules = rls.rules
         var rule_list = []
@@ -80,7 +80,7 @@ function checkWeak() {
                 .replace(/\\/g, "\\\\")+","
             }
             fin_prem = "[" + fin_prem.slice(0,-1) + "]"
-            var rule_sml = "Rule(\""+rules[i].rule.replace(/\\/g, "\\\\")+"\",None,"+fin_conc+","+fin_prem+")"
+            var rule_sml = "Rule(\""+rules[i].rule.replace(/\\/g, "\\\\")+"\","+rules[i].side+","+fin_conc+","+fin_prem+")"
             rule_list.push(rule_sml)
         }
         var rule_strings = ""
@@ -119,7 +119,6 @@ function checkWeak() {
                     }
                 }
             }
-            MathJax.Hub.Queue(["Typeset",MathJax.Hub,lt])
             if (right_bools.length > 1) {
                 var rt = document.getElementById("right_sides")
                 for (var i = 0; i < right_bools.length; i++) {
@@ -145,7 +144,11 @@ function checkWeak() {
                     }
                 }
             }
-            MathJax.Hub.Queue(["Typeset",MathJax.Hub,rt])
+            MathJax.Hub.Queue(["Typeset",MathJax.Hub,lt], function () { 
+                MathJax.Hub.Queue(["Typeset",MathJax.Hub,rt], function () {
+                    document.getElementById("loading").setAttribute("class", "ui inactive inverted dimmer")
+                })
+            })
         })
     })
 }

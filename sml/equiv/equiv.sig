@@ -2,6 +2,8 @@ signature EQUIVALENCE =
 sig
 	structure Dat : DATATYPES
 
+	type constraint = (Dat.ctx_var * Dat.ctx_var list * Dat.ctx_var list)
+
 	val ctx_struct_equiv : Dat.ctx_struct * Dat.ctx_struct -> bool
 	
 	val seq_equiv : Dat.seq*Dat.seq -> bool
@@ -9,7 +11,7 @@ sig
 	val check_consistent : (Dat.ctx_var * Dat.ctx_var list * Dat.ctx_var list) list * 
 	 Dat.ctx_var list * Dat.ctx_var list-> bool
 
-	
+	val extract_constraints : (Dat.seq * Dat.seq) -> constraint list
 	val check_premises : ((string * Dat.seq) list * Dat.der_tree * 
 	 (Dat.ctx_var * Dat.ctx_var list * Dat.ctx_var list) list*
 	  Dat.ctx_var list * Dat.ctx_var list) -> Dat.der_tree option

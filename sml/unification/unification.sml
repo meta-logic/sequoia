@@ -1,6 +1,7 @@
 structure unifyImpl : UNIFICATION = struct
     structure H = helpersImpl
     structure DAT = datatypesImpl
+    structure Dat = DAT
     structure APP = applyunifierImpl
 
 
@@ -186,6 +187,10 @@ structure unifyImpl : UNIFICATION = struct
                                 )(ListPair.zip(pf, vl2))
                             )part
                     in vl_sigmas end
+            
+            fun filter_subs (subs) = (List.filter (fn DAT.CTXs(cx, DAT.Ctx(cxs, _)) => 
+                            (not (List.length(cxs) = 1 andalso DAT.ctx_var_eq (List.hd cxs, cx)))
+                                                            | _ => true ) subs)
 
             (* form_list1, variable_list1, form_list2, var_list2 ??? *)
             fun try_partitions (fl1, vl1, fl2, vl2) =
@@ -199,16 +204,16 @@ structure unifyImpl : UNIFICATION = struct
                             List.map(fn s1 => 
                                 List.map(fn s2 => 
                                     let val (subs, (fresh_g, set1, set2)) = 
-                                        (s1 @ s2, get_constraint(post_ctx s1, post_ctx s2))
+                                        (filter_subs(s1 @ s2), get_constraint(post_ctx s1, post_ctx s2))
                                     in 
                                         (case (List.length(set1),List.length(set2)) of
                                            (0,0) => (subs, [])
-                                         | (1,_) => (List.take(
-                                        APP.UnifierComposition(subs,[DAT.CTXs(List.hd(set1),DAT.Ctx(set2,nil))]),
-                                        List.length subs),[])
-                                         | (_,1) => (List.take(
-                                        APP.UnifierComposition(subs,[DAT.CTXs(List.hd(set2),DAT.Ctx(set1,nil))]),
-                                        List.length subs),[])
+                                         | (1,_) => (
+                                        APP.UnifierComposition(subs,[DAT.CTXs(List.hd(set1),DAT.Ctx(set2,nil))])
+                                        ,[])
+                                         | (_,1) => (
+                                        APP.UnifierComposition(subs,[DAT.CTXs(List.hd(set2),DAT.Ctx(set1,nil))])
+                                        ,[])
                                          | _ => (subs, [(fresh_g, set1, set2)]))
                                     end
                                 )sigma1
@@ -216,7 +221,7 @@ structure unifyImpl : UNIFICATION = struct
                     in 
                         List.map(fn (sb,c) => (List.filter(fn DAT.CTXs(cx, DAT.Ctx(cxs, _)) => 
                             not (List.length(cxs) = 1 andalso DAT.ctx_var_eq (List.hd cxs, cx))
-                                                            | _ => raise Fail "try_partitions in Unify_ctx")sb, c))temp
+                                                            | _ => true )sb, c))temp
                     end
                 end
 
@@ -267,7 +272,17 @@ structure unifyImpl : UNIFICATION = struct
 
             fun sub_update f = Option.map (List.map (fn (subs,cons)=> (f subs,cons)))
             fun cons_update f = Option.map (List.map (fn (subs,cons)=> (subs,f cons)))
+            
             val unification_result = Unify_ctx_AUX(DAT.Ctx(vl1, fl1), DAT.Ctx(vl2, fl2))
+
+
+            fun sub_toString (DAT.CTXs(DAT.CtxVar(a), b)) = (a ^"-->"^DAT.ctx_toString(b)^"_______\n")
+                |sub_toString (_) = "_______________\n"
+            
+            (* val _ = List.app (fn y => (List.app (fn x => ignore (print(sub_toString x))) y) before (print "\n\n||||||||||||||||\n\n")) (List.map #1 (Option.valOf unification_result)) handle (Option ) => ()
+                
+
+            val _ = print ("//////////////////\n\n") *)
 
             val update_vars = (fn sub => APP.UnifierComposition(sub,base_subs))
 
@@ -279,7 +294,9 @@ structure unifyImpl : UNIFICATION = struct
             val unification_result = cons_update update_cons_vars unification_result
             (* val unification_result = sub_update remove_base_subs unification_result *)
 
+            (* val _ = List.app (fn y => (List.app (fn x => ignore (print(sub_toString x))) y) before (print "\n\n|||||||||||||||||||\n\n")) (List.map #1 (Option.valOf unification_result)) handle (Option ) => () *)
 
+            (* val _ = print ("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\n\n") *)
 
         in
             Option.map (fn sb => H.remove_duplicates (sb, DAT.sub_eq)) unification_result

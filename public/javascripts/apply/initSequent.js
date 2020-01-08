@@ -1,6 +1,5 @@
 var parser_copy = pt
 var parser = ""
-var seq_symbols = {}
 
 function clear() {
     document.getElementById("seq").remove()
@@ -63,9 +62,8 @@ function useSequent() {
 
 function parse_and_use(temp_parser) {
     var warning_text = "<div id=\"parse warning\"><div class=\"ui red negative message\">"+
-    "<div class=\"header\">Unrecognized Symbols</div>"+
-    "<p>All symbols used in calculus should be inputted to table</p></div>"
-    
+    "<div class=\"header\">Parsing Error</div>"+
+    "<p>Sequent must be structurally valid sequent and contain term symbols from the sequent term symbols table</p></div>"
     var sequent = document.getElementById("Sequent").value.replace(/\(/g, " ( ").replace(/\)/g, " ) ")
     document.getElementById("Sequent").innerHTML += " \\quad "
     try {

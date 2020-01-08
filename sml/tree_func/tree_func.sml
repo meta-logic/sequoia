@@ -5,6 +5,7 @@
     structure Dat = datatypesImpl
     structure App = applyunifierImpl
     structure U = unifyImpl
+    structure E = Equivalence
 
 
 
@@ -115,32 +116,27 @@
             List.filter(fn (sb,_) => not (List.exists(fn s => bad_sub(s,sequent))sb))sigcons
         end
     
-    fun add_constraints(sigcons, sequent) = sigcons
-        (* let
-            
-            fun remove (_,[]) = []
-                |remove (x,y::L) = if Dat.ctx_var_eq(x,y) then remove(x,L) else y::remove(x,L)
-            fun unique ([]) = []
-                |unique (x::L) = x::remove(x,L)
-            val ctx_vars = unique(get_ctx_vars sequent)
-            fun update_cons (subs,cons) = 
-                let
-                    val subs_for_each_var = List.concat (List.map (fn (var) => List.filter 
-                                                                (fn (Dat.CTXs(sub_var,_)) => Dat.ctx_var_eq(var,sub_var) 
-                                                                | _ => false) subs) ctx_vars)
-                    val new_cons = List.map (fn (Dat.CTXs(var,Dat.Ctx(vars,_))) => (var,[var],vars) | _ => raise Fail "") subs_for_each_var
-                in
-                    (subs,new_cons@cons)
-                end
-        in
-            List.map update_cons sigcons
-        end *)
 
     fun get_premises_of(Dat.DerTree(id, _, _, []), sid) = []
         | get_premises_of(Dat.DerTree(id, _, _, pq), sid) = 
             if id = sid then List.map(fn Dat.DerTree(_, sq, _, _) => sq)pq
             else if not (String.isPrefix id sid) then []
             else List.foldl(fn (branch, premises) => premises @ (get_premises_of(branch,sid)))([])pq
+    
+    exception NotFound
+
+    fun get_seq_of (Dat.DerTree(id,conc,_,[]),sid) = if id = sid then conc else raise NotFound
+        | get_seq_of (Dat.DerTree(id,conc,_,pq),sid) = 
+            if id = sid then conc
+            else if not (String.isPrefix id sid) then raise NotFound
+            else let
+                    val child = (Option.valOf 
+                    (List.find (fn Dat.DerTree(pid,_,_,_) => (String.isPrefix pid sid)) pq) )
+                    handle (Option) => raise NotFound
+                                
+                in
+                    get_seq_of (child,sid)
+                end
 
     fun check_rule_of(_,Dat.DerTree(id, _, Dat.NoRule, pq), sid) = not (id = sid)
         | check_rule_of(cn, Dat.DerTree(id, _, rq, pq), sid) = if id = sid then true 
@@ -158,7 +154,6 @@
                             let val formulas = get_forms(conc)
                                 val new_sigscons = filter_bad_subs(sigscons,sq)
                                 (* val _ = print ((Int.toString (List.length(sigscons)))^" to "^(Int.toString (List.length(new_sigscons)))^"\n") *)
-                                val new_sigscons = add_constraints(new_sigscons,sq)
                                 
                                 val next_ids = List.tabulate(List.length(premises), fn i => Int.toString(i))
                                 val prems_ids = ListPair.zip(premises, next_ids)
@@ -196,6 +191,9 @@
                     apply_rule(tree, rule, sid))tree_list))([(fm,cn,dt)])ids
         end
 
+
+    
+    
     fun apply_rule_all_ways((fm,cn,dt), rule, at_least_once) = 
         let val ids = List.map(fn  Dat.DerTree(id,_,_,_)=> id)(get_open_prems dt)
             val num = if at_least_once then 1 else 0
@@ -204,12 +202,26 @@
                 ListPair.unzip (List.concat(
                 List.tabulate(List.length(ids)+rng, fn i => 
                 H.chooseK (ids,i+num,fn(a,b)=>a=b))))
+            (* val _ = print "\n___________________________________________________\n\n\n"
+            val _ = print ("ids: "^(ListFormat.listToString (fn x => x) (ids))^"________\n" ) *)
+
+            fun check_applied (ids_needed, tree) = 
+                let
+                    val tree_open_ids = List.map(fn  Dat.DerTree(id,_,_,_)=> id) (get_open_prems tree)
+                    val res = true
+                    val res = List.all (fn id => not (List.exists (fn tree_id => id=tree_id) tree_open_ids)) ids_needed
+                in
+                    res
+                end
+            
         in
-            List.concat(List.map(fn id_set => 
-                List.foldl(fn (sid, tree_list) => 
+            List.concat(List.map (fn id_set =>  
+                List.filter 
+                (fn (_,_,tree) => check_applied(id_set,tree))
+                (List.foldl(fn (sid, tree_list) => 
                     List.concat(List.map(fn tree =>
                         apply_rule(tree, rule, sid))tree_list))
-                        ([(fm,cn,dt)])id_set)(id_sets))
+                        ([(fm,cn,dt)])id_set) )  (id_sets) )
         end
 
     fun apply_multiple_rules_all_ways(dt, []) = [dt]
@@ -234,22 +246,47 @@
             val _ = TextIO.closeOut fd
         in () end
 
+<<<<<<< HEAD
     fun translate_premises(tree,rule,id, index) = 
         let val () = change_index(index)
             val new_trees = List.map(fn (_,cn,tr) => (cn, tr))(apply_rule(([],[],tree),rule,id))
             val filtered = List.filter(fn (cn, tr) => check_rule_of(cn,tr,id))new_trees
             
+=======
+    fun filter_constraints (cons) = List.filter (fn (_,l1,l2) => not (H.mset_eq(l1,l2,Dat.ctx_var_eq)) ) cons
+
+    fun translate_premises' fd (tree,rule,id, index) = 
+        let val () = change_index(index)
+            val new_trees = List.map(fn (_,cn,tr) => (cn, tr))(apply_rule(([],[],tree),rule,id))
+            val filtered = List.filter(fn (cn, tr) => check_rule_of(cn,tr,id))new_trees
+            val Dat.DerTree (_,temp_conc,_,_) = tree
+            val pre_conc = (get_seq_of(tree,id)) handle (NotFound) => temp_conc
+            fun update_cons (cn,tr) = 
+                let
+                    val tree_conc = (get_seq_of(tr,id)) handle (NotFound) => temp_conc
+                    val new_cons = (E.extract_constraints(pre_conc,tree_conc))
+                    val new_cons = filter_constraints new_cons
+                in
+                    (new_cons@cn,tr)
+                end
+>>>>>>> master
         in
             (case filtered of 
-            [] => writeFD 3 "NOT APPLICABLE"
+            [] => writeFD fd "NOT APPLICABLE"
             | _ => 
+<<<<<<< HEAD
                 let val new_premises = List.map(fn (cn, tr) => (cn, get_premises_of(tr,id))) filtered 
+=======
+                let 
+                    val filtered = List.map (update_cons) filtered
+                    val new_premises = List.map(fn (cn, tr) => (cn, get_premises_of(tr,id))) filtered 
+>>>>>>> master
                     fun prems_to_vars prems = List.map (fn Dat.CtxVar(x) => x) (List.concat (List.map get_ctx_vars prems))
                     fun hd (l) = List.hd(l) handle (List.Empty) => ""
                     fun tl (l) = List.tl(l) handle (List.Empty) => []
                 in
                     (case new_premises of 
-                    [(_,[])] => writeFD 3 "[{}@@{}]"
+                    [(_,[])] => writeFD fd "[{}@@{}@@{}@@{}]"
                     | _ => 
                         let val new_premises_strings = List.map (fn (cn_list, pr_list) => 
                                 (List.map (Dat.const_toString) cn_list, List.map (Dat.seq_toString) pr_list, prems_to_vars(pr_list) )) new_premises
@@ -261,10 +298,11 @@
                                     )new_premises_strings
                             val final_form = "["^(List.foldl (fn (str1,str2) => str1^" && "^str2) (List.hd(new_premises_strings2)) (List.tl(new_premises_strings2)))^"]"
                         in 
-                            writeFD 3 final_form
+                            writeFD fd final_form
                         end)
                 end)
-        end 
+        end
+    fun translate_premises (input) = translate_premises' 3 input  
 end
 
 

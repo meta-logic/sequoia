@@ -11,7 +11,8 @@ var calculusSchema = new Schema({
     title       : String,
     description : String, 
     rules       : [String], 
-    symbols     : [String]
+    symbols     : [String],
+    user        : String
 })
 
 module.exports = mongoose.model("Calculus", calculusSchema)

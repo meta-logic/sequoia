@@ -15,6 +15,7 @@ function createCalculus (req, res) {
     calculus.description = req.body.description
     calculus.rules = []
     calculus.symbols = []
+    calculus.user = req.body.user
     //saving the calculus in the database
     calculus.save(function (err) {
         //if something went wrong while saving, return the error
@@ -100,7 +101,7 @@ function getCalculus (req, res) {
 
 function getCalculi (req, res) {
     //looking up the calculus
-    Calculus.find({}, function (err, calculi) {
+    Calculus.find({user : req.params.user_id}, function (err, calculi) {
         //if the calculi do not exist
         if (err || calculi == null) {
             return res.status(400).json({

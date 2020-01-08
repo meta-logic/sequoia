@@ -85,12 +85,14 @@ function checkUser (req, res) {
         //if the user does not exist
         if (user.length == 0) {
             return res.status(200).json({
-                "status"  : "failure"
+                "status"  : "failure",
+                "message" : "calculus does not exist"
             })
         }
         //return the user 
         return res.status(200).json({
-            "status"    : "success"
+            "status"    : "success",
+            "user"      : user
         })
     })
 }
