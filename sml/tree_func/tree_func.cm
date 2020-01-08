@@ -5,5 +5,7 @@ is
   ../basics/basics.cm
   ../applyunifier/applyunifier.cm
   ../unification/unification.cm
+  ../equiv/equiv.cm
   tree_func.sig
   tree_func.sml
+

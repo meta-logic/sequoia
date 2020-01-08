@@ -71,9 +71,6 @@ structure applyunifierImpl : APPLYUNIFIER = struct
             let val (s', equivalent) = compose(s, sigma2) 
                 val sigma1temp = UnifierComposition'(sigma1, sigma2)
                 val sigma1new = if equivalent then sigma1temp else (s')::sigma1temp
-                val sigma2new = List.filter (fn s2 => not 
-                            (List.exists (fn s1 => DAT.sub_prefix_eq(s2, s1)) 
-                            sigma2)) (if equivalent then sigma1new else (s')::sigma1new)
             in 
                 sigma1new
             end
@@ -83,8 +80,14 @@ structure applyunifierImpl : APPLYUNIFIER = struct
             val sigma2new = List.filter (fn s2 => not 
                             (List.exists (fn s1 => DAT.sub_prefix_eq(s2, s1)) 
                             sigma1)) sigma2
+            val res = UnifierComposition'(sigma1,sigma2new)
+            fun sub_toString (DAT.CTXs(DAT.CtxVar(a), b)) = (a ^"-->"^DAT.ctx_toString(b)^"_______\n")
+                |sub_toString (_) = "_______________\n"
+            (* val _ = print ("uni comp") *)
+            (* val _ = List.app (fn x => ignore (print(sub_toString x))) (res)  *)
+            (* val _ = print ("uni comp\n\n") *)
         in
-            UnifierComposition'(sigma1,sigma2new)
+            res
         end
 
 end
