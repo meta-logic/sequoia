@@ -58,6 +58,7 @@ function permRules() {
 
     if (side1 == "None" || side2 == "None") {
         message.innerHTML = warning_init
+        document.getElementById("loading").setAttribute("class", "ui inactive inverted dimmer")
         return
     }
     if (document.getElementById('init warning') != null) {
