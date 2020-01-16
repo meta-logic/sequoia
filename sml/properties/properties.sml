@@ -31,6 +31,15 @@ struct
 
     exception Arity
 
+    fun constraintL_toString(l)=
+        let
+            fun constraint_toString (_,l,r) = (Dat.ctx_varL_toString(l)) ^ "=" ^ (Dat.ctx_varL_toString(r))
+            val list_format = ListFormat.fmt {init = "{", sep = "&& ", final = "}" , fmt = constraint_toString}
+        in
+            print(list_format l);
+            list_format l
+        end
+
 
     fun writeFD fd content = 
         let
@@ -346,11 +355,11 @@ struct
 
     fun init_coherence_print (a,b,c) = 
         (let
-            fun print_helper((_,tree1),SOME((_,tree2))) = 
+            fun print_helper((clist1,tree1),SOME((clist2,tree2))) = 
                 "$$"^Latex.der_tree_toLatex2(tree1)
                 ^" \\leadsto "
                 ^Latex.der_tree_toLatex2(tree2)^"$$"
-            | print_helper((_,tree1),NONE) = 
+            | print_helper((clist1,tree1),NONE) = 
                 "$$"^Latex.der_tree_toLatex2(tree1)^"$$"
         in
             let val (bol, out) = init_coherence(a,b,c)
