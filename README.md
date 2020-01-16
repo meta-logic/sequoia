@@ -12,7 +12,7 @@ You need to have [Node.js](http://nodejs.org/), [Bower](https://bower.io/) and [
 Clone the repo
 
 ```
-git clone https://github.com/AboudFayad/sequoia.git 
+git clone git@github.com:meta-logic/sequoia.git
 ```
 
 Installing the dependencies
