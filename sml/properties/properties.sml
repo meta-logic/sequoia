@@ -359,8 +359,11 @@ struct
                 "$$"^Latex.der_tree_toLatex2(tree1)
                 ^" \\leadsto "
                 ^Latex.der_tree_toLatex2(tree2)^"$$"
+                ^"$$"^constraintL_toString(clist1)^"$$"
+                ^"$$"^constraintL_toString(clist2)^"$$"
             | print_helper((clist1,tree1),NONE) = 
                 "$$"^Latex.der_tree_toLatex2(tree1)^"$$"
+                ^"$$"^constraintL_toString(clist1)^"$$"
         in
             let val (bol, out) = init_coherence(a,b,c)
                 val t = List.map(fn (bl,pf) => if bl 
@@ -469,12 +472,15 @@ struct
 
     fun weakening_print rules = 
         let 
-            fun print_helper((_,tree1),SOME((_,tree2))) = 
+            fun print_helper((clist1,tree1),SOME((clist2,tree2))) = 
                     "$$"^Latex.der_tree_toLatex2(tree1)^"$$"
                     ^"$$ \\leadsto $$"
                     ^"$$"^Latex.der_tree_toLatex2(tree2)^"$$"
-                | print_helper((_,tree1),NONE) = 
+                    ^"$$"^constraintL_toString(clist1)^"$$"
+                    ^"$$"^constraintL_toString(clist2)^"$$"
+                | print_helper((clist1,tree1),NONE) = 
                     "$$"^Latex.der_tree_toLatex2(tree1)^"$$"
+                    ^"$$"^constraintL_toString(clist1)^"$$"
         in
             let val (L,R) = weakening_proofs(rules)
                 val tL = List.map(fn (bl,pfs) => if bl 
@@ -621,12 +627,15 @@ struct
 
     fun result_to_latex_strings ((true_list,fail_list)) = 
         let 
-            fun latex_res ((_,tree1),(_,tree2)) = 
+            fun latex_res ((clist1,tree1),(clist2,tree2)) = 
                 "$$"^Latex.der_tree_toLatex2(tree1)^"\\leadsto "
                 ^""^Latex.der_tree_toLatex2(tree2)^"$$"
+                ^"$$"^constraintL_toString(clist1)^"$$"
+                ^"$$"^constraintL_toString(clist2)^"$$"
         in
             let val true_strings = List.map (latex_res) true_list
-                val fail_strings = List.map (fn (_,dvt) => "$$"^Latex.der_tree_toLatex2(dvt)^"$$") fail_list
+                val fail_strings = List.map (fn (cl,dvt) => "$$"^Latex.der_tree_toLatex2(dvt)^"$$"
+                                                            ^"$$"^constraintL_toString(cl)^"$$") fail_list
                 val true_string = List.foldr (fn (x,y) => x^"###"^y) "" true_strings
                 val fail_string = List.foldr (fn (x,y) => x^"###"^y) "" fail_strings
             in true_string^"&&&"^fail_string end
