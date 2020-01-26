@@ -9,6 +9,7 @@ var controller = require("../controllers/rule")
 
 //rule routes
 router.post("/rule", controller.createRule)
+router.post("/rules_init", controller.createRules)
 router.put("/rule", controller.updateRule)
 router.delete("/rule", controller.deleteRule)
 router.get("/rule/:rule_id", controller.getRule)
