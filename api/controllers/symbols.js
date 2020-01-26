@@ -20,13 +20,41 @@ function addSymbol (req, res) {
                 "message" : "something went wrong while creating the symbol"
             })
         }
-        //send success message and created rule
+        //send success message and created symbol
         return res.status(200).json({
             "status"  : "success",
             "message" : "symbol was created",
-            "symbol"    : symbol  
+            "symbol"  : symbol  
         })
     }) 
+}
+
+
+function addSymbols (req, res) {
+    var symbols = JSON.parse(req.body.items)
+    for (var i = 0; i < symbols.length; i++) {
+        var symbol = new Symbols()
+        var syms = symbols[i]
+        symbol.symbol     = syms.symbol
+        symbol.type       = syms.type
+        symbol.group      = syms.group
+        symbol.calculus   = syms.calculus
+        symbol.save(function (err) {
+            //if something went wrong while saving, return the error
+            if (err) {
+                return res.status(400).json({
+                    "status"  : "failure",
+                    "message" : "something went wrong while creating the symbol"
+                })
+            }
+        }) 
+    }
+    //send success message and created symbol
+    return res.status(200).json({
+        "status"  : "success",
+        "message" : "symbol was created",
+        "symbol"  : symbol  
+    })
 }
 
 
@@ -65,8 +93,8 @@ function getRuleSymbols (req, res) {
         }
         //return the symbol
         return res.status(200).json({
-            "status" : "success",
-            "symbols"   : symbols
+            "status"  : "success",
+            "symbols" : symbols
         })
     })
 }
@@ -108,11 +136,11 @@ function getCertainSymbols (req, res) {
         }
         //return the symbol
         return res.status(200).json({
-            "status"    : "success",
-            "symbols"   : symbols
+            "status"  : "success",
+            "symbols" : symbols
         })
     })
 }
 
 
-module.exports = {addSymbol, deleteSymbol, getRuleSymbols, getSeqSymbols, getCertainSymbols}
+module.exports = {addSymbol, addSymbols, deleteSymbol, getRuleSymbols, getSeqSymbols, getCertainSymbols}
