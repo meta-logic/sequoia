@@ -61,7 +61,7 @@ function addSomeCalculus(sample) {
     var user_id = document.getElementById("user_id").innerHTML
     var the_symbols = []
     var the_rules = []
-    $.post("/api/calculus", {title : "Sample Calculus", description : "This is a sample calculus with BLAH BLAH BLAH", user : user_id}, function(data, status){
+    $.post("/api/calculus", {title : "Sample Calculus", description : "This is a sample calculus with some basic rules. Try it out!", user : user_id}, function(data, status){
         the_symbols = [ {symbol : "A", type: "formula variable", group : "rule", calculus : data.calculus._id},
                         {symbol : "B", type: "formula variable", group : "rule", calculus : data.calculus._id},
                         {symbol : "C", type: "formula variable", group : "rule", calculus : data.calculus._id},
