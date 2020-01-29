@@ -645,7 +645,7 @@ struct
         (case (List.length(right),List.length(wrong)) of
            ( 0 , 0 ) => "N/A@@@N/A"
          | (_ , 0) => "The Rule Permutes@@@The first rule always permutes down the second. Permutations for the trees below are shown."
-         | (0,_) => "The Rule Does Not Permutes@@@The first rule never permutes down the second. No permutations for the trees below were found."
+         | (0,_) => "The Rule Does Not Permute@@@The first rule never permutes down the second. No permutations for the trees below were found."
          | (_,_) => "The Rule Permutes Sometimes@@@The first rule sometimes permutes down the second. Permutations for some of trees below are shown while there are no permutations for the other trees.")
     
     fun permute_res_to_string (res) = 

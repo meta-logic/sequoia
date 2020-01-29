@@ -1,8 +1,8 @@
 var cmd = require("node-cmd")
 const cmd2 = require("child_process")
 
-function permuteRules(rule1, rule2, init_rules, res) {
-    var sml_command = "Properties.permute_print("+rule1+","+rule2+","+init_rules+",([],[]));\n"
+function permuteRules(rule1, rule2, init_rules, wL, wR, res) {
+    var sml_command = "Properties.permute_print("+rule1+","+rule2+","+init_rules+",("+wL+","+wR+"));\n"
     const smlTerminalInput = 
     "CM.make \"sml/unify.cm\";\n"
     +"Control.Print.printDepth :=100;\n"

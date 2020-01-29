@@ -78,7 +78,7 @@ function permRules() {
     init_list = init_list.slice(0,Math.max(1,init_list.length-1)) + "]"
 
 
-    $.post("/permute", { rule1: rule_sml1, rule2: rule_sml2, init_rules: init_list }, function(data, status) {
+    $.post("/permute", { rule1: rule_sml1, rule2: rule_sml2, init_rules: init_list, wL: weak_l, wR: weak_r}, function(data, status) {
         var output = data.output.split("%%%")
         var answer = output[0].split("@@@")
         var trees = output[1].split("&&&")

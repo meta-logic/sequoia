@@ -132,7 +132,7 @@ app.get('/calculus/:calc_id/properties/permutability', checkAuthenticated, funct
 });
 
 app.post('/permute', checkAuthenticated, function (req, res) {
-	var result = sml_permute.permuteRules(req.body.rule1, req.body.rule2, req.body.init_rules, res);
+	var result = sml_permute.permuteRules(req.body.rule1, req.body.rule2, req.body.init_rules, req.body.wL, req.body.wR, res);
 });
 
 app.get('/calculus/:calc_id/properties/init_coherence', checkAuthenticated, function (req, res) {
