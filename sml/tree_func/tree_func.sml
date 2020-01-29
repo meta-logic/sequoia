@@ -290,7 +290,24 @@
                         end)
                 end)
         end
-    fun translate_premises (input) = translate_premises' 3 input  
+    fun update_cut_rule (Dat.Rule(name,side,conc,prems),sub) = 
+        let
+            val sub_l = sub
+            val new_conc = App.apply_seq_Unifier (conc,sub_l)
+            val new_prems = List.map (fn prem => App.apply_seq_Unifier (prem,sub_l)) prems
+        in
+            Dat.Rule(name,side,conc,prems)
+        end
+
+    fun translate_premises_cut' fd (tree, rule, id , index, sub) = 
+        let
+            val new_rule = update_cut_rule (rule,sub) 
+        in
+            translate_premises' fd (tree,new_rule,id,index)
+        end
+
+    fun translate_premises (input) = translate_premises_cut' 3 input
+
 end
 
 
