@@ -1,19 +1,5 @@
 var c = 0
 
-function showInfo ( modal_num) {
-    $('#modal'+modal_num).modal({
-        onApprove: function(){
-            if (del == true) {
-                delete_symbol_fromTable(id, tbl)
-            } else {
-                update_symbol_inTable(id, tbl)
-            }
-        }
-    })
-    .modal('setting', 'closable', false)
-    .modal('show')
-}
-
 function get_calculi_toPage() {
     var calculi_container = document.getElementById("calculi")
     for (i = 0; i < c; i++) {

@@ -14,8 +14,8 @@ var ruleSchema = new Schema({
     sml_prem    : [String],
     sml_conc    : String,
     calculus    : String,
-    connective : String,
-    side : String
+    connective  : String,
+    side        : String
 })
 
 module.exports = mongoose.model("Rule", ruleSchema)

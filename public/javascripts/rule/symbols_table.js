@@ -38,7 +38,7 @@ function get_symbols_toTable(tbl) {
             if (tbl == "rule") {
                 button_action = "showInfo(true,"+i+",\'rule\',1)"
             } else {
-                button_action = "delete_symbol_fromTable("+i+",\'seq\')"
+                button_action = "showInfo(true,"+i+",\'seq\',1)"
             } 
             row.innerHTML = "<td id ="+new_id+" value = "+symb+"><type=\"text\">$$"+symb+"$$</td>"
             +"<td id ="+select_id+"><type=\"text\">"+typ
@@ -81,10 +81,8 @@ function add_symbol_toTable(tbl) {
                     ind = i
                 }
             }
-            if (ind != -1 && tbl == "rule") {
+            if (ind != -1) {
                 showInfo(false,ind,tbl,1)
-            } else if (ind != -1 && tbl == "seq"){
-                update_symbol_inTable(ind, tbl)
             } else {
                 $.get(other_req+calc_id, function(sb, status) {
                     var syms = sb.symbols
@@ -119,8 +117,10 @@ function delete_symbol_fromTable (val, tbl) {
         type: "DELETE",
         data : {"symbol" : symbol},
         success: function(result) {
-            fixRules()
-            get_rules_toPage()
+            if (tbl == "rule") {
+                fixRules()
+                get_rules_toPage()
+            }
             get_symbols_toTable(tbl)
             console.log("Symbol sucessfully deleted.")
         },
@@ -140,7 +140,9 @@ function update_symbol_inTable (val, tbl) {
         success: function(result) {
             $.post("/api/symbols", {symbol : symb, type : typ, group : tbl, calculus : calc_id}, 
             function(data, status) {
-                fixRules()
+                if (tbl == "rule") {
+                    fixRules()
+                }
                 get_symbols_toTable(tbl)
             })
             console.log("Symbol successfully updated.")

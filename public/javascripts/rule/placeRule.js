@@ -54,8 +54,8 @@ function placeRule(opt) {
 
 function parse_and_place(parser, opt) {
     var warning_text_symb = "<div id=\"parse warning\"><div class=\"ui red negative message\">"+
-    "<div class=\"header\">Parsing Error</div>"+
-    "<p>Sequent must be a structurally valid sequent and contain symbols from the symbols table</p></div>"
+    "<div class=\"header\">Rule Parsing Error</div>"+
+    "<p>Rule sequents must be structurally valid and contain symbols from the rule symbols table</p></div>"
     var calc_id = document.getElementById("calc_id").innerHTML
     var prem = []
     var parsed_prem = []
