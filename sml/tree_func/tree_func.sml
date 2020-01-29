@@ -286,7 +286,7 @@
                     fun tl (l) = List.tl(l) handle (List.Empty) => []
                 in
                     (case new_premises of 
-                    [(_,[])] => writeFD fd "[{}@@{}@@{}@@{}]"
+                    [(_,[])] => writeFD 3 ("[{}@@{}@@{}@@{"^(Int.toString(get_index()))^"}]")
                     | _ => 
                         let val new_premises_strings = List.map (fn (cn_list, pr_list) => 
                                 (List.map (Dat.const_toString) cn_list, List.map (Dat.seq_toString) pr_list, prems_to_vars(pr_list) )) new_premises

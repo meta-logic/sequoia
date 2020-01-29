@@ -49,7 +49,7 @@ app.use(bodyParser.json()); // get information from html forms
 app.use(bodyParser.urlencoded({extended: false})); // get information from html forms
 app.use(flash())
 app.use(session({
-    secret: process.env.SESSION_SECRET,
+    secret: "process.env.SESSION_SECRET",
     resave: false,
     saveUninitialized: false
 }))

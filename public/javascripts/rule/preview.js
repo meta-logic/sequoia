@@ -135,7 +135,7 @@ function preview (opt) {
             document.getElementById("sym_table").remove()
         }
         table.innerHTML =
-            "<table id=\"sym_table\" class= \"ui sortable fixed single line celled table\"> <thead> <tr><th>Symbols</th> <th>Types</th> </tr></thead>"+ 
+            "<table id=\"sym_table\" class= \"ui sortable fixed single line celled table\"> <thead> <tr><th>Rule Symbols</th> <th>Types</th> </tr></thead>"+ 
                 "<tbody id=\"init\"><tbody>"+
                 "<tbody id=\"table_head\">"+ 
                     "<tr id = \"input_row\">"+

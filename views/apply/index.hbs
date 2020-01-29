@@ -2,19 +2,20 @@
 <div id="calc_id" hidden>{{calc_id}}</div>
 
 
-<div class="ui huge right fixed vertical menu" id="side_menu_R" style="margin-top: 61px; margin-left: 0px overflow-y:scroll;">
-  <div id="rules" class="ui grid cards"></div>
+<div class="ui huge right fixed vertical menu" id="side_menu_R" style="margin-top: 61px; overflow-y:auto;">
+  <br>
+  <div id="rules" class="ui one cards"></div>
   <br>
   <div id="undo"></div>
-</div>
-<div class="ui left fixed vertical menu" id="side_menu_L" style="margin-top: 61px; overflow-y:hidden;">
+  <br><br><br><br>
 </div>
 
+<div class="ui left fixed vertical menu" id="side_menu_L" style="margin-top: 61px; overflow-y:auto;">
+</div>
 
 {{!-- Grid --}}
 <div class="ui container">
-  <div class="ui grid" style="margin-top: 26px; overflow-x: hidden;">
-    {{!-- Container --}}
+  <div class="ui grid" style="margin-top: 26px; overflow-x: auto;">
       {{!-- Sequent Input --}}
       <div class="fourteen wide column" id="seq">
         <div class="ui input fluid">
