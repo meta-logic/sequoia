@@ -39,9 +39,7 @@ signature TREEFUNC = sig
         rule list
         -> (form list * (ctx_var * ctx_var list * ctx_var list) list * der_tree) 
             list
-<<<<<<< HEAD
-=======
     val translate_premises' : int -> der_tree * rule * string * int -> unit
->>>>>>> master
-    val translate_premises : der_tree * rule * string * int -> unit
+    val translate_premises_cut' : int -> der_tree * rule * string * int * sub -> unit
+    val translate_premises : der_tree * rule * string * int * sub-> unit
 end
