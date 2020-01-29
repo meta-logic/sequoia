@@ -78,10 +78,10 @@ function checkInit() {
             var type = ""
             if (bool == "F") {
                 type = "negative"
-                answer = "Init coherence fails for this calculus system"
+                answer = "Identity expansion test fails for this calculus system"
             } else {
                 type = "info"
-                answer = "Init coherence succeeds for this calculus system"
+                answer = "Identity expansion test succeeds for this calculus system"
             }
             message.innerHTML = '<div id="answer" class="ui '+type+' message">'
                 +'<div class="header">'+answer+'</div>'

@@ -160,14 +160,17 @@ function checkAuthenticated (req, res, next) {
 		if (req.params.calc_id != null) {
 			calculusModel.find({_id : req.params.calc_id, user : req.user._id}, function (err, calculus) {
 				if (err || calculus.length == 0) {
-					console.log("yo")
 					return res.status(403).json();
+				} else {
+					return next()
 				}
 			})
+		} else {
+			return next()
 		}
-        return next()
-    }
-    res.redirect('/login')
+    } else {
+		res.redirect('/login')
+	}
 }
 
 function checkNotAuthenticated (req, res, next) {

@@ -8,7 +8,6 @@ var Rule = require("../models/rule")
 //creating a rule
 function createRule (req, res) {
     var rule = new Rule()
-    //populating the rule model with sequents and their connectives
     rule.rule      = req.body.rule
     rule.premises  = JSON.parse(req.body.premises)
     rule.conclusion = req.body.conclusion
@@ -34,6 +33,39 @@ function createRule (req, res) {
             "rule"    : rule   
         })
     }) 
+}
+
+
+function createRules (req, res) {
+    var rules = JSON.parse(req.body.items)
+    for (var i = 0; i < rules.length; i++) {
+        var rule = new Rule()
+        var rls = rules[i]
+        rule.rule      = rls.rule
+        rule.premises  = JSON.parse(rls.premises)
+        rule.conclusion = rls.conclusion
+        rule.sml_prem = JSON.parse(rls.parsed_prem)
+        rule.sml_conc = rls.parsed_conc
+        rule.calculus = rls.calculus
+        rule.connective = rls.connective
+        rule.side = rls.side
+        //saving the rule in the database
+        rule.save(function (err) {
+            //if something went wrong while saving, return the error
+            if (err) {
+                return res.status(400).json({
+                    "status"  : "failure",
+                    "message" : "something went wrong while creating the rule"
+                })
+            }
+        }) 
+    }
+    //send success message and created rule
+    return res.status(200).json({
+        "status"  : "success",
+        "message" : "rule was created",
+        "rule"    : rule   
+    })
 }
 
 
@@ -128,4 +160,4 @@ function getRules (req, res) {
 }
 
 
-module.exports = {createRule, updateRule, deleteRule, getRule, getRules}
+module.exports = {createRule, createRules, updateRule, deleteRule, getRule, getRules}
