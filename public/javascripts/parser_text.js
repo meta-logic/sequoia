@@ -64,3 +64,37 @@ ATOM = atom:Atom { return 'Atom ("' + atom + '")' }
 _ "whitespace"
   = [ ]*
 `
+
+var fpt = 
+`
+// Formula 
+FORM = BIFORM / GENFORM  
+
+FORM_LIST 
+  = _ form:FORM _ "," _ form_lst:FORM_LIST _ { 
+      form_lst.unshift(form)
+      return form_lst 
+    }
+  / _ form:FORM _ { return [form] }
+
+BIFORM
+  = fr:GENFORM _ conn:CONN _ fr2:FORM 
+  { return "Form (" + conn + ", [" + fr + "," + fr2 + "])" }
+
+GENFORM
+  = "(" _ form:FORM _ ")" { return form }
+  / conn:CONN _ form:GENFORM { return "Form (" + conn + ", [" + form + "])" }
+  / conn:CONN _ "(" _ fls:FORM_LIST _ ")" {return 'Form(' + conn + ",[" + fls.join(", ") + "])"}
+  / form_var:FORM_VAR { return form_var }
+  / atom_var:ATOM_VAR { return atom_var }
+  / atom:ATOM { return atom }
+
+// Symbols
+CONN = conn:Conn { return 'Con ("' + conn  + '")' }
+FORM_VAR = form_var:FormVar { return 'FormVar ("' + form_var + '")' }
+ATOM_VAR = atom_var:AtomVar { return 'AtomVar ("' + atom_var + '")' }
+ATOM = atom:Atom { return 'Atom ("' + atom + '")' }
+
+_ "whitespace"
+  = [ ]*
+`

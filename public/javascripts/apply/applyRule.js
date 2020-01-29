@@ -23,6 +23,8 @@ function cutSelect (side, callback) {
                 } else {
                     cut_var = v
                     cut_form = f
+                    document.getElementById("var").value = ""
+                    document.getElementById("form").value = ""
                     callback()
                 }
             }
@@ -70,12 +72,12 @@ function applyRule(i) {
             if (side == "Cut") {
                 try {
                     console.log(cut_form)
-                    var cF = parser.parse(cut_form).replace(/\\/g, "\\\\")
+                    var cF = formula_parser.parse(cut_form).replace(/\\/g, "\\\\")
                 } catch(error) {
                     document.getElementById("warning").innerHTML = warning_text_form
                     return
                 }
-                params = { rule: rule_sml, tree: tree_sml, node_id: "\""+leaf_id+"\"", index : rng_index, subs: "[Fs(Form(\""+cut_var+"\"),"+cF+")]" }
+                params = { rule: rule_sml, tree: tree_sml, node_id: "\""+leaf_id+"\"", index : rng_index, subs: "[Fs(FormVar(\""+cut_var+"\"),"+cF+")]" }
             }
             $.post("/apply", params, function(data, status) {
                 cut_var = ""

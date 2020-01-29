@@ -1,8 +1,10 @@
 var parser_copy = pt
-
+var formula_parser_copy = fpt
 
 function updateParser(new_symbols, callback) {
     var parser_text = parser_copy
+    var formula_parser_text = formula_parser_copy
+
     var arrow = "SeqSign = \"NO-ARROW\" "
     var sep = "CtxSep = \"NO-SEP\" "
     var conn = "Conn = \"NO-Conn\" "
@@ -59,9 +61,12 @@ function updateParser(new_symbols, callback) {
         for (var i = 0; i < context_variables.length; i ++) {
             set += "/ \"" + context_variables[i] + "\" "
         }
+
     extra_text = "\n" + arrow + "\n" + sep + "\n" + conn + "\n" + set + "\n" + form + "\n" + atom_var + "\n" + atom + "\n" 
     parser_text += extra_text
     parser = peg.generate(parser_text)
+    formula_parser_text += extra_text
+    formula_parser = peg.generate(formula_parser_text)
     callback()
     })
 }

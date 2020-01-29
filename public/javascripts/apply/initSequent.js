@@ -1,5 +1,6 @@
 var parser_copy = pt
 var parser = ""
+var formula_parser = ""
 
 function clear() {
     document.getElementById("seq").remove()
