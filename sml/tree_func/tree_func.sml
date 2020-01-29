@@ -296,7 +296,7 @@
             val new_conc = App.apply_seq_Unifier (conc,sub_l)
             val new_prems = List.map (fn prem => App.apply_seq_Unifier (prem,sub_l)) prems
         in
-            Dat.Rule(name,side,conc,prems)
+            Dat.Rule(name,side,new_conc,new_prems)
         end
 
     fun translate_premises_cut' fd (tree, rule, id , index, sub) = 
