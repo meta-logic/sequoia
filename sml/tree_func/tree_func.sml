@@ -246,13 +246,6 @@
             val _ = TextIO.closeOut fd
         in () end
 
-<<<<<<< HEAD
-    fun translate_premises(tree,rule,id, index) = 
-        let val () = change_index(index)
-            val new_trees = List.map(fn (_,cn,tr) => (cn, tr))(apply_rule(([],[],tree),rule,id))
-            val filtered = List.filter(fn (cn, tr) => check_rule_of(cn,tr,id))new_trees
-            
-=======
     fun filter_constraints (cons) = List.filter (fn (_,l1,l2) => not (H.mset_eq(l1,l2,Dat.ctx_var_eq)) ) cons
 
     fun translate_premises' fd (tree,rule,id, index) = 
@@ -269,18 +262,13 @@
                 in
                     (new_cons@cn,tr)
                 end
->>>>>>> master
         in
             (case filtered of 
             [] => writeFD fd "NOT APPLICABLE"
             | _ => 
-<<<<<<< HEAD
-                let val new_premises = List.map(fn (cn, tr) => (cn, get_premises_of(tr,id))) filtered 
-=======
                 let 
                     val filtered = List.map (update_cons) filtered
                     val new_premises = List.map(fn (cn, tr) => (cn, get_premises_of(tr,id))) filtered 
->>>>>>> master
                     fun prems_to_vars prems = List.map (fn Dat.CtxVar(x) => x) (List.concat (List.map get_ctx_vars prems))
                     fun hd (l) = List.hd(l) handle (List.Empty) => ""
                     fun tl (l) = List.tl(l) handle (List.Empty) => []
@@ -302,7 +290,24 @@
                         end)
                 end)
         end
-    fun translate_premises (input) = translate_premises' 3 input  
+    fun update_cut_rule (Dat.Rule(name,side,conc,prems),sub) = 
+        let
+            val sub_l = sub
+            val new_conc = App.apply_seq_Unifier (conc,sub_l)
+            val new_prems = List.map (fn prem => App.apply_seq_Unifier (prem,sub_l)) prems
+        in
+            Dat.Rule(name,side,conc,prems)
+        end
+
+    fun translate_premises_cut' fd (tree, rule, id , index, sub) = 
+        let
+            val new_rule = update_cut_rule (rule,sub) 
+        in
+            translate_premises' fd (tree,new_rule,id,index)
+        end
+
+    fun translate_premises (input) = translate_premises_cut' 3 input
+
 end
 
 
