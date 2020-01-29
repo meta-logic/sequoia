@@ -8,7 +8,7 @@ function addUser() {
         $.get("/api/users/"+username, function (data, status) {
             if (data.status != "success") {
                 if (password1 == password2) {
-                    $.post("/api/user", { username : username, password : password, 
+                    $.post("/api/user", { username : username, password : password1, 
                         email : email, occupation : occupation}, function(data, status){
                         window.location.href = "/login"})
                 } else {
