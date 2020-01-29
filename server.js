@@ -120,7 +120,7 @@ app.get('/calculus/:calc_id/apply', checkAuthenticated, function (req, res) {
 });
 
 app.post('/apply', checkAuthenticated, function (req, res) {
-	var result = sml_apply.applyRule(req.body.rule, req.body.tree, req.body.node_id, req.body.index, res);
+	var result = sml_apply.applyRule(req.body.rule, req.body.tree, req.body.node_id, req.body.index, req.body.subs, res);
 });
 
 app.get('/calculus/:calc_id/properties', checkAuthenticated, function (req, res) {

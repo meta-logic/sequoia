@@ -87,7 +87,7 @@ function preview (opt) {
         if (document.getElementById("side warning") != null){
             document.getElementById("side warning").remove()
         }
-        if (connective == "" && side != "None") {
+        if (connective == "" && (side == "Right" || side == "Left")) {
             warning.innerHTML = warning_text_connective
             return
         }

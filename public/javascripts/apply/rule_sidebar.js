@@ -24,7 +24,7 @@ function get_rules_toPage() {
             rules_container.innerHTML += 
             '<div id="rule_card"'+i+'" class="card">'
                 +'<button class="ui button basic black" id="r'+i+'" onClick=applyRule("'+i+'") '
-                +'rule_name="'+rules[i].rule+'" conclusion="'+fin_conc+'" premises="'+fin_prem+'">'
+                +'rule_name="'+rules[i].rule+'" side="'+rules[i].side+'" conclusion="'+fin_conc+'" premises="'+fin_prem+'">'
                     +'\\[\\frac{'+rules[i].premises.join(" \\quad \\quad ")+'}{'+rules[i].conclusion+'}'+rules[i].rule+'\\]'
                 +'</button>'
             +'</div>'

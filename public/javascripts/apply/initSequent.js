@@ -4,7 +4,7 @@ var parser = ""
 function clear() {
     document.getElementById("seq").remove()
     document.getElementById("apply").remove()
-    document.getElementById("table").remove()
+    // document.getElementById("table").remove()
     document.getElementById("warning").innerHTML =""
 }
 
@@ -62,8 +62,8 @@ function useSequent() {
 
 function parse_and_use(temp_parser) {
     var warning_text = "<div id=\"parse warning\"><div class=\"ui red negative message\">"+
-    "<div class=\"header\">Parsing Error</div>"+
-    "<p>Sequent must be a structurally valid sequent and contain term symbols from the sequent term symbols table</p></div>"
+    "<div class=\"header\">Sequent Parsing Error</div>"+
+    "<p>Sequents must be structurally valid and contain term symbols from the sequent term symbols table</p></div>"
     var sequent = document.getElementById("Sequent").value.replace(/\(/g, " ( ").replace(/\)/g, " ) ")
     document.getElementById("Sequent").innerHTML += " \\quad "
     try {
@@ -84,6 +84,10 @@ function parse_and_use(temp_parser) {
         var apply_warning = document.getElementById("apply warning")
         if (apply_warning != null) {
             apply_warning.remove()
+        }
+        var seq_warning = document.getElementById("seq warning")
+        if (seq_warning != null) {
+            seq_warning.remove()
         }
         console.log(seq_text)
     })

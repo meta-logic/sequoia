@@ -1,7 +1,7 @@
 var cmd = require("node-cmd")
 const cmd2 = require("child_process")
 
-function applyRule(rule, tree, id, index, res) {
+function applyRule(rule, tree, id, index, subs, res) {
     var sml_command = "treefuncImpl.translate_premises("+tree+","+rule+","+id+","+index+");\n"
     const smlTerminalInput = 
     "CM.make \"sml/unify.cm\";\n"
