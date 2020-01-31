@@ -68,10 +68,11 @@ function applyRule(i) {
             }
             var rule_sml = "Rule(\""+name+"\",None,"+conclusion+","+premises+")"
             var tree_sml = "DerTree(\""+leaf_id+"\","+sequent+", NoRule, [])"
+            console.log("Rule : ",rule_sml)
+            console.log("Sequent : ",sequent)
             params = { rule: rule_sml, tree: tree_sml, node_id: "\""+leaf_id+"\"", index : rng_index, subs: "[]" }
             if (side == "Cut") {
                 try {
-                    console.log(cut_form)
                     var cF = formula_parser.parse(cut_form).replace(/\\/g, "\\\\")
                 } catch(error) {
                     document.getElementById("warning").innerHTML = warning_text_form

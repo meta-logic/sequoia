@@ -28,7 +28,8 @@ function build_proof_tree(branch_id, rule, derivations) {
     conclusion.setAttribute("colspan", derivations.length)
     
     // creating the rule
-    var rule = "<td class=\"rulename\" rowspan=\"2\"><div class=\"rulename\">\\[\\scriptsize{" + rule.replace(/\\\\/g, "\\") + "}\\]</div></td>"
+    var rule = "<td class=\"rulename\" rowspan=\"2\">"+
+                "<div class=\"rulename\">\\[\\scriptsize{" + rule.replace(/\\\\/g, "\\") + "}\\]</div></td>"
 
     // creating the new derivation branches
     var new_branches = ""
@@ -40,7 +41,7 @@ function build_proof_tree(branch_id, rule, derivations) {
             "</td></tr>"+
         "</table></td>"
     }
-    var row = "<tr id = delete_id"+ branch_id +" >" + new_branches + rule + "</tr>"
+    var row = "<tr class=\"prm\" id = delete_id"+ branch_id +" >" + new_branches + rule + "</tr>"
 
     // adding the derivations to the branch
     proof_tree_branch.innerHTML = row + proof_tree_branch.innerHTML
