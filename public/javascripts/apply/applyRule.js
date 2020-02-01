@@ -181,7 +181,7 @@ function undo() {
         var undo_id = undo_items[0] 
         var undo_branch_count = undo_items[1] 
         var undo_seq = undo_items[2]
-        var proof_tree = $("#prooftree")[0]
+        var proof_tree = $("#prooftree_0")[0]
         proof_tree.setAttribute("count", undo_branch_count)
         var conclusion = $("#prooftree_" + undo_id + "_conc")[0]
         conclusion.setAttribute("class", "conc-temp")

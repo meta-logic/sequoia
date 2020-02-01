@@ -9,7 +9,7 @@ function preview() {
 
     init_sequent.innerHTML =
         "<div style=\"margin: 35px;\">"
-            +"<table id=\"prooftree\" count=\"1\" style=\"margin: auto;\">"
+            +"<table id=\"prooftree_0\" count=\"1\" style=\"margin: auto;\">"
                 +"<tr><td class=\"conc-temp\" id=\"prooftree_0_conc\">"
                     +"\\["+conc+"\\]"
                 +"</td></tr>"
