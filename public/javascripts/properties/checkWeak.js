@@ -72,16 +72,18 @@ function checkWeak() {
         var rules = rls.rules
         var rule_list = []
         for (var i = 0; i < rules.length; i++) {
-            var fin_conc = rules[i].sml_conc
-            .replace(/\\/g, "\\\\")
-            var fin_prem = ""
-            for (var j = 0; j < rules[i].sml_prem.length; j++) {
-                fin_prem += rules[i].sml_prem[j]
-                .replace(/\\/g, "\\\\")+","
+            if (rules[i].side != "Cut") {
+                var fin_conc = rules[i].sml_conc
+                .replace(/\\/g, "\\\\")
+                var fin_prem = ""
+                for (var j = 0; j < rules[i].sml_prem.length; j++) {
+                    fin_prem += rules[i].sml_prem[j]
+                    .replace(/\\/g, "\\\\")+","
+                }
+                fin_prem = "[" + fin_prem.slice(0,-1) + "]"
+                var rule_sml = "Rule(\""+rules[i].rule.replace(/\\/g, "\\\\")+"\","+rules[i].side+","+fin_conc+","+fin_prem+")"
+                rule_list.push(rule_sml)
             }
-            fin_prem = "[" + fin_prem.slice(0,-1) + "]"
-            var rule_sml = "Rule(\""+rules[i].rule.replace(/\\/g, "\\\\")+"\","+rules[i].side+","+fin_conc+","+fin_prem+")"
-            rule_list.push(rule_sml)
         }
         var rule_strings = ""
         for (var j = 0; j < rule_list.length; j++) {
