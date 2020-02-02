@@ -66,7 +66,6 @@ function parse_and_use(temp_parser) {
     "<div class=\"header\">Sequent Parsing Error</div>"+
     "<p>Sequents must be structurally valid and contain term symbols from the sequent term symbols table</p></div>"
     var sequent = document.getElementById("Sequent").value.replace(/\(/g, " ( ").replace(/\)/g, " ) ")
-    document.getElementById("Sequent").innerHTML += " \\quad "
     try {
         var sequent_final = temp_parser.parse(sequent).replace(/\\/g, "\\\\")
     }   
@@ -93,8 +92,12 @@ function parse_and_use(temp_parser) {
         console.log(seq_text)
     })
     document.getElementById("style").innerHTML = 
-        "<style> table { border-spacing: 12px 0;}"+
-            "td {text-align:center;height: 1em;vertical-align:bottom;}"+
-            "td.conc {border-top: solid 1px;} div.rulename {margin-top:-2em;}"+
-            "td.prem {}.MJXc-display, .MathJax_Display {margin:0px !important;} </style>"
+        "<style>"+
+            "table { border-spacing: 12px 0; }"+
+            "td { position: relative;  text-align:center;height: 1em; }"+
+            "td.conc { position:relative;border-top: solid 1px;vertical-align:bottom;}"+
+            "td.conc-prem { vertical-align:bottom;}"+
+            "td span.rulename { position: absolute; right: 0;bottom: 0;}"+
+            ".MJXc-display, .MathJax_Display {margin:0px !important;}"
+        "</style>"
 }

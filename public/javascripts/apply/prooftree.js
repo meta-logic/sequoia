@@ -11,7 +11,7 @@ var seq_text = ""
 // Output: A branch/branches with the given derivation(s) expanding from the given branch in the proof tree provided
 function build_proof_tree(branch_id, rule, derivations) {
     // retrieving the proof tree branch html
-    var proof_tree = $("#prooftree")[0]
+    var proof_tree = $("#prooftree_0")[0]
 
     // getting the total number of branches to assign ids for the new branches
     var branch_count = parseInt(proof_tree.getAttribute("count"))
@@ -20,7 +20,8 @@ function build_proof_tree(branch_id, rule, derivations) {
 
     // retrieving the proof tree branch html
     var proof_tree_branch = $("#prooftree_" + branch_id + " tbody")[0]
-    if (branch_count == 1) proof_tree_branch = $("#prooftree tbody")[0]
+    console.log(branch_id)
+    console.log(proof_tree_branch)
 
     // creating the line on top of the branch
     var conclusion = $("#prooftree_" + branch_id + "_conc")[0]
@@ -28,7 +29,8 @@ function build_proof_tree(branch_id, rule, derivations) {
     conclusion.setAttribute("colspan", derivations.length)
     
     // creating the rule
-    var rule = "<td class=\"rulename\" rowspan=\"2\"><div class=\"rulename\">\\[\\scriptsize{" + rule.replace(/\\\\/g, "\\") + "}\\]</div></td>"
+    var rule = "<td class=\"rulename\" rowspan=\"2\">"+
+                "<div class=\"rulename\">\\[\\scriptsize{" + rule.replace(/\\\\/g, "\\") + "}\\]</div></td>"
 
     // creating the new derivation branches
     var new_branches = ""

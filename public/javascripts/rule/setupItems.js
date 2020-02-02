@@ -1,3 +1,4 @@
+$('#main-menu').sticky({});
 var calc_id = document.getElementById("calc_id").innerHTML
 document.getElementById("Calculus icon").setAttribute("href", "/calculus/"+calc_id)
 document.getElementById("Proof Tree icon").setAttribute("href", "/calculus/"+calc_id+"/apply")

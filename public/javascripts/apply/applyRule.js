@@ -68,10 +68,11 @@ function applyRule(i) {
             }
             var rule_sml = "Rule(\""+name+"\",None,"+conclusion+","+premises+")"
             var tree_sml = "DerTree(\""+leaf_id+"\","+sequent+", NoRule, [])"
+            console.log("Rule : ",rule_sml)
+            console.log("Sequent : ",sequent)
             params = { rule: rule_sml, tree: tree_sml, node_id: "\""+leaf_id+"\"", index : rng_index, subs: "[]" }
             if (side == "Cut") {
                 try {
-                    console.log(cut_form)
                     var cF = formula_parser.parse(cut_form).replace(/\\/g, "\\\\")
                 } catch(error) {
                     document.getElementById("warning").innerHTML = warning_text_form
@@ -180,7 +181,7 @@ function undo() {
         var undo_id = undo_items[0] 
         var undo_branch_count = undo_items[1] 
         var undo_seq = undo_items[2]
-        var proof_tree = $("#prooftree")[0]
+        var proof_tree = $("#prooftree_0")[0]
         proof_tree.setAttribute("count", undo_branch_count)
         var conclusion = $("#prooftree_" + undo_id + "_conc")[0]
         conclusion.setAttribute("class", "conc-temp")
