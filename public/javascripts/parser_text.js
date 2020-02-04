@@ -6,7 +6,7 @@ SEQ
 
 // Context struct
 CTX_STR 
-  = ctx:CTX _ ctx_sep:CtxSep _ ctx_str:CTX_STR { return "Mult ( Con (" + ctx_sep + "), " + ctx + ", " + ctx_str + ")" }
+  = ctx:CTX _ ctx_sep:CtxSep _ ctx_str:CTX_STR { return 'Mult ( Con ("' + ctx_sep + '"), ' + ctx + ", " + ctx_str + ")" }
   / ctx:CTX { return "Single (" + ctx + ")" } 
 
 // Context
