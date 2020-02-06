@@ -34,9 +34,8 @@ struct
     fun constraintL_toString(l)=
         let
             fun constraint_toString (_,l,r) = (Dat.ctx_varL_toString(l)) ^ "=" ^ (Dat.ctx_varL_toString(r))
-            val list_format = ListFormat.fmt {init = "{", sep = "&& ", final = "}" , fmt = constraint_toString}
+            val list_format = ListFormat.fmt {init = "{", sep = "\\\\ ", final = "}" , fmt = constraint_toString}
         in
-            print(list_format l);
             list_format l
         end
 
@@ -644,9 +643,9 @@ struct
     fun permute_res ((right,wrong)) = 
         (case (List.length(right),List.length(wrong)) of
            ( 0 , 0 ) => "N/A@@@N/A"
-         | (_ , 0) => "The Rule Permutes@@@The first rule always permutes down the second. Permutations for the trees below are shown."
-         | (0,_) => "The Rule Does Not Permute@@@The first rule never permutes down the second. No permutations for the trees below were found."
-         | (_,_) => "The Rule Permutes Sometimes@@@The first rule sometimes permutes down the second. Permutations for some of trees below are shown while there are no permutations for the other trees.")
+         | (_ , 0) => "The Rule Permutes@@@The first rule always permutes up the second. All permutation tree transformations were found and are shown below."
+         | (0,_) => "The Rule Does Not Permute@@@The first rule never permutes up the second. No permutation tree transformations were found."
+         | (_,_) => "The Rule Permutes Sometimes@@@The first rule sometimes permutes up the second. Permutation tree transformations were found for some cases and are shown below, while no permutation transformations were found for the rest.")
     
     fun permute_res_to_string (res) = 
         let
