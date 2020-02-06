@@ -9,7 +9,7 @@ function cutSelect (side, callback) {
     if (side != "Cut") {
         callback()
     } else {
-        $('#modal3').modal({
+        $('#modal2').modal({
             onApprove: function () {
                 var v = $("#var").val()
                 var f = $("#form").val()
