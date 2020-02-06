@@ -2,10 +2,8 @@
 <div id="calc_id" hidden>{{calc_id}}</div>
 <div id="rule_id" hidden>{{rule_id}}</div>
 <div id="page" hidden>{{page}}</div>
-
-{{!-- Container --}}
+<br>
 <div class="ui container">
-	{{!-- Rule Input --}}
 	<div class="row">
 		<div class="ui input">
 			<input id="rule_name" type="text" placeholder="Rule Name">
@@ -14,6 +12,7 @@
 			<option value="">Side</option>
 			<option value="Left">Left</option>
 			<option value="Right">Right</option>
+			<option value="Structural">Structural</option>
 			<option value="Cut">Cut</option>
 			<option value="None">None</option>
 		</select>
@@ -21,69 +20,76 @@
 			<input id="connective" type="text" placeholder="Main Connective">
 		</div>
 	</div>
-	
 	<br>
-	
-	{{!-- Premises Inputs --}}
 	<div class="row">
 		<div class="ui fluid action input" id="premise">
 			<input id="i0" type="text" placeholder="Premise">
-			
-			{{!-- Adding Premise button --}}
 			<button onclick="addPremise()" class="ui circular icon button green">
 				<i class="icon add"></i>
 			</button>
-			<p style="color: white">s</p>
 		</div>
 	</div>
-	
-	{{!-- Divider Line --}}
 	<div class="ui divider"></div>
-	
-	{{!-- Conclusion Input --}}
 	<div class="row">
 		<div class="ui input fluid">
-			<input type="text" id="Conclusion" placeholder="Conclusion">
+			<input type="text" id="conclusion" placeholder="Conclusion">
 		</div>
 	</div>
-
 	<br>
-	
-	{{!-- Preview Button --}}
-	<button id="prev button" class="ui large green button" onclick="preview('Add')">
-		Preview
-	</button>
-	<br><br><br>
-	{{!-- Rule container --}}
+	<button id="prev button" class="ui large green button" onclick="preview('Add')">Preview</button>
+	<br><br>
 	<div id="rule" style="font-size: 150%"></div>
 	<br><br>
-	<div id="add"></div>
-	<br><br>
-	<div id="warning"></div>
-	<br><br>
-	{{!-- Table container --}}
-	<div id="table"></div>
-
-	<div id ="modal1" class="ui special modal">
-		<div class="header">Rules Affected</div>
-		<div id = "change warning" class="content">
+	<a id ="submit" class="ui fluid large circular icon button green" style="visibility: hidden;">TEMP</a>
+	<div id="warning" class="ui negative message" style="visibility: hidden;">
+		<div id="warning_header" class="header">TEMP</div>
+		<p id="warning_text">TEMP</p>
+	</div>
+	<table id="sym_table" class= "ui sortable fixed single line celled table" style="visibility: hidden;">
+		<thead><tr><th>Rule Symbols</th><th>Types</th></tr></thead> 
+		<tbody id="init"><tbody> 
+		<tbody id="table_head"> 
+			<tr id ="input_row">
+				<td id="input_field" style="text-align:center">
+					<div class="ui input focus">
+						<input id="sym" type="text" placeholder="Symbol Here">
+					</div>
+				</td>
+				<td id="select_field">
+					<select class="ui search dropdown" style="visibility: hidden;" id="typ">
+						<option value="">Type</option>
+						<option value="atom variable">atom variable</option>
+						<option value="formula variable">formula variable</option>
+						<option value="connective">connective</option>
+						<option value="context variable">context variable</option>
+						<option value="sequent sign">sequent sign</option>
+						<option value="context separator">context separator</option>
+						<option value="empty">empty</option>
+					</select>
+					<button class="ui large green right floated button" onclick="add_symbol_toTable('rule')">Add Symbol</button>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+	<br><br><br>
+</div>
+<div id ="modal1" class="ui special modal">
+	<div class="header">Rules Affected</div>
+	<div id = "change warning" class="content">
 		<p>Updating or removing existing symbols may alter the parsing of the rules already defined. This can result in the update or deletion of certain rules.
 			Would you like to continue?</p>
-		</div>
-		<div class="actions">
+	</div>
+	<div class="actions">
 		<div id="yes_button" class="ui approve button">Yes</div>
 		<div id="no_button" class="ui cancel button">No</div>
-		</div>
 	</div>
-
-	<div id ="modal2" class="ui special modal">
-		<div class="header">Symbol Used</div>
-		<div id = "change warning" class="content">
+</div>
+<div id ="modal2" class="ui special modal">
+	<div class="header">Symbol Used</div>
+	<div id = "change warning" class="content">
 		<p>This symbol already exists in the sequent symbols table. Try using a differnt one.</p>
-		</div>
-		<div class="actions">
-		<div id="ok_button" class="ui cancel button">Okay</div>
-		</div>
 	</div>
-
+	<div class="actions">
+		<div id="ok_button" class="ui cancel button">Okay</div>
+	</div>
 </div>
