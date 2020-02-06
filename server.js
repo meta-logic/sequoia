@@ -22,10 +22,7 @@ var calculusRoutes = require('./api/routes/calculus');
 var ruleRoutes     = require('./api/routes/rule');
 var symbolsRoutes  = require('./api/routes/symbols');
 var database       = require('./config/db');
-var sml_apply      = require('./sml/applyRule');
-var sml_permute    = require('./sml/permuteRules');
-var sml_weaken     = require('./sml/weakenSides');
-var sml_init       = require('./sml/initCohRules');
+var sml_command    = require('./sml/smlCommands');
 var initPassport   = require('./passport-config');
 var userModel      = require('./api/models/user');
 var calculusModel  = require('./api/models/calculus');
@@ -107,12 +104,12 @@ app.get('/calculus/:calc_id', checkAuthenticated, function (req, res) {
 
 app.get('/calculus/:calc_id/add-rule', checkAuthenticated, function (req, res) {
 	return res.render('rule/index', {'title' : 'Sequoia - add rule', 'layout' : 'rule', 'calc_id' : req.params.calc_id,
-						'page' : 'add'});
+						'page' : 'Add'});
 });
 
 app.get('/calculus/:calc_id/edit-rule/:rule_id', checkAuthenticated, function (req, res) {
 	return res.render('rule/index', {'title' : 'Sequoia - edit rule', 'layout' : 'rule', 'calc_id' : req.params.calc_id, 
-					'rule_id' : req.params.rule_id, 'page' : 'edit'});
+					'rule_id' : req.params.rule_id, 'page' : 'Update'});
 });
 
 app.get('/calculus/:calc_id/apply', checkAuthenticated, function (req, res) {
@@ -120,7 +117,7 @@ app.get('/calculus/:calc_id/apply', checkAuthenticated, function (req, res) {
 });
 
 app.post('/apply', checkAuthenticated, function (req, res) {
-	var result = sml_apply.applyRule(req.body.rule, req.body.tree, req.body.node_id, req.body.index, req.body.subs, res);
+	var result = sml_command.applyRule(req.body.rule, req.body.tree, req.body.node_id, req.body.index, req.body.subs, res);
 });
 
 app.get('/calculus/:calc_id/properties', checkAuthenticated, function (req, res) {
@@ -132,7 +129,7 @@ app.get('/calculus/:calc_id/properties/permutability', checkAuthenticated, funct
 });
 
 app.post('/permute', checkAuthenticated, function (req, res) {
-	var result = sml_permute.permuteRules(req.body.rule1, req.body.rule2, req.body.init_rules, req.body.wL, req.body.wR, res);
+	var result = sml_command.permuteRules(req.body.rule1, req.body.rule2, req.body.init_rules, req.body.wL, req.body.wR, res);
 });
 
 app.get('/calculus/:calc_id/properties/init_coherence', checkAuthenticated, function (req, res) {
@@ -140,7 +137,7 @@ app.get('/calculus/:calc_id/properties/init_coherence', checkAuthenticated, func
 });
 
 app.post('/initRules', checkAuthenticated, function (req, res) {
-	var result = sml_init.initRules(req.body.first, req.body.second, req.body.third, res);
+	var result = sml_command.initRules(req.body.first, req.body.second, req.body.third, res);
 });
 
 app.get('/calculus/:calc_id/properties/weak_admissability', checkAuthenticated, function (req, res) {
@@ -148,7 +145,7 @@ app.get('/calculus/:calc_id/properties/weak_admissability', checkAuthenticated, 
 });
 
 app.post('/weakenSides', checkAuthenticated, function (req, res) {
-	var result = sml_weaken.weakenSides(req.body.rules, res);
+	var result = sml_command.weakenSides(req.body.rules, res);
 });
 
 app.get('/calculus/:calc_id/properties/cut_admissability', checkAuthenticated, function (req, res) {
