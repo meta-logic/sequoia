@@ -1,59 +1,33 @@
 
 <div id="user_id" hidden>{{user_id}}</div>
-
-
 <div id="section" class="ui middle aligned center aligned teal huge header">{{username}}'s Calculi</div>
-
-{{!-- Container --}}
-
 <div class="ui container">
-	{{!-- Rule Input --}}
 	<div class="row">
 		<div class="ui input">
 			<input id="title" type="text" placeholder="Title">
 		</div>
 	</div>
-	
 	<br>
-	
 	<div class="row">
 		<div class="ui fluid input">
 			<input id="description" type="text" placeholder="Description">
 		</div>
 	</div>
-
 	<br>
-
-	{{!-- Add Buttons --}}
-	<a class="ui large green button" onclick="addCalculus()" >
-		Add Custom Calculus
-	</a>
-
-	<a class="ui large green button" onclick="addSomeCalculus('LJ')" >
-		LJ System
-	</a>
-
-	<a class="ui large green button" onclick="addSomeCalculus('LK')" >
-		LK System
-	</a>
-
+	<a class="ui large green button" onclick="addCalculus()">Add Custom Calculus</a>
+	<a class="ui large green button" onclick="addSomeCalculus('LJ')">LJ System</a>
+	<a class="ui large green button" onclick="addSomeCalculus('LK')">LK System</a>
 	<br><br><br><br>
-
-	{{!-- Cards --}}
-	<div class="ui grid cards" id="calculi"></div>
-	
-	<br><br><br>
-	
-	<div id ="modal1" class="ui special modal">
-		<div class="header">Calculus Deletion</div>
-		<div id = "change warning" class="content">
-			<p>If you delete this calculus all the rules and symbols of the calculus will 
-				also be deleted. Are you sure you want to delete this calculus?</p>
-		</div>
-		<div class="actions">
-			<div id="yes_button" class="ui approve button">yes</div>
-			<div id="no_button" class="ui cancel button">No</div>
-		</div>
+	<div class="ui four grid cards" id="calculi"></div>
+</div>
+<div id ="modal1" class="ui special modal">
+	<div class="header">Calculus Deletion</div>
+	<div id = "change warning" class="content">
+		<p>If you delete this calculus all the rules and symbols associated with it
+		will also be deleted. Are you sure you want to delete this calculus?</p>
 	</div>
-
+	<div class="actions">
+		<div id="yes_button" class="ui approve button">Yes</div>
+		<div id="no_button" class="ui cancel button">No</div>
+	</div>
 </div>

@@ -1,41 +1,22 @@
 
 <div id="calc_id" hidden>{{calc_id}}</div>
-
-
 <div id="title" class="ui middle aligned center aligned huge teal header">Permutability
-	<div id="description" class="sub header">
-		Select two rules to check if the first permutes up the second</div>
+	<div id="description" class="sub header">Select two rules to check if the first permutes up the second</div>
 </div>
 <div id="property" hidden>Permutability</div>
-
-<br>
-
+<br><br>
 <div class="ui container">
-
-	<br>
-	
 	<div class="ui four special cards" id="rules"></div>
-
 	<br>
-
-	<div id="perm_button" class="ui disabled teal large button" onclick="permRules()">
-        Permute Rules
-    </div>
-
-	<br><br><br>
-
-	<div id="info_answer"></div>
-
-	<br>
-
-	<div class="ui one special cards" id="good_trees"></div>
-	<div class="ui divider"></div>
-	<div class="ui one special cards" id="bad_trees"></div>
-
-	<br><br><br>
-
-	<div id="loading" class="ui inactive inverted dimmer">
-		<div class="ui text loader">Loading</div>
+	<div id="perm_button" class="ui disabled teal large button" onclick="permRules()">Permute Rules</div>
+	<div id="info_answer" class="ui message" style="visibility: hidden;">
+		<div id="info_header" class="header">TEMP</div>
+		<p id="info_text">TEMP</p>
 	</div>
-
+	<div class="ui divider"></div>
+	<div class="ui one centered cards" id="good_trees"></div>
+	<div class="ui one centered cards" id="bad_trees"></div>
+</div>
+<div id="loading" class="ui inactive inverted dimmer">
+	<div class="ui text loader">Loading</div>
 </div>

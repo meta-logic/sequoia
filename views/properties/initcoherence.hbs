@@ -1,33 +1,21 @@
 
 <div id="calc_id" hidden>{{calc_id}}</div>
-
-
 <div id="title" class="ui middle aligned center aligned huge teal header">Identity Expansion
-	<div id="description" class="sub header">
-		Check if your calculus exhibits identity expansion</div>
+	<div id="description" class="sub header">Check if your calculus exhibits identity expansion</div>
 </div>
 <div id="property" hidden>Initial Coherence</div>
-
 <br><br>
-
 <div class="ui container">
-	<div id="init_button" class="ui teal large button" onclick="checkInit()">
-        Perform Check
-    </div>
-
-	<br>
-
-	<div id="info_answer"></div>
-
-
-	<div class="ui divider"></div>
-
-	<div class="ui centered one cards" id="proofs_connectives"></div>
-
-	<br><br><br>
-
-	<div id="loading" class="ui inactive inverted dimmer">
-		<div class="ui text loader">Loading</div>
+	<div id="init_button" class="ui teal large button" onclick="checkInit()">Perform Check</div>
+	<div id="answer_succ" class="ui info message" style="display: none;">
+		<div class="header">Identity expansion test succeeds for this calculus system.</div>
 	</div>
-
+	<div id="answer_fail" class="ui negative message" style="display: none;">
+		<div class="header">Identity expansion test fails for this calculus system.</div>
+	</div>
+	<div class="ui divider"></div>
+	<div class="ui one centered cards" id="proofs_connectives"></div>
+</div>
+<div id="loading" class="ui inactive inverted dimmer">
+	<div class="ui text loader">Loading</div>
 </div>

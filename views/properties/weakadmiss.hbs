@@ -1,31 +1,16 @@
 
 <div id="calc_id" hidden>{{calc_id}}</div>
-
-
 <div id="title" class="ui middle aligned center aligned huge teal header">Weakening Admissability
-	<div id="description" class="sub header">
-		Check which contexts in your calculus exhibit weakening admissability </div>
+	<div id="description" class="sub header">Check which contexts in your calculus exhibit weakening admissability</div>
 </div>
 <div id="property" hidden>Weak Admissability</div>
-
 <br><br>
-
 <div class="ui container">
-	<div id="weak_button" class="ui teal large button" onclick="checkWeak()">
-        Perform Check
-    </div>
-
-	<br>
-
+	<div id="weak_button" class="ui teal large button" onclick="checkWeak()">Perform Check</div>
 	<div class="ui divider"></div>
-
-	<div class="ui one cards" id="left_sides"></div>
-	<div class="ui one cards" id="right_sides"></div>
-
-	<br><br><br>
-	
-	<div id="loading" class="ui inactive inverted dimmer">
-		<div class="ui text loader">Loading</div>
-	</div>
-
+	<div class="ui one centered cards" id="left_sides"></div>
+	<div class="ui one centered cards" id="right_sides"></div>
+</div>
+<div id="loading" class="ui inactive inverted dimmer">
+	<div class="ui text loader">Loading</div>
 </div>
