@@ -9,24 +9,19 @@ var Rule = require("../models/rule")
 var Symbols = require("../models/symbols")
 
 
-//creating a User
 async function createUser (req, res) {
     var user  = new User()
     user.username = req.body.username
-    var psswd = await bcrypt.hash(req.body.password, 2)
-    user.password = psswd
+    user.password = await bcrypt.hash(req.body.password, 2)
     user.email = req.body.email
     user.occupation = req.body.occupation
-    //saving the user in the database
     user.save(function (err) {
-        //if something went wrong while saving, return the error
         if (err) {
             return res.status(400).json({
                 "status"  : "failure",
                 "message" : "something went wrong while creating the user"
             })
         }
-        //send success message and created calculus
         return res.status(200).json({
             "status"     : "success",
             "message"    : "user was created",
@@ -36,21 +31,17 @@ async function createUser (req, res) {
 }
 
 
-//deleting a User
 function deleteUser (req, res) {
-    //deleting a user
-    User.deleteOne({ _id : req.body.id}, function (err, user) {
+    User.deleteOne({_id : req.body.id}, function (err, user) {
         Calculus.remove({user : req.body.id}, function (err, clcs) {})
         Symbols.remove({user : req.body.id}, function (err, symbs) {})
         Rule.remove({user : req.body.id}, function (err, rls) {})
-        //if the user does not exist
         if (err || user == null) {
             return res.status(400).json({
                 "status"  : "failure",
                 "message" : "user does not exist"
             })
         }
-        //user deleted
         return res.status(200).json({
             "status"  : "success",
             "message" : "user successfully deleted"
@@ -59,18 +50,14 @@ function deleteUser (req, res) {
 }
 
 
-//fetching a user
 function getUser (req, res) {
-    //looking up the user
     User.findById(req.params.user_id, function (err, user) {
-        //if the user does not exist
         if (err || user == null) {
             return res.status(400).json({
                 "status"  : "failure",
-                "message" : "calculus does not exist"
+                "message" : "user does not exist"
             })
         }
-        //return the user 
         return res.status(200).json({
             "status"    : "success",
             "user"      : user
@@ -78,18 +65,15 @@ function getUser (req, res) {
     })
 }
 
-//checking a user
+
 function checkUser (req, res) {
-    //looking up the user
     User.find({'username' : req.params.username}, function (err, user) {
-        //if the user does not exist
         if (user.length == 0) {
             return res.status(200).json({
                 "status"  : "failure",
-                "message" : "calculus does not exist"
+                "message" : "user does not exist"
             })
         }
-        //return the user 
         return res.status(200).json({
             "status"    : "success",
             "user"      : user
