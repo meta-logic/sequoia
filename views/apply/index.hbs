@@ -1,96 +1,110 @@
 
 <div id="calc_id" hidden>{{calc_id}}</div>
-
-
 <div class="ui huge right fixed vertical menu" id="side_menu_R" style="margin-top: 61px; overflow-y:auto;">
+  <button id="undo" class="ui disabled fluid huge icon button red" onclick="undo()">
+    <i class="icon undo"></i>
+  </button>
   <br>
   <div id="rules" class="ui one cards"></div>
-  <br>
-  <div id="undo"></div>
   <br><br><br><br>
 </div>
-
-<div class="ui left fixed float vertical menu" id="side_menu_L" style="margin-top: 61px; overflow-y:auto;">
-</div>
-
-{{!-- Grid --}}
+<div class="ui left fixed float vertical menu" id="side_menu_L" style="margin-top: 61px; overflow-y:auto;"></div>
 <div class="ui container">
   <div class="ui grid" style="margin-top: 26px;">
-      {{!-- Sequent Input --}}
-      <div class="fifteen wide column" id="seq">
+      <div class="fifteen wide column" id="seq" style="display: inline;">
         <div class="ui input fluid">
           <input type="text" id="Sequent" placeholder="Sequent">
         </div>
         <br>
         <div id="preview">
-          <button class="ui large teal button" onclick="preview()">
-            Preview
+          <button class="ui large teal button" onclick="preview()">Preview
           </button>
         </div>
       </div>
-
       <br>
-
       <div id="workspace" class="fifteen wide column" style="overflow-x: auto;">
-          <div id="info_prems"></div>
-          <br><br>
-          <div id="init sequent" style="font-size: 120%"></div>
-          <br><br>
-          <div id="apply"></div>
-          <br><br>
-          <div id="warning"></div>
-          <br><br>
-          <div id="table"></div>
-      </div>
-  </div>
-
-  <br><br><br>
-
-  <div id ="modal1" class="ui special modal">
-    <div class="header">Rules Affected</div>
-      <div id = "change warning" class="content">
-      <p>Updating or removing existing symbols may alter the parsing of the tree sequents. This can result in the errors when applying rules.
-        Would you like to continue?</p>
-      </div>
-    <div class="actions">
-      <div id="yes_button" class="ui approve button">Yes</div>
-      <div id="no_button" class="ui cancel button">No</div>
-    </div>
-  </div>
-
-  <div id ="modal2" class="ui special modal">
-    <div class="header">Symbol Used</div>
-      <div id = "change warning" class="content">
-      <p>This symbol already exists in the rule symbols table. Try using a differnt one.</p>
-      </div>
-    <div class="actions">
-      <div id="ok_button" class="ui cancel button">Okay</div>
-    </div>
-  </div>
-
-  <div id ="modal3" class="ui special modal">
-		<div class="header">Cut Formulas</div>
-		<div id = "change warning" class="content">
-      <p>Please provide the substitutions needed for the cut, from the cut formula variable to the intended cut formula.</p>
-      <p id= "cut_rule"></p>
-      <div class="ui form">
-        <div class="two fields">
-          <div class="field">
-            <label>Variable</label>
-            <input id="var" type="text">
+          <div id="info" class="ui info message" style="display: none;">
+            <div class="header">Multiple Applications</div>
+            <div class="content">
+              <p>The rule can be applied to a the selected sequent in more than one way. Select the set of premises
+                for which you would like to use to continue building the tree on the selected sequent.</p>
+            </div>
+            <ul id="choice" class="list"></ul>
           </div>
-          <div class="field">
-            <label>Formula</label>
-            <input id="form" type="text">
+          <br><br>
+          <div id="main_tree" style="text-align: center;">
+            <div id="prooftree_0" class="tree">
+              <div id="exp_0" class="sequence">
+                  <div id="conc_0" class="leaf" style="visibility: hidden;">TEMP</div>
+              </div>
+            </div>
           </div>
+          <br><br>
+          <a id ="submit" class="ui fluid large circular icon button teal" onclick="useSequent()" style="visibility: hidden;">Start Building Tree</a>
+          <div id="warning" class="ui negative message" style="visibility: hidden;">
+              <div id="warning_header" class="header">TEMP</div>
+                <p id="warning_text">TEMP</p>
+          </div>
+          <table id="sym_table" class= "ui sortable fixed single line celled table" style="visibility: hidden;">
+            <thead><tr><th>Sequent Term Symbols</th><th>Types</th></tr></thead>
+            <tbody id="init"><tbody> 
+            <tbody id="table_head"> 
+              <tr id ="input_row">
+                <td id="input_field" style="text-align:center">
+                  <div class="ui input focus">
+                    <input id="sym" type="text" placeholder="Symbol Here">
+                  </div>
+                </td>
+                <td id="select_field">
+                  <select class="ui search dropdown" style="visibility: hidden;" id="typ">
+                    <option value="">Type</option>
+                    <option value="atom">atom</option>
+                    <option value="atom variable">atom variable</option>
+                    <option value="formula variable">formula variable</option>
+                    <option value="context variable">context variable</option>
+                  </select>
+                  <button class="ui large green right floated button" onclick="add_symbol_toTable('seq')">Add Symbol</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+      </div>
+  </div>
+</div>
+<div id ="modal1" class="ui special modal">
+  <div class="header">Sequents Affected</div>
+    <div id = "change warning" class="content">
+    <p>Updating or removing existing symbols may alter the parsing of the tree sequents. This can result in the errors when applying rules.
+      Would you like to continue?</p>
+    </div>
+  <div class="actions">
+    <div id="yes_button" class="ui approve button">Yes</div>
+    <div id="no_button" class="ui cancel button">No</div>
+  </div>
+</div>
+<div id ="modal2" class="ui special modal">
+  <div class="header">Cut Formulas</div>
+  <div id = "change warning" class="content">
+    <p>Please provide the substitutions needed for the cut, from the cut formula variable to the intended cut formula.</p>
+    <p id= "cut_rule"></p>
+    <div class="ui form">
+      <div class="two fields">
+        <div class="field">
+          <label>Variable</label>
+          <input id="var" type="text">
+        </div>
+        <div class="field">
+          <label>Formula</label>
+          <input id="form" type="text">
         </div>
       </div>
-      <div id="modal_warning"></div>
     </div>
-		<div class="actions">
-		<div id="yes_button" class="ui approve button">Confirm</div>
-		<div id="no_button" class="ui cancel button">Cancel</div>
-		</div>
-	</div>
-
+    <div id="modal_warning" class="ui red negative message" style="visibility: hidden;">
+      <div class="header">Formula Parsing Error</div>
+      <p>Formulas must contain term symbols from the sequent symbols table</p>
+    </div>
+  <div class="actions">
+  <div id="yes_button" class="ui approve button">Confirm</div>
+  <div id="no_button" class="ui cancel button">Cancel</div>
+  </div>
 </div>
