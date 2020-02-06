@@ -101,7 +101,7 @@ structure datatypesImpl : DATATYPES = struct
     fun seq_alpha_eq (Seq(ctxL1,conn1,ctxR1), Seq(ctxL2,conn2,ctxR2)) = 
         conn_eq(conn1, conn2) andalso ctx_struct_alpha_eq(ctxL1, ctxL2) andalso ctx_struct_alpha_eq(ctxR1, ctxR2)
 
-    datatype side = Left | Right | None
+    datatype side = Left | Right | None | Cut
     datatype rule = Rule of string * side * seq * seq list
     fun rule_eq(Rule(name1, Left, sq1, pq1), Rule(name2, Left, sq2, pq2)) = 
         name1 = name2 andalso seq_eq(sq1,sq2) andalso 
@@ -110,6 +110,8 @@ structure datatypesImpl : DATATYPES = struct
         name1 = name2 andalso seq_eq(sq1,sq2) andalso 
         List.all(fn (a,b) => seq_eq(a,b))(ListPair.zip(pq1,pq2))
         | rule_eq(Rule(name1, None, sq1, []), Rule(name2, None, sq2, [])) =
+        name1 = name2 andalso seq_eq(sq1,sq2)
+        | rule_eq(Rule(name1, Cut, sq1, []), Rule(name2, Cut, sq2, [])) =
         name1 = name2 andalso seq_eq(sq1,sq2)
         | rule_eq(_, _) = false
 

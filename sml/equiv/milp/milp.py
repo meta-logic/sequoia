@@ -1,5 +1,10 @@
 import sys
 import os
+
+if len(sys.argv) < 2:
+    print ("usage: python %s <file> <logfile(optional)>" %sys.argv[0])
+    sys.exit()
+
 nl = open(os.devnull,'w')
 temp = sys.stdout
 temp2 = sys.stderr
@@ -14,9 +19,7 @@ from mip.constants import *
 
 
 
-if len(sys.argv) < 2:
-    print ("usage: python %s <file> <logfile(optional)>" %sys.argv[0])
-    sys.exit()
+
 file = sys.argv[1]
 
 f = open(file,"r")
@@ -45,9 +48,7 @@ m = get_model()
 
 
 m.verbose = 0
-sys.stdout = temp
-sys.stderr = temp2
-nl.close()
+
 
 
 #m.setParam("OutputFlag",0)
@@ -79,6 +80,10 @@ for i in range(t1_num):
 
 m.emphasis=1
 status = m.optimize()
+
+sys.stdout = temp
+sys.stderr = temp2
+nl.close()
 
 solved = (status == OptimizationStatus.OPTIMAL) or (status == OptimizationStatus.FEASIBLE)
 
