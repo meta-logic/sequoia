@@ -2,12 +2,6 @@ var parser_copy = pt
 var parser = ""
 var formula_parser = ""
 
-function clear() {
-    document.getElementById("seq").remove()
-    document.getElementById("apply").remove()
-    // document.getElementById("table").remove()
-    document.getElementById("warning").innerHTML =""
-}
 
 function useSequent() {
     var parser_text = parser_copy
@@ -18,8 +12,7 @@ function useSequent() {
     var form = "FormVar = \"NO-FORM\" "
     var atom_var = "AtomVar = \"NO-ATOMVAR\" "
     var atom = "Atom = \"NO-ATOM\" "
-    var calc_id = document.getElementById("calc_id").innerHTML
-
+    var calc_id = $("#calc_id").text()
     $.get("/api/cert_symbols/"+calc_id, function(sb, status) {
         var syms = sb.symbols
         syms = syms.sort(function(a, b){
@@ -53,7 +46,7 @@ function useSequent() {
                 atom += "/ \"" + symbol + "\" "
             }
         }
-    extra_text = "\n" + arrow + "\n" + sep + "\n" + conn + "\n" + set + "\n" + form + "\n" + atom_var + "\n" + atom + "\n" 
+    var extra_text = "\n" + arrow + "\n" + sep + "\n" + conn + "\n" + set + "\n" + form + "\n" + atom_var + "\n" + atom + "\n" 
     parser_text += extra_text
     var temp_parser = peg.generate(parser_text)
     parse_and_use(temp_parser)
@@ -62,42 +55,25 @@ function useSequent() {
 
 
 function parse_and_use(temp_parser) {
-    var warning_text = "<div id=\"parse warning\"><div class=\"ui red negative message\">"+
-    "<div class=\"header\">Sequent Parsing Error</div>"+
-    "<p>Sequents must be structurally valid and contain term symbols from the sequent term symbols table</p></div>"
-    var sequent = document.getElementById("Sequent").value.replace(/\(/g, " ( ").replace(/\)/g, " ) ")
+    var sequent = $("#Sequent").val().replace(/\(/g, " ( ").replace(/\)/g, " ) ")
     try {
-        var sequent_final = temp_parser.parse(sequent).replace(/\\/g, "\\\\")
-    }   
+        temp_parser.parse(sequent)
+    }
     catch(error) {
-        var warning = document.getElementById("warning")
-        warning.innerHTML = warning_text
+        $("#warning_header").html("Sequent Parsing Error")
+        $("#warning_text").html("RSequents must be structurally valid and contain term symbols from the sequent term symbols table.")
+        $("#warning").css("visibility","visible")
         return
     }
-    clear()
+    $("#seq").css("display","none")
+    $("#submit").css("visibility","hidden")
+    $("#warning").css("visibility","hidden")
+    $("#undo").attr("class","ui fluid huge icon button red")
     parser = temp_parser
-    var undo_button = document.getElementById("undo")
-    undo_button.innerHTML += "<button class=\"ui fluid huge icon button red\" onclick=\"undo()\"><i class=\"icon undo\"></i></button>"
-    $(".conc-temp").click(function() {
+    $(".leaf").click(function() {
         leaf_id = this.id.split("_")[1]
         seq_text = $(this).find("script")[0].innerText
-        var apply_warning = document.getElementById("apply warning")
-        if (apply_warning != null) {
-            apply_warning.remove()
-        }
-        var seq_warning = document.getElementById("seq warning")
-        if (seq_warning != null) {
-            seq_warning.remove()
-        }
+        $("#warning").css("visibility","hidden")
         console.log(seq_text)
     })
-    document.getElementById("style").innerHTML = 
-        "<style>"+
-            "table { border-spacing: 12px 0; }"+
-            "td { position: relative;  text-align:center;height: 1em; }"+
-            "td.conc { position:relative;border-top: solid 1px;vertical-align:bottom;}"+
-            "td.conc-prem { vertical-align:bottom;}"+
-            "td span.rulename { position: absolute; right: 0;bottom: 0;}"+
-            ".MJXc-display, .MathJax_Display {margin:0px !important;}"
-        "</style>"
 }

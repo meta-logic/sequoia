@@ -1,118 +1,91 @@
-temp_proofs = []
 
 function showProof(index, on) {
-    pfid = "proof"+index
     if (on == "yes") {
-        pfid = "proof"+index
-        document.getElementById("I"+index).setAttribute("onClick", "showProof("+index+",\"no\")")
-        document.getElementById(pfid).innerHTML = ""
-        return 
+        $("#I"+index).attr("onClick", "showProof("+index+",'no')")
+        $("#proof"+index).css("display", "none")
+    } else {
+        $("#I"+index).attr("onClick", "showProof("+index+",'yes')")
+        $("#proof"+index).css("display", "flex")
     }
-    var t = document.getElementById(pfid)
-    t.innerHTML += 
-        '<div class="ui card">'
-            +'<div class="content">'
-                +'<div class="header">'+temp_proofs[index]+'</div>'
-            +'</div>'
-        +'</div>'
-    MathJax.Hub.Queue(["Typeset",MathJax.Hub,t])
-    document.getElementById("I"+index).setAttribute("onClick", "showProof("+index+",\"yes\")")
 }
 
-function list_to_string(rule_list) {
-    var rule_strings = ""
-    for (var j = 0; j < rule_list.length; j++) {
-        rule_strings += rule_list[j] + ","
-    }
-    return rule_strings = "[" + rule_strings.slice(0,-1) + "]"
-}
 
 function checkInit() {
-    document.getElementById("loading").setAttribute("class", "ui active inverted dimmer")
+    $("#loading").attr("class", "ui active inverted dimmer")
     $.get("/api/rules/"+calc_id, function (rls, status) { 
         var rules = rls.rules
-        var other_rules = []
+        var intitial_rules = []
+        var connective_rules = []
         var connective_dict = {}
         var con_ordered = []
         for (var i = 0; i < rules.length; i++) {
-            var fin_conc = rules[i].sml_conc
-            .replace(/\\/g, "\\\\")
-            var fin_prem = ""
-            for (var j = 0; j < rules[i].sml_prem.length; j++) {
-                fin_prem += rules[i].sml_prem[j]
-                .replace(/\\/g, "\\\\")+","
-            }
-            fin_prem = "[" + fin_prem.slice(0,-1) + "]"
-            var rule_sml = "Rule(\""+rules[i].rule.replace(/\\/g, "\\\\")+"\","+rules[i].side+","+fin_conc+","+fin_prem+")"
-            if (rules[i].side == "Left") {
-                if (rules[i].connective in connective_dict) {
-                    connective_dict[rules[i].connective][0].push(rule_sml)
+            var rule_name = rules[i].rule.replace(/\\/g, "\\\\")
+            var rule_side = rules[i].side
+            var rule_conc = rules[i].sml_conc.replace(/\\/g, "\\\\")
+            var rule_prem = list_to_string(rules[i].sml_prem).replace(/\\/g, "\\\\")
+            var rule_conn = rules[i].connective
+            var rule_sml = "Rule(\""+rule_name+"\","+rule_side+","+rule_conc+","+rule_prem+")"
+            if (rule_side == "Left") {
+                if (rule_conn in connective_dict) {
+                    connective_dict[rule_conn][0].push(rule_sml)
                 } else {
-                    connective_dict[rules[i].connective] = [[rule_sml], []]
+                    connective_dict[rule_conn] = [[rule_sml], []]
                 }
-            } else if (rules[i].side == "Right") {
-                if (rules[i].connective in connective_dict) {
-                    connective_dict[rules[i].connective][1].push(rule_sml)
+            } else if (rule_side == "Right") {
+                if (rule_conn in connective_dict) {
+                    connective_dict[rule_conn][1].push(rule_sml)
                 } else {
-                    connective_dict[rules[i].connective] =[[], [rule_sml]]
+                    connective_dict[rule_conn] =[[], [rule_sml]]
                 }
-            } else if (rules[i].side == "None") {
-                other_rules.push(rule_sml)
+            } else if (rule_side == "None") {
+                intitial_rules.push(rule_sml)
             }
         }
-        var other_strings = list_to_string(other_rules)
-        var temp_tuples = []
+        var init_strings = list_to_string(intitial_rules)
         for (var key in connective_dict) {
             con_ordered.push("\\\\"+key)
-            temp = "(Con(\"\\"+key+"\")," + list_to_string(connective_dict[key][0]) + "," + list_to_string(connective_dict[key][1]) + ")"
-            temp_tuples.push(temp)
+            var temp = "(Con(\"\\"+key+"\"),"+list_to_string(connective_dict[key][0])+","+list_to_string(connective_dict[key][1])+")"
+            connective_rules.push(temp)
         }
-        var connective_strings = list_to_string(temp_tuples)
-
-        $.post("/initRules", { first: connective_strings, second: other_strings, third: "[]"}, function(data, status) {
-            document.getElementById("init_button").remove()
+        var connective_strings = list_to_string(connective_rules)
+        $.post("/initRules", { first: connective_strings, second: init_strings, third: "[]"}, function(data, status) {
+            $("#init_button").css("display", "none")
             var output = data.output.split("%%%")
-            connective_out = output[1].split("@@@")
-            bool = output[0]
-            var message = document.getElementById('info_answer')
-            var type = ""
-            if (bool == "F") {
-                type = "negative"
-                answer = "Identity expansion test fails for this calculus system"
+            var connective_out = output[1].split("@@@")
+            if (output[0] == "T") {
+                $("#answer_succ").css("display", "block")
             } else {
-                type = "info"
-                answer = "Identity expansion test succeeds for this calculus system"
+                $("#answer_fail").css("display", "block")
             }
-            message.innerHTML = '<div id="answer" class="ui '+type+' message">'
-                +'<div class="header">'+answer+'</div>'
-                +'</div>'
-            if (connective_out.length > 1) {
-                var cp = document.getElementById("proofs_connectives")
-                for (var i = 0; i < connective_out.length; i++) {
-                    if (connective_out[i] != "") {
-                        var temp = connective_out[i].split("###")
-                        var color = "red"
-                        if (temp[0] == "T") {
-                            color = "green"
-                        }
-                        temp_proofs.push(temp[1])
-                        newString = con_ordered[i]
-                        cp.innerHTML += 
-                            '<div id="init_card'+i+'" class="'+color+' card">'
-                                +'<div class="content">'
-                                    +'<div class="header">$$'+newString+'$$</div>'
-                                +'</div>'
-                                +'<div id="I'+i+'" class="ui bottom attached button" onClick=showProof('+i+',"no")>'
-                                    +'<i class="question icon"></i>'
-                                +'</div>'
-                            +'</div>'
-                            +'<div class="ui one cards" id="proof'+i+'">'
-                            +'</div>'
+            var cp = $("#proofs_connectives")
+            for (var i = 0; i < connective_out.length; i++) {
+                if (connective_out[i] != "") {
+                    var temp = connective_out[i].split("###")
+                    var color = "red"
+                    if (temp[0] == "T") {
+                        color = "green"
                     }
+                    cp.append( 
+                        '<div id="init_card'+i+'" class="'+color+' card">'+
+                            '<div class="content">'+
+                                '<div class="header">$$'+con_ordered[i]+'$$</div>'+
+                            '</div>'+
+                            '<div id="I'+i+'" class="ui bottom attached button" onClick=showProof('+i+',"no")>'+
+                                '<i class="question icon"></i>'+
+                            '</div>'+
+                        '</div>'+
+                        '<div class="ui one cards" id="proof'+i+'" style="display: none;">'+
+                            '<div class="ui card">'+
+                                '<div class="content">'+
+                                    '<div class="header">'+temp[1]+'</div>'+
+                                '</div>'+
+                            '</div>'+
+                        '</div>'
+                    )
                 }
             }
-            MathJax.Hub.Queue(["Typeset",MathJax.Hub,cp], function () {
-                document.getElementById("loading").setAttribute("class", "ui inactive inverted dimmer")
+            MathJax.Hub.Queue(["Typeset",MathJax.Hub,cp[0]], function () {
+                $("#loading").attr("class", "ui inactive inverted dimmer")
             })
         })
     })

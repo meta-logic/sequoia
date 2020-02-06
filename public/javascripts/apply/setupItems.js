@@ -1,8 +1,18 @@
-$('#main-menu').sticky({});
-var calc_id = document.getElementById("calc_id").innerHTML
-document.getElementById("Calculus icon").setAttribute("href", "/calculus/"+calc_id)
-document.getElementById("Proof Tree icon").setAttribute("href", "/calculus/"+calc_id+"/apply")
-document.getElementById("Properties icon").setAttribute("href", "/calculus/"+calc_id+"/properties")
+$("#main-menu").sticky({});
+var calc_id = $("#calc_id").text()
+$("#Calculus_icon").attr("href", "/calculus/"+calc_id)
+$("#Prooftree_icon").attr("href", "/calculus/"+calc_id+"/apply")
+$("#Properties_icon").attr("href", "/calculus/"+calc_id+"/properties")
 $.get("/api/calculus/"+calc_id, function (calc, status) {
     get_rules_toPage()
+    get_symbols_toTable("seq")
 })
+
+
+function list_to_string(item_list) {
+    var item_string = ""
+    for (var j = 0; j < item_list.length; j++) {
+        item_string += item_list[j] + ","
+    }
+    return "["+item_string.slice(0,-1)+"]"
+}

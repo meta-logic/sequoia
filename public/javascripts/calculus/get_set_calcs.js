@@ -1,73 +1,104 @@
 var c = 0
 
 function get_calculi_toPage() {
-    var calculi_container = document.getElementById("calculi")
-    for (i = 0; i < c; i++) {
-        entry = document.getElementById("calc_card"+i)
+    var calculi_container = $("#calculi")
+    for (var i = 0; i < c; i++) {
+        var entry = $("#calc_"+i)
         if (entry != null) {
             entry.remove()
         }
     }
-    var user_id = document.getElementById("user_id").innerHTML
-    $.get("/api/calculi/"+user_id, function (calcs, status) {
+    $.get("/api/calculi/"+$("#user_id").text(), function (calcs, status) {
         var calculi = calcs.calculi
         for (var i = 0; i < calculi.length; i++) {
-            calculi_container.innerHTML +=
-            '<div id="calc_card'+i+'" class="card">'
-                +'<a class="content" href=calculus/'+calculi[i]._id+'>'
-                    +'<div class="header">'+calculi[i].title+'</div>'
-                    +'<div class="description">'+calculi[i].description+'</div>'
-                +'</a>'
-                +'<div class="ui red bottom attached button" onClick=deleteCalculus("'+calculi[i]._id+'")>'
-                    +'<i class="close icon"></i>Delete'
-                +'</div>'
-            +'</div>'
-            }
-        MathJax.Hub.Queue(["Typeset",MathJax.Hub,calculi_container])
+            calculi_container.append(
+                '<div id="calc_'+i+'" class="card">'+
+                    '<a class="content" href=calculus/'+calculi[i]._id+'>'+
+                        '<div class="header">'+calculi[i].title+'</div>'+
+                        '<div class="description">'+calculi[i].description+'</div>'+
+                    '</a>'+
+                    '<div id="delete_'+i+'" class="ui red bottom attached button" onClick=deleteCalculus('+i+',"'+calculi[i]._id+'")>'+
+                        '<i class="close icon"></i>Delete'+
+                    '</div>'+
+                '</div>'
+            )
+        }
         c = calculi.length
     })
 }
 
+
 function addCalculus() {
-    var title = document.getElementById("title").value
-    var description = document.getElementById("description").value
-    var user_id = document.getElementById("user_id").innerHTML
+    var calculi_container = $("#calculi")
+    var title = $("#title").val()
+    var description = $("#description").val()
     if (title != "" && description != "") {
-        $.post("/api/calculus", {title : title, description : description, user : user_id}, function(data, status){
-            document.getElementById("title").value = ""
-            document.getElementById("description").value = ""
-            get_calculi_toPage()
-        }
-    )}
+        $.post("/api/calculus", {title : title, description : description, user : $("#user_id").text()}, 
+        function(data, status) {
+            calculi_container.append(
+                '<div id="calc_'+c+'" class="card">'+
+                    '<a class="content" href=calculus/'+data.calculus._id+'>'+
+                        '<div class="header">'+data.calculus.title+'</div>'+
+                        '<div class="description">'+data.calculus.description+'</div>'+
+                    '</a>'+
+                    '<div id="delete_'+c+'" class="ui red bottom attached button" onClick=deleteCalculus('+c+',"'+data.calculus._id+'")>'+
+                        '<i class="close icon"></i>Delete'+
+                    '</div>'+
+                '</div>'
+            )
+            c++
+            $("#title").val("")
+            $("#description").val("")
+        })
+    }
 }
 
+
 function addSomeCalculus(sample) {
-    var title = document.getElementById("title").value
-    var description = document.getElementById("description").value
-    var user_id = document.getElementById("user_id").innerHTML
-    var the_symbols = []
-    var the_rules = []
-    $.post("/api/calculus", {title : sample, description : "This is a sample calculus with some basic rules. Try it out!", user : user_id}, function(data, status){
-        syms_rules = sample_calc(sample, data.calculus)
+    var calculi_container = $("#calculi")
+    $.post("/api/calculus", {title : sample, description : "This is a sample calculus with some basic rules. Try it out!", user : $("#user_id").text()}, 
+    function(data, status) {
+        var sampleCalc = data.calculus
+        syms_rules = sample_calc(sample, data.calculus._id)
         $.post("/api/symbols_init", {items : JSON.stringify(syms_rules[0])}, function(data, status){
             $.post("/api/rules_init", {items : JSON.stringify(syms_rules[1])}, function(data, status){
-                document.getElementById("title").value = ""
-                document.getElementById("description").value = ""
-                get_calculi_toPage()
+                calculi_container.append(
+                    '<div id="calc_'+c+'" class="card">'+
+                        '<a class="content" href=calculus/'+sampleCalc._id+'>'+
+                            '<div class="header">'+sampleCalc.title+'</div>'+
+                            '<div class="description">'+sampleCalc.description+'</div>'+
+                        '</a>'+
+                        '<div id="delete_'+c+'" class="ui red bottom attached button" onClick=deleteCalculus('+c+',"'+sampleCalc._id+'")>'+
+                            '<i class="close icon"></i>Delete'+
+                        '</div>'+
+                    '</div>'
+                )
+                c++
+                $("#title").val("")
+                $("#description").val("")
             })
         })
     })
 }
 
-function deleteCalculus(id) {
-    $('#modal1').modal({
+
+function deleteCalculus(card_id, mongo_id) {
+    $("#modal1").modal({
         onApprove: function(){
             $.ajax({
                 url: "/api/calculus",
                 type: "DELETE",
-                data : { "id" : id },
+                data : {"id" : mongo_id},
                 success: function(result) {
-                    get_calculi_toPage()
+                    $("#calc_"+card_id).hide('slow', function(){$("#calc_"+card_id).remove()})
+                    for (var i = card_id+1; i < c; i++) {
+                        var delete_text = $("#delete_"+i).attr("onClick").split(",")[1]
+                        var new_delete_text = "deleteCalculus("+(i-1)+","+delete_text
+                        $("#delete_"+i).attr("onClick", new_delete_text)
+                        $("#delete_"+i).attr("id", "delete_"+(i-1))
+                        $("#calc_"+i).attr("id", "calc_"+(i-1))
+                    }
+                    c --
                     console.log("Calculus sucessfully deleted.")
                 },
                 error: function(result) {
@@ -76,8 +107,5 @@ function deleteCalculus(id) {
             })
         }
     })
-    .modal('setting', 'closable', false)
-    .modal('show')
-
-    
+    .modal("setting", "closable", false).modal("show")
 }

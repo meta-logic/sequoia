@@ -1,49 +1,20 @@
-var left_proofs = []
-var right_proofs = []
 
 function showProof(side, index, on) {
     if (on == "yes") {
-        if (side == "L") {
-            pfid = "lproof"+index
-        } else {
-            pfid = "rproof"+index
-        }
-        document.getElementById(side+index).setAttribute("onClick", "showProof(\""+side+"\","+index+",\"no\")")
-        document.getElementById(pfid).innerHTML = ""
-        return 
-    }
-    var proofs = ""
-    var pfid = ""
-    if (side == "L") {
-        proofs = left_proofs[index]
-        pfid = "lproof"+index
+        $("#"+side+index).attr("onClick", "showProof('"+side+"',"+index+",'no')")
+        $("#"+side+"proof"+index).css("display", "none")
     } else {
-        proofs = right_proofs[index]
-        pfid = "rproof"+index
+        $("#"+side+index).attr("onClick", "showProof('"+side+"',"+index+",'yes')")
+        $("#"+side+"proof"+index).css("display", "flex")
     }
-    current_side = side
-    current_index = index
-    var proofs_list = proofs.split("&&&")
-    var t = document.getElementById(pfid)
-    for (var i = 0; i < proofs_list.length; i++) {
-        if (proofs_list[i] != "") {
-            t.innerHTML += 
-                '<div class="ui card">'
-                    +'<div class="content">'
-                        +'<div class="header">'+proofs_list[i]+'</div>'
-                    +'</div>'
-                +'</div>'
-        }
-    }
-    MathJax.Hub.Queue(["Typeset",MathJax.Hub,t])
-    document.getElementById(side+index).setAttribute("onClick", "showProof(\""+side+"\","+index+",\"yes\")")
 }
+
 
 function setLabel(left_bools, right_bools, index, side) {
     var label_string = ""
     for (var j = 0; j < left_bools.length -1; j++) {
-        space = "\\_"
-        if (side == "L") {
+        var space = "\\_"
+        if (side == "L" && j == index) {
             space = "\\Gamma"
         } 
         if (j == left_bools.length-2) {
@@ -53,8 +24,8 @@ function setLabel(left_bools, right_bools, index, side) {
         }
     }
     for (var j = 0; j < right_bools.length -1; j++) {
-        space = "\\_"
-        if (side == "R") {
+        var space = "\\_"
+        if (side == "R" && j == index) {
             space = "\\Gamma"
         } 
         if (j == right_bools.length-2) {
@@ -63,92 +34,106 @@ function setLabel(left_bools, right_bools, index, side) {
             label_string += space+","
         }
     }
-    return "$$" + label_string + "$$"
+    return "$$"+label_string+"$$"
 }
 
+
 function checkWeak() {
-    document.getElementById("loading").setAttribute("class", "ui active inverted dimmer")
+    $("#loading").attr("class", "ui active inverted dimmer")
     $.get("/api/rules/"+calc_id, function (rls, status) { 
         var rules = rls.rules
         var rule_list = []
         for (var i = 0; i < rules.length; i++) {
-            if (rules[i].side != "Cut") {
-                var fin_conc = rules[i].sml_conc
-                .replace(/\\/g, "\\\\")
-                var fin_prem = ""
-                for (var j = 0; j < rules[i].sml_prem.length; j++) {
-                    fin_prem += rules[i].sml_prem[j]
-                    .replace(/\\/g, "\\\\")+","
-                }
-                fin_prem = "[" + fin_prem.slice(0,-1) + "]"
-                var rule_sml = "Rule(\""+rules[i].rule.replace(/\\/g, "\\\\")+"\","+rules[i].side+","+fin_conc+","+fin_prem+")"
+            if (rules[i].side == "Left" || rules[i].side == "Right" || rules[i].side == "None") {
+                var rule_name = rules[i].rule.replace(/\\/g, "\\\\")
+                var rule_side = rules[i].side
+                var rule_conc = rules[i].sml_conc.replace(/\\/g, "\\\\")
+                var rule_prem = list_to_string(rules[i].sml_prem).replace(/\\/g, "\\\\")
+                var rule_sml = "Rule(\""+rule_name+"\","+rule_side+","+rule_conc+","+rule_prem+")"
                 rule_list.push(rule_sml)
             }
         }
-        var rule_strings = ""
-        for (var j = 0; j < rule_list.length; j++) {
-            rule_strings += rule_list[j] + ","
-        }
-        rule_strings = "[" + rule_strings.slice(0,-1) + "]"
-
+        var rule_strings = list_to_string(rule_list)
         $.post("/weakenSides", { rules: rule_strings }, function(data, status) {
-            document.getElementById("weak_button").remove()
+            $("#weak_button").css("display", "none")
             var output = data.output.split("%%%")
-            left_bools = output[0].split("@@@")
-            right_bools = output[1].split("@@@")
-            if (left_bools.length > 1) {
-                var lt = document.getElementById("left_sides")
-                for (var i = 0; i < left_bools.length; i++) {
-                    if (left_bools[i] != "") {
-                        var tempL = left_bools[i].split("###")
-                        var color = "red"
-                        if (tempL[0] == "T") {
-                            color = "green"
+            var left_bools = output[0].split("@@@")
+            var right_bools = output[1].split("@@@")
+            var lt = $("#left_sides")
+            for (var i = 0; i < left_bools.length; i++) {
+                if (left_bools[i] != "") {
+                    var tempL = left_bools[i].split("###")
+                    var color = "red"
+                    if (tempL[0] == "T") {
+                        color = "green"
+                    }
+                    var newString = setLabel(left_bools, right_bools, i, 'L')
+                    lt.append(
+                        '<div id="lweak_card'+i+'" class="'+color+' card">'+
+                            '<div class="content">'+
+                                '<div class="header">'+newString+'</div>'+
+                            '</div>'+
+                            '<div id="L'+i+'" class="ui bottom attached button" onClick=showProof("L",'+i+',"no")>'+
+                                '<i class="question icon"></i>'+
+                            '</div>'+
+                        '</div>'+
+                        '<div class="ui two cards" id="Lproof'+i+'" style="display: none;">'+
+                        '</div>'
+                    )
+                    var proofs_list = tempL[1].split("&&&")
+                    var left_proofs = $("#Lproof"+i)
+                    for (var j = 0; j < proofs_list.length; j++) {
+                        if (proofs_list[j] != "") {
+                            left_proofs.append(
+                                '<div class="ui card">'+
+                                    '<div class="content">'+
+                                        '<div class="header">'+proofs_list[j]+'</div>'+
+                                    '</div>'+
+                                '</div>'
+                            )
                         }
-                        left_proofs.push(tempL[1])
-                        newString = setLabel(left_bools, right_bools, i, 'L')
-                        lt.innerHTML += 
-                            '<div id="lweak_card'+i+'" class="'+color+' card">'
-                                +'<div class="content">'
-                                    +'<div class="header">'+newString+'</div>'
-                                +'</div>'
-                                +'<div id="L'+i+'" class="ui bottom attached button" onClick=showProof("L",'+i+',"no")>'
-                                    +'<i class="question icon"></i>'
-                                +'</div>'
-                            +'</div>'
-                            +'<div class="ui two cards" id="lproof'+i+'">'
-                            +'</div>'
                     }
                 }
             }
-            if (right_bools.length > 1) {
-                var rt = document.getElementById("right_sides")
-                for (var i = 0; i < right_bools.length; i++) {
-                    if (right_bools[i] != "") {
-                        var tempR = right_bools[i].split("###")
-                        var color = "red"
-                        if (tempR[0] == "T") {
-                            color = "green"
+            var rt = $("#right_sides")
+            for (var i = 0; i < right_bools.length; i++) {
+                if (right_bools[i] != "") {
+                    var tempR = right_bools[i].split("###")
+                    var color = "red"
+                    if (tempR[0] == "T") {
+                        color = "green"
+                    }
+                    var newString = setLabel(left_bools, right_bools, i, 'R')
+                    rt.append( 
+                        '<div id="rweak_card'+i+'" class="'+color+' card">'+
+                            '<div class="content">'+
+                                '<div class="header">'+newString+'</div>'+
+                            '</div>'+
+                            '<div id="R'+i+'" class="ui bottom attached button" onClick=showProof("R",'+i+',"no")>'+
+                                '<i class="question icon"></i>'+
+                            '</div>'+
+                        '</div>'+
+                        '<div class="ui two cards" id="Rproof'+i+'" style="display: none;">'+
+                        '</div>'
+                    )
+                    var proofs_list = tempR[1].split("&&&")
+                    var right_proofs = $("#Rproof"+i)
+                    for (var j = 0; j < proofs_list.length; j++) {
+                        if (proofs_list[j] != "") {
+                            right_proofs.append(
+                                '<div class="ui card">'+
+                                    '<div class="content">'+
+                                        '<div class="header">'+proofs_list[j]+'</div>'+
+                                    '</div>'+
+                                '</div>'
+                            )
                         }
-                        right_proofs.push(tempR[1])
-                        newString = setLabel(left_bools, right_bools, i, 'R')
-                        rt.innerHTML += 
-                            '<div id="rweak_card'+i+'" class="'+color+' card">'
-                                +'<div class="content">'
-                                    +'<div class="header">'+newString+'</div>'
-                                +'</div>'
-                                +'<div id="R'+i+'" class="ui bottom attached button" onClick=showProof("R",'+i+',"no")>'
-                                    +'<i class="question icon"></i>'
-                                +'</div>'
-                            +'</div>'
-                            +'<div class="ui two cards" id="rproof'+i+'">'
-                            +'</div>'
                     }
                 }
             }
-            MathJax.Hub.Queue(["Typeset",MathJax.Hub,lt], function () { 
-                MathJax.Hub.Queue(["Typeset",MathJax.Hub,rt], function () {
-                    document.getElementById("loading").setAttribute("class", "ui inactive inverted dimmer")
+            MathJax.Hub.Queue(["Typeset",MathJax.Hub,lt[0]], function () { 
+                MathJax.Hub.Queue(["Typeset",MathJax.Hub,rt[0]], function () {
+                    $("#loading").attr("class", "ui inactive inverted dimmer")
                 })
             })
         })

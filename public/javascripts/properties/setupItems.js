@@ -1,17 +1,26 @@
-$('#main-menu').sticky({});
-var calc_id = document.getElementById("calc_id").innerHTML
-document.getElementById("Calculus icon").setAttribute("href", "/calculus/"+calc_id)
-document.getElementById("Proof Tree icon").setAttribute("href", "/calculus/"+calc_id+"/apply")
-document.getElementById("Properties icon").setAttribute("href", "/calculus/"+calc_id+"/properties")
-var property = document.getElementById("property").innerHTML
+$("#main-menu").sticky({});
+var calc_id = $("#calc_id").text()
+$("#Calculus_icon").attr("href", "/calculus/"+calc_id)
+$("#Prooftree_icon").attr("href", "/calculus/"+calc_id+"/apply")
+$("#Properties_icon").attr("href", "/calculus/"+calc_id+"/properties")
+var property = $("#property").text()
 if (property == "Main Page") {
-    document.getElementById("prop1").setAttribute("href", "/calculus/"+calc_id+"/properties/init_coherence")
-    document.getElementById("prop2").setAttribute("href", "/calculus/"+calc_id+"/properties/weak_admissability")
-    document.getElementById("prop3").setAttribute("href", "/calculus/"+calc_id+"/properties/permutability")
-    document.getElementById("prop4").setAttribute("href", "/calculus/"+calc_id+"/properties/cut_admissability")
+    $("#prop1").attr("href", "/calculus/"+calc_id+"/properties/init_coherence")
+    $("#prop2").attr("href", "/calculus/"+calc_id+"/properties/weak_admissability")
+    $("#prop3").attr("href", "/calculus/"+calc_id+"/properties/permutability")
+    $("#prop4").attr("href", "/calculus/"+calc_id+"/properties/cut_admissability")
 }
 if (property == "Permutability") {
     $.get("/api/calculus/"+calc_id, function (calc, status) {
         get_rules_toPage()
     })
+}
+
+
+function list_to_string(item_list) {
+    var item_string = ""
+    for (var j = 0; j < item_list.length; j++) {
+        item_string += item_list[j] + ","
+    }
+    return "["+item_string.slice(0,-1)+"]"
 }

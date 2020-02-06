@@ -1,6 +1,6 @@
 var parser_copy = pt
 
-function fixRules() {
+function fixRules(callback) {
     var parser_text = parser_copy
     var arrow = "SeqSign = \"NO-ARROW\" "
     var sep = "CtxSep = \"NO-SEP\" "
@@ -9,8 +9,7 @@ function fixRules() {
     var form = "FormVar = \"NO-FORM\" "
     var atom_var = "AtomVar = \"NO-ATOMVAR\" "
     var atom = "Atom = \"NO-ATOM\" "
-    var calc_id = document.getElementById("calc_id").innerHTML
-
+    var calc_id = $("#calc_id").text()
     $.get("/api/rule_symbols/"+calc_id, function(sb, status) {
         var syms = sb.symbols
         syms = syms.sort(function(a, b){
@@ -44,22 +43,22 @@ function fixRules() {
                 atom += "/ \"" + symbol + "\" "
             }
         }
-    extra_text = "\n" + arrow + "\n" + sep + "\n" + conn + "\n" + set + "\n" + form + "\n" + atom_var + "\n" + atom + "\n" 
+    var extra_text = "\n" + arrow + "\n" + sep + "\n" + conn + "\n" + set + "\n" + form + "\n" + atom_var + "\n" + atom + "\n" 
     parser_text += extra_text
     var parser = peg.generate(parser_text)
-    var calc_id = document.getElementById("calc_id").innerHTML
-    $.get("/api/rules/"+calc_id, function (rls, status) {
+    $.get("/api/rules/"+$("#calc_id").text(), function (rls, status) {
         var rules = rls.rules
             for (var i = 0; i < rules.length; i++) {
                 parse_and_fix(parser, rules[i])
             }
+        callback()
         })
     })
 }
 
 
 function parse_and_fix(parser, rule) {
-    var calc_id = document.getElementById("calc_id").innerHTML
+    var calc_id = $("#calc_id").text()
     var prem = rule.premises
     var parsed_prem = []
     if (prem[0] != ""){
@@ -68,7 +67,7 @@ function parse_and_fix(parser, rule) {
                 parsed_prem.push(parser.parse(prem[i]))
             }   
             catch(error) {
-                deleteRule (rule._id)
+                deleteRule (-1,rule._id)
                 return
             }
         }
@@ -78,7 +77,7 @@ function parse_and_fix(parser, rule) {
         var conc_final = parser.parse(conc)
     }   
     catch(error) {
-        deleteRule (rule._id)
+        deleteRule (-1,rule._id)
         return
     }
     $.ajax({
@@ -88,6 +87,4 @@ function parse_and_fix(parser, rule) {
             conclusion : conc, premises : JSON.stringify(prem), parsed_conc : conc_final, 
             parsed_prem : JSON.stringify(parsed_prem), calculus : calc_id, 
             connective : rule.connective, side : rule.side, function(data) {}}})
-
-    window.location.href = "/calculus/"+calc_id
 }

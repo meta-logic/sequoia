@@ -1,41 +1,52 @@
 var r = 0
 
 function get_rules_toPage() {
-    var rules_container = document.getElementById("rules")
-    if (rules_container == null) { return }
+    var rules_container = $("#rules")
+    if (rules_container[0] == null)
+        return
     for (i = 0; i < r; i++) {
-        entry = document.getElementById("rule_card"+i)
+        var entry = $("#rule_"+i)
         if (entry != null) {
             entry.remove()
         }
     }
-    var calc_id = document.getElementById("calc_id").innerHTML
-    $.get("/api/rules/"+calc_id, function (rls, status) {
+    $.get("/api/rules/"+$("#calc_id").text(), function (rls, status) {
         var rules = rls.rules
         for (var i = 0; i < rules.length; i++) {
-            rules_container.innerHTML += 
-            '<div id="rule_card'+i+'" class="ui card">' 
-                +'<div class="content">'
-                    +'\\[\\frac{'+rules[i].premises.join(" \\quad \\quad ")+'}{'+rules[i].conclusion+'}'+rules[i].rule+'\\]' 
-                +'</div>'
-                +'<div class="ui bottom attached buttons">'
-                    +'<a class="ui basic blue button" href="/calculus/'+calc_id+'/edit-rule/'+rules[i]._id+'">Edit</a>'
-                    +'<a class="ui basic red button" onClick=deleteRule("'+rules[i]._id+'")>Delete</a>'
-                +'</div>'
-            +'</div>'
+            var card_content = '$$\\frac{'+rules[i].premises.join(" \\quad \\quad ")+'}{'+rules[i].conclusion+'}'+rules[i].rule+'$$'
+            rules_container.append( 
+                '<div id="rule_'+i+'" class="ui card">'+
+                    '<div class="content">'+card_content+'</div>'+
+                    '<div class="ui bottom attached buttons">'+
+                        '<a class="ui basic blue button" href="/calculus/'+calc_id+'/edit-rule/'+rules[i]._id+'">Edit</a>'+
+                        '<a id="deleteR_'+i+'" class="ui basic red button" onClick=deleteRule('+i+',"'+rules[i]._id+'")>Delete</a>'+
+                    '</div>'+
+                '</div>'
+            )
+            MathJax.Hub.Queue(["Typeset",MathJax.Hub,card_content])
         }
-        MathJax.Hub.Queue(["Typeset",MathJax.Hub,rules_container])
         r = rules.length
     })
 }
 
-function deleteRule (id) {
+
+function deleteRule(card_id, mongo_id) {
     $.ajax({
         url: "/api/rule",
         type: "DELETE",
-        data : { "id" : id },
+        data : {"id" : mongo_id},
         success: function(result) {
-            get_rules_toPage()
+            if (card_id != -1) {
+                $("#rule_"+card_id).hide('slow', function(){$("#rule_"+card_id).remove()})
+                for (var i = card_id+1; i < r; i++) {
+                    var delete_text = $("#deleteR_"+i).attr("onClick").split(",")[1]
+                    var new_delete_text = "deleteRule("+(i-1)+","+delete_text
+                    $("#deleteR_"+i).attr("onClick", new_delete_text)
+                    $("#deleteR_"+i).attr("id", "deleteR_"+(i-1))
+                    $("#rule_"+i).attr("id", "rule_"+(i-1))
+                }
+                r --
+            }
             console.log("Rule sucessfully deleted.")
         },
         error: function(result) {
