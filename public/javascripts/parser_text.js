@@ -31,6 +31,7 @@ CTX_LST
     }
   / ctx_var:CTX_VAR { return [[ctx_var], []] } 
   / form:FORM { return [[], [form]] } 
+  / _ { return [[],[]] }
 
 // Formula 
 FORM = BIFORM / GENFORM  
