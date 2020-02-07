@@ -1,5 +1,6 @@
 
 function addUser () {
+    $("#warning").css("visibility","hidden")
     $("#p1").attr("class", "required field")
     $("#p2").attr("class", "required field")
     $("#u").attr("class", "required field")
@@ -18,12 +19,14 @@ function addUser () {
                 } else {
                     $("#p1").attr("class", "required field error")
                     $("#p2").attr("class", "required field error")
-                    $("#warning").html('<div class="ui red negative message"><p>Passwords are not the same.</p></div>')
+                    $("#warning_header").html("Passwords are not the same.")
+                    $("#warning").css("visibility","visible")
                     return
                 }
             } else {
                 $("#u").attr("class", "required field error")
-                $("#warning").html('<div class="ui red negative message"><p>Username already exists.</p></div>')
+                $("#warning_header").html("Username already exists.")
+                $("#warning").css("visibility","visible")
                 return
             }
         })
