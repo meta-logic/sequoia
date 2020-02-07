@@ -74,6 +74,5 @@ function parse_and_use(temp_parser) {
         leaf_id = this.id.split("_")[1]
         seq_text = $(this).find("script")[0].innerText
         $("#warning").css("visibility","hidden")
-        console.log(seq_text)
     })
 }

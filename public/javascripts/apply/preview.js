@@ -1,7 +1,7 @@
 
 function preview() {
-    var initial_sequent = $("#Sequent").val().replace(/\(/g, " ( ").replace(/\)/g, " ) ")
     $("#warning").css("visibility","hidden")
+    var initial_sequent = $("#Sequent").val().replace(/\(/g, " ( ").replace(/\)/g, " ) ")
     if (initial_sequent == "")
         return
     $("#conc_0").html('$$'+initial_sequent+'$$')

@@ -63,8 +63,8 @@ function removePremise(index) {
 
 
 function preview() {
-    var calc_id = $("#calc_id").text()
     $("#warning").css("visibility","hidden")
+    var calc_id = $("#calc_id").text()
     $.get("/api/rules/"+calc_id, function (rls, status) {
         var rules = rls.rules
         rule_name = $("#rule_name").val()

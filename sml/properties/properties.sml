@@ -355,8 +355,7 @@ struct
     fun init_coherence_print (a,b,c) = 
         (let
             fun print_helper((clist1,tree1),SOME((clist2,tree2))) = 
-                "$$"^Latex.der_tree_toLatex2(tree1)
-                ^" \\leadsto "
+                "$$"^Latex.der_tree_toLatex2(tree1)^" \\leadsto "
                 ^Latex.der_tree_toLatex2(tree2)^"$$"
                 ^"$$"^constraintL_toString(clist1)^"$$"
                 ^"$$"^constraintL_toString(clist2)^"$$"
@@ -368,11 +367,12 @@ struct
                 val t = List.map(fn (bl,pf) => if bl 
                     then "T###"^print_helper(pf) else "F###"^print_helper(pf)) out
                 val p = List.foldr (fn (a,b) => a^"@@@"^b) "" t
-                val b = if bol then "T" else "F"
+                val b = if bol then "Identity Expansion Test Succeeds###Identity expansion is a property this calculus system. The proof tree transformations are shown below for each connective." 
+                                else "Identity Expansion Test Fails###Identity expansion is not a property of this calculus system. There are proof tree transformations that could not be found for certain connectives."
                 val bp = b^"%%%"^p
             in writeFD 3 bp end
         end)
-        handle (Arity) => writeFD 3 "Arity problem"
+        handle (Arity) => writeFD 3 "Arity Problem%%%Temp"
         
 
     (*  *)
@@ -473,9 +473,9 @@ struct
         let 
             fun print_helper((clist1,tree1),SOME((clist2,tree2))) = 
                     "$$"^Latex.der_tree_toLatex2(tree1)^"$$"
+                    ^"$$"^constraintL_toString(clist1)^"$$"
                     ^"$$ \\leadsto $$"
                     ^"$$"^Latex.der_tree_toLatex2(tree2)^"$$"
-                    ^"$$"^constraintL_toString(clist1)^"$$"
                     ^"$$"^constraintL_toString(clist2)^"$$"
                 | print_helper((clist1,tree1),NONE) = 
                     "$$"^Latex.der_tree_toLatex2(tree1)^"$$"
@@ -627,8 +627,8 @@ struct
     fun result_to_latex_strings ((true_list,fail_list)) = 
         let 
             fun latex_res ((clist1,tree1),(clist2,tree2)) = 
-                "$$"^Latex.der_tree_toLatex2(tree1)^"\\leadsto "
-                ^""^Latex.der_tree_toLatex2(tree2)^"$$"
+                "$$"^Latex.der_tree_toLatex2(tree1)^" \\leadsto "
+                ^Latex.der_tree_toLatex2(tree2)^"$$"
                 ^"$$"^constraintL_toString(clist1)^"$$"
                 ^"$$"^constraintL_toString(clist2)^"$$"
         in
@@ -642,7 +642,7 @@ struct
 
     fun permute_res ((right,wrong)) = 
         (case (List.length(right),List.length(wrong)) of
-           ( 0 , 0 ) => "N/A@@@N/A"
+           ( 0 , 0 ) => "N/A@@@These rules are not capable of permuting."
          | (_ , 0) => "The Rule Permutes@@@The first rule always permutes up the second. All permutation tree transformations were found and are shown below."
          | (0,_) => "The Rule Does Not Permute@@@The first rule never permutes up the second. No permutation tree transformations were found."
          | (_,_) => "The Rule Permutes Sometimes@@@The first rule sometimes permutes up the second. Permutation tree transformations were found for some cases and are shown below, while no permutation transformations were found for the rest.")
