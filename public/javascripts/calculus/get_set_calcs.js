@@ -30,8 +30,8 @@ function get_calculi_toPage() {
 
 function addCalculus() {
     var calculi_container = $("#calculi")
-    var title = $("#title").val()
-    var description = $("#description").val()
+    var title = $("#title").val().trim()
+    var description = $("#description").val().trim()
     if (title != "" && description != "") {
         $.post("/api/calculus", {title : title, description : description, user : $("#user_id").text()}, 
         function(data, status) {

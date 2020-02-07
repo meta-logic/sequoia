@@ -3,7 +3,7 @@ function addUser () {
     $("#p1").attr("class", "required field")
     $("#p2").attr("class", "required field")
     $("#u").attr("class", "required field")
-    var username = $("#username").val()
+    var username = $("#username").val().trim()
     var password1 = $("#password1").val()
     var password2 = $("#password2").val()
     var email = $("#email").val()

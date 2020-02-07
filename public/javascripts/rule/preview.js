@@ -1,4 +1,10 @@
 var v = 0
+var rule_name = ""
+var rule_type = ""
+var rule_side = ""
+var rule_connective = ""
+var rule_premises = []
+var rule_conclusion = ""
 
 function addPremise() {
     var premises = ""
@@ -61,16 +67,26 @@ function preview() {
     $("#warning").css("visibility","hidden")
     $.get("/api/rules/"+calc_id, function (rls, status) {
         var rules = rls.rules
-        var rule_name = $("#rule_name").val()
-        var premises = $("#i0").val()
-        var conc = $("#conclusion").val()
-        var connective = $("#connective").val()
-        var side = $("#side").val()
+        rule_name = $("#rule_name").val()
+        rule_type = $("#kind").val()
+        rule_side = $("#side").val()
+        rule_connective = $("#connective").val()
+        temp_premises = $("#i0").val().replace(/\s\s+/g, " ")
+        rule_premises = [($("#i0").val())]
+        for (var i = 1; i <= v; i++) {
+            var prem_seq = $("#i"+i).val()
+            if (prem_seq.trim() != "") {
+                temp_premises += " \\quad \\quad " + prem_seq
+                rule_premises.push(prem_seq)
+            }
+        }
+        rule_conclusion = $("#conclusion").val()
         var opt = $("#page").text()
         if (rule_name == "") {
             $("#warning_header").html("Rule Name Missing")
-            $("#warning_text").html("Rules must be given a name.")
+            $("#warning_text").html("A rule must be given a name.")
             $("#warning").css("visibility","visible")
+            $("#submit").attr("class","ui disabled fluid large circular icon button green")
             return
         }
         for (var i = 0; i < rules.length; i++) {
@@ -79,41 +95,48 @@ function preview() {
                     $("#warning_header").html("Redundant Names")
                     $("#warning_text").html("A rule with that name is already defined.")
                     $("#warning").css("visibility","visible")
+                    $("#submit").attr("class","ui disabled fluid large circular icon button green")
                     return
                 }
-                else if (opt == "Update" && $("#rule_id").val() != rules[i]._id){
+                else if (opt == "Update" && $("#rule_id").text() != rules[i]._id){
                     $("#warning_header").html("Redundant Names")
                     $("#warning_text").html("A rule with that name is already defined.")
                     $("#warning").css("visibility","visible")
+                    $("#submit").attr("class","ui disabled fluid large circular icon button green")
                     return
                 }
             } 
         }
-        if (side == "") {
-            $("#warning_header").html("Rule Side Missing")
-            $("#warning_text").html("Rules must be associated either with a side if its a normal rule, with structural if its a structural rule, with cut if it's a cut rule, or with none if there is no clear side (inital and axiom rules).")
+        if (rule_type == "") {
+            $("#warning_header").html("Rule Type Missing")
+            $("#warning_text").html("A rule must be associated with a rule type.")
             $("#warning").css("visibility","visible")
+            $("#submit").attr("class","ui disabled fluid large circular icon button green")
             return
         }
-        if (connective == "" && (side == "Right" || side == "Left")) {
-            $("#warning_header").html("Rule Main Connective Missing")
-            $("#warning_text").html("Rules must be associated with a main connective.")
+        if (rule_side == "" || !((rule_side == "None" && (rule_type == "Axiom" || rule_type == "Cut")) ||
+            ((rule_side == "Left" || rule_side == "Right") && (rule_type == "Logical" || rule_type == "Structural")))) {
+            $("#warning_header").html("Rule Side Error")
+            $("#warning_text").html("A Logical or Structural type rule must be associated with a Left or Right side, and an Axiom or Cut type rule must be associated with None.")
             $("#warning").css("visibility","visible")
+            $("#submit").attr("class","ui disabled fluid large circular icon button green")
             return
         }
-        if (conc.trim() == "") {
+        if (rule_connective == "" && rule_type == "Logical") {
+            $("#warning_header").html("Main Connective Missing")
+            $("#warning_text").html("A Logical type rule must be associated with a main connective.")
+            $("#warning").css("visibility","visible")
+            $("#submit").attr("class","ui disabled fluid large circular icon button green")
+            return
+        }
+        if (rule_conclusion.trim() == "") {
             $("#warning_header").html("Conclusion Missing")
-            $("#warning_text").html("Rules must have a non-empty conclusion.")
+            $("#warning_text").html("A rule must have a non-empty conclusion.")
             $("#warning").css("visibility","visible")
+            $("#submit").attr("class","ui disabled fluid large circular icon button green")
             return
         }
-        premises.replace(/\s\s+/g, " ")
-        for (var i = 1; i <= v; i++) {
-            if ($("#i"+i).val().trim() != "") {
-                premises += " \\quad \\quad " + $("#i"+i).val()
-            }
-        }
-        $("#rule").html('$$\\frac{'+premises+'}{'+conc+'}'+rule_name+'$$')
+        $("#rule").html('$$\\frac{'+temp_premises+'}{'+rule_conclusion+'}'+rule_name+'$$')
         MathJax.Hub.Queue(["Typeset",MathJax.Hub,$("#rule")[0]])
         var addButton = $("#submit")
         addButton.attr("onClick", "placeRule('"+opt+"')") 
@@ -121,5 +144,6 @@ function preview() {
         addButton.css("visibility","visible")
         $("#sym_table").css("visibility","visible")
         $("#typ").css("visibility","visible")
+        $("#submit").attr("class","ui fluid large circular icon button green")
     })
 }

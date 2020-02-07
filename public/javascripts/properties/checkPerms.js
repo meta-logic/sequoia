@@ -11,8 +11,8 @@ function selectRule(bl, i) {
         }
         $("#rule_card"+i).attr("class", "ui raised card")
         $("#b"+i).attr("class", "ui active bottom attached button")
-        $("#b"+i).attr("onClick", 'selectRule(false,'+i+')')
-        $("#i"+i).attr("class", 'close icon')
+        $("#b"+i).attr("onClick", "selectRule(false,"+i+")")
+        $("#i"+i).attr("class", "close icon")
     } else if (!bl) {
         if (rule1 == "r"+i) {
             rule1 = ""
@@ -21,8 +21,8 @@ function selectRule(bl, i) {
         }
         $("#rule_card"+i).attr("class", "ui card")
         $("#b"+i).attr("class", "ui bottom attached button")
-        $("#b"+i).attr("onClick", 'selectRule(true,'+i+')')
-        $("#i"+i).attr("class", 'add icon')
+        $("#b"+i).attr("onClick", "selectRule(true,"+i+")")
+        $("#i"+i).attr("class", "add icon")
         $("#perm_button").attr("class", "ui disabled teal large button")
     }
     if (rule1 != "" && rule2 != "") {
