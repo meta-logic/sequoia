@@ -4,9 +4,9 @@ var fresh_symbols = {}
 var cut_var = ""
 var cut_form = ""
 
-function cutSelect (side, callback) {
+function cutSelect (type, callback) {
     $("#modal_warning").css("visibility","hidden")
-    if (side != "Cut") {
+    if (type != "Cut") {
         callback()
     } else {
         $('#modal2').modal({
@@ -38,9 +38,10 @@ function applyRule(i) {
     var ruletemp = $("#r"+i)
     var name = ruletemp.attr("rule_name").replace(/\\/g, "\\\\")
     var side = ruletemp.attr("side")
+    var type = ruletemp.attr("type")
     var conclusion = ruletemp.attr("conclusion")
     var premises = ruletemp.attr("premises")
-    cutSelect (side, function () { 
+    cutSelect (type, function () { 
         updateParser(fresh_symbols, function() {
             try {
                 var sequent = parser.parse(seq_text).replace(/\\/g, "\\\\")
@@ -53,12 +54,12 @@ function applyRule(i) {
             var rule_sml = "Rule(\""+name+"\",None,"+conclusion+","+premises+")"
             var tree_sml = "DerTree(\""+leaf_id+"\","+sequent+", NoRule, [])"
             var params = { rule: rule_sml, tree: tree_sml, node_id: "\""+leaf_id+"\"", index : rng_index, subs: "[]" }
-            if (side == "Cut") {
+            if (type == "Cut") {
                 try {
                     var cF = formula_parser.parse(cut_form).replace(/\\/g, "\\\\")
                 } catch(error) {
                     $("#warning_header").html("Formula Parsing Error")
-                    $("#warning_text").html("Formulas must contain term symbols from the sequent symbols table.")
+                    $("#warning_text").html("Cut formulas must be structurally valid and contain term symbols from the sequent symbols table.")
                     $("#warning").css("visibility","visible")
                     return
                 }
@@ -95,7 +96,6 @@ function applyRule(i) {
                         leaf_id = this.id.split("_")[1]
                         seq_text = $(this).find("script")[0].innerText
                         $("#warning").css("visibility","hidden")
-                        console.log(seq_text)
                     })
                     constraint_history.push(cons_set[index])
                     var the_constraints = constraint_history.flat()
@@ -124,7 +124,6 @@ function applyRule(i) {
                             leaf_id = this.id.split("_")[1]
                             seq_text = $(this).find("script")[0].innerText
                             $("#warning").css("visibility","hidden")
-                            console.log(seq_text)
                         })
                         constraint_history.push(cons_set[index])
                         var the_constraints = constraint_history.flat()
@@ -158,7 +157,6 @@ function undo() {
             leaf_id = this.id.split("_")[1]
             seq_text = $(this).find("script")[0].innerText
             $("#warning").css("visibility","hidden")
-            console.log(seq_text)
         })
         constraint_history.pop()
         var the_constraints = constraint_history.flat()

@@ -15,6 +15,7 @@ var ruleSchema = new Schema({
     sml_conc    : String,
     calculus    : String,
     connective  : String,
+    type        : String,
     side        : String
 })
 

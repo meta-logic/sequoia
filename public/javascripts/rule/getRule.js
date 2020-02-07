@@ -8,6 +8,7 @@ if ($("#page").text() == "Update") {
         $("#rule_id").val(data.rule._id)
         $("#rule_name").val(data.rule.rule)
         $("#side").val(data.rule.side)
+        $("#kind").val(data.rule.type)
         $("#connective").val(data.rule.connective)
         for (var i = 0; i < data.rule.premises.length; i++) {
             if (i > 0) {

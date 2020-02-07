@@ -44,7 +44,7 @@ function checkWeak() {
         var rules = rls.rules
         var rule_list = []
         for (var i = 0; i < rules.length; i++) {
-            if (rules[i].side == "Left" || rules[i].side == "Right" || rules[i].side == "None") {
+            if (rules[i].type != "Structural") {
                 var rule_name = rules[i].rule.replace(/\\/g, "\\\\")
                 var rule_side = rules[i].side
                 var rule_conc = rules[i].sml_conc.replace(/\\/g, "\\\\")

@@ -16,8 +16,8 @@ function get_rules_toPage() {
             var rule_prem = list_to_string(rules[i].sml_prem).replace(/\\/g, "\\\\").replace(/'/g, "&apos;").replace(/"/g, "&quot;")
             rules_container.append( 
                 '<div id="rule_card"'+i+'" class="card">'+
-                    '<button class="ui button basic black" id="r'+i+'" onClick=applyRule("'+i+'") '+
-                    'rule_name="'+rules[i].rule+'" side="'+rules[i].side+'" conclusion="'+rule_conc+'" premises="'+rule_prem+'">'+
+                    '<button class="ui button basic black" id="r'+i+'" onClick=applyRule("'+i+'") type="'+rules[i].type+'"'+
+                    ' rule_name="'+rules[i].rule+'" side="'+rules[i].side+'" conclusion="'+rule_conc+'" premises="'+rule_prem+'">'+
                         '$$\\frac{'+rules[i].premises.join(" \\quad \\quad ")+'}{'+rules[i].conclusion+'}'+rules[i].rule+'$$'+
                     '</button>'+
                 '</div>'

@@ -16,7 +16,7 @@ function get_rules_toPage() {
         var rules = rls.rules
         var init_list = []
         for (var i = 0; i < rules.length; i++) {
-            if (rules[i].side == "Left" || rules[i].side == "Right") {
+            if (rules[i].type == "Logical") {
                 var rule_name = rules[i].rule.replace(/\\/g, "\\\\")
                 var rule_conc = rules[i].sml_conc.replace(/\\/g, "\\\\").replace(/'/g, "&apos;").replace(/"/g, "&quot;")
                 var rule_prem = list_to_string(rules[i].sml_prem).replace(/\\/g, "\\\\").replace(/'/g, "&apos;").replace(/"/g, "&quot;")
@@ -32,10 +32,10 @@ function get_rules_toPage() {
                         '</div>'+
                     '</div>'
                 )
-            } else if (rules[i].side == "None") {
+            } else if (rules[i].type == "Axiom") {
                 var rule_name = rules[i].rule.replace(/\\/g, "\\\\")
                 var rule_conc = rules[i].sml_conc.replace(/\\/g, "\\\\")
-                var rule_sml = "Rule(\""+rule_name+"\",None,"+rule_conc+",\[\])"
+                var rule_sml = "Rule(\""+rule_name+"\","+rules[i].side+","+rule_conc+",\[\])"
                 init_list.push(rule_sml) 
             }
         }
@@ -52,7 +52,7 @@ function initWeak(calc_id) {
         var rules = rls.rules
         var rule_list = []
         for (var i = 0; i < rules.length; i++) {
-            if (rules[i].side == "Left" || rules[i].side == "Right" || rules[i].side == "None") {
+            if (rules[i].type !== "Structural") {
                 var rule_name = rules[i].rule.replace(/\\/g, "\\\\")
                 var rule_side = rules[i].side
                 var rule_conc = rules[i].sml_conc.replace(/\\/g, "\\\\")

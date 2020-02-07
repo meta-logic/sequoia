@@ -8,12 +8,17 @@
 		<div class="ui input">
 			<input id="rule_name" type="text" placeholder="Rule Name">
 		</div>
+		<select class="ui search dropdown" id="kind" >
+			<option value="">Type</option>
+			<option value="Logical">Logical</option>
+			<option value="Axiom">Axiom</option>
+			<option value="Structural">Structural</option>
+			<option value="Cut">Cut</option>
+		</select>
 		<select class="ui search dropdown" id="side" >
 			<option value="">Side</option>
 			<option value="Left">Left</option>
 			<option value="Right">Right</option>
-			<option value="Structural">Structural</option>
-			<option value="Cut">Cut</option>
 			<option value="None">None</option>
 		</select>
 		<div class="ui input">
@@ -40,7 +45,7 @@
 	<br><br>
 	<div id="rule" style="font-size: 150%"></div>
 	<br><br>
-	<a id ="submit" class="ui fluid large circular icon button green" style="visibility: hidden;">TEMP</a>
+	<a id="submit" class="ui fluid large circular icon button green" style="visibility: hidden;">TEMP</a>
 	<div id="warning" class="ui negative message" style="visibility: hidden;">
 		<div id="warning_header" class="header">TEMP</div>
 		<p id="warning_text">TEMP</p>
@@ -64,7 +69,6 @@
 						<option value="context variable">context variable</option>
 						<option value="sequent sign">sequent sign</option>
 						<option value="context separator">context separator</option>
-						<option value="empty">empty</option>
 					</select>
 					<button class="ui large green right floated button" onclick="add_symbol_toTable('rule')">Add Symbol</button>
 				</td>

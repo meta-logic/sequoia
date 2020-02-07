@@ -36,13 +36,14 @@ function createRules (req, res) {
     for (var i = 0; i < rules.length; i++) {
         var rule = new Rule()
         var rls = rules[i]
-        rule.rule      = rls.rule
+        rule.rule = rls.rule
         rule.premises  = JSON.parse(rls.premises)
         rule.conclusion = rls.conclusion
         rule.sml_prem = JSON.parse(rls.parsed_prem)
         rule.sml_conc = rls.parsed_conc
         rule.calculus = rls.calculus
         rule.connective = rls.connective
+        rule.type = rls.type
         rule.side = rls.side
         rule.save(function (err) {
             if (err) {
@@ -70,6 +71,7 @@ function updateRule (req, res) {
             sml_conc : req.body.parsed_conc,
             calculus : req.body.calculus,
             connective : req.body.connective,
+            type : req.body.type,
             side : req.body.side
         }, { new : true}, 
         function (err, rule) {
