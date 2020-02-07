@@ -65,16 +65,18 @@ app.use('/api', ruleRoutes);
 app.use('/api', symbolsRoutes);
 
 
-
-
 //Page Routes ===========================================================
-app.get('/', checkAuthenticated, function (req, res) {
+app.get('/', checkNotAuthenticated, function (req, res) {
+	return res.render('login/landing', {'layout' : 'landing'});
+});
+
+app.get('/home', checkAuthenticated, function (req, res) {
 	return res.render('main/index', {'title' : 'Sequoia','layout' : 'main', 'user_id' : req.user._id, 'username' : req.user.username});
 });
 
 app.get('/login', function (req, res) {
 	if (req.isAuthenticated()) {
-		return res.redirect('/')
+		return res.redirect('/home')
 	}
 	if (req.flash('error').length > 0) {
 		return res.render('login/fail', {'title' : 'Sequoia - login','layout' : 'login'});
@@ -84,7 +86,7 @@ app.get('/login', function (req, res) {
 
 app.post('/login', checkNotAuthenticated, passport.authenticate('local', {
 	session: true,
-	successRedirect: '/',
+	successRedirect: '/home',
 	failureRedirect : '/login',
 	failureFlash : true}
 ));
@@ -94,7 +96,7 @@ app.get('/logout', checkAuthenticated, function(req, res) {
     res.redirect('/login')
 });
 
-app.get('/register', function (req, res) {
+app.get('/register', checkNotAuthenticated, function (req, res) {
 	return res.render('login/register', {'title' : 'Sequoia - register','layout' : 'login'});
 });
 
