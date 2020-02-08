@@ -55,18 +55,7 @@ function parse_and_place(parser, opt) {
     var calc_id = $("#calc_id").text()
     var prem = rule_premises
     var parsed_prem = []
-    
-    // __ZAN__
-    // if (prem[0] != "" && prem[0][0].replace(/\s\s+/g, " ") ==  " ") {
-    //     console.log(prem[0],"|",prem[0][0].replace(/\s\s+/g, " "),"|",prem[0].replace(/\s\s+/g, " "),"|",60)
-    //     prem[0] = ""
-    // }
-    // I changed this so that the replace affects the entire
-    // string, and the check is done to the entire string as well
-    // as the check would ignore the premises if the first one starts with 
-    // a whitespace
     if (prem[0] != "" && prem[0].replace(/\s\s+/g, " ") ==  " ") {
-        // console.log(prem[0],"|",prem[0].replace(/\s\s+/g, " "),"|",prem[0].replace(/\s\s+/g, " "),"|",60)
         prem[0] = ""
     }
     if (prem[0] != ""){
