@@ -7,6 +7,7 @@ structure datatypesImpl : DATATYPES = struct
 
 
     datatype form = Atom of string | AtomVar of string | FormVar of string | Form of conn * form list
+    
     fun form_toString (Atom (s)) = s 
         | form_toString (AtomVar(s)) = s 
         | form_toString (FormVar (s)) = s
@@ -22,9 +23,7 @@ structure datatypesImpl : DATATYPES = struct
             | _ => (case y of
                 Form (Con (cn), fl) => form_toString(x) ^ " " ^ c ^ " (" ^ form_toString(y) ^ ")"
                 | _ => form_toString(x) ^ " " ^ c ^ " " ^ form_toString(y)))
-        | subforms_toString (c, x::l) = (case x of
-            Form (Con (cn), fl) => "(" ^ form_toString(x) ^ ") " ^ c ^ " " ^ subforms_toString(c, l)
-            | _ => form_toString(x) ^ " " ^ c ^ " " ^ subforms_toString(c, l))
+        | subforms_toString (c, l) = c ^ (ListFormat.fmt {init = "(", sep = ",", final = ")", fmt = form_toString} l)
     fun form_eq (Atom(a), Atom(b)) = a=b
         | form_eq (AtomVar(a), AtomVar(b)) = a=b
         | form_eq (FormVar(a), FormVar(b)) = a=b
