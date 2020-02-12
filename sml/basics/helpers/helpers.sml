@@ -49,7 +49,8 @@ structure helpersImpl : HELPERS = struct
     fun chooseDP (forms, k) =
         let val DPA = Array2.tabulate(Array2.RowMajor)(k+1, List.length(forms)+1, 
                 fn(i,j) => if i = 0 then SOME([nil]) else if i > j then SOME([]) else NONE)
-            fun choose ([], _) = []
+            fun choose (_, 0) = [[]]
+                | choose ([],_) = []
                 | choose (f::forms', k) = case Array2.sub(DPA, k, List.length(f::forms')) of
                     SOME(a) => a
                     | NONE =>
