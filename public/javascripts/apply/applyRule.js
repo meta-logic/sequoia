@@ -209,7 +209,7 @@ function undo() {
         seq_text = undo_items[1]
         remove_from_tree(leaf_id)
         remove_premises(leaf_id)
-        $("leaf").click(function() {
+        $(".leaf").click(function() {
             leaf_id = this.id.split("_")[1]
             seq_text = $(this).find("script")[0].innerText
             $("#warning").css("visibility","hidden")

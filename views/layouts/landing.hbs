@@ -4,6 +4,74 @@
     <title>{{title}}</title>
     <link rel="stylesheet" type="text/css" href="/bower/semantic/dist/semantic.min.css">
   </head>
+  <div id = "style">
+    <style> 
+    .masthead {
+      background-color: rgb(71, 195, 195) !important;
+    }
+
+    .masthead.segment {
+      min-height: 400px;
+      padding: 1em 0em;
+    }
+
+    .masthead .logo.item img {
+      margin-right: 1em;
+    }
+
+    .masthead .ui.menu .ui.button {
+      margin-left: 0.5em;
+    }
+
+    .masthead h1.ui.header {
+      margin-top: 1em;
+      margin-bottom: 0em;
+      font-size: 4em;
+      font-weight: normal;
+    }
+
+    .masthead h2 {
+      font-size: 1.7em;
+      font-weight: normal;
+    }
+
+    .ui.vertical.stripe {
+      padding: 8em 0em;
+    }
+
+    .ui.vertical.stripe h3 {
+      font-size: 2em;
+    }
+    
+    .ui.vertical.stripe .button + h3,
+    .ui.vertical.stripe p + h3 {
+      margin-top: 3em;
+    }
+
+    .ui.vertical.stripe .floated.image {
+      clear: both;
+    }
+
+    .ui.vertical.stripe p {
+      font-size: 1.33em;
+    }
+
+    .ui.vertical.stripe .horizontal.divider {
+      margin: 3em 0em;
+    }
+
+
+    .footer.segment {
+      padding: 5em 0em;
+    }
+
+    .secondary.pointing.menu .toc.item {
+      display: none;
+    }
+
+
+    </style>
+  </div>
   <body>
     {{> log_navbar}}
 	  {{{body}}}
@@ -12,5 +80,6 @@
   	<script type="text/javascript" src="/bower/jquery/dist/jquery.min.js"></script>
     <script type="text/javascript" src="/bower/semantic/dist/semantic.min.js"></script>
   	<script type="text/javascript" src="/bower/async/dist/async.min.js"></script>
+    <script type="text/javascript" src="/static/javascripts/login/setupItems.js"></script>
   </body>
 </html>
