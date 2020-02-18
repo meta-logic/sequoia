@@ -12,7 +12,7 @@ var Symbols = require("../models/symbols")
 async function createUser (req, res) {
     var user  = new User()
     user.username = req.body.username
-    user.password = await bcrypt.hash(req.body.password, 2)
+    user.password = await bcrypt.hash(req.body.password, 10)
     user.email = req.body.email
     user.occupation = req.body.occupation
     user.save(function (err) {

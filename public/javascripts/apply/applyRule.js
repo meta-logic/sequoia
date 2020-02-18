@@ -3,6 +3,61 @@ var rng_index = "0"
 var fresh_symbols = {}
 var cut_var = ""
 var cut_form = ""
+var latex_tree = []
+
+function find_tree(id) {
+    var tree = latex_tree[0]
+    for(var i = 1; i < id.length; i++) {
+        tree = tree["premises"][parseInt(id[i])] 
+    }
+    return tree
+}
+
+
+function insert_premises(id, rulename, prems) {
+    var latex_prems = []
+    for(var i = 0; i < prems.length; i++) {
+        latex_prems.push({"conclusion" : prems[i], "rulename" : "", "premises" : []})
+    }
+    find_tree(id)["rulename"] = rulename
+    find_tree(id)["premises"] = latex_prems
+}
+
+
+function remove_premises(id) {
+    find_tree(id)["rulename"] = ""
+    find_tree(id)["premises"] = []
+}
+
+
+function export_to_latex(tree) {
+    var premises = tree["premises"]
+    var rulename = tree["rulename"]
+    var conclusion = tree["conclusion"]
+    if (rulename == "") {
+        return conclusion
+    } else {
+        var latex_prems = []
+        for(var i = 0; i < premises.length; i++) {
+            latex_prems.push(export_to_latex(premises[i]))
+        }
+        var latex = "\\infer["+rulename+"]{"+conclusion+"}{"+latex_prems.join(" & ")+"}"
+    }
+    return latex
+}
+
+
+function sendEmail(tree) {
+    var latex = export_to_latex(tree)
+    $("#latex").html(latex)
+    $('#modal3').modal({
+        onApprove: function () {
+            var email = $("#email").val()
+            window.open('mailto:'+encodeURIComponent(email)+'?subject='+encodeURIComponent("Sequoia Latex Proof Tree")+'&body='+encodeURIComponent(latex));
+        }
+    }).modal('setting', 'closable', false).modal('show')
+}
+
 
 function cutSelect (type, callback) {
     $("#modal_warning").css("visibility","hidden")
@@ -91,7 +146,8 @@ function applyRule(i) {
                 }
                 if (prem_set.length == 1) {
                     var index = 0
-                    build_proof_tree(leaf_id, name.replace(/\\\\/g,"\\"), prem_set[0])
+                    insert_in_tree(leaf_id, name.replace(/\\\\/g,"\\"), prem_set[0])
+                    insert_premises(leaf_id, name.replace(/\\\\/g,"\\"), prem_set[0])
                     $(".leaf").click(function() {
                         leaf_id = this.id.split("_")[1]
                         seq_text = $(this).find("script")[0].innerText
@@ -119,7 +175,8 @@ function applyRule(i) {
                     $(".select").click(function() {
                         var index = parseInt(this.getAttribute("num"))
                         $("#info").css("display","none")
-                        build_proof_tree(leaf_id, name.replace(/\\\\/g,"\\"), prem_set[index])
+                        insert_in_tree(leaf_id, name.replace(/\\\\/g,"\\"), prem_set[index])
+                        insert_premises(leaf_id, name.replace(/\\\\/g,"\\"), prem_set[index])
                         $(".leaf").click(function() {
                             leaf_id = this.id.split("_")[1]
                             seq_text = $(this).find("script")[0].innerText
@@ -150,10 +207,9 @@ function undo() {
         var undo_items = previous.shift()
         leaf_id = undo_items[0] 
         seq_text = undo_items[1]
-        $("#applied_"+leaf_id).remove()
-        $("#delete_"+leaf_id).remove()
-        $("#conc_"+leaf_id).attr("class", "leaf")
-        $("leaf").click(function() {
+        remove_from_tree(leaf_id)
+        remove_premises(leaf_id)
+        $(".leaf").click(function() {
             leaf_id = this.id.split("_")[1]
             seq_text = $(this).find("script")[0].innerText
             $("#warning").css("visibility","hidden")

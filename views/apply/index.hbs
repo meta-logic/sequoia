@@ -1,6 +1,9 @@
 
 <div id="calc_id" hidden>{{calc_id}}</div>
 <div class="ui huge right fixed vertical menu" id="side_menu_R" style="margin-top: 61px; overflow-y:auto;">
+  <button id="export" class="ui disabled fluid huge icon button green" onclick="sendEmail(latex_tree[0])">
+    <i class="icon download"></i>
+  </button>
   <button id="undo" class="ui disabled fluid huge icon button red" onclick="undo()">
     <i class="icon undo"></i>
   </button>
@@ -103,8 +106,25 @@
       <div class="header">Formula Parsing Error</div>
       <p>Formulas must contain term symbols from the sequent symbols table</p>
     </div>
-  <div class="actions">
-  <div id="yes_button" class="ui approve button">Confirm</div>
-  <div id="no_button" class="ui cancel button">Cancel</div>
   </div>
+  <div class="actions">
+    <div id="yes_button" class="ui approve button">Confirm</div>
+    <div id="no_button" class="ui cancel button">Cancel</div>
+  </div>
+</div>
+<div id ="modal3" class="ui special modal">
+  <div class="header">Send to Email</div>
+  <div class="content">
+    <p id="latex"></p>
+    <div class="ui form">
+      <div class="field">
+        <label>Email</label>
+        <input id="email" type="text">
+      </div>
+    </div>
+  </div>
+  <div class="actions">
+      <div id="yes_button" class="ui approve button">Send</div>
+      <div id="no_button" class="ui cancel button">Cancel</div>
+    </div>
 </div>

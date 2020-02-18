@@ -2,7 +2,6 @@ var parser_copy = pt
 var parser = ""
 var formula_parser = ""
 
-
 function useSequent() {
     var parser_text = parser_copy
     var arrow = "SeqSign = \"NO-ARROW\" "
@@ -61,13 +60,14 @@ function parse_and_use(temp_parser) {
     }
     catch(error) {
         $("#warning_header").html("Sequent Parsing Error")
-        $("#warning_text").html("RSequents must be structurally valid and contain term symbols from the sequent term symbols table.")
+        $("#warning_text").html("Sequents must be structurally valid and contain term symbols from the sequent term symbols table.")
         $("#warning").css("visibility","visible")
         return
     }
     $("#seq").css("display","none")
     $("#submit").css("visibility","hidden")
     $("#warning").css("visibility","hidden")
+    $("#export").attr("class","ui fluid huge icon button green")
     $("#undo").attr("class","ui fluid huge icon button red")
     parser = temp_parser
     $(".leaf").click(function() {
