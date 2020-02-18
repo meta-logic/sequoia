@@ -8,5 +8,10 @@ is
   ../unification/unification.cm
   ../latex_exporter/latex_exporter.cm
   ../equiv/equiv.cm
+  utilities/utilities.sml
+  id_expansion/id_expansion.sml
+  weakening/weakening.sml
+  permute/permute.sml
+  cut_elim/cut_elim.sml
   properties.sig
   properties.sml
