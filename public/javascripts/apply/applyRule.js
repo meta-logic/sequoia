@@ -107,7 +107,7 @@ function applyRule(i) {
                 return
             }
             var rule_sml = "Rule(\""+name+"\",None,"+conclusion+","+premises+")"
-            var tree_sml = "DerTree(\""+leaf_id+"\","+sequent+", NoRule, [])"
+            var tree_sml = "DerTree(\""+leaf_id+"\","+sequent+", NONE, [])"
             var params = { rule: rule_sml, tree: tree_sml, node_id: "\""+leaf_id+"\"", index : rng_index, subs: "[]" }
             if (type == "Cut") {
                 try {

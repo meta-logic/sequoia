@@ -56,11 +56,13 @@ GENFORM
   / atom:ATOM { return atom }
 
 // Symbols
-CONN = conn:Conn { return 'Con ("' + conn  + '")' }
-CTX_VAR = ctx_var:CtxVar { return 'CtxVar ("' + ctx_var + '")' }
+CTX_VAR 
+  = conn:CONN _ ctx_var:CtxVar { return 'CtxVar ("' + conn + ',' + ctx_var + '")' }
+  / ctx_var:CtxVar { return 'CtxVar ("NONE,' + ctx_var + '")' }
 FORM_VAR = form_var:FormVar { return 'FormVar ("' + form_var + '")' }
 ATOM_VAR = atom_var:AtomVar { return 'AtomVar ("' + atom_var + '")' }
 ATOM = atom:Atom { return 'Atom ("' + atom + '")' }
+CONN = conn:Conn { return 'Con ("' + conn  + '")' }
 
 _ "whitespace"
   = [ ]*
@@ -91,10 +93,10 @@ GENFORM
   / atom:ATOM { return atom }
 
 // Symbols
-CONN = conn:Conn { return 'Con ("' + conn  + '")' }
 FORM_VAR = form_var:FormVar { return 'FormVar ("' + form_var + '")' }
 ATOM_VAR = atom_var:AtomVar { return 'AtomVar ("' + atom_var + '")' }
 ATOM = atom:Atom { return 'Atom ("' + atom + '")' }
+CONN = conn:Conn { return 'Con ("' + conn  + '")' }
 
 _ "whitespace"
   = [ ]*
