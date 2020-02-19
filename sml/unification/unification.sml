@@ -172,19 +172,27 @@ structure unifyImpl : UNIFICATION = struct
                             )
                         )
 
+            fun context_conn_check (_, []) = true
+                | context_conn_check (DAT.CtxVar(SOME(c1),cv), DAT.Form(c2, sfl) ::fl) = 
+                    DAT.conn_eq(c1,c2) andalso context_conn_check(DAT.CtxVar(SOME(c1),cv),fl)
+                | context_conn_check (_, _) = false
+
             fun part (vl1, fl1, vl2) =
                 if List.length(fl1) = 0 andalso List.length(vl2) = 0 then [nil] else
                     let val part = H.partition_into (List.length(vl2), fl1)
                         val vl_sigmas =
-                            List.map(fn pf =>
-                                List.map(fn (p,g) =>
-                                    if List.length(p) = 0 then
-                                        if List.length(vl1) = 0 then DAT.CTXs(g, DAT.Ctx([], []))
-                                        else DAT.CTXs(g, DAT.Ctx([g], [])) 
-                                    else 
-                                        if List.length(vl1) = 0 then DAT.CTXs(g, DAT.Ctx([], p))
-                                        else DAT.CTXs(g, DAT.Ctx([update_ctx_var(g)], p))
-                                )(ListPair.zip(pf, vl2))
+                            List.map(fn pf => List.map(fn sm => Option.valOf(sm))
+                                (List.filter(fn opt => Option.isSome(opt))
+                                    (List.map(fn (p,g) => 
+                                        if context_conn_check (g,p) then 
+                                            if List.length(p) = 0 then
+                                                if List.length(vl1) = 0 then SOME(DAT.CTXs(g, DAT.Ctx([], [])))
+                                                else SOME(DAT.CTXs(g, DAT.Ctx([g], [])))
+                                            else 
+                                                if List.length(vl1) = 0 then SOME(DAT.CTXs(g, DAT.Ctx([], p)))
+                                                else SOME(DAT.CTXs(g, DAT.Ctx([update_ctx_var(g)], p)))
+                                        else NONE
+                                    )(ListPair.zip(pf, vl2))))
                             )part
                     in vl_sigmas end
             
@@ -207,14 +215,14 @@ structure unifyImpl : UNIFICATION = struct
                                         (filter_subs(s1 @ s2), get_constraint(post_ctx s1, post_ctx s2))
                                     in 
                                         (case (List.length(set1),List.length(set2)) of
-                                           (0,0) => (subs, [])
-                                         | (1,_) => (
+                                            (0,0) => (subs, [])
+                                            | (1,_) => (
                                         APP.UnifierComposition(subs,[DAT.CTXs(List.hd(set1),DAT.Ctx(set2,nil))])
                                         ,[])
-                                         | (_,1) => (
+                                            | (_,1) => (
                                         APP.UnifierComposition(subs,[DAT.CTXs(List.hd(set2),DAT.Ctx(set1,nil))])
                                         ,[])
-                                         | _ => (subs, [(fresh_g, set1, set2)]))
+                                            | _ => (subs, [(fresh_g, set1, set2)]))
                                     end
                                 )sigma1
                             )sigma2)
