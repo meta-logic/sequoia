@@ -1,8 +1,0 @@
-Group 
-  signature EXPORTHTML
-  structure htmlImpl
-is
-  ../basics/basics.cm
-  ../applyunifier/applyunifier.cm
-  html_exporter.sig
-  html_exporter.sml
