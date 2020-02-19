@@ -2,14 +2,14 @@ signature DATATYPES = sig
 
     datatype conn = Con of string
     datatype form = Atom of string | AtomVar of string | FormVar of string | Form of conn * form list
-    datatype ctx_var = CtxVar of string
+    datatype ctx_var = CtxVar of conn option * string
     datatype ctx = Ctx of ctx_var list * form list
     datatype ctx_struct = Empty | Single of ctx | Mult of conn * ctx * ctx_struct
     datatype seq = Seq of ctx_struct * conn * ctx_struct
     datatype side = Left | Right | None
     datatype rule = Rule of string * side * seq * seq list
     datatype sub = Fs of form * form | CTXs of ctx_var * ctx | CVs of ctx_var * ctx_var
-    datatype rule_name = NoRule | RuleName of string
+    type rule_name = string option
     datatype der_tree = DerTree of string * seq * rule_name * der_tree list
 
     val conn_toString : conn -> string

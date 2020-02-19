@@ -46,7 +46,7 @@ struct
     
     val cut_grade_reduction = C.cut_grade_reduction
 
-    fun test_1() =
+    (* fun test_1() =
         let
         val cf = D.Form (D.Con "@", [D.FormVar "R", D.FormVar "S"])
 
@@ -129,5 +129,5 @@ struct
         in
         (* init_coherence(cf, [rl1, rl2], [rl3], [rl4]) *)
         permute(rl1, rl3, [rl4], ([],[]))
-        end
+        end *)
 end

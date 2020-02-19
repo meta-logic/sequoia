@@ -22,7 +22,7 @@ struct
                     Dat.Rule(name,side,conc,new_prems)
                 end
             fun create_base (Dat.Rule(_,_,conc,_)) = 
-                Dat.DerTree("0",Ut.generic_ctx_var conc,Dat.NoRule,[])
+                Dat.DerTree("0",Ut.generic_ctx_var conc,NONE,[])
 
             fun product (left_rules,right_rules) = List.concat (List.map 
                 (fn l_rule => List.map (fn r_rule => (l_rule,r_rule)) right_rules) left_rules)

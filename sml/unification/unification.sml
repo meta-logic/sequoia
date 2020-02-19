@@ -22,7 +22,7 @@ structure unifyImpl : UNIFICATION = struct
 
     fun fresh'(x:string):string = (x ^"^{"^ (Int.toString(!var_index)) ^"}") before (var_index := !var_index + 1)
 
-    val hat::_ = String.explode("^")
+    val hat = #"^"
 
     fun remove_hat' (nil) = nil
         |remove_hat' (x::L) = (case (x=hat) of true => [] | false => x::remove_hat'(L))
@@ -38,7 +38,7 @@ structure unifyImpl : UNIFICATION = struct
             List.map(fn ls => 
                 List.map(fn sb => 
                     (case sb of DAT.Fs(a,b) => (DAT.form_toString a ^ " => " ^ DAT.form_toString b)
-                            |  DAT.CTXs(a,b) =>  (DAT.ctx_var_toString a ^ " => " ^ DAT.ctx_toString b)
+                            |  DAT.CTXs(a,b) => (DAT.ctx_var_toString a ^ " => " ^ DAT.ctx_toString b)
                             |  DAT.CVs(a,b) => (DAT.ctx_var_toString a ^ " => " ^ DAT.ctx_var_toString b)
                     ))ls)sigma
 
@@ -146,13 +146,13 @@ structure unifyImpl : UNIFICATION = struct
         let
             
 
-            fun update_ctx_var (DAT.CtxVar(x)) = DAT.CtxVar(fresh(x))
+            fun update_ctx_var (DAT.CtxVar(a, x)) = DAT.CtxVar(a, fresh(x))
 
             
 
             fun get_constraint (g1, g2) =
                 let val () = () in init_fresh := !init_fresh + 1;
-                (DAT.CtxVar("Gamma_" ^ Int.toString(!init_fresh)), g1, g2) end
+                (DAT.CtxVar(NONE,"Gamma_" ^ Int.toString(!init_fresh)), g1, g2) end
 
             (* update variables in vl1 and vl2. Then, create an initial sub/constraint for that change *)
             
@@ -276,7 +276,7 @@ structure unifyImpl : UNIFICATION = struct
             val unification_result = Unify_ctx_AUX(DAT.Ctx(vl1, fl1), DAT.Ctx(vl2, fl2))
 
 
-            fun sub_toString (DAT.CTXs(DAT.CtxVar(a), b)) = (a ^"-->"^DAT.ctx_toString(b)^"_______\n")
+            fun sub_toString (DAT.CTXs(a, b)) = (DAT.ctx_var_toString(a) ^"-->"^DAT.ctx_toString(b)^"_______\n")
                 |sub_toString (_) = "_______________\n"
             
             (* val _ = List.app (fn y => (List.app (fn x => ignore (print(sub_toString x))) y) before (print "\n\n||||||||||||||||\n\n")) (List.map #1 (Option.valOf unification_result)) handle (Option ) => ()

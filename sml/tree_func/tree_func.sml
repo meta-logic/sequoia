@@ -28,7 +28,7 @@
 
     fun fresh'(x:string):string = (x ^"^{"^ (Int.toString(get_index())) ^"}")
 
-    val hat::_ = String.explode("^")
+    val hat= #"^"
 
     fun remove_hat' (nil) = nil
         |remove_hat' (x::L) = (case (x=hat) of true => [] | false => x::remove_hat'(L))
@@ -39,7 +39,7 @@
 
     val update_string = fresh
 
-    fun update_ctx_var (Dat.CtxVar(x)) = Dat.CtxVar(update_string(x))
+    fun update_ctx_var (Dat.CtxVar(a,x)) = Dat.CtxVar(a,update_string(x))
 
     fun update_form (Dat.Atom(x)) = Dat.Atom(x)
         | update_form (Dat.AtomVar(x)) = Dat.AtomVar(update_string(x))
@@ -67,10 +67,10 @@
     fun get_tree_height (Dat.DerTree(_,_,_,[])) = 0
         | get_tree_height (Dat.DerTree(_,_,_,prs)) = (List.foldl  Int.max 0 (List.map (get_tree_height) prs)) +1
 
-    fun get_open_prems(Dat.DerTree(id, sq,  Dat.NoRule, pq)) = [Dat.DerTree(id, sq,  Dat.NoRule, pq)]
+    fun get_open_prems(Dat.DerTree(id, sq, NONE, pq)) = [Dat.DerTree(id, sq, NONE, pq)]
         | get_open_prems(Dat.DerTree(id, sq, rq, pq)) = List.concat (List.map get_open_prems pq)
 
-    fun closed_tree(Dat.DerTree(id, sq,  Dat.NoRule, pq)) = false
+    fun closed_tree(Dat.DerTree(id, sq, NONE, pq)) = false
         | closed_tree(Dat.DerTree(id, sq, rq, pq)) = not (List.exists(fn p => not (closed_tree p))pq)
 
     fun atomic_transform(Dat.Seq(l,c,r)) = 
@@ -138,7 +138,7 @@
                     get_seq_of (child,sid)
                 end
 
-    fun check_rule_of(_,Dat.DerTree(id, _, Dat.NoRule, pq), sid) = not (id = sid)
+    fun check_rule_of(_,Dat.DerTree(id, _, NONE, pq), sid) = not (id = sid)
         | check_rule_of(cn, Dat.DerTree(id, _, rq, pq), sid) = if id = sid then true 
         else if not (String.isPrefix id sid) then true
         else List.foldl(fn (branch, bools) => bools andalso (check_rule_of(cn, branch,sid)))(true)pq
@@ -147,8 +147,8 @@
     fun apply_rule((forms, cons, dt), rule, sid) =
         let 
             (* val rule = update_rule(rule) *)
-            fun apply_rule_aux( Dat.DerTree(id, sq,  Dat.NoRule, []), Dat.Rule(name, s, conc, premises), sid) =
-                    if id <> sid then [(forms,NONE, Dat.DerTree(id, sq,  Dat.NoRule, []))] else 
+            fun apply_rule_aux( Dat.DerTree(id, sq, NONE, []), Dat.Rule(name, s, conc, premises), sid) =
+                    if id <> sid then [(forms,NONE, Dat.DerTree(id, sq, NONE, []))] else 
                     (case U.Unify_seq(conc, sq) of
                         SOME(sigscons) => 
                             let val formulas = get_forms(conc)
@@ -157,13 +157,13 @@
                                 
                                 val next_ids = List.tabulate(List.length(premises), fn i => Int.toString(i))
                                 val prems_ids = ListPair.zip(premises, next_ids)
-                                val new_prems = List.map(fn (p, i) => Dat.DerTree(id^i,p, Dat.NoRule,[]))prems_ids
+                                val new_prems = List.map(fn (p, i) => Dat.DerTree(id^i,p, NONE,[]))prems_ids
                             in
-                                if List.length(new_sigscons) = 0 then [(forms,NONE, Dat.DerTree(id,sq, Dat.NoRule,[]))] else
+                                if List.length(new_sigscons) = 0 then [(forms,NONE, Dat.DerTree(id,sq, NONE,[]))] else
                                 List.map(fn (sg,cn) => let val frm = App.apply_formL_Unifier(formulas,sg) in
-                                (forms @ frm,SOME(sg,cn), Dat.DerTree(id,sq,Dat.RuleName(name),new_prems)) end)new_sigscons
+                                (forms @ frm,SOME(sg,cn), Dat.DerTree(id,sq,SOME(name),new_prems)) end)new_sigscons
                             end
-                        | NONE => [(forms,NONE, Dat.DerTree(id, sq,  Dat.NoRule, []))])
+                        | NONE => [(forms,NONE, Dat.DerTree(id, sq, NONE, []))])
                 | apply_rule_aux( Dat.DerTree(id, sq, rq, pq), rule, sid) =
                     if id = sid then [(forms,NONE, Dat.DerTree(id, sq, rq, pq))] else
                     let val new_prems_list = apply_rule_list(pq, rule, sid) in
@@ -269,7 +269,7 @@
                 let 
                     val filtered = List.map (update_cons) filtered
                     val new_premises = List.map(fn (cn, tr) => (cn, get_premises_of(tr,id))) filtered 
-                    fun prems_to_vars prems = List.map (fn Dat.CtxVar(x) => x) (List.concat (List.map get_ctx_vars prems))
+                    fun prems_to_vars prems = List.map (fn x => Dat.ctx_var_toString x) (List.concat (List.map get_ctx_vars prems))
                     fun hd (l) = List.hd(l) handle (List.Empty) => ""
                     fun tl (l) = List.tl(l) handle (List.Empty) => []
                 in

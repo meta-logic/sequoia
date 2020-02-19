@@ -43,8 +43,8 @@ struct
             val base = Ut.atomize_seq(base)
             val rule = Ut.update_rule(rule)
             val base2 = add_to_seq(base)
-            val rule_applied_list = List.map (fn (_,cons,tree) => (cons,tree)) (T.apply_rule(([],[],Dat.DerTree("0",base,Dat.NoRule,[])),rule,"0"))
-            val rule_applied_list_weak = List.map (fn (_,cons,tree) => (cons,tree)) (T.apply_rule(([],[],Dat.DerTree("0",base2,Dat.NoRule,[])),rule,"0"))
+            val rule_applied_list = List.map (fn (_,cons,tree) => (cons,tree)) (T.apply_rule(([],[],Dat.DerTree("0",base,NONE,[])),rule,"0"))
+            val rule_applied_list_weak = List.map (fn (_,cons,tree) => (cons,tree)) (T.apply_rule(([],[],Dat.DerTree("0",base2,NONE,[])),rule,"0"))
 
             val rule_applied_list = List.map (fn tree => Ut.rename_ids(tree)) rule_applied_list
 

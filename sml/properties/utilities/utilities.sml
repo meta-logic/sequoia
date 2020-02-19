@@ -46,10 +46,10 @@ struct
             fun gen_out(D.Empty) = D.Empty
                 | gen_out(D.Single(D.Ctx(vl,fl))) =
                 let val () = () in index := !index + 1;
-                D.Single(D.Ctx([D.CtxVar ("\\Gamma_{" ^ Int.toString(!index)^"}")],nil)) end
+                D.Single(D.Ctx([D.CtxVar (NONE,"\\Gamma_{" ^ Int.toString(!index)^"}")],nil)) end
                 | gen_out(D.Mult(con,D.Ctx(vl,fl),rest)) =
                 let val () = () in index := !index + 1;
-                D.Mult(con,D.Ctx([D.CtxVar ("\\Gamma_{" ^ Int.toString(!index)^"}")],nil),gen_out rest) end
+                D.Mult(con,D.Ctx([D.CtxVar (NONE,"\\Gamma_{" ^ Int.toString(!index)^"}")],nil),gen_out rest) end
         in
             D.Seq(gen_out a, c, gen_out b)
         end
@@ -59,10 +59,10 @@ struct
             fun gen_out(D.Empty) = D.Empty
                 | gen_out(D.Single(D.Ctx(vl,fl))) =
                 let val () = () in index := !index + 1;
-                D.Single(D.Ctx([D.CtxVar ("\\Gamma_{" ^ Int.toString(!index)^"}")],fl)) end
+                D.Single(D.Ctx([D.CtxVar (NONE,"\\Gamma_{" ^ Int.toString(!index)^"}")],fl)) end
                 | gen_out(D.Mult(con,D.Ctx(vl,fl),rest)) =
                 let val () = () in index := !index + 1;
-                D.Mult(con,D.Ctx([D.CtxVar ("\\Gamma_{" ^ Int.toString(!index)^"}")],fl),gen_out rest) end
+                D.Mult(con,D.Ctx([D.CtxVar (NONE,"\\Gamma_{" ^ Int.toString(!index)^"}")],fl),gen_out rest) end
         in
             D.Seq(gen_out a, c, gen_out b)
         end
@@ -83,7 +83,7 @@ struct
 
     
 
-    fun ctx_var_to_fresh(D.CtxVar(x)) = D.CtxVar(string_to_fresh(x)) before (index := !index + 1)
+    fun ctx_var_to_fresh(D.CtxVar(a,x)) = D.CtxVar(a,string_to_fresh(x)) before (index := !index + 1)
 
     fun ctx_to_fresh(D.Ctx(ctx_vars,forms)) = D.Ctx(List.map ctx_var_to_fresh ctx_vars,forms)
 
@@ -95,7 +95,7 @@ struct
 
     val update_string = fresh
 
-    fun update_ctx_var (Dat.CtxVar(x)) = Dat.CtxVar(update_string(x))
+    fun update_ctx_var (Dat.CtxVar(a,x)) = Dat.CtxVar(a,update_string(x))
 
     fun update_form (Dat.Atom(x)) = Dat.Atom(x)
         | update_form (Dat.AtomVar(x)) = Dat.AtomVar(update_string(x))
@@ -164,12 +164,22 @@ struct
             val constraints = cn1@cn2
             (*val _ = last1 := dvt1*)
             (*val _ = last2 := dvt2*)
-            val t1_vars = List.map (fn (D.CtxVar(x))=>x) (get_ctx_vars_der_tree(dvt1)@get_ctx_vars_from_constraints(cn1))
-            val t2_vars = List.map (fn (D.CtxVar(x))=>x) (get_ctx_vars_der_tree(dvt2)@get_ctx_vars_from_constraints(cn2))
+
+
+            (* TODO  *)
+
+
+            val t1_vars = List.map (fn (D.CtxVar(a,x))=>x) (get_ctx_vars_der_tree(dvt1)@get_ctx_vars_from_constraints(cn1))
+            val t2_vars = List.map (fn (D.CtxVar(a,x))=>x) (get_ctx_vars_der_tree(dvt2)@get_ctx_vars_from_constraints(cn2))
             val t1_vars = Set.listItems(Set.addList(Set.empty,t1_vars))
             val t2_vars = Set.listItems(Set.addList(Set.empty,t2_vars))
-            val t1_vars = List.map (fn x => D.CtxVar(x)) t1_vars
-            val t2_vars = List.map (fn x => D.CtxVar(x)) t2_vars
+
+
+            (* TODO  *)
+
+
+            val t1_vars = List.map (fn x => D.CtxVar(NONE,x)) t1_vars
+            val t2_vars = List.map (fn x => D.CtxVar(NONE,x)) t2_vars
             (* val _ = print_seq_list(t1_prems)
             val _ = print_seq_list(t2_prems)
             val _ = print ("\n\n\n") *)

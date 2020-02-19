@@ -57,9 +57,11 @@ structure datatypesImpl : DATATYPES = struct
         | formL_toString (x::l) = form_toString(x) ^ ", " ^ formL_toString(l)
 
 
-    datatype ctx_var = CtxVar of string
-    fun ctx_var_toString (CtxVar(s)) = s
-    fun ctx_var_eq (CtxVar(a), CtxVar(b)) = a=b
+    datatype ctx_var = CtxVar of conn option * string
+    fun ctx_var_toString (CtxVar(NONE, s)) = s
+        | ctx_var_toString (CtxVar(SOME(c), s)) = conn_toString(c) ^ " " ^ s
+    fun ctx_var_eq (CtxVar(NONE,a), CtxVar(NONE,b)) = a=b
+        | ctx_var_eq (CtxVar(SOME(c1),a), CtxVar(SOME(c2),b)) = a=b andalso conn_eq (c1, c2)
     fun ctx_varL_toString (nil) = ""
         | ctx_varL_toString ([x]) = ctx_var_toString(x)
         | ctx_varL_toString (x::l) = ctx_var_toString(x) ^ ", " ^ ctx_varL_toString (l)
@@ -120,7 +122,7 @@ structure datatypesImpl : DATATYPES = struct
         | sub_prefix_eq (CTXs(a,_), CTXs(b,_)) = ctx_var_eq(a,b)
         | sub_prefix_eq (_, _) = false
 
-    datatype rule_name = NoRule | RuleName of string
+    type rule_name = string option
     datatype der_tree = DerTree of string * seq * rule_name * der_tree list
 
 end

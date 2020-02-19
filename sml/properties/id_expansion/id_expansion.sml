@@ -51,7 +51,7 @@ struct
 
             fun replace_forms(Dat.Seq(a,con,b)) = Dat.Seq(replace_forms'(a),con,replace_forms'(b))
 
-            val base = Dat.DerTree("0",replace_forms(init_conc),Dat.NoRule,[])
+            val base = Dat.DerTree("0",replace_forms(init_conc),NONE,[])
 
             (* testing if init rule can be applied to base *)
 

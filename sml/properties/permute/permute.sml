@@ -11,11 +11,11 @@ struct
     fun permute(rule1, rule2, init_rule_ls, weak) =
         let
             fun get_ctx_var(D.Empty,D.Empty) =
-                [(D.CtxVar ("Gamma_" ^ Int.toString(1)),[],[])] 
+                [(D.CtxVar (NONE,"Gamma_" ^ Int.toString(1)),[],[])] 
                 | get_ctx_var(D.Single (D.Ctx (v1,_)), D.Single (D.Ctx (v2,_))) =
-                [(D.CtxVar ("Gamma_" ^ Int.toString(1)),v1,v2)] 
+                [(D.CtxVar (NONE,"Gamma_" ^ Int.toString(1)),v1,v2)] 
                 | get_ctx_var(D.Mult (_, D.Ctx(v1,_), r1), D.Mult (_, D.Ctx(v2,_), r2)) =
-                (D.CtxVar ("Gamma_" ^ Int.toString(1)),v1,v2) :: get_ctx_var(r1, r2) 
+                (D.CtxVar (NONE,"Gamma_" ^ Int.toString(1)),v1,v2) :: get_ctx_var(r1, r2) 
                 | get_ctx_var(_,_) = raise Fail "getting constraint from sequents with a different number of contexts"
 
 
@@ -103,7 +103,7 @@ struct
 
             val bases = (create_base(rule1, rule2))
             (* val _ = print("\n ________base : || " ^ (Dat.seq_toString(List.hd(bases))) ^ " || ___________\n") *)
-            val bases_pairs = List.map (fn conc => (D.DerTree("0",Ut.seq_to_fresh(conc),D.NoRule,[]),D.DerTree("0",Ut.seq_to_fresh(conc),D.NoRule,[]))) bases
+            val bases_pairs = List.map (fn conc => (D.DerTree("0",Ut.seq_to_fresh(conc),NONE,[]),D.DerTree("0",Ut.seq_to_fresh(conc),NONE,[]))) bases
             (* val _ = print ("\n________ number of bases : "^ (Int.toString(List.length(bases_pairs))) ^"_______\n") *)
             val rule1' = rule1
             val rule2' = rule2

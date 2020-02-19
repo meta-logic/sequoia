@@ -18,7 +18,7 @@ struct
             x2
         end
 
-    fun ctx_var_to_fresh(Dat.CtxVar(x)) = Dat.CtxVar(string_to_fresh(x))
+    fun ctx_var_to_fresh(Dat.CtxVar(a,x)) = Dat.CtxVar(a,string_to_fresh(x))
 
 
 	(*given 2 sequents, check if they are equivalent*)
@@ -112,7 +112,10 @@ struct
 			val vars_list = t1_vars @ t2_vars
 			val line1 = Int.toString(cons_len)^" "^Int.toString(var_num)^" "^Int.toString(t1_var_num)^"\n"
 			val matrix = cons_to_matrix (new_cons,vars_list)
-			val line2 = row_list_to_string(List.map (fn Dat.CtxVar(x) => x) vars_list)
+
+	(* TODO:  a not empty*)
+
+			val line2 = row_list_to_string(List.map (fn Dat.CtxVar(a, x) => x) vars_list)
 			val _ = writeFile "check" (line1^line2^matrix)
 			val result = C.main_check("check")
 			val _ = OS.FileSys.remove("check")
@@ -124,14 +127,14 @@ struct
 
 	fun pair_append ( (L1,L2),(L1',L2')) = (L1@ L1', L2 @ L2') 
 
-	fun fresh_CtxVar () = ctx_var_to_fresh(Dat.CtxVar("e"))
+	fun fresh_CtxVar () = ctx_var_to_fresh(Dat.CtxVar(NONE,"e"))
 	
   
 	(* TODO:  a not empty*)
 	fun extract_constraints'' (Dat.Ctx (a,_), Dat.Ctx (b,_),wk) = 
 		(case (wk) of
-		   (true) => let val A = fresh_CtxVar() in ((Dat.CtxVar("eq"),A::a,b),SOME A) end
-		 | (_) => ((Dat.CtxVar("eq"),a,b), NONE))
+		   (true) => let val A = fresh_CtxVar() in ((Dat.CtxVar(NONE,"eq"),A::a,b),SOME A) end
+		 | (_) => ((Dat.CtxVar(NONE,"eq"),a,b), NONE))
 
 
 	fun extract_constraints' (Dat.Empty,Dat.Empty,_) : (constraint list * Dat.ctx_var option list) = ([],[])
@@ -166,10 +169,10 @@ struct
 	(* returns : (tree,constraint,new_vars) list *)
 	fun set_leaves (assumed_leaves, tree, weak) = 
 		(case tree of
-		   Dat.DerTree (_,seq,Dat.NoRule,[]) => 
+		   Dat.DerTree (_,seq,NONE,[]) => 
 		   					(let
 								val possible_premises = List.filter (fn (_,y) => seq_equiv_wk (y,seq,weak)) assumed_leaves
-								val options = List.map (fn (name,seq2) => (Dat.DerTree(name,seq,Dat.NoRule,[]),extract_constraints_wk(seq2,seq,weak))) possible_premises
+								val options = List.map (fn (name,seq2) => (Dat.DerTree(name,seq,NONE,[]),extract_constraints_wk(seq2,seq,weak))) possible_premises
 							in 
 								options
 							end)
