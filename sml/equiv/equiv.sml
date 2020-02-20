@@ -112,10 +112,9 @@ struct
 			val vars_list = t1_vars @ t2_vars
 			val line1 = Int.toString(cons_len)^" "^Int.toString(var_num)^" "^Int.toString(t1_var_num)^"\n"
 			val matrix = cons_to_matrix (new_cons,vars_list)
-			val line2 = row_list_to_string(List.map (fn Dat.CtxVar(x) => x) vars_list)
-			val _ = writeFile "check" (line1^line2^matrix)
-			val result = C.main_check("check")
-			val _ = OS.FileSys.remove("check")
+			val line2 = row_list_to_string(List.map (fn Dat.CtxVar( x) => x) vars_list)
+			val final_str = ref (line1^line2^matrix)
+			val result = C.main_check(final_str)
 		in
 			result
 		end
