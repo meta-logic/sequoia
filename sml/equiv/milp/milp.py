@@ -1,16 +1,13 @@
 import sys
 import os
 
-if len(sys.argv) < 2:
-    print ("usage: python %s <file> <logfile(optional)>" %sys.argv[0])
-    sys.exit()
-
 nl = open(os.devnull,'w')
 temp = sys.stdout
 temp2 = sys.stderr
 
 sys.stdout = nl 
 sys.stderr = nl
+
 
 
 from mip.model import *
@@ -20,16 +17,25 @@ from mip.constants import *
 
 
 
-file = sys.argv[1]
 
-f = open(file,"r")
 
-log = "log.txt"
-if len(sys.argv)==3:
-    log = sys.argv[2]
-w = open(log,"a")
+f = sys.stdin
+if (len(sys.argv)>=3):
+	file = sys.argv[2]
+	f = open(file,"r")	
+
+w = nl
+if len(sys.argv)>=2:
+	log = sys.argv[1]
+	w = open(log,"a")
+
 
 w.write("_________________________________________________\n")
+
+
+
+
+	
 
 row_num, var_num, t1_num = list(map(int,f.readline().split(" ")))
 
@@ -83,7 +89,7 @@ status = m.optimize()
 
 sys.stdout = temp
 sys.stderr = temp2
-nl.close()
+
 
 solved = (status == OptimizationStatus.OPTIMAL) or (status == OptimizationStatus.FEASIBLE)
 
@@ -94,3 +100,4 @@ if (solved):
 	for i in range(len(unifier)):
 		w.write(" ".join(map(str,unifier[i])) +"\n")
 w.close()
+nl.close()
