@@ -173,6 +173,7 @@ structure unifyImpl : UNIFICATION = struct
                         )
 
             fun context_conn_check (_, []) = true
+                | context_conn_check (DAT.CtxVar(NONE,cv), fl) = true
                 | context_conn_check (DAT.CtxVar(SOME(c1),cv), DAT.Form(c2, sfl) ::fl) = 
                     DAT.conn_eq(c1,c2) andalso context_conn_check(DAT.CtxVar(SOME(c1),cv),fl)
                 | context_conn_check (_, _) = false
