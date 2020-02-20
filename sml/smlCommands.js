@@ -7,10 +7,10 @@ function smlInvoke(sml_command, res) {
     +"open datatypesImpl;\n"
     +sml_command
     +"OS.Process.exit(OS.Process.success);\n"
+    var answer = '';
     var processRef = cmd2.spawn("sml",[],{stdio: ['pipe' , 'inherit' , 'ignore' , 'pipe' ] })
-    processRef.stdio[3].on('data' , (data) => {
+    processRef.stdio[3].on('end' , () => {
         try {
-            var answer = data.toString()
             try {
                 return res.status(200).json({
                     status: 'success',
@@ -23,6 +23,7 @@ function smlInvoke(sml_command, res) {
             console.error(err)
         }
     })
+    processRef.stdio[3].on('data' , (data) => {answer += data.toString()})
     processRef.stdin.write(smlTerminalInput)
 }
 
