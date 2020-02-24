@@ -14,6 +14,7 @@ function createRule (req, res) {
     rule.sml_conc = req.body.parsed_conc
     rule.calculus = req.body.calculus
     rule.connective = req.body.connective
+    rule.type = req.body.type
     rule.side = req.body.side
     rule.save(function (err) {
         if (err) {
@@ -71,8 +72,8 @@ function updateRule (req, res) {
             sml_conc : req.body.parsed_conc,
             calculus : req.body.calculus,
             connective : req.body.connective,
-            type : req.body.type,
-            side : req.body.side
+            side : req.body.side,
+            type : req.body.type
         }, { new : true}, 
         function (err, rule) {
             if (err || rule == null) {

@@ -148,7 +148,7 @@ structure unifyImpl : UNIFICATION = struct
             
 
             fun post_ctx (sigma) = List.concat(List.map(fn DAT.CTXs(_, DAT.Ctx(cv, _)) => cv 
-                                                        | _ => raise Fail "post_ctx fun in Unify_ctx") sigma)
+                                    | _ => raise Fail "post_ctx fun in Unify_ctx") sigma)
 
             fun try_permutations (chosen_l1, chosen_l2) =
                 if List.length(chosen_l1) = 0 andalso List.length(chosen_l2) = 0 then [nil] else
@@ -183,13 +183,12 @@ structure unifyImpl : UNIFICATION = struct
                                                 if List.length(vl1) = 0 then SOME(DAT.CTXs(g, DAT.Ctx([], p)))
                                                 else SOME(DAT.CTXs(g, DAT.Ctx([update_ctx_var(g)], p)))
                                         else NONE
-                                    )(ListPair.zip(pf, vl2))))
+                                )(ListPair.zip(pf, vl2))))
                             )part
                     in vl_sigmas end
             
             fun filter_subs (subs) = (List.filter (fn DAT.CTXs(cx, DAT.Ctx(cxs, _)) => 
-                            (not (List.length(cxs) = 1 andalso DAT.ctx_var_eq (List.hd cxs, cx)))
-                                                            | _ => true ) subs)
+                (not (List.length(cxs) = 1 andalso DAT.ctx_var_eq (List.hd cxs, cx))) | _ => true ) subs)
 
             (* form_list1, variable_list1, form_list2, var_list2 ??? *)
             fun try_partitions (fl1, vl1, fl2, vl2) =
@@ -228,7 +227,7 @@ structure unifyImpl : UNIFICATION = struct
             fun unify_specific_k (vl1, fl1, vl2, fl2, i) =
                 let val k_fl1 = H.chooseK(fl1, i, DAT.form_eq)
                     val k_fl2 = H.chooseK(fl2, i, DAT.form_eq)
-                    val everyMatchOfK  = 
+                    val everyMatchOfK = 
                         List.concat(
                             List.map(fn (chosen_l2, left_l2) => 
                                 List.concat(
@@ -244,9 +243,7 @@ structure unifyImpl : UNIFICATION = struct
                                         end
                                     )k_fl1)
                             )k_fl2)
-                in
-                    everyMatchOfK
-                end
+                in everyMatchOfK end
 
             fun Unify_ctx_AUX (DAT.Ctx([], fl1), DAT.Ctx([], fl2)) = 
                     let val subs = try_permutations (fl1, fl2)
@@ -262,8 +259,7 @@ structure unifyImpl : UNIFICATION = struct
                 | Unify_ctx_AUX (DAT.Ctx(vl1, fl1), DAT.Ctx(vl2, fl2)) = 
                     let val minforms = Int.min(List.length fl1, List.length fl2)
                         val sc = List.concat(List.tabulate(minforms+1, fn i => 
-                                            unify_specific_k(vl1, fl1, vl2, fl2, i)))
-                    in SOME(sc) end
+                        unify_specific_k(vl1, fl1, vl2, fl2, i))) in SOME(sc) end
             val (fl1,fl2) = H.remove_similar (fl1, fl2, DAT.form_eq)
 
             val base_subs = List.map (fn (var) => DAT.CTXs(var,DAT.Ctx([update_ctx_var(var)],[]))) (vl1@vl2)
