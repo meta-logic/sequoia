@@ -57,7 +57,7 @@ GENFORM
 
 // Symbols
 CTX_VAR 
-  = conn:CONN _ ctx_var:CtxVar { return 'CtxVar (' + conn + ',"' + ctx_var + '")' }
+  = conn:CONN _ ctx_var:CtxVar { return 'CtxVar (SOME(' + conn + '),"' + ctx_var + '")' }
   / ctx_var:CtxVar { return 'CtxVar (NONE,"' + ctx_var + '")' }
 FORM_VAR = form_var:FormVar { return 'FormVar ("' + form_var + '")' }
 ATOM_VAR = atom_var:AtomVar { return 'AtomVar ("' + atom_var + '")' }
