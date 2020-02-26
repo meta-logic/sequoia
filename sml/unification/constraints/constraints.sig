@@ -7,5 +7,5 @@ sig
     val change_index : int -> unit
     val fresh : string -> string
 
-    val get_constraints: Dat.ctx_var list * Dat.ctx_var list -> constraint list
+    val get_constraints: Dat.ctx_var list * Dat.ctx_var list -> constraint list * Dat.sub list
 end
