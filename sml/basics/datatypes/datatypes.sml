@@ -62,6 +62,7 @@ structure datatypesImpl : DATATYPES = struct
         | ctx_var_toString (CtxVar(SOME(c), s)) = conn_toString(c) ^ " " ^ s
     fun ctx_var_eq (CtxVar(NONE,a), CtxVar(NONE,b)) = a=b
         | ctx_var_eq (CtxVar(SOME(c1),a), CtxVar(SOME(c2),b)) = a=b andalso conn_eq (c1, c2)
+        | ctx_var_eq (_,_) = false
     fun ctx_varL_toString (nil) = ""
         | ctx_varL_toString ([x]) = ctx_var_toString(x)
         | ctx_varL_toString (x::l) = ctx_var_toString(x) ^ ", " ^ ctx_varL_toString (l)

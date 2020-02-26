@@ -3,6 +3,7 @@ structure unifyImpl : UNIFICATION = struct
     structure DAT = datatypesImpl
     structure Dat = DAT
     structure APP = applyunifierImpl
+    structure C = Constraints
 
 
     type sub = DAT.sub
@@ -14,22 +15,11 @@ structure unifyImpl : UNIFICATION = struct
 
     val init_fresh = ref 100;
 
-    val var_index = ref 1;
+    val change_index = C.change_index
 
-    fun change_index (x:int): unit = ignore (var_index := x)
+    val get_index = C.get_index
 
-    fun get_index ():int = !var_index
-
-    fun fresh'(x:string):string = (x ^"^{"^ (Int.toString(!var_index)) ^"}") before (var_index := !var_index + 1)
-
-    val hat = #"^"
-
-    fun remove_hat' (nil) = nil
-        |remove_hat' (x::L) = (case (x=hat) of true => [] | false => x::remove_hat'(L))
-
-    fun remove_hat (x) = String.implode(remove_hat'(String.explode(x)))
-    (* nuke version *)
-    fun fresh(x:string):string = fresh'(remove_hat(x))
+    val fresh = C.fresh
 
 
     (*TODO: remove duplicate or remove both*)
@@ -211,8 +201,9 @@ structure unifyImpl : UNIFICATION = struct
                         List.concat(
                             List.map(fn s1 => 
                                 List.map(fn s2 => 
-                                    let val (subs, (fresh_g, set1, set2)) = 
-                                        (filter_subs(s1 @ s2), get_constraint(post_ctx s1, post_ctx s2))
+                                    let val (s1,s2) = (filter_subs s1, filter_subs s2)
+                                        val (subs, (fresh_g, set1, set2)) = 
+                                        (s1@s2, get_constraint(post_ctx s1, post_ctx s2))
                                     in 
                                         (case (List.length(set1),List.length(set2)) of
                                             (0,0) => (subs, [])

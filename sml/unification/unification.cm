@@ -1,8 +1,11 @@
 Group
   signature UNIFICATION
   structure unifyImpl
+  signature CONSTRAINTS
+  structure Constraints
 is
   ../basics/basics.cm
   ../applyunifier/applyunifier.cm
+  constraints/constraints.cm
   unification.sig
   unification.sml
