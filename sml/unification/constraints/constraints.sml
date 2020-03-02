@@ -1,4 +1,4 @@
-structure CtxVarKey : ORD_KEY = 
+structure CtxVarConKey : ORD_KEY = 
 struct
     structure D = datatypesImpl
     type ord_key = D.ctx_var
@@ -10,12 +10,31 @@ struct
          | _ => GREATER )
 end
 
+structure CtxVarKey : ORD_KEY = 
+struct
+    structure D = datatypesImpl
+    type ord_key = D.ctx_var
+    fun compare_con (D.CtxVar(a,_),D.CtxVar(b,_)) = 
+        (case (a,b) of
+           (NONE,NONE) => EQUAL
+         | (SOME (D.Con a'),SOME (D.Con b')) => String.compare(a',b')
+         | (NONE, SOME _) => LESS
+         | _ => GREATER )
+    fun compare (a as D.CtxVar(_,na),b as D.CtxVar(_,nb)) = 
+        (case compare_con(a,b) of
+           LESS => LESS
+         | GREATER => GREATER
+         | _ => String.compare(na,nb))
+end
+
 structure Constraints =
 struct
     structure Dat = datatypesImpl
     structure F = FreshVar
     structure H = helpersImpl
-    structure Map = BinaryMapFn (CtxVarKey)
+    structure Map = BinaryMapFn (CtxVarConKey)
+    structure Set = SplaySetFn(CtxVarKey)
+    structure App =applyunifierImpl
 
 
     type constraint = (Dat.ctx_var * Dat.ctx_var list * Dat.ctx_var list)
@@ -145,9 +164,16 @@ struct
 
     fun fix_constraint ((var,l1,l2):constraint') = (var,fix_names l1, fix_names l2)
 
+    fun con_or_sub base_vars (con as (var,l1,l2),(cons,subs)) = 
+        (case Set.member(base_vars,var) of
+           false => (con::cons,subs)
+         | true => if List.length(l1)=1 then (cons,(App.UnifierComposition(subs,[Dat.CTXs(var,Dat.Ctx(l2,[]))]))) 
+                                    else (con::cons,subs))
+
     fun get_constraints (var_l1,var_l2) =
         let
             val (var_l1',var_l2') = remove_common(var_l1 , var_l2)
+            val base_vars = List.foldl Set.add' Set.empty (var_l1'@var_l2')
             val (l1_comp,l1_cons) = initial_set(var_l1')
             val (l2_comp,l2_cons) = initial_set(var_l2')
             val l1 = List.map (fn (a,_,_) => a) (Map.listItems l1_comp)
@@ -158,7 +184,10 @@ struct
             val var_split_cons = List.map fix_constraint (l2_cons_refs@gen_cons_refs)
             val comp_cons = (Map.listItems l1_cons)@ (Map.listItems l2_cons)
             val final_cons = comp_cons@var_split_cons
-            val all_empty_subs = l2_empty_subs@empty_subs
+            val extra_subs = []
+            val f = con_or_sub base_vars
+            val (final_cons,extra_subs) = List.foldl f ([],[]) final_cons
+            val all_empty_subs = extra_subs@(l2_empty_subs@empty_subs)
         in
             (final_cons,all_empty_subs)
         end 
@@ -180,6 +209,6 @@ struct
             val l2 = [f c1,f c2]
         in
             (l1,l2,get_constraints(l1,l2))
-        end
+        endz
 
 end

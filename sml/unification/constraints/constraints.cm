@@ -3,6 +3,7 @@ Group
     structure Constraints
 is
     ../../basics/basics.cm
+    ../../applyunifier/applyunifier.cm
     ../fresh_var/fresh_var.sml
     constraints.sig
     constraints.sml

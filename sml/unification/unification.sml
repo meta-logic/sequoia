@@ -194,6 +194,8 @@ structure unifyImpl : UNIFICATION = struct
             fun try_partitions (fl1, vl1, fl2, vl2) =
                 let val sigma1 = part (vl1, fl1, vl2)
                     val sigma2 = part (vl2, fl2, vl1)
+                    
+                    
                 in
                     if List.length(sigma1) = 0 then [] else
                     if List.length(sigma2) = 0 then [] else
@@ -201,19 +203,13 @@ structure unifyImpl : UNIFICATION = struct
                         List.concat(
                             List.map(fn s1 => 
                                 List.map(fn s2 => 
-                                    let val (s1,s2) = (filter_subs s1, filter_subs s2)
-                                        val (subs, (fresh_g, set1, set2)) = 
-                                        (s1@s2, get_constraint(post_ctx s1, post_ctx s2))
+                                    let val ( (cons,new_subs)) = 
+                                        ( C.get_constraints(post_ctx s1, post_ctx s2))
+                                        val (s1,s2) = (filter_subs s1, filter_subs s2)
+                                        val subs = s1@s2
+                                        val new_subs' = APP.UnifierComposition(subs,new_subs)
                                     in 
-                                        (case (List.length(set1),List.length(set2)) of
-                                            (0,0) => (subs, [])
-                                            | (1,_) => (
-                                        APP.UnifierComposition(subs,[DAT.CTXs(List.hd(set1),DAT.Ctx(set2,nil))])
-                                        ,[])
-                                            | (_,1) => (
-                                        APP.UnifierComposition(subs,[DAT.CTXs(List.hd(set2),DAT.Ctx(set1,nil))])
-                                        ,[])
-                                            | _ => (subs, [(fresh_g, set1, set2)]))
+                                        (new_subs',cons) 
                                     end
                                 )sigma1
                             )sigma2)
@@ -275,14 +271,14 @@ structure unifyImpl : UNIFICATION = struct
             fun sub_toString (DAT.CTXs(a, b)) = (DAT.ctx_var_toString(a) ^"-->"^DAT.ctx_toString(b)^"_______\n")
                 |sub_toString (_) = "_______________\n"
             
-            (* val _ = List.app (fn y => (List.app (fn x => ignore (print(sub_toString x))) y) before (print "\n\n||||||||||||||||\n\n")) (List.map #1 (Option.valOf unification_result)) handle (Option ) => ()
+            (* val _ = List.app (fn y => (List.app (fn x => ignore (print(sub_toString x))) y) before (print "\n\n||||||||||||||||\n\n")) (List.map #1 (Option.valOf unification_result)) handle (Option ) => () *)
                 
 
-            val _ = print ("//////////////////\n\n") *)
+            (* val _ = print ("//////////////////\n\n") *)
 
             val update_vars = (fn sub => APP.UnifierComposition(sub,base_subs))
 
-            fun update_var_list l = List.map (fn (vars,_) => List.hd(vars)) (APP.apply_ctx_varL_Unifier(l,base_subs))
+            fun update_var_list l = List.concat (List.map (fn (vars,_) => vars) (APP.apply_ctx_varL_Unifier(l,base_subs)))
             fun update_con_vars (name,l1,l2) = (name, update_var_list l1, update_var_list l2)
             fun update_cons_vars cons = List.map update_con_vars cons
 
