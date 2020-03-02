@@ -46,150 +46,99 @@ struct
 
     fun fresh_ctx_var (Dat.CtxVar(a,name)) = Dat.CtxVar(a,fresh(name))
 
+    val no_con = Dat.CtxVar (NONE,"")
+
     fun my_insert (var,map) = 
         let
             val res = Map.find(map,var)
         in
             (case res of
-               SOME (a,b,c) => Map.insert (map,var,(a,b,var::c))
+               SOME (a,b,c) => Map.insert (map,var,(a,var::b,c))
              | NONE => let val new = fresh_ctx_var(var) in 
-             Map.insert(map,var,(new,[new],[var])) end)
+             Map.insert(map,var,(new,[var],[])) end)
         end
     
     fun initial_set' (var_list) = List.foldr my_insert Map.empty var_list
 
-    fun handle_rename (var,a,b) = 
-        (case b of
-           [old_var] => ( (old_var,[old_var],[old_var]))
-         | _ => ((var,a,b)))
-
     (* combines several variables with the same connective *)
-    (* generates a new list with the variables combined, *)
-    (* and a constraint list mapping new variables to old ones *)
-    fun initial_set (var_list:Dat.ctx_var list): (constraint' Map.map * constraint Map.map) = 
+    fun initial_set (var_list:Dat.ctx_var list): (constraint Map.map) = 
         let
             val set = initial_set'(var_list)
-            val set = Map.map (handle_rename) set
-            val constraints = Map.filter (fn (_,_,b) => List.length(b)<>1) set
-            val updated = Map.map (fn (a,b,_) => (a,[ref a],[])) set
-            (* filter renames *)
         in
-            (updated,constraints)
+            set
         end
         
     fun remove_common(var_l1,var_l2) = H.remove_similar(var_l1,var_l2,Dat.ctx_var_eq)
 
     fun empty_sub(var) = Dat.CTXs(var,Dat.Ctx([],[]))
 
-    fun create_empty_subs (var,comp) = 
-        (let
-            val (comp',(_,_,c)) = Map.remove(comp,var)
+    fun create_empty_subs (_,l1,_) = List.map empty_sub l1
 
-        in
-            (List.map empty_sub c,comp')
-        end)
-        handle (LibBase.NotFound) => ([empty_sub var],comp)
-
-    fun rename_vars (l) = (List.app (fn x => x := fresh_ctx_var(!x)) l;l)
-
-    fun rename_cons_con ((var,l1,l2),comp: constraint Map.map) = 
-        (case List.length(l2) of
-           1 => (NONE,[],comp)
-         | 2 => (SOME (var,l1,rename_vars l2),[],comp)
-         | 0 => let val (subs,comp') = create_empty_subs(var,comp) in (NONE,subs,comp') end
-         | _ => (SOME (var,l1,l2),[],comp))
-    fun rename_cons_gen ((var,l1,l2),comp) = 
-        (case List.length(l2) of
-           1 => (case Dat.ctx_var_eq(var,!(List.hd l2)) of true => (NONE,[],comp)
-                                 | false => (SOME (var,l1,l2),[],comp))
-         | 2 => (SOME (var,l1,l2),[],comp)
-         | 0 => let val (subs,comp') = create_empty_subs(var,comp) in (NONE,subs,comp') end
-         | _ => (SOME (var,l1,l2),[],comp))
-
-    fun rename_cons (cons as (var,l1,l2),comp) = 
-        (case var of
-           Dat.CtxVar(NONE,_) => rename_cons_gen(cons,comp)
-         | _ => rename_cons_con(cons,comp))
-
-    (*NONE maps to everything, SOME(a) *)
-    fun gen_constraints (var,(map,constraints,subs,comp)) =
+    fun split((var,l1,_),other_map) = 
         (case var of
            Dat.CtxVar(NONE,_) => 
-                (let
-                    val new_map = Map.map (fn (a,b,c) => (a,b,(ref a)::c)) map
-                    val equiv_vars = List.map (fn (_,_,c) => List.hd c) (Map.listItems new_map)
-                    val gen_cons = (var,[ref var],equiv_vars)
-                    val (constraints,subs,comp) = (case rename_cons (gen_cons,comp) of
-                       (NONE,new_subs,new_comp) => (constraints,new_subs@subs,new_comp)
-                     | (SOME a,new_subs,new_comp) => (a::constraints,new_subs@subs,new_comp))
-                in
-                    (new_map,constraints,subs,comp)
-                end )
-         | Dat.CtxVar(SOME _,_) => 
-            (let
-                val right_side = []
-                val new_cons = []
-                (* same connective, add var to both, add constraint *)
-                val (right_side,new_cons,map) = (case Map.find (map,var) of
-                    (* no match *)
-                   NONE => (right_side,new_cons,map)
-                   (* found var *)
-                 | SOME (a,b,c) => let val (var',a') = (ref var,ref a)
-                 in (var'::right_side,(var,[var'],[a'])::new_cons,Map.insert (map,a,(a,b,a'::c))) end)
-                (* find no connective, add var to both, no constraint *)
-                val (right_side,map) = (case Map.find(map,Dat.CtxVar(NONE,"")) of
-                    (* no generic *)
-                   NONE => (right_side,map)
-                 | SOME (a,b,c) => (let val var' = ref var
-                 in (var'::right_side,Map.insert(map,a,(a,b,var'::c))) end))
-                val var_cons = (var,[ref var], right_side)
-                val (new_cons,subs',comp') = (case rename_cons (var_cons,comp) of
-                   (NONE,new_subs,new_comp) => (new_cons,new_subs,new_comp)
-                 | (SOME a,new_subs,new_comp) => (a::new_cons,new_subs,new_comp))
+            let
+                val right_side = List.tabulate(Map.numItems(other_map),fn _ => fresh_ctx_var(var))
             in
-                (map,(new_cons)@constraints,subs'@subs,comp')
-            end))
+                (var,l1,right_side)
+            end
+         | Dat.CtxVar(SOME _,_) => 
+            let
+                val right_side = []
+                val right_side = (case Map.find(other_map,var) of
+                   SOME _ => fresh_ctx_var(var)::right_side
+                 | NONE => right_side)
+                val right_side = (case Map.find(other_map,no_con) of
+                   SOME _ => fresh_ctx_var(var)::right_side
+                 | NONE => right_side)
+            in
+                (var,l1,right_side)
+            end)
+
+    fun extract ((a,b,c),(right_side,to_insert)) = 
+    (List.hd(c)::right_side,(a,b,List.tl(c))::to_insert)
+    
+    fun ins (cons as (var,_,_),mp) = Map.insert(mp,var,cons)
+
+    fun match'([],other_map,res) = res
+        | match'((var,l1,_)::rest, other_map,res) = 
+            let
+                val keys = [var,no_con]
+                val items = (case var of
+                   Dat.CtxVar(NONE,_) => Map.listItems(other_map)
+                 | Dat.CtxVar(SOME _,_) => List.mapPartial (fn key => Map.find(other_map,key)) keys)
+                val (right_side,to_insert) = List.foldl extract ([],[]) items
+                val new_map = List.foldl ins other_map to_insert
+                val res = (case List.length(right_side) of
+                   0 => res
+                 | _ => (var,l1,right_side)::res)
+            in
+                match'(rest,new_map,res)
+            end
+    
+    fun match(l1,l2) = match'(Map.listItems l1,l2,[])
+
 
     
-    fun rename_cons_list(cons,(cons_rest,subs,comp))=
-        let
-            val (new_cons,new_subs,new_comp) = rename_cons(cons,comp)
-            val new_cons_rest = (case new_cons of
-               NONE => cons_rest
-             | SOME a => a :: cons_rest)
-        in
-            (new_cons_rest,new_subs@subs,new_comp)
-        end
-    fun fix_names (l) = List.map op! l
-
-    fun fix_constraint ((var,l1,l2):constraint') = (var,fix_names l1, fix_names l2)
-
-    fun con_or_sub base_vars (con as (var,l1,l2),(cons,subs)) = 
-        (case Set.member(base_vars,var) of
-           false => (con::cons,subs)
-         | true => if List.length(l1)=1 then (cons,(App.UnifierComposition(subs,[Dat.CTXs(var,Dat.Ctx(l2,[]))]))) 
-                                    else (con::cons,subs))
-
     fun get_constraints (var_l1,var_l2) =
         let
             val (var_l1',var_l2') = remove_common(var_l1 , var_l2)
             val base_vars = List.foldl Set.add' Set.empty (var_l1'@var_l2')
-            val (l1_comp,l1_cons) = initial_set(var_l1')
-            val (l2_comp,l2_cons) = initial_set(var_l2')
-            val l1 = List.map (fn (a,_,_) => a) (Map.listItems l1_comp)
-            val (l2_comp,gen_cons_refs,empty_subs,l1_cons) = List.foldl (gen_constraints) (l2_comp,[],[],l1_cons) l1
-            val l2_pre_rename = Map.listItems l2_comp
-            val fold = List.foldl rename_cons_list ([],[],l2_cons)
-            val (l2_cons_refs,l2_empty_subs,l2_cons) = fold l2_pre_rename
-            val var_split_cons = List.map fix_constraint (l2_cons_refs@gen_cons_refs)
-            val comp_cons = (Map.listItems l1_cons)@ (Map.listItems l2_cons)
-            val final_cons = comp_cons@var_split_cons
-            val extra_subs = []
-            val f = con_or_sub base_vars
-            val (final_cons,extra_subs) = List.foldl f ([],[]) final_cons
-            val all_empty_subs = extra_subs@(l2_empty_subs@empty_subs)
+            val (l1_comp) = initial_set(var_l1')
+            val (l2_comp) = initial_set(var_l2')
+            val l1_split = Map.map (fn x => split(x,l2_comp)) l1_comp
+            val l2_split = Map.map (fn x => split(x,l1_comp)) l2_comp
+            val l1_matched = match (l1_split,l2_split)
+            val l2_matched = match (l2_split,l1_split)
+            val l1_split = Map.listItems l1_split
+            val l2_split = Map.listItems l2_split
+            val var_split = l1_split@l2_split
+            val (rejects,split_cons) = List.partition (fn (_,_,c) => List.null c) var_split
+            val final_cons = l1_matched@l2_matched@split_cons
+            val empty_subs = List.concat ( List.map create_empty_subs rejects)
+            val result = (final_cons,empty_subs)
         in
-            (final_cons,all_empty_subs)
+            result
         end 
 
     fun test() = 
@@ -209,6 +158,6 @@ struct
             val l2 = [f c1,f c2]
         in
             (l1,l2,get_constraints(l1,l2))
-        endz
+        end
 
 end
