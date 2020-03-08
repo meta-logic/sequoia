@@ -172,21 +172,22 @@ structure unifyImpl : UNIFICATION = struct
                 if List.length(fl1) = 0 andalso List.length(vl2) = 0 then [nil] else
                     let val part = H.partition_into (List.length(vl2), fl1)
                         val vl_sigmas =
-                            List.map(fn pf => List.map(fn sm => Option.valOf(sm))
-                                (List.filter(fn opt => Option.isSome(opt))
-                                    (List.map(fn (p,g) => 
-                                        if context_conn_check (g,p) then 
-                                            if List.length(p) = 0 then
-                                                if List.length(vl1) = 0 then SOME(DAT.CTXs(g, DAT.Ctx([], [])))
-                                                else SOME(DAT.CTXs(g, DAT.Ctx([g], [])))
-                                            else 
-                                                if List.length(vl1) = 0 then SOME(DAT.CTXs(g, DAT.Ctx([], p)))
-                                                else SOME(DAT.CTXs(g, DAT.Ctx([update_ctx_var(g)], p)))
-                                        else NONE
-                                )(ListPair.zip(pf, vl2))))
+                            List.map(fn pf => 
+                                List.map(fn (p,g) => 
+                                    if context_conn_check (g,p) then 
+                                        if List.length(p) = 0 then
+                                            if List.length(vl1) = 0 then SOME(DAT.CTXs(g, DAT.Ctx([], [])))
+                                            else SOME(DAT.CTXs(g, DAT.Ctx([g], [])))
+                                        else 
+                                            if List.length(vl1) = 0 then SOME(DAT.CTXs(g, DAT.Ctx([], p)))
+                                            else SOME(DAT.CTXs(g, DAT.Ctx([update_ctx_var(g)], p)))
+                                    else NONE
+                                )(ListPair.zip(pf, vl2))
                             )part
-                    in vl_sigmas end
-            
+                        val vl_return = List.map(fn some_list => List.map (Option.valOf)some_list) 
+                                            (List.filter(fn opt_list => List.all(Option.isSome)opt_list)vl_sigmas)
+                    in vl_return end
+
             fun filter_subs (subs) = (List.filter (fn DAT.CTXs(cx, DAT.Ctx(cxs, _)) => 
                 (not (List.length(cxs) = 1 andalso DAT.ctx_var_eq (List.hd cxs, cx))) | _ => true ) subs)
 
@@ -194,8 +195,6 @@ structure unifyImpl : UNIFICATION = struct
             fun try_partitions (fl1, vl1, fl2, vl2) =
                 let val sigma1 = part (vl1, fl1, vl2)
                     val sigma2 = part (vl2, fl2, vl1)
-                    
-                    
                 in
                     if List.length(sigma1) = 0 then [] else
                     if List.length(sigma2) = 0 then [] else

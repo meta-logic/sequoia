@@ -153,6 +153,7 @@
                         SOME(sigscons) => 
                             let val formulas = get_forms(conc)
                                 val new_sigscons = filter_bad_subs(sigscons,sq)
+                                (* val _ = print("[" ^ List.foldr(fn (a,b)=> "(" ^ (List.foldr(fn (x,y)=> x ^ ";" ^ y)("")a ^ ")") ^ " OR " ^ b)("")(List.map(fn (a,b) => a)(U.print_sigs_cons (SOME new_sigscons))) ^ "]") *)
                                 (* val _ = print ((Int.toString (List.length(sigscons)))^" to "^(Int.toString (List.length(new_sigscons)))^"\n") *)
                                 
                                 val next_ids = List.tabulate(List.length(premises), fn i => Int.toString(i))
