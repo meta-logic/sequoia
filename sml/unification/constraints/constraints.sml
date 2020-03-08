@@ -134,7 +134,7 @@ struct
             val l2_split = Map.listItems l2_split
             val var_split = l1_split@l2_split
             val (rejects,split_cons) = List.partition (fn (_,_,c) => List.null c) var_split
-            val final_cons = l1_matched@l2_matched@split_cons
+            val final_cons = split_cons@l1_matched@l2_matched
             val empty_subs = List.concat ( List.map create_empty_subs rejects)
             val result = (final_cons,empty_subs)
         in

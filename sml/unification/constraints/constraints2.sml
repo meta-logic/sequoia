@@ -209,6 +209,6 @@ struct
             val l2 = [f c1,f c2]
         in
             (l1,l2,get_constraints(l1,l2))
-        endz
+        end
 
 end
