@@ -3,70 +3,85 @@
   <head>
     <title>{{title}}</title>
     <link rel="stylesheet" type="text/css" href="/bower/semantic/dist/semantic.min.css">
-    <div id = "style">
-    <style> 
-       *{
-          box-sizing: border-box;
-        }
-        div.tree{
-          /*background-color: rgba(0,233,0,0.2);*/
-          display: inline-flex;
-          align-items: flex-end;
-          padding: 0px 12px;
-          font-size: 22px;
-        }
-
-        div.rule {
-          padding-left: 2px;
-          padding-bottom: 20px;
-          /*background-color: #377;*/
-          font-size: 22px;
-        }
-
-        div.rule > .MathJax_Display{
-          margin: 0;
-        }
-
-        div.sequence{
-          display: inline-block;
-          /*border: 2px solid #fff;*/
-        }
-
-        div.premises{
-          display: inline-flex;
-          align-items: flex-end;
-          justify-content: center;
-          /*background-color: #a0a;*/
-          text-align: center;
-        }
-
-        div.conclusion{
-          border-top: 1px solid #111;
-          /*background-color: #aa1;*/
-          text-align: center;
-        }
-
-        div.conclusion > .MathJax_Display{
-          margin:0;
-        }
-
-        div.leaf{
-          /*background-color: #aa1;*/
-          text-align: center;
-          padding: 0px 21px;
-          cursor: pointer;
-        }
-
-        div.leaf > .MathJax_Display{
-          margin:0;
-        }
-
-        div.item > .MathJax_Display{
-          margin:0;
-        }
-    </style>
-    </div>
   </head>
+  <div id = "style">
+    <style> 
+      ::-webkit-scrollbar {
+          width: 0px;
+          background: transparent;
+      }
+
+      #side_menu_R{
+        height: 85vh;
+      }
+
+      #rules{
+        height: 100%;
+        overflow-y: auto;
+      }
+
+      *{
+        box-sizing: border-box;
+      }
+      
+      div.tree{
+        /*background-color: rgba(0,233,0,0.2);*/
+        display: inline-flex;
+        align-items: flex-end;
+        padding: 0px 12px;
+        font-size: 22px;
+      }
+
+      div.rule {
+        padding-left: 2px;
+        padding-bottom: 20px;
+        /*background-color: #377;*/
+        font-size: 22px;
+      }
+
+      div.rule > .MathJax_Display{
+        margin: 0;
+      }
+
+      div.sequence{
+        display: inline-block;
+        /*border: 2px solid #fff;*/
+      }
+
+      div.premises{
+        display: inline-flex;
+        align-items: flex-end;
+        justify-content: center;
+        /*background-color: #a0a;*/
+        text-align: center;
+      }
+
+      div.conclusion{
+        border-top: 1px solid #111;
+        /*background-color: #aa1;*/
+        text-align: center;
+      }
+
+      div.conclusion > .MathJax_Display{
+        margin:0;
+      }
+
+      div.leaf{
+        /*background-color: #aa1;*/
+        text-align: center;
+        padding: 0px 21px;
+        cursor: pointer;
+      }
+
+      div.leaf > .MathJax_Display{
+        margin:0;
+      }
+
+      div.item > .MathJax_Display{
+        margin:0;
+      }
+    </style>
+  </div>
   <body>
     {{> navbar}}
   {{{body}}}
