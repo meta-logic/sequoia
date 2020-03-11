@@ -1,11 +1,11 @@
 
 <div id="calc_id" hidden>{{calc_id}}</div>
-<div class="ui grid">
+<div id="main_grid" class="ui grid">
   <div class="three wide column" id="left_menu" style="margin-top: 2px;visibility: hidden;">
       <div class="ui top attached huge center aligned header">Constraints:</div>
       <div class="ui attached segment" id="side_menu_L"></div>
   </div>
-  <div class="nine wide column" style="margin-top: 26px;">
+  <div id="tree_grid" class="ten wide column" style="margin-top: 26px;">
     <div id="seq" style="display: inline">
       <div class="ui input fluid">
         <input type="text" id="Sequent" placeholder="Sequent">
@@ -62,7 +62,6 @@
       </tbody>
     </table>
   </div>
-  <div class="one wide column"></div>
   <div class="three wide column">
       <div class="ui two attached buttons">
         <button id="export" class="ui disabled fluid huge icon button green" onclick="sendEmail(latex_tree[0])">
