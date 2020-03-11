@@ -1,13 +1,10 @@
 
 <div id="calc_id" hidden>{{calc_id}}</div>
 <div class="ui grid">
-  <div class="two wide column" style="margin-top: 26px;">
-      <div class="ui huge center aligned header">Constraints</div>
-      <div class="ui huge vertical menu" id="side_menu_L" style="visibility: hidden;overflow-y:auto;"></div>
+  <div class="three wide column" id="left_menu" style="margin-top: 2px;visibility: hidden;">
+      <div class="ui top attached huge center aligned header">Constraints:</div>
+      <div class="ui attached segment" id="side_menu_L"></div>
   </div>
-
-  <div class="one wide column"></div>
-
   <div class="nine wide column" style="margin-top: 26px;">
     <div id="seq" style="display: inline">
       <div class="ui input fluid">
@@ -65,11 +62,9 @@
       </tbody>
     </table>
   </div>
-
   <div class="one wide column"></div>
-
-  <div class="three wide column" style="margin-top: 26px;">
-      <div class="ui two top attached buttons">
+  <div class="three wide column">
+      <div class="ui two attached buttons">
         <button id="export" class="ui disabled fluid huge icon button green" onclick="sendEmail(latex_tree[0])">
           <i class="icon download"></i>Export to Latex
         </button>
@@ -77,11 +72,10 @@
           <i class="icon undo"></i>Undo Apply
         </button>
       </div>
-      <div class="ui huge menu" id="side_menu_R" style="padding-top: 10px;padding-bottom: 10px;">
+      <div class="ui attached huge borderless menu" id="side_menu_R" style="padding-top: 14px;">
           <div id="rules" class="ui one cards"></div>
       </div>
 </div>
-
 <div id ="modal1" class="ui special modal">
   <div class="header">Sequents Affected</div>
     <div id = "change warning" class="content">
