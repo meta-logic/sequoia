@@ -1,7 +1,18 @@
-structure StringKey:ORD_KEY =
+structure CtxVarKey : ORD_KEY = 
 struct
-    type ord_key = string
-    val compare = String.compare
+    structure D = datatypesImpl
+    type ord_key = D.ctx_var
+    fun compare_con (D.CtxVar(a,_),D.CtxVar(b,_)) = 
+        (case (a,b) of
+           (NONE,NONE) => EQUAL
+         | (SOME (D.Con a'),SOME (D.Con b')) => String.compare(a',b')
+         | (NONE, SOME _) => LESS
+         | _ => GREATER )
+    fun compare (a as D.CtxVar(_,na),b as D.CtxVar(_,nb)) = 
+        (case compare_con(a,b) of
+           LESS => LESS
+         | GREATER => GREATER
+         | _ => String.compare(na,nb))
 end
 
 structure Utilities =
@@ -14,7 +25,7 @@ struct
     structure App = applyunifierImpl
     structure U = unifyImpl
     structure E = Equivalence
-    structure Set = SplaySetFn(StringKey);
+    structure Set = SplaySetFn(CtxVarKey);
 
     val index = ref 1;
     
@@ -166,20 +177,13 @@ struct
             (*val _ = last2 := dvt2*)
 
 
-            (* TODO  *)
+            (* TODO  change this to take into account connectives*)
 
 
-            val t1_vars = List.map (fn (D.CtxVar(a,x))=>x) (get_ctx_vars_der_tree(dvt1)@get_ctx_vars_from_constraints(cn1))
-            val t2_vars = List.map (fn (D.CtxVar(a,x))=>x) (get_ctx_vars_der_tree(dvt2)@get_ctx_vars_from_constraints(cn2))
+            val t1_vars = (get_ctx_vars_der_tree(dvt1)@get_ctx_vars_from_constraints(cn1))
+            val t2_vars = (get_ctx_vars_der_tree(dvt2)@get_ctx_vars_from_constraints(cn2))
             val t1_vars = Set.listItems(Set.addList(Set.empty,t1_vars))
             val t2_vars = Set.listItems(Set.addList(Set.empty,t2_vars))
-
-
-            (* TODO  *)
-
-
-            val t1_vars = List.map (fn x => D.CtxVar(NONE,x)) t1_vars
-            val t2_vars = List.map (fn x => D.CtxVar(NONE,x)) t2_vars
             (* val _ = print_seq_list(t1_prems)
             val _ = print_seq_list(t2_prems)
             val _ = print ("\n\n\n") *)

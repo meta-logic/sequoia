@@ -1,14 +1,6 @@
 structure Properties : PROPERTIES =
 struct
     structure D = datatypesImpl
-    structure Dat = D
-    structure H = helpersImpl
-    structure T = treefuncImpl
-    structure Latex = latexImpl
-    structure App = applyunifierImpl
-    structure U = unifyImpl
-    structure E = Equivalence
-    structure Set = SplaySetFn(StringKey);
     structure Ut = Utilities
     structure Id = IdExpansion
     structure W = Weakening

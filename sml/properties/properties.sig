@@ -1,7 +1,6 @@
 signature PROPERTIES = 
 sig
 	structure D : DATATYPES
-	structure U : UNIFICATION
 	type constraint = D.ctx_var * (D.ctx_var list) * (D.ctx_var list)
 	type tree = constraint list * D.der_tree
 	type proof = tree * (tree option)
