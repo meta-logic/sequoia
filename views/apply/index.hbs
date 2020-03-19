@@ -1,79 +1,87 @@
 
 <div id="calc_id" hidden>{{calc_id}}</div>
-<div class="ui huge right fixed vertical menu" id="side_menu_R" style="margin-top: 61px; overflow-y:auto;">
-  <button id="export" class="ui disabled fluid huge icon button green" onclick="sendEmail(latex_tree[0])">
-    <i class="icon download"></i>
-  </button>
-  <button id="undo" class="ui disabled fluid huge icon button red" onclick="undo()">
-    <i class="icon undo"></i>
-  </button>
-  <br>
-  <div id="rules" class="ui one cards"></div>
-  <br><br><br><br>
-</div>
-<div class="ui left fixed float vertical menu" id="side_menu_L" style="margin-top: 61px; overflow-y:auto;"></div>
-<div class="ui container">
-  <div class="ui grid" style="margin-top: 26px;">
-      <div class="fifteen wide column" id="seq" style="display: inline;">
-        <div class="ui input fluid">
-          <input type="text" id="Sequent" placeholder="Sequent">
-        </div>
-        <br>
-        <div id="preview">
-          <button class="ui large teal button" onclick="preview()">Preview
-          </button>
-        </div>
+<div class="ui grid">
+  <div class="two wide column" style="margin-top: 26px;">
+      <div class="ui huge center aligned header">Constraints</div>
+      <div class="ui huge vertical menu" id="side_menu_L" style="visibility: hidden;overflow-y:auto;"></div>
+  </div>
+
+  <div class="one wide column"></div>
+
+  <div class="nine wide column" style="margin-top: 26px;">
+    <div id="seq" style="display: inline">
+      <div class="ui input fluid">
+        <input type="text" id="Sequent" placeholder="Sequent">
       </div>
       <br>
-      <div id="workspace" class="fifteen wide column" style="overflow-x: auto;">
-          <div id="info" class="ui info message" style="display: none;">
-            <div class="header">Multiple Applications</div>
-            <div class="content">
-              <p>The rule can be applied to a the selected sequent in more than one way. Select the set of premises
-                for which you would like to use to continue building the tree on the selected sequent.</p>
-            </div>
-            <ul id="choice" class="list"></ul>
-          </div>
-          <br><br>
-          <div id="main_tree" style="text-align: center;">
-            <div id="prooftree_0" class="tree">
-              <div id="exp_0" class="sequence">
-                  <div id="conc_0" class="leaf" style="visibility: hidden;">TEMP</div>
-              </div>
-            </div>
-          </div>
-          <br><br>
-          <a id ="submit" class="ui fluid large circular icon button teal" onclick="useSequent()" style="visibility: hidden;">Start Building Tree</a>
-          <div id="warning" class="ui negative message" style="visibility: hidden;">
-              <div id="warning_header" class="header">TEMP</div>
-                <p id="warning_text">TEMP</p>
-          </div>
-          <table id="sym_table" class= "ui sortable fixed single line celled table" style="visibility: hidden;">
-            <thead><tr><th>Sequent Term Symbols</th><th>Types</th></tr></thead>
-            <tbody id="init"><tbody> 
-            <tbody id="table_head"> 
-              <tr id ="input_row">
-                <td id="input_field" style="text-align:center">
-                  <div class="ui input focus">
-                    <input id="sym" type="text" placeholder="Symbol Here">
-                  </div>
-                </td>
-                <td id="select_field">
-                  <select class="ui search dropdown" style="visibility: hidden;" id="typ">
-                    <option value="">Type</option>
-                    <option value="atom">atom</option>
-                    <option value="atom variable">atom variable</option>
-                    <option value="formula variable">formula variable</option>
-                    <option value="context variable">context variable</option>
-                  </select>
-                  <button class="ui large green right floated button" onclick="add_symbol_toTable('seq')">Add Symbol</button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+      <div id="preview">
+        <button class="ui large teal button" onclick="preview()">Preview
+        </button>
       </div>
+    </div>
+    <div id="info" class="ui info message" style="display: none;">
+      <div class="header">Multiple Applications</div>
+      <div class="content">
+        <p>The rule can be applied to a the selected sequent in more than one way. Select the set of premises
+          for which you would like to use to continue building the tree on the selected sequent.</p>
+      </div>
+      <ul id="choice" class="list"></ul>
+    </div>
+      <br><br>
+    <div id="main_tree" style="text-align: center;">
+      <div id="prooftree_0" class="tree">
+        <div id="exp_0" class="sequence">
+            <div id="conc_0" class="leaf" style="visibility: hidden;">TEMP</div>
+        </div>
+      </div>
+    </div>
+    <br><br>
+    <a id ="submit" class="ui fluid large circular icon button teal" onclick="useSequent()" style="visibility: hidden;">Start Building Tree</a>
+    <div id="warning" class="ui negative message" style="visibility: hidden;">
+        <div id="warning_header" class="header">TEMP</div>
+          <p id="warning_text">TEMP</p>
+    </div>
+    <table id="sym_table" class= "ui sortable fixed single line celled table" style="visibility: hidden;">
+      <thead><tr><th>Sequent Term Symbols</th><th>Types</th></tr></thead>
+      <tbody id="init"><tbody> 
+      <tbody id="table_head"> 
+        <tr id ="input_row">
+          <td id="input_field" style="text-align:center">
+            <div class="ui input focus">
+              <input id="sym" type="text" placeholder="Symbol Here">
+            </div>
+          </td>
+          <td id="select_field">
+            <select class="ui search dropdown" style="visibility: hidden;" id="typ">
+              <option value="">Type</option>
+              <option value="atom">atom</option>
+              <option value="atom variable">atom variable</option>
+              <option value="formula variable">formula variable</option>
+              <option value="context variable">context variable</option>
+            </select>
+            <button class="ui large green right floated button" onclick="add_symbol_toTable('seq')">Add Symbol</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </div>
+
+  <div class="one wide column"></div>
+
+  <div class="three wide column" style="margin-top: 26px;">
+      <div class="ui two top attached buttons">
+        <button id="export" class="ui disabled fluid huge icon button green" onclick="sendEmail(latex_tree[0])">
+          <i class="icon download"></i>Export to Latex
+        </button>
+        <button id="undo" class="ui disabled fluid huge icon button red" onclick="undo()">
+          <i class="icon undo"></i>Undo Apply
+        </button>
+      </div>
+      <div class="ui huge menu" id="side_menu_R" style="padding-top: 10px;padding-bottom: 10px;">
+          <div id="rules" class="ui one cards"></div>
+      </div>
 </div>
+
 <div id ="modal1" class="ui special modal">
   <div class="header">Sequents Affected</div>
     <div id = "change warning" class="content">

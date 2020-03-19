@@ -8,7 +8,7 @@ function smlInvoke(sml_command, res) {
     +sml_command
     +"OS.Process.exit(OS.Process.success);\n"
     var answer = '';
-    var processRef = cmd2.spawn("sml",[],{stdio: ['pipe' , 'inherit' , 'ignore' , 'pipe' ] })
+    var processRef = cmd2.spawn("sml",[],{stdio: ['pipe' , 'ignore' , 'ignore' , 'pipe' ] })
     processRef.stdio[3].on('end' , () => {
         try {
             try {

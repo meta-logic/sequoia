@@ -3,52 +3,59 @@
   <head>
     <title>{{title}}</title>
     <link rel="stylesheet" type="text/css" href="/bower/semantic/dist/semantic.min.css">
-    <div id = "style">
+  </head>
+  <div id = "style">
     <style> 
-       *{
-          box-sizing: border-box;
-        }
-        div.tree{
-          /*background-color: rgba(0,233,0,0.2);*/
-          display: inline-flex;
-          align-items: flex-end;
-          padding: 0px 12px;
-          font-size: 22px;
-        }
+      ::-webkit-scrollbar {
+          width: 0px;
+          background: transparent; /* make scrollbar transparent */
+      }
 
-        div.rule {
-          padding-left: 2px;
-          padding-bottom: 20px;
-          /*background-color: #377;*/
-          font-size: 22px;
-        }
+      *{
+        box-sizing: border-box;
+      }
+      
+      div.tree{
+        /*background-color: rgba(0,233,0,0.2);*/
+        display: inline-flex;
+        align-items: flex-end;
+        padding: 0px 12px;
+        font-size: 22px;
+      }
 
-        div.rule > .MathJax_Display{
-          margin: 0;
-        }
+      div.rule {
+        padding-left: 2px;
+        padding-bottom: 20px;
+        /*background-color: #377;*/
+        font-size: 22px;
+      }
 
-        div.sequence{
-          display: inline-block;
-          /*border: 2px solid #fff;*/
-        }
+      div.rule > .MathJax_Display{
+        margin: 0;
+      }
 
-        div.premises{
-          display: inline-flex;
-          align-items: flex-end;
-          justify-content: center;
-          /*background-color: #a0a;*/
-          text-align: center;
-        }
+      div.sequence{
+        display: inline-block;
+        /*border: 2px solid #fff;*/
+      }
 
-        div.conclusion{
-          border-top: 1px solid #111;
-          /*background-color: #aa1;*/
-          text-align: center;
-        }
+      div.premises{
+        display: inline-flex;
+        align-items: flex-end;
+        justify-content: center;
+        /*background-color: #a0a;*/
+        text-align: center;
+      }
 
-        div.conclusion > .MathJax_Display{
-          margin:0;
-        }
+      div.conclusion{
+        border-top: 1px solid #111;
+        /*background-color: #aa1;*/
+        text-align: center;
+      }
+
+      div.conclusion > .MathJax_Display{
+        margin:0;
+      }
 
         div.leaf{
           /*background-color: #aa1;*/
@@ -57,16 +64,15 @@
           cursor: pointer;
         }
 
-        div.leaf > .MathJax_Display{
-          margin:0;
-        }
+      div.leaf > .MathJax_Display{
+        margin:0;
+      }
 
-        div.item > .MathJax_Display{
-          margin:0;
-        }
+      div.item > .MathJax_Display{
+        margin:0;
+      }
     </style>
-    </div>
-  </head>
+  </div>
   <body>
     {{> navbar}}
   {{{body}}}
