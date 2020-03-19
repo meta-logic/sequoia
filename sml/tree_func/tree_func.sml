@@ -26,43 +26,6 @@
 
     val get_index : unit -> int = U.get_index
 
-    fun fresh'(x:string):string = (x ^"^{"^ (Int.toString(get_index())) ^"}")
-
-    val hat= #"^"
-
-    fun remove_hat' (nil) = nil
-        |remove_hat' (x::L) = (case (x=hat) of true => [] | false => x::remove_hat'(L))
-
-    fun remove_hat (x) = String.implode(remove_hat'(String.explode(x)))
-    (* nuke version *)
-    fun fresh(x:string):string = fresh'(remove_hat(x))
-
-    val update_string = fresh
-
-    fun update_ctx_var (Dat.CtxVar(a,x)) = Dat.CtxVar(a,update_string(x))
-
-    fun update_form (Dat.Atom(x)) = Dat.Atom(x)
-        | update_form (Dat.AtomVar(x)) = Dat.AtomVar(update_string(x))
-        | update_form (Dat.FormVar(x)) = Dat.FormVar(update_string(x))
-        | update_form (Dat.Form(c,forms)) = Dat.Form(c, List.map update_form forms)
-
-    fun update_ctx (Dat.Ctx(ctx_vars,forms)) = Dat.Ctx(List.map update_ctx_var ctx_vars,List.map update_form forms)
-
-    fun update_ctx_struct (Dat.Empty) = Dat.Empty
-        | update_ctx_struct (Dat.Single(ctx)) = Dat.Single(update_ctx(ctx))
-        | update_ctx_struct (Dat.Mult(conn,ctx,ctx_strct)) = Dat.Mult(conn,update_ctx(ctx), update_ctx_struct(ctx_strct))
-
-    fun update_seq (Dat.Seq(l,conn,r)) = Dat.Seq(update_ctx_struct(l),conn,update_ctx_struct(r))
-
-    fun update_rule (Dat.Rule(nm,side,conc,prems)) =
-        let
-            val new_conc = update_seq(conc)
-            val new_prems = List.map update_seq prems
-            val _ = change_index(get_index() + 1)
-        in
-            Dat.Rule(nm,side,new_conc,new_prems)
-        end
-
     
     fun get_tree_height (Dat.DerTree(_,_,_,[])) = 0
         | get_tree_height (Dat.DerTree(_,_,_,prs)) = (List.foldl  Int.max 0 (List.map (get_tree_height) prs)) +1
@@ -146,7 +109,6 @@
     (*  *)
     fun apply_rule((forms, cons, dt), rule, sid) =
         let 
-            (* val rule = update_rule(rule) *)
             fun apply_rule_aux( Dat.DerTree(id, sq, NONE, []), Dat.Rule(name, s, conc, premises), sid) =
                     if id <> sid then [(forms,NONE, Dat.DerTree(id, sq, NONE, []))] else 
                     (case U.Unify_seq(conc, sq) of
@@ -180,7 +142,7 @@
             (* fun print_seq (Dat.DerTree(_,sq,_,_)) = print(Dat.seq_toString(sq)) *)
         in 
             List.map   (fn (form, unif, dvt) => case unif of 
-                SOME((sg,cn)) => (form, cons @ cn, (App.apply_der_tree_Unifier(dvt, sg)))
+                SOME((sg,cn)) => (form, (App.apply_constraintL_Unifier (cons,sg)) @ cn, (App.apply_der_tree_Unifier(dvt, sg)))
                 | NONE => (form, cons, dvt))   (apply_rule_aux(dt, rule, sid))
         end
 
