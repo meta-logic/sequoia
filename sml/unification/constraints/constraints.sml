@@ -33,9 +33,11 @@ struct
     structure F = FreshVar
     structure H = helpersImpl
     structure Map = BinaryMapFn (CtxVarConKey)
+    structure Map2 = BinaryMapFn (CtxVarKey)
     structure Set = SplaySetFn(CtxVarKey)
     structure App =applyunifierImpl
 
+    exception NotFound = LibBase.NotFound
 
     type constraint = (Dat.ctx_var * Dat.ctx_var list * Dat.ctx_var list)
     type constraint' = (Dat.ctx_var * Dat.ctx_var ref list * Dat.ctx_var ref list)
@@ -47,6 +49,8 @@ struct
     fun fresh_ctx_var (Dat.CtxVar(a,name)) = Dat.CtxVar(a,fresh(name))
 
     val no_con = Dat.CtxVar (NONE,"")
+
+    fun get_con (Dat.CtxVar(a,_)) = a
 
     fun my_insert (var,map) = 
         let
@@ -74,71 +78,77 @@ struct
 
     fun create_empty_subs (_,l1,_) = List.map empty_sub l1
 
-    fun split((var,l1,_),other_map) = 
-        (case var of
-           Dat.CtxVar(NONE,_) => 
-            let
-                val right_side = List.tabulate(Map.numItems(other_map),fn _ => fresh_ctx_var(var))
-            in
-                (var,l1,right_side)
-            end
-         | Dat.CtxVar(SOME _,_) => 
-            let
-                val right_side = []
-                val right_side = (case Map.find(other_map,var) of
-                   SOME _ => fresh_ctx_var(var)::right_side
-                 | NONE => right_side)
-                val right_side = (case Map.find(other_map,no_con) of
-                   SOME _ => fresh_ctx_var(var)::right_side
-                 | NONE => right_side)
-            in
-                (var,l1,right_side)
-            end)
-
-    fun extract ((a,b,c),(right_side,to_insert)) = 
-    (List.hd(c)::right_side,(a,b,List.tl(c))::to_insert)
     
-    fun ins (cons as (var,_,_),mp) = Map.insert(mp,var,cons)
+    fun gen_constraints((var,left,_),(cons,l2)) = 
+        (case get_con var of
+           NONE => (
+                let
+                    val new_l2 = Map.map (fn (var,a,b) => (var,a,fresh_ctx_var(var)::b)) l2
+                    val new_vars = List.map (fn (var,a,b) => List.hd(b)) (Map.listItems new_l2)
+                    val new_cons = (var,left,new_vars)
+                in
+                    (new_cons::cons,new_l2)
+                end
+           )
+         | _ => (
+                let
+                    val right_side = []
+                    (* no connective check *)
+                    val (right_side,l2) = 
+                    (case Map.find(l2,no_con) of
+                       NONE => (right_side,l2)
+                     | SOME (var2,a,b) => let val new_var = fresh_ctx_var var 
+                        in (new_var::right_side,Map.insert(l2,var2,(var2,a,new_var::b))) end)
+                    (* same connective check *)
+                    val (right_side,l2) = 
+                    (case Map.find(l2,var) of
+                       NONE => (right_side,l2)
+                     | SOME (var2,a,b) => let val new_var = fresh_ctx_var var 
+                        in (new_var::right_side,Map.insert(l2,var2,(var2,a,new_var::b))) end)
+                    val new_cons = (var,left,right_side)
+                in
+                    (new_cons::cons,l2)
+                end
+         )
+         )
 
-    fun match'([],other_map,res) = res
-        | match'((var,l1,_)::rest, other_map,res) = 
-            let
-                val keys = [var,no_con]
-                val items = (case var of
-                   Dat.CtxVar(NONE,_) => Map.listItems(other_map)
-                 | Dat.CtxVar(SOME _,_) => List.mapPartial (fn key => Map.find(other_map,key)) keys)
-                val (right_side,to_insert) = List.foldl extract ([],[]) items
-                val new_map = List.foldl ins other_map to_insert
-                val res = (case List.length(right_side) of
-                   0 => res
-                 | _ => (var,l1,right_side)::res)
-            in
-                match'(rest,new_map,res)
-            end
-    
-    fun match(l1,l2) = match'(Map.listItems l1,l2,[])
+    fun create_sub (var,[a],b) = Dat.CTXs(a,Dat.Ctx(b,[]))
+        | create_sub _ = raise Fail "unexpected input create_sub"
 
+    fun seperate' (constraint as (var,left,right),(cons,subs,map)) = 
+        (case (List.length(left),List.length(right)) of
+           (_,0) => (cons,create_empty_subs(constraint)@subs,map)
+         | (1,_) => (cons,create_sub(constraint)::subs,map)
+         | (_,1) => (cons,subs,Map2.insert(map,List.hd(right),constraint))
+         | _ => (constraint::cons,subs,map))
 
+    fun seperate (cons_list) = List.foldl seperate' ([],[],Map2.empty) cons_list
+
+    fun join ((key,constraint as (var,left,_)),(cons,l2)) =
+        (let
+            val (new_l2,(var2,left2,_)) = Map2.remove(l2,key)
+            val new_cons = (var,left,left2)
+        in
+            (new_cons::cons,new_l2)
+        end)
+        handle (NotFound) => (constraint::cons,l2)
     
     fun get_constraints (var_l1,var_l2) =
         let
             val (var_l1',var_l2') = remove_common(var_l1 , var_l2)
             val base_vars = List.foldl Set.add' Set.empty (var_l1'@var_l2')
-            val (l1_comp) = initial_set(var_l1')
-            val (l2_comp) = initial_set(var_l2')
-            val l1_split = Map.map (fn x => split(x,l2_comp)) l1_comp
-            val l2_split = Map.map (fn x => split(x,l1_comp)) l2_comp
-            val l1_matched = match (l1_split,l2_split)
-            val l2_matched = match (l2_split,l1_split)
-            val l1_split = Map.listItems l1_split
-            val l2_split = Map.listItems l2_split
-            val var_split = l1_split@l2_split
-            val (rejects,split_cons) = List.partition (fn (_,_,c) => List.null c) var_split
-            val final_cons = split_cons@l1_matched@l2_matched
-            val empty_subs = List.concat ( List.map create_empty_subs rejects)
-            val result = (final_cons,empty_subs)
+            val l1_comp = initial_set(var_l1')
+            val l2_comp = initial_set(var_l2')
+            val (l1_cons,l2_map) = List.foldl gen_constraints ([],l2_comp) (Map.listItems l1_comp)
+            val l2_cons = Map.listItems (l2_map)
+            val (l1_partial_cons,l1_subs,l1_map) = seperate (l1_cons)
+            val (l2_partial_cons,l2_subs,l2_map) = seperate (l2_cons)
+            val (joined_cons,l2_map) = List.foldl join ([],l2_map) (Map2.listItemsi (l1_map))
+            val l2_final_cons = (Map2.listItems (l2_map))@l2_partial_cons
+            val final_cons = l1_partial_cons@joined_cons@l2_final_cons
+            val final_subs = l1_subs@l2_subs
         in
-            result
+            (final_cons,final_subs)
         end 
 
     fun test() = 

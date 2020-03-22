@@ -1,7 +1,6 @@
 
 structure Equivalence  : EQUIVALENCE = 
 struct
-	structure Set = SplaySetFn(StringKey);
 	(*constraint form: String*ctx_var list*ctx_var list *)
 	structure Dat = datatypesImpl
 	structure H = helpersImpl
@@ -59,12 +58,7 @@ struct
 		Dat.conn_eq(connA,connB) andalso (ctx_struct_equiv_wk(leftA,leftB,wk_l)) andalso ctx_struct_equiv_wk(rightA,rightB,wk_r)
 	 
 
-	(*taken from: https://stackoverflow.com/questions/33597175/how-to-write-to-a-file-in-sml*)
-	fun writeFile filename content =
-	    let val fd = TextIO.openOut filename
-	        val _ = TextIO.output (fd, content) handle e => (TextIO.closeOut fd; raise e)
-	        val _ = TextIO.closeOut fd
-	    in () end
+	
 
 	fun list_to_vector ([],[]) = []
 		|list_to_vector (x,[]) = raise Fail ("there might be undefined vars\n"^Dat.ctx_varL_toString(x))
@@ -112,7 +106,8 @@ struct
 			val vars_list = t1_vars @ t2_vars
 			val line1 = Int.toString(cons_len)^" "^Int.toString(var_num)^" "^Int.toString(t1_var_num)^"\n"
 			val matrix = cons_to_matrix (new_cons,vars_list)
-			val line2 = row_list_to_string(List.map (fn Dat.CtxVar(a, x) => x) vars_list)
+			(* val line2 = row_list_to_string(List.map (fn Dat.CtxVar(a, x) => x) vars_list) *)
+			val line2 = ""
 			val final_str = ref (line1^line2^matrix)
 			val result = C.main_check(final_str)
 		in

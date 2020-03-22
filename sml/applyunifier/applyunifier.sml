@@ -45,6 +45,29 @@ structure applyunifierImpl : APPLYUNIFIER = struct
         | apply_ctx_struct_allUnifiers (ctx_struct, subsL) = List.map(fn sb => apply_ctx_struct_Unifier(ctx_struct, sb))subsL
 
 
+    type constraint = DAT.ctx_var * DAT.ctx_var list * DAT.ctx_var list
+    (* TODO: should this include subs that map context variables to formulas and ctx_vars? *)
+    fun valid_sub (DAT.CTXs(var,DAT.Ctx(l,[]))) = true
+        | valid_sub (_) = false
+    fun filter_subs subs = List.filter valid_sub subs
+    fun ctx_varL_apply (vars,subs) = List.concat 
+        (List.map (fn (vars,forms)=> vars) 
+        (apply_ctx_varL_Unifier(vars,subs)))
+    fun apply_constraint_Unifier ((var,left,right),subs) = 
+        let
+            val new_left  = ctx_varL_apply(left,subs)
+            val new_right  = ctx_varL_apply(right,subs)
+        in
+            (var,new_left,new_right)
+        end
+    fun apply_constraintL_Unifier (cons,subs) = 
+        let
+            val new_subs = filter_subs subs
+        in
+            List.map (fn constraint => apply_constraint_Unifier(constraint,new_subs)) cons
+        end
+
+
     type seq = DAT.seq
     fun apply_seq_Unifier (DAT.Seq(l, c, r), subs) = DAT.Seq(apply_ctx_struct_Unifier(l, subs), c, apply_ctx_struct_Unifier(r, subs))
     fun apply_seq_allUnifier (sequent, []) = [sequent]
