@@ -36,7 +36,11 @@ struct
 	val permute_final = P.permute_final
 	val permute_print = P.permute_print 
     
+    val cut_axiom = C.cut_axiom
+    val cut_rank_reduction = C.cut_rank_reduction
     val cut_grade_reduction = C.cut_grade_reduction
+
+    val cut_elim = C.cut_elim
 
     (* fun test_1() =
         let

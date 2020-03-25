@@ -41,8 +41,9 @@ struct
             
             val Dat.Rule(_,_,base,_) = rule
             val base = Ut.atomize_seq(base)
+            val base = Ut.generic_ctx_var(base)
             val rule = Ut.update_rule(rule)
-            val base2 = add_to_seq(base)
+            val base2 = Ut.generic_ctx_var(add_to_seq(base))
             val rule_applied_list = List.map (fn (_,cons,tree) => (cons,tree)) (T.apply_rule(([],[],Dat.DerTree("0",base,NONE,[])),rule,"0"))
             val rule_applied_list_weak = List.map (fn (_,cons,tree) => (cons,tree)) (T.apply_rule(([],[],Dat.DerTree("0",base2,NONE,[])),rule,"0"))
 

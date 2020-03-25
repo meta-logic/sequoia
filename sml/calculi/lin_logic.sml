@@ -82,13 +82,13 @@ struct
   	let
   		val (name,_) = ("\\Gamma_{" ^ Int.toString(!t)^"}" , t:= !t +1)
   	in
-  		D.CtxVar(name)
+  		D.CtxVar(NONE,name)
   	end
   fun generic_ctx_var_D () = 
   	let
   		val (name,_) = ("\\Delta_{" ^ Int.toString(!t)^"}" , t:= !t +1)
   	in
-  		D.CtxVar(name)
+  		D.CtxVar(NONE,name)
   	end
 
 
@@ -539,8 +539,8 @@ struct
 	(*for every rule, val <rule> = [<rule>()]*)
 
 	fun test'(R1,nil) = raise Fail "no R2"
-  		| test'(R1,[R2]) = P.permutes(R1,R2,[],([],[]))
-  		| test'(R1,R2::rest) = P.permutes(R1,R2,[],([],[]))
+  		| test'(R1,[R2]) = P.permute(R1,R2,[],([],[]))
+  		| test'(R1,R2::rest) = P.permute(R1,R2,[],([],[]))
   				(*case test'(R1,rest) of
   					SOME true => test'(R1,rest)
   					| result => result*)
@@ -631,13 +631,13 @@ struct
 	
 	
 	val init_rule_list = [id()]
-	val rule_pairs_no_init = [(tensor_connective,[tensorR()],[tensorL()]),
-							  (lolli_connective,[lolliR()],[lolliL()]),
-							  (plus_connective,[plusR1(),plusR2()],[plusL()]),
-							  (with_connective,[withR()],[withL1(),withL2()]),
-							  (par_connective,[parR()],[parL()]),
-							  (bang_connective,[bangR()],[bangL1(),bangL2()]),
-							  (ques_connective,[quesR1(),quesR2()],[quesL()])]
+	val rule_pairs_no_init = [(tensor_connective,[tensorL()],[tensorR()]),
+							  (lolli_connective,[lolliL()],[lolliR()]),
+							  (plus_connective,[plusL()],[plusR1(),plusR2()]),
+							  (with_connective,[withL1(),withL2()],[withR()]),
+							  (par_connective,[parL()],[parR()]),
+							  (bang_connective,[bangL1(),bangL2()],[bangR()]),
+							  (ques_connective,[quesL()],[quesR1(),quesR2()])]
 
 	val axiom_list = [oneR(), botL()]
 
