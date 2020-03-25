@@ -104,14 +104,14 @@ struct
     fun weakening_print rules = 
         let 
             fun print_helper((clist1,tree1),SOME((clist2,tree2))) = 
-                    "$$"^Latex.der_tree_toLatex2(tree1)^"$$"
-                    ^"$$"^Ut.constraintL_toString(clist1)^"$$"
-                    ^"$$ \\leadsto $$"
-                    ^"$$"^Latex.der_tree_toLatex2(tree2)^"$$"
-                    ^"$$"^Ut.constraintL_toString(clist2)^"$$"
-                | print_helper((clist1,tree1),NONE) = 
-                    "$$"^Latex.der_tree_toLatex2(tree1)^"$$"
-                    ^"$$"^Ut.constraintL_toString(clist1)^"$$"
+                "$$"^Latex.der_tree_toLatex2(tree1)^"$$"
+                ^"$$"^Ut.constraintL_toString(clist1)^"$$"
+                ^"$$ \\leadsto $$"
+                ^"$$"^Latex.der_tree_toLatex2(tree2)^"$$"
+                ^"$$"^Ut.constraintL_toString(clist2)^"$$"
+            | print_helper((clist1,tree1),NONE) = 
+                "$$"^Latex.der_tree_toLatex2(tree1)^"$$"
+                ^"$$"^Ut.constraintL_toString(clist1)^"$$"
         in
             let val (L,R) = weakening_proofs(rules)
                 val tL = List.map(fn (bl,pfs) => if bl 

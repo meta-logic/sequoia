@@ -77,7 +77,7 @@ function checkWeak() {
                                 '<i class="question icon"></i>'+
                             '</div>'+
                         '</div>'+
-                        '<div class="ui two cards" id="Lproof'+i+'" style="display: none;">'+
+                        '<div class="ui one cards" id="Lproof'+i+'" style="display: none;">'+
                         '</div>'
                     )
                     var proofs_list = tempL[1].split("&&&")
@@ -113,7 +113,7 @@ function checkWeak() {
                                 '<i class="question icon"></i>'+
                             '</div>'+
                         '</div>'+
-                        '<div class="ui two cards" id="Rproof'+i+'" style="display: none;">'+
+                        '<div class="ui one cards" id="Rproof'+i+'" style="display: none;">'+
                         '</div>'
                     )
                     var proofs_list = tempR[1].split("&&&")
