@@ -7,11 +7,66 @@ struct
     structure App = applyunifierImpl
     structure Ut = Utilities
     structure P = Permute
+    structure U = unifyImpl
 
-    fun cut_axiom _ = raise Fail "Unimplemented"
+    fun create_base (Dat.Rule(_,_,conc,_)) = 
+                Dat.DerTree("0",Ut.generic_ctx_var conc,NONE,[])
+
+
+    (* (App.apply_constraintL_Unifier (cons,sg)) *)
+    fun cut_axiom (cut_rule,axiom, weakening) = 
+        let
+
+            fun check (cons,tree,(u_sb,u_cons)) = 
+                let
+                    val new_cons = App.apply_constraintL_Unifier (cons,u_sb)
+                    val new_tree = App.apply_der_tree_Unifier(tree,u_sb)
+                    val final_cons = new_cons@u_cons
+                    val Dat.DerTree(_,new_base,_,_) = new_tree
+                    val tree2 = Dat.DerTree("0",Ut.generic_ctx_var (new_base),NONE,[])
+                    val tree2_init = List.map (fn (_,a,b)=> (a,b)) (T.apply_rule(([],[],tree2),axiom,"0"))
+                    fun res (_,Dat.DerTree(_,_,NONE,_)) = false
+                        | res a = true
+                in
+                    (case List.find res tree2_init of
+                       SOME t2 => ((new_cons,new_tree),SOME t2)
+                     | NONE => ((new_cons,new_tree),Ut.check_premises'((new_cons,new_tree),([],tree2),weakening)))
+                end
+
+            (* create_base *)
+            val base = create_base(cut_rule)
+            val Dat.Rule(_,_,axiom_conc,_) = axiom
+            (* apply cut rule *)
+            (* should only generate one tree *)
+            val cut_applied = T.apply_rule(([],[],base),cut_rule,"0")
+            
+            val cut_applied = List.hd(cut_applied)
+            val (_,cons,tree) = cut_applied
+            (* unify each premise with axiom, then apply unifier to tree *)
+            val prems = T.get_premises_of(tree,"0")
+            val axiom_applied = List.concat (List.mapPartial 
+            (fn prem => U.Unify_seq(prem,axiom_conc)) prems)
+            val new_tree_set = List.map 
+            (fn unifier => check(cons,tree,unifier)) axiom_applied
+            (* check if the tree with cut can be used to close the conc of 
+            that tree without cut *)
+            val result = new_tree_set
+        in
+            result
+        end
 
     (* possible sollution *)
-    fun cut_rank_reduction (cut_rule,other_rule,weakening) = P.permute(cut_rule,other_rule,[],weakening)
+    fun cut_rank_reduction (cut_rule,other_rule,weakening) = 
+        let
+            val results = P.permute(cut_rule,other_rule,[],weakening)
+            val pos = List.concat (List.map (fn ((pos,_),_) => pos) results)
+            val neg = List.concat (List.map (fn ((_,neg),_) => neg) results)
+            val pos = List.map (fn (t1,t2) => (t1,SOME t2)) pos
+            val neg = List.map (fn t1 => (t1,NONE)) neg
+        in
+            pos@neg
+        end
+    
 
     fun cut_grade_reduction (cut_rule,(con,rulesL,rulesR),cut_formula,weakening) = 
         let
@@ -21,8 +76,7 @@ struct
                 in
                     Dat.Rule(name,side,conc,new_prems)
                 end
-            fun create_base (Dat.Rule(_,_,conc,_)) = 
-                Dat.DerTree("0",Ut.generic_ctx_var conc,NONE,[])
+            
 
             fun product (left_rules,right_rules) = List.concat (List.map 
                 (fn l_rule => List.map (fn r_rule => (l_rule,r_rule)) right_rules) left_rules)
@@ -35,18 +89,12 @@ struct
                         let
                             val right_applied = List.concat (List.map 
                                 (fn tree => T.apply_rule(tree,r_rule,"00")) cut_applied)
-                            val _  = print (Int.toString(List.length(right_applied)))
-                            val _ = print ("\n")
                             val both_applied = List.concat (List.map 
                                 (fn tree => T.apply_rule(tree,l_rule,"01")) right_applied)
-                            val _  = print (Int.toString(List.length(both_applied)))
-                            val _ = print ("\n")
                             fun get_id (Dat.DerTree(id,_,_,_)) = id
                             val filtered = List.filter 
-                            (fn (_,_,drt) => List.all (fn id => String.size(id)>0) 
+                            (fn (_,_,drt) => List.all (fn id => String.size(id)>2) 
                                 (List.map (get_id) (T.get_open_prems(drt)))) both_applied
-                            val _  = print (Int.toString(List.length(filtered)))
-                            val _ = print ("\n")
                         in
                             List.map (fn (_,cons,drt) => (cons,drt)) filtered
                         end
@@ -144,11 +192,32 @@ struct
             val rule_combinations = product(rulesL,rulesR)
 
             val drt1s = create_drt1 (base,cut_rule,rule_combinations,og_sub)
-            val _ = print (Int.toString (List.length(drt1s)))
+            val (pos,neg) = find_proofs (drt1s,base,cut_rule,subforms)
 
         in
-            find_proofs (drt1s,base,cut_rule,subforms)
+            pos@neg
         end
 
-    fun cut_elim _ = raise Fail "Unimplemented"
+    fun cut_elim' (cut_rule,connectives,axioms,weakening) = 
+        let
+            val (rule,formula) = cut_rule
+            (* axioms *)
+            val axioms = List.concat(List.map (fn axiom => cut_axiom(rule,axiom,weakening)) axioms)
+            (* rank_reductions *)
+            val all_rules = List.concat 
+                (List.map (fn (_,rulesL,rulesR) => rulesL@rulesR) connectives)
+            val rank_reductions = List.map 
+                (fn rule2 => cut_rank_reduction(rule,rule2,weakening)) all_rules
+            val rank_reductions = List.concat rank_reductions
+            (* grade_reductions *)
+            val grade_reductions = List.map 
+                (fn con => cut_grade_reduction(rule,con,formula,weakening)) connectives
+            val grade_reductions = List.concat grade_reductions
+
+        in
+            (axioms,rank_reductions,grade_reductions)        
+        end
+
+    fun cut_elim (cut_rules,connectives,axioms,weakening) = 
+        List.map (fn rule => cut_elim'(rule,connectives,axioms,weakening)) cut_rules
 end
