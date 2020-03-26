@@ -69,7 +69,7 @@ function checkWeak() {
                     }
                     var newString = setLabel(left_bools, right_bools, i, 'L')
                     lt.append(
-                        '<div id="lweak_card'+i+'" class="'+color+' card">'+
+                        '<div class="'+color+' card">'+
                             '<div class="content">'+
                                 '<div class="header">'+newString+'</div>'+
                             '</div>'+
