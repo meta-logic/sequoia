@@ -263,9 +263,9 @@ struct
         let
 
 
-            val result = cut_elim input
+            val result = cut_elim' input
 
-            val result = ListFormat.fmt cut_rule_join_fmt result
+            val result = cut_rule_fmt result
         in
             Ut.writeFD fd result
         end
