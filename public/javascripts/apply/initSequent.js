@@ -67,7 +67,6 @@ function parse_and_use(temp_parser) {
     $("#seq").css("display","none")
     $("#submit").css("visibility","hidden")
     $("#warning").css("visibility","hidden")
-    $("#side_menu_L").css("visibility","visible")
     $("#export").attr("class","ui fluid huge icon button green")
     $("#undo").attr("class","ui fluid huge icon button red")
     parser = temp_parser

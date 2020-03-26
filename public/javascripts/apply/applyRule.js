@@ -159,8 +159,13 @@ function applyRule(i) {
                     constraints.html("")
                     for (i = 0; i < the_constraints.length; i++) {
                         if (the_constraints[i] != "") {
-                            constraints.append('<div class="item">$$'+the_constraints[i]+'$$</div>') 
+                            constraints.append('<p>$$'+the_constraints[i]+'$$</p>') 
                         }
+                    }
+                    if (constraint_history.length == 0) {
+                        $("#left_menu").css("visibility","hidden")
+                    } else {
+                        $("#left_menu").css("visibility","visible")
                     }
                     MathJax.Hub.Queue(["Typeset",MathJax.Hub,constraints[0]])
                 } else {
@@ -188,8 +193,13 @@ function applyRule(i) {
                         constraints.html("")
                         for (var i = 0; i < the_constraints.length; i++) {
                             if (the_constraints[i] != "") {
-                                constraints.append('<div class="item">$$'+the_constraints[i]+'$$</div>') 
+                                constraints.append('<p>$$'+the_constraints[i]+'$$</p>')  
                             }
+                        }
+                        if (constraint_history.length == 0) {
+                            $("#left_menu").css("visibility","hidden")
+                        } else {
+                            $("#left_menu").css("visibility","visible")
                         }
                         MathJax.Hub.Queue(["Typeset",MathJax.Hub,constraints[0]])
                     })
@@ -220,8 +230,13 @@ function undo() {
         constraints.html("")
         for (var i = 0; i < the_constraints.length; i++) {
             if (the_constraints[i] != "") {
-                constraints.append('<div class="item">$$'+the_constraints[i]+'$$</div>') 
+                constraints.append('<p>$$'+the_constraints[i]+'$$</p>') 
             }
+        }
+        if (constraint_history.length == 0) {
+            $("#left_menu").css("visibility","hidden")
+        } else {
+            $("#left_menu").css("visibility","visible")
         }
         MathJax.Hub.Queue(["Typeset",MathJax.Hub,constraints[0]])
     }

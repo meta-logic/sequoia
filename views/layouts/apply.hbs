@@ -8,7 +8,25 @@
     <style> 
       ::-webkit-scrollbar {
           width: 0px;
-          background: transparent; /* make scrollbar transparent */
+          background: transparent;
+      }
+
+      #side_menu_R{
+        height: 85vh;
+      }
+
+      #rules{
+        height: 100%;
+        overflow-y: auto;
+      }
+
+      #main_grid{
+        width: 101.5vw;
+      }
+
+      #tree_grid{
+        width: 100%;
+        overflow-x: auto;
       }
 
       *{
@@ -57,12 +75,12 @@
         margin:0;
       }
 
-        div.leaf{
-          /*background-color: #aa1;*/
-          text-align: center;
-          padding: 0px 21px;
-          cursor: pointer;
-        }
+      div.leaf{
+        /*background-color: #aa1;*/
+        text-align: center;
+        padding: 0px 21px;
+        cursor: pointer;
+      }
 
       div.leaf > .MathJax_Display{
         margin:0;
