@@ -40,8 +40,8 @@ sig
 			((bool * proof list) list) *
 			((bool * proof list) list)) list
 	
-	val cut_elim_print' : int -> (D.rule * D.form) list * (D.conn * D.rule list * D.rule list) list * (D.rule list) * (bool list * bool list) -> unit
-	val cut_elim_print : (D.rule * D.form) list * (D.conn * D.rule list * D.rule list) list * (D.rule list) * (bool list * bool list) -> unit
+	val cut_elim_print' : int -> (D.rule * D.form) * (D.conn * D.rule list * D.rule list) list * (D.rule list) * (bool list * bool list) -> unit
+	val cut_elim_print : (D.rule * D.form) * (D.conn * D.rule list * D.rule list) list * (D.rule list) * (bool list * bool list) -> unit
 		
 
 end
