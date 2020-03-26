@@ -2,15 +2,13 @@ var r = 0
 var weak_l = "[]"
 var weak_r = "[]"
 var init_strings = "[]"
+var conn_strings = "[]"
+var con_ordered = []
+var rl_ordered = []
+var it_ordered = []
 
 function get_rules_toPage() {
     var rules_container = $("#rules")
-    for (i = 0; i < r; i++) {
-        entry = $("#rule_card"+i)
-        if (entry != null) {
-            entry.remove()
-        }
-    }
     var calc_id = $("#calc_id").text()
     $.get("/api/rules/"+calc_id, function (rls, status) {
         var rules = rls.rules
@@ -45,6 +43,75 @@ function get_rules_toPage() {
         initWeak(calc_id)
     })
 }
+
+
+function get_cuts_toPage() {
+    var rules_container = $("#rules")
+    var calc_id = $("#calc_id").text()
+    $.get("/api/rules/"+calc_id, function (rls, status) {
+        var rules = rls.rules
+        var init_list = []
+        var connective_rules = []
+        var connective_dict = {}
+        for (var i = 0; i < rules.length; i++) {
+            if (rules[i].type == "Cut") {
+                var rule_name = rules[i].rule.replace(/\\/g, "\\\\")
+                var rule_conc = rules[i].sml_conc.replace(/\\/g, "\\\\").replace(/'/g, "&apos;").replace(/"/g, "&quot;")
+                var rule_prem = list_to_string(rules[i].sml_prem).replace(/\\/g, "\\\\").replace(/'/g, "&apos;").replace(/"/g, "&quot;")
+                rules_container.append( 
+                    '<div id="rule_card'+i+'" class="ui card">'+
+                        '<div class="content" id="r'+i+'" '+
+                            'rule_name="'+rule_name+'" conclusion="'+rule_conc+'" premises="'+rule_prem+'" '+ 
+                            'conn="'+rules[i].connective+'" side="'+rules[i].side+'">'+
+                                '$$\\frac{'+rules[i].premises.join(" \\quad \\quad ")+'}{'+rules[i].conclusion+'}'+rules[i].rule+'$$'+
+                        '</div>'+
+                        '<div class="ui bottom attached button" id="b'+i+'" onClick=selectRule(true,'+i+')>'+
+                            '<i id="i'+i+'" class="add icon"></i>'+
+                        '</div>'+
+                    '</div>'
+                )
+            } else {
+                var rule_name = rules[i].rule.replace(/\\/g, "\\\\")
+                var rule_type = rules[i].type
+                var rule_side = rules[i].side
+                var rule_conc = rules[i].sml_conc.replace(/\\/g, "\\\\")
+                var rule_prem = list_to_string(rules[i].sml_prem).replace(/\\/g, "\\\\")
+                var rule_conn = rules[i].connective.replace(/\\/g, "\\\\")
+                var rule_sml = "Rule(\""+rule_name+"\","+rule_side+","+rule_conc+","+rule_prem+")"
+                if (rule_type == "Logical" && rule_side == "Left") {
+                    if (rule_conn in connective_dict) {
+                        connective_dict[rule_conn][0].push([rule_sml,"\\"+rule_name])
+                    } else {
+                        connective_dict[rule_conn] = [[[rule_sml,"\\"+rule_name]], []]
+                    }
+                } else if (rule_type == "Logical" && rule_side == "Right") {
+                    if (rule_conn in connective_dict) {
+                        connective_dict[rule_conn][1].push([rule_sml,"\\"+rule_name])
+                    } else {
+                        connective_dict[rule_conn] =[[], [[rule_sml,"\\"+rule_name]]]
+                    }
+                } else if (rule_type == "Axiom") {
+                    init_list.push(rule_sml)
+                    it_ordered.push(rule_name)
+                }
+            }
+        }
+        for (var key in connective_dict) {
+            itemsL = unzip(connective_dict[key][0])
+            itemsR = unzip(connective_dict[key][1])
+            var temp = "(Con(\""+key+"\"),"+list_to_string(itemsL[0])+","+list_to_string(itemsR[0])+")"
+            con_ordered.push("\\"+key)
+            rl_ordered = rl_ordered.concat(itemsL[1]).concat(itemsR[1])
+            connective_rules.push(temp)
+        }
+        init_strings = list_to_string(init_list)
+        conn_strings = list_to_string(connective_rules)
+        MathJax.Hub.Queue(["Typeset",MathJax.Hub,rules_container[0]])
+        r = rules.length
+        initWeak(calc_id)
+    })
+}
+
 
 function initWeak(calc_id) {
     $("#loading").attr("class", "ui active inverted dimmer")

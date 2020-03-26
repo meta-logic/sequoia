@@ -47,5 +47,20 @@ function permuteRules(rule1, rule2, init_rules, wL, wR, res) {
     smlInvoke(sml_command, res)
 }
 
+function permuteRules(rule1, rule2, init_rules, wL, wR, res) {
+    var sml_command = "Properties.permute_print("+rule1+","+rule2+","+init_rules+",("+wL+","+wR+"));\n"
+    smlInvoke(sml_command, res)
+}
 
-module.exports = { smlInvoke, applyRule, initRules, weakenSides, permuteRules }
+function cutElim(rule1, formula, init_rules, conn_rules, wL, wR, res) {
+    console.log(rule1)
+    console.log(formula)
+    console.log(init_rules)
+    console.log(conn_rules)
+    console.log(wL)
+    console.log(wR)
+    var sml_command = "Properties.cut_elim_print(("+rule1+","+formula+"),"+conn_rules+",("+init_rules+"),("+wL+","+wR+"));\n"
+    smlInvoke(sml_command, res)
+}
+
+module.exports = { smlInvoke, applyRule, initRules, weakenSides, permuteRules, cutElim }
