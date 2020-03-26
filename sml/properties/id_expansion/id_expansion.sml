@@ -119,19 +119,7 @@ struct
 
     fun init_coherence_print (a,b,c) = 
         (let
-<<<<<<< HEAD
             val print_helper = Ut.print_helper
-=======
-            fun print_helper((clist1,tree1),SOME((clist2,tree2))) = 
-                "$$"^Latex.der_tree_toLatex2(tree1)^"$$"
-                ^"$$"^Ut.constraintL_toString(clist1)^"$$"
-                ^"$$ \\leadsto $$"
-                ^"$$"^Latex.der_tree_toLatex2(tree2)^"$$"
-                ^"$$"^Ut.constraintL_toString(clist2)^"$$"
-            | print_helper((clist1,tree1),NONE) = 
-                "$$"^Latex.der_tree_toLatex2(tree1)^"$$"
-                ^"$$"^Ut.constraintL_toString(clist1)^"$$"
->>>>>>> 02ea267a3d333494c9084f137d80713578102a80
         in
             let val (bol, out) = init_coherence(a,b,c)
                 val t = List.map(fn (bl,pf) => if bl 
