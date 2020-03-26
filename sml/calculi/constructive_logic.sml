@@ -214,7 +214,7 @@ struct
 
 	fun init_coherence_test () = P.init_coherence(rule_pairs_no_init,init_rule_list,axiom_list)
 
-	fun cut_test () = P.cut_elim (cut,rule_pairs_no_init,init_rule_list,weak_test())
+	fun cut_test () = P.cut_elim_print' 1 (cut,rule_pairs_no_init,init_rule_list,weak_test())
 	val weak: (bool list * bool list) option ref = ref NONE
   	fun test([R1],nil) = raise Fail "no R2"
   		| test([R1],[R2]) = 
