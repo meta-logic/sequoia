@@ -249,4 +249,16 @@ struct
     check_arity_ctx_struct(con,arity,L) andalso check_arity_ctx_struct(con,arity,R)
 
 
+
+    fun print_helper((clist1,tree1),SOME((clist2,tree2))) = 
+        "$$"^Latex.der_tree_toLatex2(tree1)^"$$"
+        ^"$$"^constraintL_toString(clist1)^"$$"
+        ^"$$ \\leadsto $$"
+        ^"$$"^Latex.der_tree_toLatex2(tree2)^"$$"
+        ^"$$"^constraintL_toString(clist2)^"$$"
+    | print_helper((clist1,tree1),NONE) = 
+        "$$"^Latex.der_tree_toLatex2(tree1)^"$$"
+        ^"$$"^constraintL_toString(clist1)^"$$"
+
+
 end
