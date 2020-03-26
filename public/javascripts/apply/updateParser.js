@@ -19,7 +19,7 @@ function updateParser(new_symbols, callback) {
         }
         context_variables.push(symbol)
     }
-    $.get("/api/cert_symbols/"+calc_id, function(sb, status) {
+    $.get("/api/parsing_symbols/"+calc_id, function(sb, status) {
         var syms = sb.symbols
         syms = syms.sort(function(a, b){
             return b.symbol.length - a.symbol.length
