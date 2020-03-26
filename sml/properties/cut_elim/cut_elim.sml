@@ -12,6 +12,7 @@ struct
     fun create_base (Dat.Rule(_,_,conc,_)) = 
                 Dat.DerTree("0",Ut.generic_ctx_var conc,NONE,[])
 
+    fun check_true (l) = List.all (fn (_,opt) => Option.isSome(opt)) l
 
     (* (App.apply_constraintL_Unifier (cons,sg)) *)
     fun cut_axiom (cut_rule,axiom, weakening) = 
@@ -50,7 +51,7 @@ struct
             (fn unifier => check(cons,tree,unifier)) axiom_applied
             (* check if the tree with cut can be used to close the conc of 
             that tree without cut *)
-            val result = new_tree_set
+            val result = (check_true new_tree_set,new_tree_set)
         in
             result
         end
@@ -64,7 +65,7 @@ struct
             val pos = List.map (fn (t1,t2) => (t1,SOME t2)) pos
             val neg = List.map (fn t1 => (t1,NONE)) neg
         in
-            pos@neg
+            (List.null neg,pos@neg)
         end
     
 
@@ -152,6 +153,7 @@ struct
                                 find_proofs(found@checked,List.map (fn x => #1x) rem,cut_rules,num_to_apply+1)
                             end
                         )
+                    
                 in 
                     find_proofs([],drt1s,cut_rules_subforms,1)
                 end                   
@@ -193,31 +195,81 @@ struct
 
             val drt1s = create_drt1 (base,cut_rule,rule_combinations,og_sub)
             val (pos,neg) = find_proofs (drt1s,base,cut_rule,subforms)
-
         in
-            pos@neg
+            (List.null neg, pos@neg)
         end
 
     fun cut_elim' (cut_rule,connectives,axioms,weakening) = 
         let
             val (rule,formula) = cut_rule
             (* axioms *)
-            val axioms = List.concat(List.map (fn axiom => cut_axiom(rule,axiom,weakening)) axioms)
+            val check = List.all (fn (bool,_) => bool)
+            val axioms = List.map (fn axiom => cut_axiom(rule,axiom,weakening)) axioms
+            val axioms_check = check axioms
             (* rank_reductions *)
             val all_rules = List.concat 
                 (List.map (fn (_,rulesL,rulesR) => rulesL@rulesR) connectives)
             val rank_reductions = List.map 
                 (fn rule2 => cut_rank_reduction(rule,rule2,weakening)) all_rules
-            val rank_reductions = List.concat rank_reductions
+            val rank_check = check rank_reductions
             (* grade_reductions *)
             val grade_reductions = List.map 
                 (fn con => cut_grade_reduction(rule,con,formula,weakening)) connectives
-            val grade_reductions = List.concat grade_reductions
-
+            val grade_check = check grade_reductions
+            val bool = axioms_check andalso rank_check andalso grade_check
         in
-            (axioms,rank_reductions,grade_reductions)        
+            (bool,axioms,rank_reductions,grade_reductions)        
         end
 
     fun cut_elim (cut_rules,connectives,axioms,weakening) = 
         List.map (fn rule => cut_elim'(rule,connectives,axioms,weakening)) cut_rules
+
+
+    (* ~~~: seperates cut rules *)
+    (* %%% seperates bool/axioms/rank/grade for a cut rule*)
+    (* @@@: seperates rules/connectives *)
+    (* ### seperates bool from proofs*)
+    (* &&& seperates proofs*)
+   
+    (* Ut.print_helper *)
+    val proof_join_fmt = {init = "", sep = "&&&", final = "", fmt = Ut.print_helper }
+
+    fun rule_fmt (bool,proof_l) = 
+        let
+            val proof_l_string = ListFormat.fmt proof_join_fmt proof_l
+            val bool_string = if bool then "T" else "F"
+        in
+            bool_string^"###"^proof_l_string
+        end
+    
+
+    val rule_join_fmt = {init = "", sep = "@@@", final = "", fmt = rule_fmt}
+
+    fun cut_rule_fmt (bool,axioms,rank,grade) =
+        let
+            val axioms_string = ListFormat.fmt rule_join_fmt axioms
+            val rank_string = ListFormat.fmt rule_join_fmt rank
+            val grade_string = ListFormat.fmt rule_join_fmt grade
+            val bool_string = if bool then "T" else "F"
+            val connector = "%%%"
+        in
+            bool_string^connector^axioms_string^connector^rank_string^connector^grade_string
+        end
+
+    val cut_rule_join_fmt = {init = "", sep = "~~~", final = "", fmt = cut_rule_fmt}
+
+    fun cut_elim_print' fd input= 
+        let
+
+
+            val result = cut_elim input
+
+            val result = ListFormat.fmt cut_rule_join_fmt result
+        in
+            Ut.writeFD fd result
+        end
+
+
+    fun cut_elim_print input = cut_elim_print' 3 input
+    
 end

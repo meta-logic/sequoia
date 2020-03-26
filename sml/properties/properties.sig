@@ -30,14 +30,18 @@ sig
 	val permute_print : D.rule * D.rule * D.rule list * (bool list * bool list) -> unit
 
 
-	val cut_axiom : D.rule * D.rule * (bool list * bool list) -> proof list
-	val cut_rank_reduction : D.rule * D.rule * (bool list * bool list) -> proof list
-	val cut_grade_reduction : D.rule * (D.conn * D.rule list * D.rule list) * D.form * (bool list * bool list) -> proof list
+	val cut_axiom : D.rule * D.rule * (bool list * bool list) -> bool * proof list
+	val cut_rank_reduction : D.rule * D.rule * (bool list * bool list) -> bool * proof list
+	val cut_grade_reduction : D.rule * (D.conn * D.rule list * D.rule list) * 
+	D.form * (bool list * bool list) -> bool * proof list
 
 	val cut_elim: (D.rule * D.form) list * (D.conn * D.rule list * D.rule list) list * (D.rule list) * (bool list * bool list) 
-		-> (proof list *
-			proof list *
-			proof list) list
+		-> (bool * ((bool * proof list) list) *
+			((bool * proof list) list) *
+			((bool * proof list) list)) list
+	
+	val cut_elim_print' : int -> (D.rule * D.form) list * (D.conn * D.rule list * D.rule list) list * (D.rule list) * (bool list * bool list) -> unit
+	val cut_elim_print : (D.rule * D.form) list * (D.conn * D.rule list * D.rule list) list * (D.rule list) * (bool list * bool list) -> unit
 		
 
 end

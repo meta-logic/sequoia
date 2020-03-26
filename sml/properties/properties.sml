@@ -42,6 +42,9 @@ struct
 
     val cut_elim = C.cut_elim
 
+    val cut_elim_print' = C.cut_elim_print'
+    val cut_elim_print = C.cut_elim_print
+
     (* fun test_1() =
         let
         val cf = D.Form (D.Con "@", [D.FormVar "R", D.FormVar "S"])
