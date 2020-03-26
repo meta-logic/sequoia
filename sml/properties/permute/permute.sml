@@ -83,7 +83,7 @@ struct
 
 
                         fun apply_init_rule_all_trees (rule,trees) = List.concat (List.map (fn (tree) =>
-                                                             T.apply_rule_everywhere(tree,rule)) trees)
+                                                            T.apply_rule_everywhere(tree,rule)) trees)
 
 
 
@@ -143,10 +143,10 @@ struct
 
     fun permute_res ((right,wrong)) = 
         (case (List.length(right),List.length(wrong)) of
-           ( 0 , 0 ) => "N/A@@@These rules are not capable of permuting."
-         | (_ , 0) => "The Rule Permutes@@@The first rule always permutes up the second. All permutation tree transformations were found and are shown below."
-         | (0,_) => "The Rule Does Not Permute@@@The first rule never permutes up the second. No permutation tree transformations were found."
-         | (_,_) => "The Rule Permutes Sometimes@@@The first rule sometimes permutes up the second. Permutation tree transformations were found for some cases and are shown below, while no permutation transformations were found for the rest.")
+            ( 0 , 0 ) => "N/A@@@These rules are not capable of permuting."
+            | (_ , 0) => "The Rule Permutes@@@The first rule always permutes up the second. All permutation tree transformations were found and are shown below."
+            | (0,_) => "The Rule Does Not Permute@@@The first rule never permutes up the second. No permutation tree transformations were found."
+            | (_,_) => "The Rule Permutes Sometimes@@@The first rule sometimes permutes up the second. Permutation tree transformations were found for some cases and are shown below, while no permutation transformations were found for the rest.")
     
     fun permute_res_to_string (res) = 
         let
