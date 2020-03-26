@@ -248,8 +248,6 @@ struct
     fun check_arity(con: Dat.conn, arity: int, Dat.Rule(_,_,Dat.Seq(L,_,R),_)) = 
     check_arity_ctx_struct(con,arity,L) andalso check_arity_ctx_struct(con,arity,R)
 
-
-
     fun print_helper((clist1,tree1),SOME((clist2,tree2))) = 
         "$$"^Latex.der_tree_toLatex2(tree1)^"$$"
         ^"$$"^constraintL_toString(clist1)^"$$"
