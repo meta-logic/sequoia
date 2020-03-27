@@ -30,7 +30,7 @@ function get_symbols_toTable(tbl) {
             var button_action = 'showInfo(false,'+i+',\''+syms[i]._id+'\',\''+tbl+'\')'
             row.html(
                 '<td id="sym'+i+'" value='+sym+'>$$'+sym+'$$</td>'+
-                '<td id ="typ'+i+'" value='+typ+'>'+typ+
+                '<td id="typ'+i+'" value='+typ+'>'+typ+
                     '<button id="deleteS_'+i+'" onclick="'+button_action+'" class="ui right floated circular red icon button">'+
                         '<i class="icon close"></i>'+
                     '</button>'+
@@ -41,6 +41,26 @@ function get_symbols_toTable(tbl) {
         s = syms.length
         $("#sym").val("")
         $("#typ").val("")
+    })
+}
+
+
+function get_cert_symbols_toTable() {
+    var sym_table = $("#cert_table_head")
+    $.get("/api/cert_symbols/"+$("#calc_id").text(), function(sb, status) {
+        var syms = sb.symbols
+        for (var i = 0; i < syms.length; i++) {
+            var sym = syms[i].symbol
+            var row = document.createElement("tr")
+            row.setAttribute("id", "cert_row"+i)
+            sym_table.after(row, $("#cert_row"+(i-1)))
+            row = $("#cert_row"+i)
+            row.html(
+                '<td id="cert_sym'+i+'" value='+sym+'>$$'+sym+'$$</td>'+
+                '<td id="cert_ltx'+i+'" value='+sym+'>'+sym+'</td>'
+            )
+            MathJax.Hub.Queue(["Typeset",MathJax.Hub,sym])
+        }
     })
 }
 

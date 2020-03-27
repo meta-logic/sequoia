@@ -30,6 +30,7 @@ function selectRule(bl, i) {
     }
 }
 
+
 function permRules() {
     $("#loading").attr("class", "ui active inverted dimmer")
     $("#good_trees").html("")

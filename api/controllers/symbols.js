@@ -104,7 +104,7 @@ function getSeqSymbols (req, res) {
 }
 
 
-function getCertainSymbols (req, res) {
+function getParsingSymbols (req, res) {
     Symbols.find({ $and: [{'calculus': req.params.calc_id}, 
     {$or:[{group: "seq"},{type : {$in: ["connective", "sequent sign", "context separator", "empty"]}}]}]}, 
     function (err, symbols) {
@@ -122,4 +122,22 @@ function getCertainSymbols (req, res) {
 }
 
 
-module.exports = {addSymbol, addSymbols, deleteSymbol, getRuleSymbols, getSeqSymbols, getCertainSymbols}
+function getCertainSymbols (req, res) {
+    Symbols.find({ $and: [{'calculus': req.params.calc_id}, 
+    {type : {$in: ["connective", "sequent sign", "context separator", "empty"]}}]}, 
+    function (err, symbols) {
+        if (err || symbols == null) {
+            return res.status(400).json({
+                "status"  : "failure",
+                "message" : "symbol does not exist"
+            })
+        }
+        return res.status(200).json({
+            "status"  : "success",
+            "symbols" : symbols
+        })
+    })
+}
+
+
+module.exports = {addSymbol, addSymbols, deleteSymbol, getRuleSymbols, getSeqSymbols, getParsingSymbols, getCertainSymbols}

@@ -14,7 +14,7 @@ function checkInit() {
     $("#loading").attr("class", "ui active inverted dimmer")
     $.get("/api/rules/"+calc_id, function (rls, status) { 
         var rules = rls.rules
-        var intitial_rules = []
+        var init_list = []
         var connective_rules = []
         var connective_dict = {}
         var con_ordered = []
@@ -39,17 +39,17 @@ function checkInit() {
                     connective_dict[rule_conn] =[[], [rule_sml]]
                 }
             } else if (rule_type == "Axiom") {
-                intitial_rules.push(rule_sml)
+                init_list.push(rule_sml)
             }
         }
-        var init_strings = list_to_string(intitial_rules)
         for (var key in connective_dict) {
             con_ordered.push("\\"+key)
             var temp = "(Con(\""+key+"\"),"+list_to_string(connective_dict[key][0])+","+list_to_string(connective_dict[key][1])+")"
             connective_rules.push(temp)
         }
-        var connective_strings = list_to_string(connective_rules)
-        $.post("/initRules", { first: connective_strings, second: init_strings, third: "[]"}, function(data, status) {
+        var init_strings = list_to_string(init_list)
+        var conn_strings = list_to_string(connective_rules)
+        $.post("/initRules", { first: conn_strings, second: init_strings, third: "[]"}, function(data, status) {
             $("#init_button").css("display", "none")
             var output = data.output.split("%%%")
             var result = output[0]
@@ -77,7 +77,7 @@ function checkInit() {
                         color = "green"
                     }
                     cp.append( 
-                        '<div id="init_card'+i+'" class="'+color+' card">'+
+                        '<div class="'+color+' card">'+
                             '<div class="content">'+
                                 '<div class="header">$$'+con_ordered[i]+'$$</div>'+
                             '</div>'+

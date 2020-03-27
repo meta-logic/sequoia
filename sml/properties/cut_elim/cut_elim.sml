@@ -250,7 +250,8 @@ struct
             val axioms_string = ListFormat.fmt rule_join_fmt axioms
             val rank_string = ListFormat.fmt rule_join_fmt rank
             val grade_string = ListFormat.fmt rule_join_fmt grade
-            val bool_string = if bool then "T" else "F"
+            val bool_string = if bool then "Cut Admissibility Test Succeeds@@@The selected cut rule is admissible in this calculus. The proof tree transformations are shown below for each rule and connective." 
+                                    else "Cut Admissibility Test Fails@@@The selected cut rule is not admissible in this calculus. There are proof tree transformations that could not be found for certain rules or connectives."
             val connector = "%%%"
         in
             bool_string^connector^axioms_string^connector^rank_string^connector^grade_string
@@ -262,9 +263,9 @@ struct
         let
 
 
-            val result = cut_elim input
+            val result = cut_elim' input
 
-            val result = ListFormat.fmt cut_rule_join_fmt result
+            val result = cut_rule_fmt result
         in
             Ut.writeFD fd result
         end
