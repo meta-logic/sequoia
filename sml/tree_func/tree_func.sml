@@ -6,7 +6,8 @@
     structure App = applyunifierImpl
     structure U = unifyImpl
     structure E = Equivalence
-
+    structure Latex = latexImpl
+    structure Html = htmlImpl
 
 
     type conn = Dat.conn
@@ -231,19 +232,19 @@
             | _ => 
                 let 
                     val filtered = List.map (update_cons) filtered
-                    val new_premises = List.map(fn (cn, tr) => (cn, get_premises_of(tr,id))) filtered 
+                    val new_premises = List.map(fn (cn, tr) => (cn, Latex.der_tree_toLatex2(tr), Html.der_tree_toHtml(tr), Html.der_tree_toHtml2(tr), get_premises_of(tr,id))) filtered 
                     fun prems_to_vars prems = List.map (fn x => Dat.ctx_var_toString x) (List.concat (List.map get_ctx_vars prems))
                     fun hd (l) = List.hd(l) handle (List.Empty) => ""
                     fun tl (l) = List.tl(l) handle (List.Empty) => []
                 in
                     (case new_premises of 
-                    [(_,[])] => writeFD 3 ("[{}@@{}@@{}@@{"^(Int.toString(get_index()))^"}]")
+                    [(_,_,_,_,[])] => writeFD 3 ("[{}@@{}@@{}@@{"^(Int.toString(get_index()))^"}]")
                     | _ => 
-                        let val new_premises_strings = List.map (fn (cn_list, pr_list) => 
-                                (List.map (Dat.const_toString) cn_list, List.map (Dat.seq_toString) pr_list, prems_to_vars(pr_list) )) new_premises
-                            val new_premises_strings2 = List.map (fn (c, p, v): (string list * string list * string list) => 
+                        let val new_premises_strings = List.map (fn (cn_list, latex_tree, html_tree, sml_tree, pr_list) => 
+                                (List.map (Dat.const_toString) cn_list, List.map (Dat.seq_toString) pr_list, prems_to_vars(pr_list), latex_tree, html_tree, sml_tree)) new_premises
+                            val new_premises_strings2 = List.map (fn (c, p, v, l, h, s): (string list * string list * string list * string * string * string) => 
                                     "{"^(List.foldl (fn (str1,str2) => str2^"##"^str1) (hd(c)) (tl(c)))^"}@@"^
-                                    "{"^(List.foldl (fn (str1,str2) => str2^"##"^str1) (hd(p)) (tl(p)))^"}@@"^
+                                    "{"^(List.foldl (fn (str1,str2) => str2^"##"^str1) (hd(p)) (tl(p)))^"%%"^l^"%%"^h^"%%"^s^"}@@"^
                                     "{"^(List.foldl (fn (str1,str2) => str2^"##"^str1) (hd(v)) (tl(v)))^"}@@"^
                                     "{"^(Int.toString(get_index()))^"}"
                                     )new_premises_strings
