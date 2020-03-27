@@ -216,7 +216,7 @@
         let val () = change_index(index)
             val new_trees = List.map(fn (_,cn,tr) => (cn, tr))(apply_rule(([],[],tree),rule,id))
             val filtered = List.filter(fn (cn, tr) => check_rule_of(cn,tr,id))new_trees
-            val Dat.DerTree (_,temp_conc,_,_) = tree
+            (* val Dat.DerTree (_,temp_conc,_,_) = tree
             val pre_conc = (get_seq_of(tree,id)) handle (NotFound) => temp_conc
             fun update_cons (cn,tr) = 
                 let
@@ -225,13 +225,13 @@
                     val new_cons = filter_constraints new_cons
                 in
                     (new_cons@cn,tr)
-                end
+                end *)
         in
             (case filtered of 
             [] => writeFD fd "NOT APPLICABLE"
             | _ => 
                 let 
-                    val filtered = List.map (update_cons) filtered
+                    (* val filtered = List.map (update_cons) filtered *)
                     val new_premises = List.map(fn (cn, tr) => (cn, Latex.der_tree_toLatex2(tr), Html.der_tree_toHtml(tr), Html.der_tree_toHtml2(tr), get_premises_of(tr,id))) filtered 
                     fun prems_to_vars prems = List.map (fn x => Dat.ctx_var_toString x) (List.concat (List.map get_ctx_vars prems))
                     fun hd (l) = List.hd(l) handle (List.Empty) => ""
