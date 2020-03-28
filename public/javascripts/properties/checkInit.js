@@ -49,6 +49,14 @@ function checkInit() {
         }
         var init_strings = list_to_string(init_list)
         var conn_strings = list_to_string(connective_rules)
+        if (init_list.length == 0) {
+            $("#info_header").html("Rules Missing")
+            $("#info_text").html("No initial or axiom rules are defined for this calculus system. Therefore, identity expansion cannot be checked.")
+            $("#loading").attr("class", "ui inactive inverted dimmer")
+            $("#info_answer").attr("class", "ui negative message")
+            $("#info_answer").css("display", "block")
+            return
+        }
         $.post("/initRules", { first: conn_strings, second: init_strings, third: "[]"}, function(data, status) {
             $("#init_button").css("display", "none")
             var output = data.output.split("%%%")
