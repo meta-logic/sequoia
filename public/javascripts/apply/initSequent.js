@@ -20,9 +20,7 @@ function useSequent() {
         for (var i = 0; i < syms.length; i++) {
             var symbol = syms[i].symbol
             var type = syms[i].type
-            if (symbol.includes("\\")) {
-                symbol = "\\" + symbol
-            }
+            symbol = symbol.replace(/\\/g, "\\\\")
             if (type == "sequent sign") {
                 arrow += "/ \"" + symbol + "\" "
             }
@@ -56,7 +54,7 @@ function useSequent() {
 function parse_and_use(temp_parser) {
     var sequent = $("#Sequent").val().replace(/\(/g, " ( ").replace(/\)/g, " ) ")
     try {
-        temp_parser.parse(sequent)
+        var sml_seq = temp_parser.parse(sequent).replace(/\\/g, "\\\\")
     }
     catch(error) {
         $("#warning_header").html("Sequent Parsing Error")
@@ -75,4 +73,15 @@ function parse_and_use(temp_parser) {
         seq_text = $(this).find("script")[0].innerText
         $("#warning").css("visibility","hidden")
     })
+    var stree = "DerTree(\"0\","+sml_seq+", NONE, [])"
+    sml_history.push(stree)
+    var ltree ="\\deduce[]{"+sequent+"}{0}"
+    latex_history.push(ltree)
+    var htree = 
+        "<div id=\"prooftree_0\" class=\"tree\">"+
+            "<div id=\"exp_0\" class=\"sequence\">"+
+                "<div id=\"conc_0\" class=\"leaf\">$$"+sequent+"$$</div>"+
+            "</div>"+
+        "</div>"
+    tree_history.push(htree)
 }

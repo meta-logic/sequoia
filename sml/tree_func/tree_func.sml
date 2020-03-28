@@ -212,9 +212,9 @@
 
     fun filter_constraints (cons) = List.filter (fn (_,l1,l2) => not (H.mset_eq(l1,l2,Dat.ctx_var_eq)) ) cons
 
-    fun translate_premises' fd (tree,rule,id, index) = 
+    fun translate_premises' fd (constraints,tree,rule,id,index) = 
         let val () = change_index(index)
-            val new_trees = List.map(fn (_,cn,tr) => (cn, tr))(apply_rule(([],[],tree),rule,id))
+            val new_trees = List.map(fn (_,cn,tr) => (cn, tr))(apply_rule(([],constraints,tree),rule,id))
             val filtered = List.filter(fn (cn, tr) => check_rule_of(cn,tr,id))new_trees
             (* val Dat.DerTree (_,temp_conc,_,_) = tree
             val pre_conc = (get_seq_of(tree,id)) handle (NotFound) => temp_conc
@@ -232,8 +232,8 @@
             | _ => 
                 let 
                     (* val filtered = List.map (update_cons) filtered *)
-                    val new_premises = List.map(fn (cn, tr) => (cn, Latex.der_tree_toLatex2(tr), Html.der_tree_toHtml(tr), Html.der_tree_toHtml2(tr), get_premises_of(tr,id))) filtered 
-                    fun prems_to_vars prems = List.map (fn x => Dat.ctx_var_toString x) (List.concat (List.map get_ctx_vars prems))
+                    val new_premises = List.map(fn (cn, tr) => (cn, Latex.der_tree_toLatex(tr), Html.der_tree_toHtml(tr), Html.der_tree_toHtml2(tr), get_premises_of(tr,id))) filtered 
+                    fun prems_to_vars prems = List.map (fn Dat.CtxVar(_,x) => x) (List.concat (List.map get_ctx_vars prems))
                     fun hd (l) = List.hd(l) handle (List.Empty) => ""
                     fun tl (l) = List.tl(l) handle (List.Empty) => []
                 in
@@ -241,11 +241,11 @@
                     [(_,_,_,_,[])] => writeFD 3 ("[{}@@{}@@{}@@{"^(Int.toString(get_index()))^"}]")
                     | _ => 
                         let val new_premises_strings = List.map (fn (cn_list, latex_tree, html_tree, sml_tree, pr_list) => 
-                                (List.map (Dat.const_toString) cn_list, List.map (Dat.seq_toString) pr_list, prems_to_vars(pr_list), latex_tree, html_tree, sml_tree)) new_premises
-                            val new_premises_strings2 = List.map (fn (c, p, v, l, h, s): (string list * string list * string list * string * string * string) => 
-                                    "{"^(List.foldl (fn (str1,str2) => str2^"##"^str1) (hd(c)) (tl(c)))^"}@@"^
-                                    "{"^(List.foldl (fn (str1,str2) => str2^"##"^str1) (hd(p)) (tl(p)))^"%%"^l^"%%"^h^"%%"^s^"}@@"^
-                                    "{"^(List.foldl (fn (str1,str2) => str2^"##"^str1) (hd(v)) (tl(v)))^"}@@"^
+                                (List.map (Dat.const_toString) cn_list, List.map (Dat.const_stringify) cn_list, List.map (Dat.seq_toString) pr_list, prems_to_vars(pr_list), latex_tree, html_tree, sml_tree)) new_premises
+                            val new_premises_strings2 = List.map (fn (c, z, p, v, l, h, s): (string list * string list * string list * string list * string * string * string) => 
+                                    "{"^(String.concatWith ("##")c)^"%%["^(String.concatWith (",")z)^"]}@@"^
+                                    "{"^(String.concatWith ("##")p)^"%%"^l^"%%"^h^"%%"^s^"}@@"^
+                                    "{"^(String.concatWith ("##")v)^"}@@"^
                                     "{"^(Int.toString(get_index()))^"}"
                                     )new_premises_strings
                             val final_form = "["^(List.foldl (fn (str1,str2) => str1^" && "^str2) (List.hd(new_premises_strings2)) (List.tl(new_premises_strings2)))^"]"
@@ -263,11 +263,11 @@
             Dat.Rule(name,side,new_conc,new_prems)
         end
 
-    fun translate_premises_cut' fd (tree, rule, id , index, sub) = 
+    fun translate_premises_cut' fd (constraints, tree, rule, id , index, sub) = 
         let
             val new_rule = update_cut_rule (rule,sub) 
         in
-            translate_premises' fd (tree,new_rule,id,index)
+            translate_premises' fd (constraints,tree,new_rule,id,index)
         end
 
     fun translate_premises (input) = translate_premises_cut' 3 input

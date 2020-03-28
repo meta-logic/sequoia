@@ -15,7 +15,7 @@ function updateParser(new_symbols, callback) {
     var context_variables = []
     for (var symbol in new_symbols) {
         if (symbol.includes("\\")) {
-            symbol = "\\" + symbol
+            symbol = symbol.replace(/\\/g, "\\\\")
         }
         context_variables.push(symbol)
     }
@@ -27,9 +27,7 @@ function updateParser(new_symbols, callback) {
         for (var i = 0; i < syms.length; i++) {
             var symbol = syms[i].symbol
             var type = syms[i].type
-            if (symbol.includes("\\")) {
-                symbol = "\\" + symbol
-            }
+            symbol = symbol.replace(/\\/g, "\\\\")
             if (type == "sequent sign") {
                 arrow += "/ \"" + symbol + "\" "
             }
@@ -62,6 +60,7 @@ function updateParser(new_symbols, callback) {
 
     var extra_text = "\n" + arrow + "\n" + sep + "\n" + conn + "\n" + set + "\n" + form + "\n" + atom_var + "\n" + atom + "\n" 
     parser_text += extra_text
+    console.log(extra_text)
     parser = peg.generate(parser_text)
     formula_parser_text += extra_text
     formula_parser = peg.generate(formula_parser_text)

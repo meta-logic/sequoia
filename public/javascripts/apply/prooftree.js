@@ -1,30 +1,71 @@
-var previous = []
-var leaf_id = "-1"
-var seq_text = ""
 
-function insert_in_tree(branch_id, rule, derivations) {
-    var proof_tree = $("#prooftree_"+branch_id)
-    proof_tree.append('<div id="applied_'+branch_id+'" class="rule">$$\\scriptsize{'+rule+'}$$</div>')
-    var new_trees = ""
-    for (var i = 0; i < derivations.length; i++) {
-        new_trees +=
-            '<div id="prooftree_'+branch_id+i+'" class="tree">'+
-                '<div id="exp_'+branch_id+i+'" class="sequence">'+
-                    '<div id="conc_'+branch_id+i+'" class="leaf">$$'+derivations[i]+'$$</div>'+
-                '</div>'+
-            '</div>'
+function insert_new_tree(cn, cz, lt, ht, st) {
+    latex_history.push(lt)
+    sml_history.push(st.replace(/\\/g, "\\\\"))
+    tree_history.push(ht)
+    var main_tree = $("#main_tree")
+    main_tree.html(ht)
+    $(".leaf").click(function() {
+        leaf_id = this.id.split("_")[1]
+        seq_text = $(this).find("script")[0].innerText
+        console.log(seq_text)
+        $("#warning").css("visibility","hidden")
+    })
+    constraint_history.push(cn)
+    smlconstraint_history.push(cz.replace(/\\/g, "\\\\"))
+    if (constraint_history.length > 0) {
+        var the_constraints = constraint_history[constraint_history.length-1]
+        if (the_constraints[0] != "") {
+            var constraints = $("#side_menu_L")
+            constraints.html("")
+            for (var i = 0; i < the_constraints.length; i++) {
+                if (the_constraints[i] != "") {
+                    constraints.append('<p>$$'+the_constraints[i]+'$$</p>')  
+                }
+            }
+            $("#left_menu").css("visibility","visible")
+            MathJax.Hub.Queue(["Typeset",MathJax.Hub,constraints[0]])
+        }
+    } else {
+        $("#left_menu").css("visibility","hidden")
     }
-    $("#conc_"+branch_id).attr("class", "conclusion")
-    var tree_branch = $("#exp_"+branch_id)
-    tree_branch.html('<div id="delete_'+branch_id+'" class="premises">'+new_trees+'</div>'+tree_branch.html() )
-    MathJax.Hub.Queue(["Typeset", MathJax.Hub,$("#applied_"+branch_id)[0]])
-    MathJax.Hub.Queue(["Typeset",MathJax.Hub,$("#delete_"+branch_id)[0]])
-    previous.unshift([branch_id,seq_text])
+    seq_text = ""
+    leaf_id = "-1"
+    MathJax.Hub.Queue(["Typeset",MathJax.Hub,main_tree[0]])
 }
 
 
-function remove_from_tree(branch_id) {
-    $("#applied_"+branch_id).remove()
-    $("#delete_"+branch_id).remove()
-    $("#conc_"+branch_id).attr("class", "leaf")
+function insert_old_tree() {
+    latex_history.pop()
+    sml_history.pop()
+    tree_history.pop()
+    var main_tree = $("#main_tree")
+    main_tree.html(tree_history[tree_history.length-1])
+    $(".leaf").click(function() {
+        leaf_id = this.id.split("_")[1]
+        seq_text = $(this).find("script")[0].innerText
+        console.log(seq_text)
+        $("#warning").css("visibility","hidden")
+    })
+    constraint_history.pop()
+    smlconstraint_history.pop()
+    if (constraint_history.length > 0) {
+        var the_constraints = constraint_history[constraint_history.length-1]
+        if (the_constraints[0] != "") {
+            var constraints = $("#side_menu_L")
+            constraints.html("")
+            for (var i = 0; i < the_constraints.length; i++) {
+                if (the_constraints[i] != "") {
+                    constraints.append('<p>$$'+the_constraints[i]+'$$</p>')  
+                }
+            }
+            $("#left_menu").css("visibility","visible")
+            MathJax.Hub.Queue(["Typeset",MathJax.Hub,constraints[0]])
+        }
+    } else {
+        $("#left_menu").css("visibility","hidden")
+    }
+    seq_text = ""
+    leaf_id = "-1"
+    MathJax.Hub.Queue(["Typeset",MathJax.Hub,main_tree[0]])
 }

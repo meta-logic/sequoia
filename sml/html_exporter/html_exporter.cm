@@ -1,6 +1,6 @@
 Group
   signature EXPORTHTML
-  structure HTML_Export
+  structure htmlImpl
 is
   ../basics/basics.cm
   ../applyunifier/applyunifier.cm

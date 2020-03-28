@@ -16,25 +16,31 @@ signature DATATYPES = sig
     val conn_eq : conn * conn -> bool
 
     val form_toString : form -> string
+    val form_stringify : form -> string
     val form_eq : form * form -> bool
     val form_alpha_eq : form * form -> bool
     val form_larger : form * form -> bool
     val formL_toString : form list -> string
 
     val ctx_var_toString : ctx_var -> string
+    val ctx_var_stringify : ctx_var -> string
     val ctx_var_eq : ctx_var * ctx_var -> bool
     val ctx_varL_toString : ctx_var list -> string
     val const_toString : ctx_var * ctx_var list * ctx_var list -> string
+    val const_stringify : ctx_var * ctx_var list * ctx_var list -> string
 
     val ctx_toString : ctx -> string
+    val ctx_stringify : ctx -> string
     val ctx_eq : ctx * ctx -> bool
     val ctx_alpha_eq : ctx * ctx -> bool
 
     val ctx_struct_toString : ctx_struct -> string
+    val ctx_struct_stringify : ctx_struct -> string
     val ctx_struct_eq : ctx_struct * ctx_struct -> bool
     val ctx_struct_alpha_eq : ctx_struct * ctx_struct -> bool
 
     val seq_toString : seq -> string
+    val seq_stringify : seq -> string
     val seq_eq : seq * seq -> bool
     val seq_alpha_eq : seq * seq -> bool
 

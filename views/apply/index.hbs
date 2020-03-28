@@ -42,6 +42,7 @@
       <thead><tr><th>Usable Symbols</th><th>Latex</th></tr></thead>
       <tbody id="cert_table_head"></tbody>
     </table>
+    <br>
     <table id="sym_table" class= "ui sortable fixed single line celled table" style="visibility: hidden;">
       <thead><tr><th>Sequent Term Symbols</th><th>Types</th></tr></thead>
       <tbody id="init"><tbody> 
@@ -69,7 +70,7 @@
   </div>
   <div class="three wide column">
       <div class="ui two attached buttons">
-        <button id="export" class="ui disabled fluid huge icon button green" onclick="sendEmail(latex_tree[0])">
+        <button id="export" class="ui disabled fluid huge icon button green" onclick="sendEmail()">
           <i class="icon download"></i>Export to Latex
         </button>
         <button id="undo" class="ui disabled fluid huge icon button red" onclick="undo()">

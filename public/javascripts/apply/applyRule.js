@@ -1,55 +1,20 @@
-var constraint_history = []
 var rng_index = "0"
 var fresh_symbols = {}
+var seq_text = ""
+var leaf_id = "-1"
 var cut_var = ""
 var cut_form = ""
-var latex_tree = []
+var sml_history = []
+var latex_history = []
+var tree_history = []
+var smlconstraint_history = ["nil"]
+var constraint_history = []
 
-function find_tree(id) {
-    var tree = latex_tree[0]
-    for(var i = 1; i < id.length; i++) {
-        tree = tree["premises"][parseInt(id[i])] 
+function sendEmail() {
+    $("#latex").html("Tree: <br>"+latex_history[latex_history.length-1])
+    if (constraint_history.length > 0) {
+        $("#latex").append("<br><br> Constraints: <br>["+((constraint_history[constraint_history.length-1]).join(","))+"]")
     }
-    return tree
-}
-
-
-function insert_premises(id, rulename, prems) {
-    var latex_prems = []
-    for(var i = 0; i < prems.length; i++) {
-        latex_prems.push({"conclusion" : prems[i], "rulename" : "", "premises" : []})
-    }
-    find_tree(id)["rulename"] = rulename
-    find_tree(id)["premises"] = latex_prems
-}
-
-
-function remove_premises(id) {
-    find_tree(id)["rulename"] = ""
-    find_tree(id)["premises"] = []
-}
-
-
-function export_to_latex(tree) {
-    var premises = tree["premises"]
-    var rulename = tree["rulename"]
-    var conclusion = tree["conclusion"]
-    if (rulename == "") {
-        return conclusion
-    } else {
-        var latex_prems = []
-        for(var i = 0; i < premises.length; i++) {
-            latex_prems.push(export_to_latex(premises[i]))
-        }
-        var latex = "\\infer["+rulename+"]{"+conclusion+"}{"+latex_prems.join(" & ")+"}"
-    }
-    return latex
-}
-
-
-function sendEmail(tree) {
-    var latex = export_to_latex(tree)
-    $("#latex").html(latex)
     $('#modal3').modal({
         onApprove: function () {
             var email = $("#email").val()
@@ -107,8 +72,9 @@ function applyRule(i) {
                 return
             }
             var rule_sml = "Rule(\""+name+"\",None,"+conclusion+","+premises+")"
-            var tree_sml = "DerTree(\""+leaf_id+"\","+sequent+", NONE, [])"
-            var params = { rule: rule_sml, tree: tree_sml, node_id: "\""+leaf_id+"\"", index : rng_index, subs: "[]" }
+            var tree_sml = sml_history[sml_history.length-1]
+            var constraints_sml = smlconstraint_history[smlconstraint_history.length-1]
+            var params = { rule: rule_sml, constraints: constraints_sml, tree: tree_sml, node_id: "\""+leaf_id+"\"", index : rng_index, subs: "[]" }
             if (type == "Cut") {
                 try {
                     var cF = formula_parser.parse(cut_form).replace(/\\/g, "\\\\")
@@ -118,7 +84,7 @@ function applyRule(i) {
                     $("#warning").css("visibility","visible")
                     return
                 }
-                params = { rule: rule_sml, tree: tree_sml, node_id: "\""+leaf_id+"\"", index : rng_index, subs: "[Fs(FormVar(\""+cut_var+"\"),"+cF+")]" }
+                params = { rule: rule_sml, constraints: constraints_sml, tree: tree_sml, node_id: "\""+leaf_id+"\"", index : rng_index, subs: "[Fs(FormVar(\""+cut_var+"\"),"+cF+")]" }
             }
             $.post("/apply", params, function(data, status) {
                 cut_var = ""
@@ -130,12 +96,22 @@ function applyRule(i) {
                     $("#warning").css("visibility","visible")
                     return
                 }
-                var prem_set = []
                 var cons_set = []
+                var new_sml_cons = []
+                var prem_set = []
+                var new_latex_trees = []
+                var new_html_trees = []
+                var new_sml_trees = []
                 for (var k = 0; k < output.length; k++) {
                     var prems_cons = output[k].split("@@")
-                    cons_set.push(prems_cons[0].trim().slice(1,-1).split("##"))
-                    prem_set.push(prems_cons[1].trim().slice(1,-1).split("##"))
+                    var cons_sml = prems_cons[0].trim().slice(1,-1).split("%%")
+                    cons_set.push(cons_sml[0].split("##"))
+                    new_sml_cons.push(cons_sml[1])
+                    var prems_latex_html_sml = prems_cons[1].trim().slice(1,-1).split("%%")
+                    prem_set.push(prems_latex_html_sml[0].split("##"))
+                    new_latex_trees.push(prems_latex_html_sml[1])
+                    new_html_trees.push(prems_latex_html_sml[2])
+                    new_sml_trees.push(prems_latex_html_sml[3])
                     fresh_list = prems_cons[2].trim().slice(1,-1).split("##")
                     for (var y = 0; y < fresh_list.length; y++) {
                         if (fresh_list[y].length != 0) {
@@ -146,28 +122,7 @@ function applyRule(i) {
                 }
                 if (prem_set.length == 1) {
                     var index = 0
-                    insert_in_tree(leaf_id, name.replace(/\\\\/g,"\\"), prem_set[0])
-                    insert_premises(leaf_id, name.replace(/\\\\/g,"\\"), prem_set[0])
-                    $(".leaf").click(function() {
-                        leaf_id = this.id.split("_")[1]
-                        seq_text = $(this).find("script")[0].innerText
-                        $("#warning").css("visibility","hidden")
-                    })
-                    constraint_history.push(cons_set[index])
-                    var the_constraints = constraint_history.flat()
-                    var constraints = $("#side_menu_L")
-                    constraints.html("")
-                    for (i = 0; i < the_constraints.length; i++) {
-                        if (the_constraints[i] != "") {
-                            constraints.append('<p>$$'+the_constraints[i]+'$$</p>') 
-                        }
-                    }
-                    if (constraint_history.length == 0) {
-                        $("#left_menu").css("visibility","hidden")
-                    } else {
-                        $("#left_menu").css("visibility","visible")
-                    }
-                    MathJax.Hub.Queue(["Typeset",MathJax.Hub,constraints[0]])
+                    insert_new_tree(cons_set[index],new_sml_cons[index],new_latex_trees[index],new_html_trees[index],new_sml_trees[index])
                 } else {
                     var choice = $("#choice")
                     choice.html("")
@@ -180,28 +135,7 @@ function applyRule(i) {
                     $(".select").click(function() {
                         var index = parseInt(this.getAttribute("num"))
                         $("#info").css("display","none")
-                        insert_in_tree(leaf_id, name.replace(/\\\\/g,"\\"), prem_set[index])
-                        insert_premises(leaf_id, name.replace(/\\\\/g,"\\"), prem_set[index])
-                        $(".leaf").click(function() {
-                            leaf_id = this.id.split("_")[1]
-                            seq_text = $(this).find("script")[0].innerText
-                            $("#warning").css("visibility","hidden")
-                        })
-                        constraint_history.push(cons_set[index])
-                        var the_constraints = constraint_history.flat()
-                        var constraints = $("#side_menu_L")
-                        constraints.html("")
-                        for (var i = 0; i < the_constraints.length; i++) {
-                            if (the_constraints[i] != "") {
-                                constraints.append('<p>$$'+the_constraints[i]+'$$</p>')  
-                            }
-                        }
-                        if (constraint_history.length == 0) {
-                            $("#left_menu").css("visibility","hidden")
-                        } else {
-                            $("#left_menu").css("visibility","visible")
-                        }
-                        MathJax.Hub.Queue(["Typeset",MathJax.Hub,constraints[0]])
+                        insert_new_tree(cons_set[index],new_sml_cons[index],new_latex_trees[index],new_html_trees[index],new_sml_trees[index])
                     })
                 }
             })
@@ -213,31 +147,7 @@ function applyRule(i) {
 function undo() {
     $("#warning").css("visibility","hidden")
     $("#info").css("display","none")
-    if (previous.length != 0) {
-        var undo_items = previous.shift()
-        leaf_id = undo_items[0] 
-        seq_text = undo_items[1]
-        remove_from_tree(leaf_id)
-        remove_premises(leaf_id)
-        $(".leaf").click(function() {
-            leaf_id = this.id.split("_")[1]
-            seq_text = $(this).find("script")[0].innerText
-            $("#warning").css("visibility","hidden")
-        })
-        constraint_history.pop()
-        var the_constraints = constraint_history.flat()
-        var constraints = $("#side_menu_L")
-        constraints.html("")
-        for (var i = 0; i < the_constraints.length; i++) {
-            if (the_constraints[i] != "") {
-                constraints.append('<p>$$'+the_constraints[i]+'$$</p>') 
-            }
-        }
-        if (constraint_history.length == 0) {
-            $("#left_menu").css("visibility","hidden")
-        } else {
-            $("#left_menu").css("visibility","visible")
-        }
-        MathJax.Hub.Queue(["Typeset",MathJax.Hub,constraints[0]])
+    if (tree_history.length > 1) {
+        insert_old_tree()
     }
 }

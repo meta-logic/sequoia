@@ -27,8 +27,8 @@ function smlInvoke(sml_command, res) {
     processRef.stdin.write(smlTerminalInput)
 }
 
-function applyRule(rule, tree, id, index, subs, res) {
-    var sml_command = "treefuncImpl.translate_premises("+tree+","+rule+","+id+","+index+","+subs+");\n"
+function applyRule(rule, constraints, tree, id, index, subs, res) {
+    var sml_command = "treefuncImpl.translate_premises("+constraints+","+tree+","+rule+","+id+","+index+","+subs+");\n"
     smlInvoke(sml_command, res)
 }
 
@@ -53,12 +53,6 @@ function permuteRules(rule1, rule2, init_rules, wL, wR, res) {
 }
 
 function cutElim(rule1, formula, init_rules, conn_rules, wL, wR, res) {
-    console.log(rule1)
-    console.log(formula)
-    console.log(init_rules)
-    console.log(conn_rules)
-    console.log(wL)
-    console.log(wR)
     var sml_command = "Properties.cut_elim_print(("+rule1+","+formula+"),"+conn_rules+",("+init_rules+"),("+wL+","+wR+"));\n"
     smlInvoke(sml_command, res)
 }
