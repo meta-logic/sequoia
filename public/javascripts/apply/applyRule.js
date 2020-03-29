@@ -11,14 +11,19 @@ var smlconstraint_history = ["nil"]
 var constraint_history = []
 
 function sendEmail() {
-    $("#latex").html("Tree: <br>"+latex_history[latex_history.length-1])
+    var latex_tree = latex_history[latex_history.length-1]
+    var latex_constraints = ""
+    $("#latex").html("Tree: <br>"+latex_tree)
     if (constraint_history.length > 0) {
-        $("#latex").append("<br><br> Constraints: <br>["+((constraint_history[constraint_history.length-1]).join(","))+"]")
+        latex_constraints = ((constraint_history[constraint_history.length-1]).join(","))
+        $("#latex").append("<br><br> Constraints: <br>["+latex_constraints+"]")
     }
     $('#modal3').modal({
         onApprove: function () {
             var email = $("#email").val()
-            window.open('mailto:'+encodeURIComponent(email)+'?subject='+encodeURIComponent("Sequoia Latex Proof Tree")+'&body='+encodeURIComponent(latex));
+            window.open('mailto:'+encodeURIComponent(email)+
+            '?subject='+encodeURIComponent("Sequoia Latex Proof Tree")+
+            '&body='+encodeURIComponent("Tree: \n"+latex_tree+"\n\n"+"Constraints: \n"+latex_constraints));
         }
     }).modal('setting', 'closable', false).modal('show')
 }
