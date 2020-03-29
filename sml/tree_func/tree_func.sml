@@ -55,6 +55,9 @@
             Dat.Seq(ctx_struct_trans l, c, ctx_struct_trans r)
         end
 
+    fun get_form_vars(Dat.Form (_, fl)) = List.concat(List.map(get_form_vars)fl)
+        | get_form_vars (f) = [f]
+
     fun get_forms(Dat.Seq (l,_,r)) = 
         let 
             fun get_forms_aux(Dat.Empty) = []
@@ -75,7 +78,8 @@
                 | bad_sub(Dat.CTXs(v1, Dat.Ctx(_, fl)), sequent) = 
                     List.exists(fn v2 => Dat.ctx_var_eq(v1,v2))(get_ctx_vars sequent)
                 | bad_sub(Dat.Fs(a1,_), sequent) = 
-                    List.exists(fn a2 => Dat.form_eq(a1,a2))(get_forms sequent)
+                    List.exists(fn a2 => Dat.form_eq(a1,a2))
+                    (List.concat(List.map(get_form_vars)(get_forms sequent)))
                 | bad_sub _ = false
         in 
             List.filter(fn (sb,_) => not (List.exists(fn s => bad_sub(s,sequent))sb))sigcons
@@ -115,7 +119,7 @@
             val new_set = List.foldr tree_to_vars' set prems
             val base_vars = List.map (fn Dat.CtxVar(_,x) => x) (get_ctx_vars base)
         in
-          List.foldr Set.add' new_set base_vars
+            List.foldr Set.add' new_set base_vars
         end
 
     fun tree_to_vars (tree:Dat.der_tree): string list =  
@@ -135,9 +139,9 @@
                         SOME(sigscons) => 
                             let val formulas = get_forms(conc)
                                 val new_sigscons = filter_bad_subs(sigscons,sq)
-                                (* val _ = print("[" ^ List.foldr(fn (a,b)=> "(" ^ (List.foldr(fn (x,y)=> x ^ ";" ^ y)("")a ^ ")") ^ " OR " ^ b)("")(List.map(fn (a,b) => a)(U.print_sigs_cons (SOME new_sigscons))) ^ "]") *)
-                                (* val _ = print ((Int.toString (List.length(sigscons)))^" to "^(Int.toString (List.length(new_sigscons)))^"\n") *)
-                                
+                                (* val _ = print("[" ^ (String.concatWith (" OR ")(List.map(fn a => "("^(String.concatWith ("; ")a) ^")")
+                                        (List.map(fn (a,b) => a)(U.print_sigs_cons (SOME new_sigscons))))) ^ "]")
+                                val _ = print ((Int.toString (List.length(sigscons)))^" to "^(Int.toString (List.length(new_sigscons)))^"\n") *)
                                 val next_ids = List.tabulate(List.length(premises), fn i => Int.toString(i))
                                 val prems_ids = ListPair.zip(premises, next_ids)
                                 val new_prems = List.map(fn (p, i) => Dat.DerTree(id^i,p, NONE,[]))prems_ids
@@ -231,10 +235,6 @@
 
     fun filter_constraints (cons) = List.filter (fn (_,l1,l2) => not (H.mset_eq(l1,l2,Dat.ctx_var_eq)) ) cons
 
-
-    
-
-
     fun translate_premises' fd (constraints,tree,rule,id,index) = 
         let val () = change_index(index)
             val new_trees = List.map(fn (_,cn,tr) => (cn, tr))(apply_rule(([],constraints,tree),rule,id))
@@ -260,21 +260,18 @@
                     fun hd (l) = List.hd(l) handle (List.Empty) => ""
                     fun tl (l) = List.tl(l) handle (List.Empty) => []
                 in
-                    (case new_premises of 
-                    [(_,_,_,_,[])] => writeFD 3 ("[{}@@{}@@{}@@{"^(Int.toString(get_index()))^"}]")
-                    | _ => 
-                        let val new_premises_strings = List.map (fn (cn_list, latex_tree, html_tree, sml_tree, pr_list) => 
-                                (List.map (Dat.const_toString) cn_list, List.map (Dat.const_stringify) cn_list, List.map (Dat.seq_toString) pr_list, tree_to_vars(sml_tree), latex_tree, html_tree, Html.der_tree_toHtml2(sml_tree))) new_premises
-                            val new_premises_strings2 = List.map (fn (c, z, p, v, l, h, s): (string list * string list * string list * string list * string * string * string) => 
-                                    "{"^(String.concatWith ("##")c)^"%%["^(String.concatWith (",")z)^"]}@@"^
-                                    "{"^(String.concatWith ("##")p)^"%%"^l^"%%"^h^"%%"^s^"}@@"^
-                                    "{"^(String.concatWith ("##")v)^"}@@"^
-                                    "{"^(Int.toString(get_index()))^"}"
-                                    )new_premises_strings
-                            val final_form = "["^(List.foldl (fn (str1,str2) => str1^" && "^str2) (List.hd(new_premises_strings2)) (List.tl(new_premises_strings2)))^"]"
-                        in 
-                            writeFD fd final_form
-                        end)
+                    let val new_premises_strings = List.map (fn (cn_list, latex_tree, html_tree, sml_tree, pr_list) => 
+                            (List.map (Dat.const_toString) cn_list, List.map (Dat.const_stringify) cn_list, List.map (Dat.seq_toString) pr_list, tree_to_vars(sml_tree), latex_tree, html_tree, Html.der_tree_toHtml2(sml_tree))) new_premises
+                        val new_premises_strings2 = List.map (fn (c, z, p, v, l, h, s): (string list * string list * string list * string list * string * string * string) => 
+                                "{"^(String.concatWith ("##")c)^"%%["^(String.concatWith (",")z)^"]}@@"^
+                                "{"^(String.concatWith ("##")p)^"%%"^l^"%%"^h^"%%"^s^"}@@"^
+                                "{"^(String.concatWith ("##")v)^"}@@"^
+                                "{"^(Int.toString(get_index()))^"}"
+                                )new_premises_strings
+                        val final_form = "["^(List.foldl (fn (str1,str2) => str1^" && "^str2) (List.hd(new_premises_strings2)) (List.tl(new_premises_strings2)))^"]"
+                    in 
+                        writeFD fd final_form
+                    end
                 end)
         end
     fun update_cut_rule (Dat.Rule(name,side,conc,prems),sub) = 
