@@ -1,33 +1,35 @@
 //server.js
 'use strict';
-var port = 3000
+const port = 3000
 
 
 //Loading Dependencies =============================================
-require('dotenv').config()
-var express      = require('express');
-var app = express();
-var passport     = require('passport')
-var session      = require('express-session')
-var flash        = require('express-flash')
-var path         = require('path');
-var helmet       = require('helmet');
-var mongoose     = require('mongoose');
-var morgan       = require('morgan');
-var bodyParser   = require('body-parser');
-var hbs          = require('express-handlebars');
+const https        = require('https');
+const fs           = require('fs');
+const express      = require('express');
+const app          = express();
+const passport     = require('passport')
+const session      = require('express-session')
+const flash        = require('express-flash')
+const path         = require('path');
+const helmet       = require('helmet');
+const mongoose     = require('mongoose');
+const morgan       = require('morgan');
+const bodyParser   = require('body-parser');
+const hbs          = require('express-handlebars');
+const envm         = require('dotenv').config()
 
 
 //loading local files ===============================================
-var userRoutes     = require('./api/routes/user');
-var calculusRoutes = require('./api/routes/calculus');
-var ruleRoutes     = require('./api/routes/rule');
-var symbolsRoutes  = require('./api/routes/symbols');
-var database       = require('./config/db');
-var sml_command    = require('./sml/smlCommands');
-var initPassport   = require('./passport-config');
-var userModel      = require('./api/models/user');
-var calculusModel  = require('./api/models/calculus');
+const userRoutes     = require('./api/routes/user');
+const calculusRoutes = require('./api/routes/calculus');
+const ruleRoutes     = require('./api/routes/rule');
+const symbolsRoutes  = require('./api/routes/symbols');
+const database       = require('./config/db');
+const sml_command    = require('./sml/smlCommands');
+const initPassport   = require('./passport-config');
+const userModel      = require('./api/models/user');
+const calculusModel  = require('./api/models/calculus');
 initPassport(passport, userModel)
 
 
@@ -188,3 +190,9 @@ function checkNotAuthenticated (req, res, next) {
 
 //intiating server ==================================================
 app.listen(port);
+// Serve the API with signed certificate on 443 (SSL/HTTPS) port
+// const httpsServer = https.createServer({
+// 	key: fs.readFileSync('/afs/qatar.cmu.edu/course/15/logic/sequoia/certificates/logic.qatar.cmu.edu.key'),
+// 	cert: fs.readFileSync('/afs/qatar.cmu.edu/course/15/logic/sequoia/certificates/logic.qatar.cmu.edu.cert'),
+// }, app);
+// httpsServer.listen(port, () => {console.log('HTTPS Server running on port 443');});
