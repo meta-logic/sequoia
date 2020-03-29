@@ -1,6 +1,7 @@
 Group
   signature EQUIVALENCE
   structure Equivalence
+  structure StringKey
 is
   ../basics/basics.cm
   set.sml

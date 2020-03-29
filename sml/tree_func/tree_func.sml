@@ -8,6 +8,7 @@
     structure E = Equivalence
     structure Latex = latexImpl
     structure Html = htmlImpl
+    structure Set = BinarySetFn(StringKey)
 
 
     type conn = Dat.conn
@@ -106,6 +107,24 @@
         | check_rule_of(cn, Dat.DerTree(id, _, rq, pq), sid) = if id = sid then true 
         else if not (String.isPrefix id sid) then true
         else List.foldl(fn (branch, bools) => bools andalso (check_rule_of(cn, branch,sid)))(true)pq
+
+    (* (List.map (fn Dat.CtxVar(_,x) => x) (get_ctx_vars base))@ (List.concat(List.map tree_to_vars prems)) *)
+
+    fun tree_to_vars' (Dat.DerTree(_,base,_,prems),set) = 
+        let
+            val new_set = List.foldr tree_to_vars' set prems
+            val base_vars = List.map (fn Dat.CtxVar(_,x) => x) (get_ctx_vars base)
+        in
+          List.foldr Set.add' new_set base_vars
+        end
+
+    fun tree_to_vars (tree:Dat.der_tree): string list =  
+        let
+            val final_set = tree_to_vars' (tree,Set.empty)
+        in
+            Set.listItems(final_set)
+        end
+
 
     (*  *)
     fun apply_rule((forms, cons, dt), rule, sid) =
@@ -212,6 +231,10 @@
 
     fun filter_constraints (cons) = List.filter (fn (_,l1,l2) => not (H.mset_eq(l1,l2,Dat.ctx_var_eq)) ) cons
 
+
+    
+
+
     fun translate_premises' fd (constraints,tree,rule,id,index) = 
         let val () = change_index(index)
             val new_trees = List.map(fn (_,cn,tr) => (cn, tr))(apply_rule(([],constraints,tree),rule,id))
@@ -232,8 +255,8 @@
             | _ => 
                 let 
                     (* val filtered = List.map (update_cons) filtered *)
-                    val new_premises = List.map(fn (cn, tr) => (cn, Latex.der_tree_toLatex(tr), Html.der_tree_toHtml(tr), Html.der_tree_toHtml2(tr), get_premises_of(tr,id))) filtered 
-                    fun prems_to_vars prems = List.map (fn Dat.CtxVar(_,x) => x) (List.concat (List.map get_ctx_vars prems))
+                    val new_premises = List.map(fn (cn, tr) => (cn, Latex.der_tree_toLatex(tr), Html.der_tree_toHtml(tr), tr, get_premises_of(tr,id))) filtered 
+                    
                     fun hd (l) = List.hd(l) handle (List.Empty) => ""
                     fun tl (l) = List.tl(l) handle (List.Empty) => []
                 in
@@ -241,7 +264,7 @@
                     [(_,_,_,_,[])] => writeFD 3 ("[{}@@{}@@{}@@{"^(Int.toString(get_index()))^"}]")
                     | _ => 
                         let val new_premises_strings = List.map (fn (cn_list, latex_tree, html_tree, sml_tree, pr_list) => 
-                                (List.map (Dat.const_toString) cn_list, List.map (Dat.const_stringify) cn_list, List.map (Dat.seq_toString) pr_list, prems_to_vars(pr_list), latex_tree, html_tree, sml_tree)) new_premises
+                                (List.map (Dat.const_toString) cn_list, List.map (Dat.const_stringify) cn_list, List.map (Dat.seq_toString) pr_list, tree_to_vars(sml_tree), latex_tree, html_tree, Html.der_tree_toHtml2(sml_tree))) new_premises
                             val new_premises_strings2 = List.map (fn (c, z, p, v, l, h, s): (string list * string list * string list * string list * string * string * string) => 
                                     "{"^(String.concatWith ("##")c)^"%%["^(String.concatWith (",")z)^"]}@@"^
                                     "{"^(String.concatWith ("##")p)^"%%"^l^"%%"^h^"%%"^s^"}@@"^
