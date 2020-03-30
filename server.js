@@ -190,9 +190,9 @@ function checkNotAuthenticated (req, res, next) {
 
 //intiating server ==================================================
 app.listen(port);
-// Serve the API with signed certificate on 443 (SSL/HTTPS) port
 // const httpsServer = https.createServer({
 // 	key: fs.readFileSync('/afs/qatar.cmu.edu/course/15/logic/sequoia/certificates/logic.qatar.cmu.edu.key'),
 // 	cert: fs.readFileSync('/afs/qatar.cmu.edu/course/15/logic/sequoia/certificates/logic.qatar.cmu.edu.cert'),
+// 	ca: [fs.readFileSync('/afs/qatar.cmu.edu/course/15/logic/sequoia/certificates/intermediate_ca.cert')]
 // }, app);
 // httpsServer.listen(port, () => {console.log('HTTPS Server running on port 443');});
