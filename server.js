@@ -35,8 +35,8 @@ app.set('view engine', 'hbs');
 
 
 // public folder path setup
-app.use('/static', express.static(path.join(__dirname, 'public')));
-app.use('/bower', express.static(path.join(__dirname, 'bower_components')));
+app.use('/sequoia/static', express.static(path.join(__dirname, '/public')));
+app.use('/sequoia/bower', express.static(path.join(__dirname, '/bower_components')));
 
 
 //Configurations =====================================================
