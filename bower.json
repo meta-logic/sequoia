@@ -2,11 +2,9 @@
   "name": "sequoia",
   "description": "Sequent calculus proof construction tool",
   "main": "server.js",
-  "authors": [
-  "Giselle Reis"
-  ],
+  "authors": ["Giselle Reis"],
   "license": "ISC",
-  "homepage": "https://github.com/AboudFayad/sequoia",
+  "homepage": "https://github.com/meta-logic/sequoia",
   "ignore": [
     "**/.*",
     "node_modules",
