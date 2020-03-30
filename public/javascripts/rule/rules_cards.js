@@ -18,7 +18,7 @@ function get_rules_toPage() {
                 '<div id="rule_'+i+'" class="ui card">'+
                     '<div class="content">'+card_content+'</div>'+
                     '<div class="ui bottom attached buttons">'+
-                        '<a class="ui basic blue button" href="/calculus/'+calc_id+'/edit-rule/'+rules[i]._id+'">Edit</a>'+
+                        '<a class="ui basic blue button" href="/sequoia/calculus/'+calc_id+'/edit-rule/'+rules[i]._id+'">Edit</a>'+
                         '<a id="deleteR_'+i+'" class="ui basic red button" onClick=deleteRule('+i+',"'+rules[i]._id+'")>Delete</a>'+
                     '</div>'+
                 '</div>'

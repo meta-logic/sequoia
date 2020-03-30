@@ -50,7 +50,7 @@ function addUser () {
                 } else {
                     $.post("/api/user", {username : username, password : password1, 
                         email : email, occupation : occupation}, function(data, status) {
-                        window.location.href = "/login"})
+                        window.location.href = "/sequoia/login"})
                 }
             }
         })

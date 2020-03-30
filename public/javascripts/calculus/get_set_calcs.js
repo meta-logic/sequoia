@@ -13,7 +13,7 @@ function get_calculi_toPage() {
         for (var i = 0; i < calculi.length; i++) {
             calculi_container.append(
                 '<div id="calc_'+i+'" class="card">'+
-                    '<a class="content" href=calculus/'+calculi[i]._id+'>'+
+                    '<a class="content" href=/sequoia/calculus/'+calculi[i]._id+'>'+
                         '<div class="header">'+calculi[i].title+'</div>'+
                         '<div class="description">'+calculi[i].description+'</div>'+
                     '</a>'+
@@ -37,7 +37,7 @@ function addCalculus() {
         function(data, status) {
             calculi_container.append(
                 '<div id="calc_'+c+'" class="card">'+
-                    '<a class="content" href=calculus/'+data.calculus._id+'>'+
+                    '<a class="content" href=/sequoia/calculus/'+data.calculus._id+'>'+
                         '<div class="header">'+data.calculus.title+'</div>'+
                         '<div class="description">'+data.calculus.description+'</div>'+
                     '</a>'+
@@ -64,7 +64,7 @@ function addSomeCalculus(sample) {
             $.post("/api/rules_init", {items : JSON.stringify(syms_rules[1])}, function(data, status){
                 calculi_container.append(
                     '<div id="calc_'+c+'" class="card">'+
-                        '<a class="content" href=calculus/'+sampleCalc._id+'>'+
+                        '<a class="content" href=/sequoia/calculus/'+sampleCalc._id+'>'+
                             '<div class="header">'+sampleCalc.title+'</div>'+
                             '<div class="description">'+sampleCalc.description+'</div>'+
                         '</a>'+

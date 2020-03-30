@@ -110,5 +110,5 @@ function parse_and_place(parser, opt) {
             }
         })
     }
-    window.location.href = "/calculus/"+calc_id
+    window.location.href = "/sequoia/calculus/"+calc_id
 }
