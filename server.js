@@ -59,7 +59,7 @@ app.use(passport.session())
 
 
 //connecting to mongo database 
-mongoose.connect(database.local, {useNewUrlParser: true});
+mongoose.connect(database.local, {useNewUrlParser: true, useUnifiedTopology: true});
 
 
 //Api Routers ===========================================================
