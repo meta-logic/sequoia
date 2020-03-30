@@ -1,15 +1,15 @@
 $("#main-menu").sticky({});
 $("#Properties_icon").attr("class", "active item")
 var calc_id = $("#calc_id").text()
-$("#Calculus_icon").attr("href", "/calculus/"+calc_id)
-$("#Prooftree_icon").attr("href", "/calculus/"+calc_id+"/apply")
-$("#Properties_icon").attr("href", "/calculus/"+calc_id+"/properties")
+$("#Calculus_icon").attr("href", "/sequoia/calculus/"+calc_id)
+$("#Prooftree_icon").attr("href", "/sequoia/calculus/"+calc_id+"/apply")
+$("#Properties_icon").attr("href", "/sequoia/calculus/"+calc_id+"/properties")
 var property = $("#property").text()
 if (property == "Main Page") {
-    $("#prop1").attr("href", "/calculus/"+calc_id+"/properties/init_coherence")
-    $("#prop2").attr("href", "/calculus/"+calc_id+"/properties/weak_admissability")
-    $("#prop3").attr("href", "/calculus/"+calc_id+"/properties/permutability")
-    $("#prop4").attr("href", "/calculus/"+calc_id+"/properties/cut_admissability")
+    $("#prop1").attr("href", "/sequoia/calculus/"+calc_id+"/properties/init_coherence")
+    $("#prop2").attr("href", "/sequoia/calculus/"+calc_id+"/properties/weak_admissability")
+    $("#prop3").attr("href", "/sequoia/calculus/"+calc_id+"/properties/permutability")
+    $("#prop4").attr("href", "/sequoia/calculus/"+calc_id+"/properties/cut_admissability")
 }
 if (property == "Permutability") {
     $.get("/api/calculus/"+calc_id, function (calc, status) {

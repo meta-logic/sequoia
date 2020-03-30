@@ -1,7 +1,7 @@
 var calc_id = $("#calc_id").text()
-$("#Calculus_icon").attr("href", "/calculus/"+calc_id)
-$("#Prooftree_icon").attr("href", "/calculus/"+calc_id+"/apply")
-$("#Properties_icon").attr("href", "/calculus/"+calc_id+"/properties")
+$("#Calculus_icon").attr("href", "/sequoia/calculus/"+calc_id)
+$("#Prooftree_icon").attr("href", "/sequoia/calculus/"+calc_id+"/apply")
+$("#Properties_icon").attr("href", "/sequoia/calculus/"+calc_id+"/properties")
 if ($("#page").text() == "Update") {
     $("#prev button").attr("onclick", "preview('Update')") 
     $.get("/api/rule/"+$("#rule_id").text(), function (data, status) {
