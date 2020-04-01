@@ -34,7 +34,7 @@ function addUser () {
         $("#warning").css("visibility","visible")
         return
     } else {
-        $.get("/api/users/"+username, function (data, status) {
+        $.get("/sequoia/api/users/"+username, function (data, status) {
             if (data.status == "success") {
                 $("#u").attr("class", "required field error")
                 $("#warning_header").html("Username already exists.")
@@ -48,7 +48,7 @@ function addUser () {
                     $("#warning").css("visibility","visible")
                     return
                 } else {
-                    $.post("/api/user", {username : username, password : password1, 
+                    $.post("/sequoia/api/user", {username : username, password : password1, 
                         email : email, occupation : occupation}, function(data, status) {
                         window.location.href = "/sequoia/login"})
                 }

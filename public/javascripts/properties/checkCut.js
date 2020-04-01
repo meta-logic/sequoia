@@ -61,7 +61,7 @@ function checkCut() {
     var conclusion1 = ruletemp1.attr("conclusion")
     var premises1 = ruletemp1.attr("premises")
     var rule_sml1 = "Rule(\""+name1+"\","+side1+","+conclusion1+","+premises1+")"
-    $.post("/cutElim", { rule1: rule_sml1, formula: cutform, init_rules: init_strings, conn_rules: conn_strings, wL: weak_l, wR: weak_r }, function(data, status) {
+    $.post("/sequoia/cutElim", { rule1: rule_sml1, formula: cutform, init_rules: init_strings, conn_rules: conn_strings, wL: weak_l, wR: weak_r }, function(data, status) {
         $("#results").css("visibility","visible")
         var output = data.output.split("%%%")
         var answer = output[0].split("@@@")

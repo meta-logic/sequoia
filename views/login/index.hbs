@@ -1,4 +1,5 @@
 
+<div id="page" hidden>{{page}}</div>
 <div id="section" class="ui middle aligned center aligned teal huge header">Login</div>
 <br>
 <div class="ui container">
@@ -21,7 +22,9 @@
             <i class="terminal icon"></i>Login
         </button>
     </form>
-    <br><br><br>
+    <div id="warning" class="ui negative message" style="visibility: hidden;">
+        <div id="warning_header" class="header">Incorrect username or password.</div>
+    </div>
     <div class="ui divider"></div>
     New to Sequoia? You can sign up <a href="/sequoia/register">here</a>!
 </div>

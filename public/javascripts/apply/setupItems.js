@@ -4,7 +4,7 @@ var calc_id = $("#calc_id").text()
 $("#Calculus_icon").attr("href", "/sequoia/calculus/"+calc_id)
 $("#Prooftree_icon").attr("href", "/sequoia/calculus/"+calc_id+"/apply")
 $("#Properties_icon").attr("href", "/sequoia/calculus/"+calc_id+"/properties")
-$.get("/api/calculus/"+calc_id, function (calc, status) {
+$.get("/sequoia/api/calculus/"+calc_id, function (calc, status) {
     get_rules_toPage()
     get_cert_symbols_toTable()
     get_symbols_toTable("seq")

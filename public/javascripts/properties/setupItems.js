@@ -12,13 +12,9 @@ if (property == "Main Page") {
     $("#prop4").attr("href", "/sequoia/calculus/"+calc_id+"/properties/cut_admissability")
 }
 if (property == "Permutability") {
-    $.get("/api/calculus/"+calc_id, function (calc, status) {
-        get_rules_toPage()
-    })
+    get_rules_toPage()
 } else if (property == "Cut Admissibility") {
-    $.get("/api/calculus/"+calc_id, function (calc, status) {
-        get_cuts_toPage()
-    })
+    get_cuts_toPage()
 }
 
 

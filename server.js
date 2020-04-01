@@ -63,15 +63,18 @@ mongoose.connect(database.local, {useNewUrlParser: true, useUnifiedTopology: tru
 
 
 //Api Routers ===========================================================
-app.use('/api', userRoutes);
-app.use('/api', calculusRoutes);
-app.use('/api', ruleRoutes);
-app.use('/api', symbolsRoutes);
+app.use('/sequoia/api', userRoutes);
+app.use('/sequoia/api', calculusRoutes);
+app.use('/sequoia/api', ruleRoutes);
+app.use('/sequoia/api', symbolsRoutes);
 
 
 //Page Routes ===========================================================
-app.get('/sequoia', checkNotAuthenticated, function (req, res) {
-	return res.render('login/landing', {'layout' : 'landing'});
+app.get('/sequoia', function (req, res) {
+	if (req.isAuthenticated()) {
+		return res.render('login/landing', {'layout' : 'landing_in', 'page' : "in"});
+	}
+	return res.render('login/landing', {'layout' : 'landing_out', 'page' : "out"});
 });
 
 app.get('/sequoia/home', checkAuthenticated, function (req, res) {
@@ -83,9 +86,9 @@ app.get('/sequoia/login', function (req, res) {
 		return res.redirect('/sequoia/home')
 	}
 	if (req.flash('error').length > 0) {
-		return res.render('login/fail', {'title' : 'Sequoia - login','layout' : 'login'});
+		return res.render('login/index', {'title' : 'Sequoia - login','layout' : 'login', 'page' : "fail"});
 	}
-	return res.render('login/index', {'title' : 'Sequoia - login','layout' : 'login'});
+	return res.render('login/index', {'title' : 'Sequoia - login','layout' : 'login', 'page' : "normal"});
 });
 
 app.post('/sequoia/login', checkNotAuthenticated, passport.authenticate('local', {
@@ -122,7 +125,7 @@ app.get('/sequoia/calculus/:calc_id/apply', checkAuthenticated, function (req, r
 	return res.render('apply/index', {'title' : 'Sequoia - apply', 'layout' : 'apply', 'calc_id' : req.params.calc_id});
 });
 
-app.post('/apply', checkAuthenticated, function (req, res) {
+app.post('/sequoia/apply', checkAuthenticated, function (req, res) {
 	var result = sml_command.applyRule(req.body.rule, req.body.constraints, req.body.tree, req.body.node_id, req.body.index, req.body.subs, res);
 });
 
@@ -134,7 +137,7 @@ app.get('/sequoia/calculus/:calc_id/properties/permutability', checkAuthenticate
 	return res.render('properties/permutability', {'title' : 'Sequoia - properties', 'layout' : 'permutability', 'calc_id' : req.params.calc_id});
 });
 
-app.post('/permute', checkAuthenticated, function (req, res) {
+app.post('/sequoia/permute', checkAuthenticated, function (req, res) {
 	var result = sml_command.permuteRules(req.body.rule1, req.body.rule2, req.body.init_rules, req.body.wL, req.body.wR, res);
 });
 
@@ -142,7 +145,7 @@ app.get('/sequoia/calculus/:calc_id/properties/init_coherence', checkAuthenticat
 	return res.render('properties/initcoherence', {'title' : 'Sequoia - properties', 'layout' : 'initcoherence', 'calc_id' : req.params.calc_id});
 });
 
-app.post('/initRules', checkAuthenticated, function (req, res) {
+app.post('/sequoia/initRules', checkAuthenticated, function (req, res) {
 	var result = sml_command.initRules(req.body.first, req.body.second, req.body.third, res);
 });
 
@@ -150,7 +153,7 @@ app.get('/sequoia/calculus/:calc_id/properties/weak_admissability', checkAuthent
 	return res.render('properties/weakadmiss', {'title' : 'Sequoia - properties', 'layout' : 'weakadmiss', 'calc_id' : req.params.calc_id});
 });
 
-app.post('/weakenSides', checkAuthenticated, function (req, res) {
+app.post('/sequoia/weakenSides', checkAuthenticated, function (req, res) {
 	var result = sml_command.weakenSides(req.body.rules, res);
 });
 
@@ -158,7 +161,7 @@ app.get('/sequoia/calculus/:calc_id/properties/cut_admissability', checkAuthenti
 	return res.render('properties/cutadmiss', {'title' : 'Sequoia - properties', 'layout' : 'cutadmiss', 'calc_id' : req.params.calc_id});
 });
 
-app.post('/cutElim', checkAuthenticated, function (req, res) {
+app.post('/sequoia/cutElim', checkAuthenticated, function (req, res) {
 	var result = sml_command.cutElim(req.body.rule1, req.body.formula, req.body.init_rules, req.body.conn_rules, req.body.wL, req.body.wR, res);
 });
 

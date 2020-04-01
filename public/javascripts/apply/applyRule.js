@@ -91,7 +91,7 @@ function applyRule(i) {
                 }
                 params = { rule: rule_sml, constraints: constraints_sml, tree: tree_sml, node_id: "\""+leaf_id+"\"", index : rng_index, subs: "[Fs(FormVar(\""+cut_var+"\"),"+cF+")]" }
             }
-            $.post("/apply", params, function(data, status) {
+            $.post("/sequoia/apply", params, function(data, status) {
                 cut_var = ""
                 cut_form = ""
                 var output = data.output.slice(1,-1).split("&&")

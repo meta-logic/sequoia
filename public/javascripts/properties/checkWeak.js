@@ -40,7 +40,7 @@ function setLabel(left_bools, right_bools, index, side) {
 
 function checkWeak() {
     $("#loading").attr("class", "ui active inverted dimmer")
-    $.get("/api/rules/"+calc_id, function (rls, status) { 
+    $.get("/sequoia/api/rules/"+calc_id, function (rls, status) { 
         var rules = rls.rules
         var rule_list = []
         for (var i = 0; i < rules.length; i++) {
@@ -54,7 +54,7 @@ function checkWeak() {
             }
         }
         var rule_strings = list_to_string(rule_list)
-        $.post("/weakenSides", { rules: rule_strings }, function(data, status) {
+        $.post("/sequoia/weakenSides", { rules: rule_strings }, function(data, status) {
             $("#weak_button").css("display", "none")
             var output = data.output.split("%%%")
             var left_bools = output[0].split("@@@")

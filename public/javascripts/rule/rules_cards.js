@@ -10,7 +10,7 @@ function get_rules_toPage() {
             entry.remove()
         }
     }
-    $.get("/api/rules/"+$("#calc_id").text(), function (rls, status) {
+    $.get("/sequoia/api/rules/"+$("#calc_id").text(), function (rls, status) {
         var rules = rls.rules
         for (var i = 0; i < rules.length; i++) {
             var card_content = '$$\\frac{'+rules[i].premises.join(" \\quad \\quad ")+'}{'+rules[i].conclusion+'}'+rules[i].rule+'$$'
@@ -32,7 +32,7 @@ function get_rules_toPage() {
 
 function deleteRule(card_id, mongo_id) {
     $.ajax({
-        url: "/api/rule",
+        url: "/sequoia/api/rule",
         type: "DELETE",
         data : {"id" : mongo_id},
         success: function(result) {
