@@ -5,6 +5,7 @@ struct
 	structure Dat = datatypesImpl
 	structure H = helpersImpl
 	structure C = Check
+	structure Cons = Constraints
 
 	type constraint = Dat.ctx_var * Dat.ctx_var list * Dat.ctx_var list
 
@@ -114,21 +115,40 @@ struct
 			result
 		end
 
-	fun pair_cons((a,b), (L1,L2)) = (a::L1,b::L2)
+	fun pair_cons((a,b), (L1,L2)) = (a@L1,b@L2)
 
 	fun pair_append ( (L1,L2),(L1',L2')) = (L1@ L1', L2 @ L2') 
 
 	fun fresh_CtxVar () = ctx_var_to_fresh(Dat.CtxVar(NONE,"e"))
 	
+	fun weaken_constraints(cons_list) = 
+		(let
+			val new_cons = List.map 
+			(fn (a,b,c) => (a,(Cons.fresh_ctx_var(List.hd(b)))::b,c)) cons_list
+			val new_vars = List.map 
+			(fn (_,b,_) => List.hd(b)) new_cons
+		in
+			(new_cons,new_vars)
+		end)
+		handle (Empty) => raise Fail ("empty left side of constraint, not supposed to happen\n"
+								^"either fix constraint generation or weaken_constraints in equiv.sml")
   
 	(* TODO:  a not empty*)
 	fun extract_constraints'' (Dat.Ctx (a,_), Dat.Ctx (b,_),wk) = 
-		(case (wk) of
-		   (true) => let val A = fresh_CtxVar() in ((Dat.CtxVar(NONE,"eq"),A::a,b),SOME A) end
-		 | (_) => ((Dat.CtxVar(NONE,"eq"),a,b), NONE))
+		let
+			val (a_cons,b_cons) = Cons.get_constraints'(a,b)
+			val (a_cons,new_vars) = 
+			(case wk of
+			   false => (a_cons,[])
+			 | _ => weaken_constraints(a_cons) )
+			val full_cons = a_cons@b_cons
+			val new_con_vars = List.concat(List.map (fn (_,_,c) => c) a_cons)
+		in
+			(a_cons@b_cons,new_con_vars@new_vars)
+		end
 
 
-	fun extract_constraints' (Dat.Empty,Dat.Empty,_) : (constraint list * Dat.ctx_var option list) = ([],[])
+	fun extract_constraints' (Dat.Empty,Dat.Empty,_) : (constraint list * Dat.ctx_var list) = ([],[])
 		| extract_constraints' (Dat.Single a, Dat.Single b,wk) = 
 			(case wk of
 			   [] => pair_cons(extract_constraints'' (a,b,false),extract_constraints' (Dat.Empty,Dat.Empty,[]))
@@ -182,7 +202,7 @@ struct
 	fun check_premises_wk (assumed_leaves,conc,cons,weak,t1_vars,t2_vars) =
 		let
 			val new_trees = set_leaves (assumed_leaves,conc,weak)
-			val result = List.find (fn (_,(new_cons,new_vars)) => check_consistent(new_cons@cons,t1_vars,(List.mapPartial (fn x => x) new_vars)@t2_vars)) new_trees
+			val result = List.find (fn (_,(new_cons,new_vars)) => check_consistent(new_cons@cons,t1_vars,(new_vars)@t2_vars)) new_trees
 		in
 			Option.map (fn (tree,_) => tree ) result
 		end

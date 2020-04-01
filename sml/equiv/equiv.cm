@@ -4,6 +4,7 @@ Group
   structure StringKey
 is
   ../basics/basics.cm
+  ../unification/unification.cm
   set.sml
   check.sml
   equiv.sml

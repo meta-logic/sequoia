@@ -27,7 +27,7 @@ struct
          | _ => String.compare(na,nb))
 end
 
-structure Constraints =
+structure Constraints : CONSTRAINTS =
 struct
     structure Dat = datatypesImpl
     structure F = FreshVar
@@ -133,14 +133,22 @@ struct
         end)
         handle (NotFound) => (constraint::cons,l2)
     
-    fun get_constraints (var_l1,var_l2) =
+    fun get_constraints' (var_l1,var_l2) =
         let
             val (var_l1',var_l2') = remove_common(var_l1 , var_l2)
-            val base_vars = List.foldl Set.add' Set.empty (var_l1'@var_l2')
             val l1_comp = initial_set(var_l1')
             val l2_comp = initial_set(var_l2')
             val (l1_cons,l2_map) = List.foldl gen_constraints ([],l2_comp) (Map.listItems l1_comp)
             val l2_cons = Map.listItems (l2_map)
+        in
+            (l1_cons,l2_cons)
+        end 
+
+    fun get_constraints (var_l1,var_l2) =
+        let
+            val (var_l1',var_l2') = remove_common(var_l1 , var_l2)
+            val base_vars = List.foldl Set.add' Set.empty (var_l1'@var_l2')
+            val (l1_cons,l2_cons) = get_constraints'(var_l1',var_l2')
             val (l1_partial_cons,l1_subs,l1_map) = seperate (l1_cons)
             val (l2_partial_cons,l2_subs,l2_map) = seperate (l2_cons)
             val (joined_cons,l2_map) = List.foldl join ([],l2_map) (Map2.listItemsi (l1_map))
