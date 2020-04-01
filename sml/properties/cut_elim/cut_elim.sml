@@ -22,6 +22,7 @@ struct
                 let
                     val new_cons = App.apply_constraintL_Unifier (cons,u_sb)
                     val new_tree = App.apply_der_tree_Unifier(tree,u_sb)
+                    val (new_cons,new_tree) = Ut.rename_ids (new_cons,new_tree)
                     val final_cons = new_cons@u_cons
                     val Dat.DerTree(_,new_base,_,_) = new_tree
                     val tree2 = Dat.DerTree("0",Ut.generic_ctx_var (new_base),NONE,[])
