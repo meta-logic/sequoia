@@ -46,7 +46,7 @@ function permRules() {
     var conclusion2 = ruletemp2.attr("conclusion")
     var premises2 = ruletemp2.attr("premises")
     var rule_sml2 = "Rule(\""+name2+"\","+side2+","+conclusion2+","+premises2+")"
-    $.post("/permute", { rule1: rule_sml1, rule2: rule_sml2, init_rules: init_strings, wL: weak_l, wR: weak_r}, function(data, status) {
+    $.post("/sequoia/permute", { rule1: rule_sml1, rule2: rule_sml2, init_rules: init_strings, wL: weak_l, wR: weak_r}, function(data, status) {
         var output = data.output.split("%%%")
         var answer = output[0].split("@@@")
         var trees = output[1].split("&&&")

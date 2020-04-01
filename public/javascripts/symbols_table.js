@@ -18,7 +18,7 @@ function get_symbols_toTable(tbl) {
             entry.remove()
         }
     }
-    $.get("/api/"+tbl+"_symbols/"+$("#calc_id").text(), function(sb, status) {
+    $.get("/sequoia/api/"+tbl+"_symbols/"+$("#calc_id").text(), function(sb, status) {
         var syms = sb.symbols
         for (var i = 0; i < syms.length; i++) {
             var sym = syms[i].symbol
@@ -62,7 +62,7 @@ function add_symbol_toTable(tbl) {
     }
     $("#warning").css("visibility","hidden")
     if (symb.replace(/\s/g, '').length > 0 && typ != "") {
-        $.get("/api/"+tbl+"_symbols/"+calc_id, function(sb, status) {
+        $.get("/sequoia/api/"+tbl+"_symbols/"+calc_id, function(sb, status) {
             var syms = sb.symbols 
             var ind = -1
             var mg_id = -1
@@ -75,7 +75,7 @@ function add_symbol_toTable(tbl) {
             if (ind != -1) {
                 showInfo(true,ind,mg_id,tbl)
             } else {
-                $.get("/api/"+other+"_symbols/"+calc_id, function(sb, status) {
+                $.get("/sequoia/api/"+other+"_symbols/"+calc_id, function(sb, status) {
                     var syms = sb.symbols
                     var exists = false
                     for (var i = 0; i < syms.length; i++) {
@@ -92,7 +92,7 @@ function add_symbol_toTable(tbl) {
                         }
                     }
                     $("#warning").css("visibility","hidden")
-                    $.post("/api/symbols", {symbol : symb, type : typ, group : tbl, calculus : calc_id}, 
+                    $.post("/sequoia/api/symbols", {symbol : symb, type : typ, group : tbl, calculus : calc_id}, 
                     function(data, status) {
                         var row = document.createElement("tr")
                         row.setAttribute("id", "row"+s)
@@ -121,12 +121,12 @@ function add_symbol_toTable(tbl) {
 
 function delete_symbol_fromTable(update, card_id, mongo_id, tbl) {
     $.ajax({
-        url: "/api/symbols",
+        url: "/sequoia/api/symbols",
         type: "DELETE",
         data : {"id" : mongo_id},
         success: function(result) {
             if (update) {
-                $.post("/api/symbols", {symbol : $("#sym").val(), type : $("#typ").val(), group : tbl, calculus : $("#calc_id").text()}, 
+                $.post("/sequoia/api/symbols", {symbol : $("#sym").val(), type : $("#typ").val(), group : tbl, calculus : $("#calc_id").text()}, 
                 function(data, status) {
                     if (tbl == "rule") {
                         fixRules(get_rules_toPage)

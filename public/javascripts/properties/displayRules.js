@@ -12,7 +12,7 @@ function get_rules_toPage() {
         }
     }
     var calc_id = $("#calc_id").text()
-    $.get("/api/rules/"+calc_id, function (rls, status) {
+    $.get("/sequoia/api/rules/"+calc_id, function (rls, status) {
         var rules = rls.rules
         var init_list = []
         for (var i = 0; i < rules.length; i++) {
@@ -48,7 +48,7 @@ function get_rules_toPage() {
 
 function initWeak(calc_id) {
     $("#loading").attr("class", "ui active inverted dimmer")
-    $.get("/api/rules/"+calc_id, function (rls, status) { 
+    $.get("/sequoia/api/rules/"+calc_id, function (rls, status) { 
         var rules = rls.rules
         var rule_list = []
         for (var i = 0; i < rules.length; i++) {
@@ -62,7 +62,7 @@ function initWeak(calc_id) {
             }
         }
         var rule_strings = list_to_string(rule_list)
-        $.post("/weakenSides", { rules: rule_strings }, function(data, status) {
+        $.post("/sequoia/weakenSides", { rules: rule_strings }, function(data, status) {
             var output = data.output.split("%%%")
             var left_bools = output[0].split("@@@")
             var right_bools = output[1].split("@@@")

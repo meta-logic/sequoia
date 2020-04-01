@@ -12,7 +12,7 @@ function showProof(index, on) {
 
 function checkInit() {
     $("#loading").attr("class", "ui active inverted dimmer")
-    $.get("/api/rules/"+calc_id, function (rls, status) { 
+    $.get("/sequoia/api/rules/"+calc_id, function (rls, status) { 
         var rules = rls.rules
         var intitial_rules = []
         var connective_rules = []
@@ -49,7 +49,7 @@ function checkInit() {
             connective_rules.push(temp)
         }
         var connective_strings = list_to_string(connective_rules)
-        $.post("/initRules", { first: connective_strings, second: init_strings, third: "[]"}, function(data, status) {
+        $.post("/sequoia/initRules", { first: connective_strings, second: init_strings, third: "[]"}, function(data, status) {
             $("#init_button").css("display", "none")
             var output = data.output.split("%%%")
             var result = output[0]

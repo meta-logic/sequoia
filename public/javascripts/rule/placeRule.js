@@ -10,7 +10,7 @@ function placeRule(opt) {
     var atom_var = "AtomVar = \"NO-ATOMVAR\" "
     var atom = "Atom = \"NO-ATOM\" "
     var calc_id = $("#calc_id").text()
-    $.get("/api/rule_symbols/"+calc_id, function(sb, status) {
+    $.get("/sequoia/api/rule_symbols/"+calc_id, function(sb, status) {
         var syms = sb.symbols
         syms = syms.sort(function(a, b){
             return b.symbol.length - a.symbol.length
@@ -82,12 +82,12 @@ function parse_and_place(parser, opt) {
         return
     }
     if (opt == "Add") {
-        $.post("/api/rule", {rule : rule_name, conclusion : conc, premises : JSON.stringify(prem),
+        $.post("/sequoia/api/rule", {rule : rule_name, conclusion : conc, premises : JSON.stringify(prem),
             parsed_conc : conc_final ,parsed_prem : JSON.stringify(parsed_prem) , calculus : calc_id,
             connective : rule_connective, side : rule_side, type : rule_type})
     } else if (opt == "Update") {
         var rule_id = $("#rule_id").text()
-        $.get("/api/rules/"+calc_id, function (rls, status) {
+        $.get("/sequoia/api/rules/"+calc_id, function (rls, status) {
             var rules = rls.rules
             var still_exists = false
             for (var i = 0; i < rules.length; i++) {
@@ -96,12 +96,12 @@ function parse_and_place(parser, opt) {
                 }
             }
             if (!still_exists) {
-                $.post("/api/rule", {rule : rule_name, conclusion : conc, premises : JSON.stringify(prem),
+                $.post("/sequoia/api/rule", {rule : rule_name, conclusion : conc, premises : JSON.stringify(prem),
                     parsed_conc : conc_final ,parsed_prem : JSON.stringify(parsed_prem) , calculus : calc_id, 
                     connective : rule_connective, side : rule_side, type : rule_type})
             } else {
                 $.ajax({
-                    url: "/api/rule",
+                    url: "/sequoia/api/rule",
                     type: "PUT",
                     data : { id : rule_id, rule : rule_name, 
                         conclusion : conc, premises : JSON.stringify(prem), parsed_conc : conc_final, 

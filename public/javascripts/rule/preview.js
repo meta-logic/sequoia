@@ -65,7 +65,7 @@ function removePremise(index) {
 function preview() {
     $("#warning").css("visibility","hidden")
     var calc_id = $("#calc_id").text()
-    $.get("/api/rules/"+calc_id, function (rls, status) {
+    $.get("/sequoia/api/rules/"+calc_id, function (rls, status) {
         var rules = rls.rules
         rule_name = $("#rule_name").val()
         rule_type = $("#kind").val()
