@@ -9,7 +9,7 @@ function get_rules_toPage() {
         }
     }
     var calc_id = $("#calc_id").text()
-    $.get("/api/rules/"+calc_id, function (rls, status) {
+    $.get("/sequoia/api/rules/"+calc_id, function (rls, status) {
         var rules = rls.rules
         for (var i = 0; i < rules.length; i++) {
             var rule_conc = rules[i].sml_conc.replace(/\\/g, "\\\\").replace(/'/g, "&apos;").replace(/"/g, "&quot;")
