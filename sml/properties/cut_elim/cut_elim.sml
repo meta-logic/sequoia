@@ -36,7 +36,11 @@ struct
                 end
 
             (* create_base *)
-            val base = create_base(cut_rule)
+            val Dat.Rule(name,_,conc,prems) = cut_rule
+            val prems_i = List.tabulate(List.length(prems),(fn i => Int.toString(i)))
+            val prems_pairs = ListPair.zip(prems_i,prems)
+            val prems = List.map (fn (i,seq) => Dat.DerTree("0"^i,seq,NONE,[])) prems_pairs 
+            val base = Dat.DerTree("0",conc,(SOME name), prems)
             val Dat.Rule(_,_,axiom_conc,_) = axiom
             (* apply cut rule *)
             (* should only generate one tree *)
