@@ -41,19 +41,15 @@ struct
                      | NONE => ((new_cons,new_tree),Ut.check_premises'((new_cons,new_tree),([],tree2),weakening)))
                 end
 
-            (* create_base *)
+            (* create_base with cut already applied *)
             val Dat.Rule(name,_,conc,prems) = cut_rule
             val prems_i = List.tabulate(List.length(prems),(fn i => Int.toString(i)))
             val prems_pairs = ListPair.zip(prems_i,prems)
             val prems = List.map (fn (i,seq) => Dat.DerTree("0"^i,seq,NONE,[])) prems_pairs 
             val base = Dat.DerTree("0",conc,(SOME name), prems)
             val Dat.Rule(_,_,axiom_conc,_) = axiom
-            (* apply cut rule *)
-            (* should only generate one tree *)
-            val cut_applied = T.apply_rule(([],[],base),cut_rule,"0")
             
-            val cut_applied = List.hd(cut_applied)
-            val (_,cons,tree) = cut_applied
+            val (cons,tree) = ([],base)
             (* unify each premise with axiom, then apply unifier to tree *)
             val prems = T.get_premises_of(tree,"0")
             val axiom_applied = List.concat (List.mapPartial 
