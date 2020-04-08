@@ -1,3 +1,9 @@
+// Sequoia Copyright (C) 2020  Zan Naeem
+// This program comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+// This is free software, and you are welcome to redistribute it
+// under certain conditions; type `show c' for details.
+
+
 $("#main-menu").sticky({});
 $("#Properties_icon").attr("class", "active item")
 var calc_id = $("#calc_id").text()
