@@ -1,7 +1,7 @@
 (*  Sequoia  Copyright (C) 2020  Mohammed Hashim
-    This program comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+    This program comes with ABSOLUTELY NO WARRANTY; for details see LICENSE.
     This is free software, and you are welcome to redistribute it
-    under certain conditions; type `show c' for details.
+    under certain conditions; see LICENSE for details.
 *)
 
  
