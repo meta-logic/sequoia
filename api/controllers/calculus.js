@@ -33,6 +33,26 @@ function createCalculus (req, res) {
 }
 
 
+function updateCalculus (req, res) {
+    Calculus.findOneAndUpdate({ _id : req.body.id}, 
+        {   title : req.body.title, 
+            description :req.body.description
+        }, { new : true}, 
+        function (err, calculus) {
+            if (err || calculus == null) {
+                return res.status(400).json({
+                    "status"  : "failure",
+                    "message" : "calculus does not exist"
+                })
+            }
+            return res.status(200).json({
+                "status"   : "success",
+                "calculus" : calculus
+            })
+        })
+}
+
+
 function deleteCalculus (req, res) {
     Calculus.deleteOne({ _id : req.body.id}, function (err, calc) {
         Symbols.remove({calculus : req.body.id}, function (err, symbs) {})
@@ -83,4 +103,4 @@ function getCalculi (req, res) {
 }
 
 
-module.exports = {createCalculus, deleteCalculus, getCalculus, getCalculi}
+module.exports = {createCalculus, updateCalculus, deleteCalculus, getCalculus, getCalculi}
