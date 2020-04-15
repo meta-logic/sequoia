@@ -62,13 +62,14 @@ function get_cuts_toPage() {
         for (var i = 0; i < rules.length; i++) {
             if (rules[i].type == "Cut") {
                 var rule_name = rules[i].rule.replace(/\\/g, "\\\\")
+                var rule_cutvar = rules[i].cutvar.replace(/\\/g, "\\\\").replace(/'/g, "&apos;").replace(/"/g, "&quot;")
                 var rule_conc = rules[i].sml_conc.replace(/\\/g, "\\\\").replace(/'/g, "&apos;").replace(/"/g, "&quot;")
                 var rule_prem = list_to_string(rules[i].sml_prem).replace(/\\/g, "\\\\").replace(/'/g, "&apos;").replace(/"/g, "&quot;")
                 rules_container.append( 
                     '<div id="rule_card'+i+'" class="ui card">'+
                         '<div class="content" id="r'+i+'" '+
                             'rule_name="'+rule_name+'" conclusion="'+rule_conc+'" premises="'+rule_prem+'" '+ 
-                            'conn="'+rules[i].connective+'" side="'+rules[i].side+'">'+
+                            'conn="'+rules[i].connective+'" side="'+rules[i].side+'" cutvar="'+rule_cutvar+'">'+
                                 '$$\\frac{'+rules[i].premises.join(" \\quad \\quad ")+'}{'+rules[i].conclusion+'}'+rules[i].rule+'$$'+
                         '</div>'+
                         '<div class="ui bottom attached button" id="b'+i+'" onClick=selectRule(true,'+i+')>'+

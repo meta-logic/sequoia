@@ -5,7 +5,6 @@
 
 
 var rule1 = ""
-var cutform = ""
 
 function selectRule(bl, i) {
     $("#info_answer").css("visibility","hidden")
@@ -38,23 +37,6 @@ function showProof(type, index, on) {
 }
 
 
-function cutSelect () {
-    $('#modal1').modal({
-        onApprove: function () {
-            var v = $("#var").val()
-            if (v == "") {
-                return
-            } else {
-                cutform = "FormVar(\""+v+"\")"
-                $("#var").val("")
-                checkCut()
-            }
-        }
-    })
-    .modal('setting', 'closable', false).modal('show')
-}
-
-
 function checkCut() {
     $("#results").css("visibility","hidden")
     $("#loading").attr("class", "ui active inverted dimmer")
@@ -67,6 +49,7 @@ function checkCut() {
     var conclusion1 = ruletemp1.attr("conclusion")
     var premises1 = ruletemp1.attr("premises")
     var rule_sml1 = "Rule(\""+name1+"\","+side1+","+conclusion1+","+premises1+")"
+    var cutform = ruletemp1.attr("cutvar")
     $.post("/sequoia/cutElim", { rule1: rule_sml1, formula: cutform, init_rules: init_strings, conn_rules: conn_strings, wL: weak_l, wR: weak_r }, function(data, status) {
         $("#results").css("visibility","visible")
         var output = data.output.split("%%%")

@@ -13,7 +13,7 @@ under certain conditions; see LICENSE for details. --}}
 <div class="ui container">
     <div class="ui three special cards" id="rules"></div>
     <br>
-    <div id="cut_button" class="ui disabled teal large button" onclick="cutSelect()">Perform Check</div>
+    <div id="cut_button" class="ui disabled teal large button" onclick="checkCut()">Perform Check</div>
     <div id="info_answer" class="ui message" style="visibility: hidden;">
         <div id="info_header" class="header">TEMP</div>
         <p id="info_text">TEMP</p>
@@ -31,23 +31,4 @@ under certain conditions; see LICENSE for details. --}}
 </div>
 <div id="loading" class="ui inactive inverted dimmer">
     <div class="ui text loader">Loading</div>
-</div>
-<div id ="modal1" class="ui special modal">
-    <div class="header">Cut Formula</div>
-    <div id = "change warning" class="content">
-        <p>Please indicate the cut formula variable.</p>
-        <p id= "cut_rule"></p>
-        <div class="ui form">
-            <div class="two fields">
-                <div class="field">
-                    <label>Variable</label>
-                    <input id="var" type="text">
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="actions">
-        <div id="yes_button" class="ui approve button">Confirm</div>
-        <div id="no_button" class="ui cancel button">Cancel</div>
-    </div>
 </div>

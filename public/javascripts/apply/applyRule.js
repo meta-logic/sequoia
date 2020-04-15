@@ -8,7 +8,6 @@ var rng_index = "0"
 var fresh_symbols = {}
 var seq_text = ""
 var leaf_id = "-1"
-var cut_var = ""
 var cut_form = ""
 var sml_history = []
 var latex_history = []
@@ -42,15 +41,12 @@ function cutSelect (type, callback) {
     } else {
         $('#modal2').modal({
             onApprove: function () {
-                var v = $("#var").val()
                 var f = $("#form").val()
-                if (v == "" || f == "") {
+                if (f == "") {
                     $("#modal_warning").css("visibility","visible")
                     return false
                 } else {
-                    cut_var = v
                     cut_form = f
-                    $("#var").val("")
                     $("#form").val("")
                     callback()
                 }
@@ -70,6 +66,7 @@ function applyRule(i) {
     var name = ruletemp.attr("rule_name").replace(/\\/g, "\\\\")
     var side = ruletemp.attr("side")
     var type = ruletemp.attr("type")
+    var cutvar = ruletemp.attr("cutvar")
     var conclusion = ruletemp.attr("conclusion")
     var premises = ruletemp.attr("premises")
     cutSelect (type, function () { 
@@ -95,7 +92,7 @@ function applyRule(i) {
                     $("#warning").css("visibility","visible")
                     return
                 }
-                params = { rule: rule_sml, constraints: constraints_sml, tree: tree_sml, node_id: "\""+leaf_id+"\"", index : rng_index, subs: "[Fs(FormVar(\""+cut_var+"\"),"+cF+")]" }
+                params = { rule: rule_sml, constraints: constraints_sml, tree: tree_sml, node_id: "\""+leaf_id+"\"", index : rng_index, subs: "[Fs("+cutvar+","+cF+")]" }
             }
             $.post("/sequoia/apply", params, function(data, status) {
                 cut_var = ""

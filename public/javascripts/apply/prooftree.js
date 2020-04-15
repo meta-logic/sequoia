@@ -13,7 +13,6 @@ function insert_new_tree(cn, cz, lt, ht, st) {
     $(".leaf").click(function() {
         leaf_id = this.id.split("_")[1]
         seq_text = $(this).find("script")[0].innerText
-        console.log(seq_text)
         $("#warning").css("visibility","hidden")
     })
     constraint_history.push(cn)
@@ -49,7 +48,6 @@ function insert_old_tree() {
     $(".leaf").click(function() {
         leaf_id = this.id.split("_")[1]
         seq_text = $(this).find("script")[0].innerText
-        console.log(seq_text)
         $("#warning").css("visibility","hidden")
     })
     constraint_history.pop()
