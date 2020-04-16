@@ -4,7 +4,9 @@
 // under certain conditions; see LICENSE for details.
 
 
-function insertTD() {
+function insertTD(title,description) {
+    console.log(title)
+    console.log(description)
     $("#editArea").html(
         '<div class="row">'+
             '<div class="ui input">'+
@@ -15,45 +17,36 @@ function insertTD() {
         '<div class="row">'+
             '<div class="ui fluid input">'+
                 '<input id="description" type="text" placeholder="Description">'+
-                '<button class="tiny ui button" onclick="updateTD()">'+
+                '<button class="tiny ui button" onclick="updateTD(\''+title+'\',\''+description+'\')">'+
                     '<i class="grey check icon"></i>'+
                 '</button>'+
             '</div>'+
         '</div>'
     )
+    $("#title").val(title)
+    $("#description").val(description)
 }
 
 
-function updateTD() {
-    var title = $("#title").val().trim()
-    var description = $("#description").val().trim()
-    if (title != "" && description != "") {
-        $("#editArea").html(
-            '<div id="title" class="ui middle aligned center aligned huge teal header">'+title+
-                '<div id="description" class="sub header">'+description+
-                    '<button class="tiny ui button" onclick="insertTD()" style="margin-left: 10px;">'+
-                        '<i class="grey pencil alternate icon"></i>'+
-                    '</button>'+
-                '</div>'+
-            '</div>'+
-            '<br>'
-        )
+function updateTD(title,description) {
+    var newtitle = $("#title").val().trim()
+    var newdescription = $("#description").val().trim()
+    if (newtitle != "" && newdescription != "") {
+        title = newtitle
+        description = newdescription
         $.ajax({
             url: "/sequoia/api/calculus",
             type: "PUT",
             data : { id : $("#calc_id").text(), title : title, description : description, function(data) {}}})
-    } else {
-        $.get("/sequoia/api/calculus/"+calc_id, function (calc, status) {
-            $("#editArea").html(
-                '<div id="title" class="ui middle aligned center aligned huge teal header">'+calc.calculus.title+
-                    '<div id="description" class="sub header">'+calc.calculus.description+
-                        '<button class="tiny ui button" onclick="insertTD()" style="margin-left: 10px;">'+
-                            '<i class="grey pencil alternate icon"></i>'+
-                        '</button>'+
-                    '</div>'+
-                '</div>'+
-                '<br>'
-            )
-        })
     }
+    $("#editArea").html(
+        '<div id="title" class="ui middle aligned center aligned huge teal header">'+title+
+            '<div id="description" class="sub header">'+description+
+                '<button class="tiny ui button" onclick="insertTD(\''+title+'\',\''+description+'\')" style="margin-left: 10px;">'+
+                    '<i class="grey pencil alternate icon"></i>'+
+                '</button>'+
+            '</div>'+
+        '</div>'+
+        '<br>'
+    )
 }
