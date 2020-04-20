@@ -16,6 +16,7 @@ if (property == "Main Page") {
     $("#prop2").attr("href", "/sequoia/calculus/"+calc_id+"/properties/weak_admissability")
     $("#prop3").attr("href", "/sequoia/calculus/"+calc_id+"/properties/permutability")
     $("#prop4").attr("href", "/sequoia/calculus/"+calc_id+"/properties/cut_admissability")
+    $("#prop5").attr("href", "/sequoia/calculus/"+calc_id+"/properties/invertibility")
 }
 if (property == "Permutability") {
     get_rules_toPage()

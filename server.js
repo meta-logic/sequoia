@@ -171,6 +171,10 @@ app.post('/sequoia/cutElim', checkAuthenticated, function (req, res) {
 	var result = sml_command.cutElim(req.body.rule1, req.body.formula, req.body.init_rules, req.body.conn_rules, req.body.wL, req.body.wR, res);
 });
 
+app.get('/sequoia/calculus/:calc_id/properties/invertibility', checkAuthenticated, function (req, res) {
+	return res.render('temporary/index', {'title' : 'Sequoia - properties', 'layout' : 'temporary'});
+});
+
 function checkAuthenticated (req, res, next) {
     if (req.isAuthenticated()) {
 		if (req.params.calc_id != null) {
