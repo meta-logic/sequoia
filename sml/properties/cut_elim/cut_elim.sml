@@ -20,6 +20,17 @@ struct
 
     fun check_true (l) = List.all (fn (_,opt) => Option.isSome(opt)) l
 
+    fun cut_rule_to_tree(cut_rule) = 
+    let
+        val Dat.Rule(name,_,conc,prems) = cut_rule
+        val prems_i = List.tabulate(List.length(prems),(fn i => Int.toString(i)))
+        val prems_pairs = ListPair.zip(prems_i,prems)
+        val prems = List.map (fn (i,seq) => Dat.DerTree("0"^i,seq,NONE,[])) prems_pairs 
+        val base = Dat.DerTree("0",conc,(SOME name), prems)
+        
+    in
+      base
+    end
     (* (App.apply_constraintL_Unifier (cons,sg)) *)
     fun cut_axiom (cut_rule,axiom, weakening) = 
         let
@@ -31,7 +42,8 @@ struct
                     val (new_cons,new_tree) = Ut.rename_ids (new_cons,new_tree)
                     val final_cons = new_cons@u_cons
                     val Dat.DerTree(_,new_base,_,_) = new_tree
-                    val tree2 = Dat.DerTree("0",Ut.generic_ctx_var (new_base),NONE,[])
+                    val tree2 = Dat.DerTree("0",new_base,NONE,[])
+                    val tree2 = Ut.fresh_tree(tree2)
                     val tree2_init = List.map (fn (_,a,b)=> (a,b)) (T.apply_rule(([],[],tree2),axiom,"0"))
                     fun res (_,Dat.DerTree(_,_,NONE,_)) = false
                         | res a = true
@@ -42,11 +54,7 @@ struct
                 end
 
             (* create_base with cut already applied *)
-            val Dat.Rule(name,_,conc,prems) = cut_rule
-            val prems_i = List.tabulate(List.length(prems),(fn i => Int.toString(i)))
-            val prems_pairs = ListPair.zip(prems_i,prems)
-            val prems = List.map (fn (i,seq) => Dat.DerTree("0"^i,seq,NONE,[])) prems_pairs 
-            val base = Dat.DerTree("0",conc,(SOME name), prems)
+            val base = cut_rule_to_tree(cut_rule)
             val Dat.Rule(_,_,axiom_conc,_) = axiom
             
             val (cons,tree) = ([],base)
@@ -75,6 +83,44 @@ struct
             (List.null neg,pos@neg)
         end
     
+    fun mod_tree (tree,left_rule,right_rule) = 
+        let
+
+            fun fresh_base (seq) = Dat.DerTree("0",seq,NONE,[])
+
+            fun apply_unifier(tree,(subs,cons)) = 
+                let
+                    val new_tree = App.apply_der_tree_Unifier(tree,subs)
+                    val Dat.DerTree(_,new_base,_,_) = new_tree
+                in
+                    (new_tree,fresh_base new_base,cons)
+                end
+
+            val Dat.Rule(_,_,l_conc,_) = left_rule
+            val Dat.Seq(_,_,r) = l_conc
+
+            val Dat.Rule(_,_,r_conc,_) = right_rule
+            val Dat.Seq(l,_,_) = r_conc
+            
+            (* assume at least 2 prems *)
+            val Dat.DerTree(_,conc,_,prems) = tree
+            val (prem1)::(prem2)::_ = prems
+            
+            val Dat.DerTree(_,Dat.Seq(l2,_,_),_,_) = prem1
+            val Dat.DerTree(_,Dat.Seq(_,_,r2),_,_) = prem2
+
+            val fake_seq = Dat.Seq(l,Dat.Con("f"),r)
+            val fake_seq2 = Dat.Seq(l2,Dat.Con("f"),r2)
+
+            val unifier = U.Unify_seq(fake_seq,fake_seq2)
+
+            val result =  (case unifier of
+               NONE => (tree,fresh_base conc,[])
+             | SOME (u::_) => apply_unifier(tree,u))
+
+        in
+            result
+        end
 
     fun cut_grade_reduction (cut_rule,(con,rulesL,rulesR),cut_formula,weakening) = 
         let
@@ -89,12 +135,15 @@ struct
             fun product (left_rules,right_rules) = List.concat (List.map 
                 (fn l_rule => List.map (fn r_rule => (l_rule,r_rule)) right_rules) left_rules)
 
-            fun create_drt1 (base,cut_rule,rules_combo_list,main_sub) = 
+            fun create_drt1 (cut_rule,rules_combo_list,main_sub) = 
                 let
                     val new_cut = mod_cut_rule(cut_rule,main_sub)
-                    val cut_applied = (T.apply_rule(([],[],base),new_cut,"0"))
+
+                    val cut_applied = cut_rule_to_tree(new_cut)
                     fun apply_left_right (l_rule,r_rule) = 
                         let
+                            val (cut_applied,new_base,new_cons) = mod_tree(cut_applied,l_rule,r_rule)
+                            val cut_applied = [([],new_cons,cut_applied)]
                             val right_applied = List.concat (List.map 
                                 (fn tree => T.apply_rule(tree,r_rule,"00")) cut_applied)
                             val both_applied = List.concat (List.map 
@@ -103,14 +152,16 @@ struct
                             val filtered = List.filter 
                             (fn (_,_,drt) => List.all (fn id => String.size(id)>2) 
                                 (List.map (get_id) (T.get_open_prems(drt)))) both_applied
+                            val forms_removed = List.map (fn (_,cons,drt) => (cons,drt)) filtered
+                            val trees_final = List.map (Ut.rename_ids) forms_removed
                         in
-                            List.map (fn (_,cons,drt) => (cons,drt)) filtered
+                            (trees_final,new_base)
                         end
-                    val combo_applied = List.concat(List.map apply_left_right rules_combo_list)
+                    val combo_applied = (List.map apply_left_right rules_combo_list)
 
 
                 in
-                    List.map (Ut.rename_ids) combo_applied
+                    combo_applied
                 end
 
             fun find_proofs (drt1s,base,cut_rule,subformulas)=
@@ -141,8 +192,8 @@ struct
                             apply_cuts(List.concat(mapped),rest,id^"1")
                         end
 
-                    fun find_proofs (checked,[],_,_)= (checked,[])
-                        |find_proofs (checked,drts_to_check,cut_rules,num_to_apply)=
+                    fun find_proofs' (checked,[],_,_)= (checked,[])
+                        |find_proofs' (checked,drts_to_check,cut_rules,num_to_apply)=
                         (case H.chooseDP(cut_rules,num_to_apply) of
                            [] => (checked,List.map (fn x => (x,NONE)) drts_to_check)
                          | rules => 
@@ -157,12 +208,12 @@ struct
                                 val found = List.map (fn (a,b) => (a,Option.valOf(b))) found
 
                             in
-                                find_proofs(found@checked,List.map (fn x => #1x) rem,cut_rules,num_to_apply+1)
+                                find_proofs'(found@checked,List.map (fn x => #1x) rem,cut_rules,num_to_apply+1)
                             end
                         )
                     
                 in 
-                    find_proofs([],drt1s,cut_rules_subforms,1)
+                    find_proofs'([],drt1s,cut_rules_subforms,1)
                 end                   
                     
                     
@@ -192,19 +243,22 @@ struct
             val subforms = List.tabulate(arity,(fn i => Dat.Atom(Char.toString(Char.chr(chars+i)))))
             val con_form = Dat.Form(con,subforms)
 
-            
-
             val og_sub = [Dat.Fs(cut_formula,con_form)]
-
-            val base = create_base(cut_rule)
 
             val rule_combinations = product(rulesL,rulesR)
 
-            val drt1s = create_drt1 (base,cut_rule,rule_combinations,og_sub)
-            val (pos,neg) = find_proofs (drt1s,base,cut_rule,subforms)
+            val drt1s = create_drt1 (cut_rule,rule_combinations,og_sub)
+
+            val results = List.map (fn (trees,base) => find_proofs (trees,base,cut_rule,subforms)) drt1s
+
+            val (pos_l,neg_l) = ListPair.unzip(results)
+
+
+            val (pos,neg) = (List.concat pos_l, List.concat neg_l)
         in
             (List.null neg, pos@neg)
         end
+
 
     fun cut_elim' (cut_rule,connectives,axioms,weakening) = 
         let

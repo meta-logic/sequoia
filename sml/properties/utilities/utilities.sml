@@ -29,6 +29,7 @@ struct
     structure T = treefuncImpl
     structure Latex = latexImpl
     structure App = applyunifierImpl
+    structure C = Constraints
     structure U = unifyImpl
     structure E = Equivalence
     structure Set = SplaySetFn(CtxVarKey);
@@ -101,6 +102,10 @@ struct
     
 
     fun ctx_var_to_fresh(D.CtxVar(a,x)) = D.CtxVar(a,string_to_fresh(x)) before (index := !index + 1)
+
+    
+
+    
 
     fun ctx_to_fresh(D.Ctx(ctx_vars,forms)) = D.Ctx(List.map ctx_var_to_fresh ctx_vars,forms)
 
@@ -199,6 +204,16 @@ struct
             Option.map (fn x => (cn2,x)) res
         end
 
+    
+
+    fun fresh_tree(tree) = 
+        let
+            val ctx_vars = get_ctx_vars_der_tree(tree)
+            val ctx_vars_no_dup = Set.listItems(Set.addList(Set.empty,ctx_vars))
+            val subs = List.map (fn var => Dat.CTXs(var,Dat.Ctx([C.fresh_ctx_var(var)],[]))) ctx_vars_no_dup
+        in
+            App.apply_der_tree_Unifier(tree,subs)
+        end
 
 
 
