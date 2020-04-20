@@ -35,10 +35,12 @@ struct
     fun cut_axiom (cut_rule,axiom, weakening) = 
         let
 
-            fun check (cons,tree,(u_sb,u_cons)) = 
+            fun check (cons,tree,(id,(u_sb,u_cons))) = 
                 let
                     val new_cons = App.apply_constraintL_Unifier (cons,u_sb)
                     val new_tree = App.apply_der_tree_Unifier(tree,u_sb)
+                    val new_tree = T.apply_rule (([],new_cons,new_tree),axiom,id)
+                    val (_,new_cons,new_tree)::_ = new_tree
                     val (new_cons,new_tree) = Ut.rename_ids (new_cons,new_tree)
                     val final_cons = new_cons@u_cons
                     val Dat.DerTree(_,new_base,_,_) = new_tree
@@ -57,11 +59,21 @@ struct
             val base = cut_rule_to_tree(cut_rule)
             val Dat.Rule(_,_,axiom_conc,_) = axiom
             
+            fun enum([],_) = []
+                | enum (a::b,num) = ("0"^(Int.toString(num)),a)::(enum(b,num+1))
+            
+
             val (cons,tree) = ([],base)
             (* unify each premise with axiom, then apply unifier to tree *)
             val prems = T.get_premises_of(tree,"0")
-            val axiom_applied = List.concat (List.mapPartial 
-            (fn prem => U.Unify_seq(prem,axiom_conc)) prems)
+            val prems = enum (prems,0)
+            val axiom_applied = List.map 
+            (fn (id,prem) => (id,U.Unify_seq(prem,axiom_conc))) prems
+            val axiom_applied = List.mapPartial (fn (id,uni) => Option.map (fn u => (id,u)) uni) axiom_applied
+            val axiom_applied = List.map (fn (id,unifiers) => 
+                List.map (fn u => (id,u)) unifiers) axiom_applied
+            val axiom_applied = List.concat axiom_applied
+
             val new_tree_set = List.map 
             (fn unifier => check(cons,tree,unifier)) axiom_applied
             (* check if the tree with cut can be used to close the conc of 
@@ -110,6 +122,7 @@ struct
             val Dat.DerTree(_,Dat.Seq(_,_,r2),_,_) = prem2
 
             val fake_seq = Dat.Seq(l,Dat.Con("f"),r)
+            val fake_seq = Ut.generic_ctx_var(fake_seq)
             val fake_seq2 = Dat.Seq(l2,Dat.Con("f"),r2)
 
             val unifier = U.Unify_seq(fake_seq,fake_seq2)
