@@ -13,7 +13,7 @@ struct
 
     fun weakening_rule_context (rule: (Dat.rule) , (side,context_num) : Dat.side * int) = 
         let
-
+            val _ = Ut.set_to_1()
             val res = false
             val weak_form = Dat.Atom "W^*"
 
@@ -66,7 +66,7 @@ struct
             val res = List.all (fn (_,r) => Option.isSome(r)) res2
 
             (* val res2 = if res then res2 else List.filter (fn (_,r) => false = Option.isSome(r)) res2 *)
-            
+            val _ = Ut.reset()
         in
           (res,res2)
         end

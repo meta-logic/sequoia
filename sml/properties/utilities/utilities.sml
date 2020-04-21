@@ -35,6 +35,11 @@ struct
     structure Set = SplaySetFn(CtxVarKey);
 
     val index = ref 1;
+
+    val ind = ref 1;
+
+    fun set_to_1 () = (ind := U.get_index();U.change_index(1))
+    fun reset () = (U.change_index(!ind))
     
 
     type constraint = D.ctx_var * (D.ctx_var list) * (D.ctx_var list)

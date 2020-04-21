@@ -16,6 +16,7 @@ struct
 
     fun permute(rule1, rule2, init_rule_ls, weak) =
         let
+            val _ = Ut.set_to_1()
             fun get_ctx_var(D.Empty,D.Empty) =
                 [(D.CtxVar (NONE,"Gamma_" ^ Int.toString(1)),[],[])] 
                 | get_ctx_var(D.Single (D.Ctx (v1,_)), D.Single (D.Ctx (v2,_))) =
@@ -123,7 +124,7 @@ struct
             val opens2 = stack_rules(bases2, rule2', rule1', init_rule_ls)
             (* val _ = print ("\n__________ opens2 bases 1 length: "^ (Int.toString(List.length(List.hd(opens2))))^ "_______\n") *)
 
-
+            val _ = Ut.reset()
         in
             check_premises(opens1,opens2,weak)
         end
