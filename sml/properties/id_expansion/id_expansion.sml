@@ -14,6 +14,7 @@ struct
       (* check which formula  *)
     fun init_coherence_con ((con:Dat.conn, rulesL: Dat.rule list, rulesR: Dat.rule list), init_rule: Dat.rule, axioms: Dat.rule list)=
         let
+            val _ = Ut.set_to_1()
             val Dat.Rule (_,_,init_conc,_) = init_rule
             (* changing names of context variables in rule and conclusion of rule *)
             val init_rule = Ut.update_rule(init_rule)
@@ -98,6 +99,7 @@ struct
                                                   | _ => true)) both_applied
             val res = no_open_prems
             (*  *)
+            val _ = Ut.reset()
         in
             (* rules_applied *)
             (case res of

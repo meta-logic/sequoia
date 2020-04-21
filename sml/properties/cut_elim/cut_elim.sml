@@ -34,7 +34,7 @@ struct
     (* (App.apply_constraintL_Unifier (cons,sg)) *)
     fun cut_axiom (cut_rule,axiom, weakening) = 
         let
-
+            val _ = Ut.set_to_1()
             fun check (cons,tree,(id,(u_sb,u_cons))) = 
                 let
                     val new_cons = App.apply_constraintL_Unifier (cons,u_sb)
@@ -79,6 +79,7 @@ struct
             (* check if the tree with cut can be used to close the conc of 
             that tree without cut *)
             val result = (check_true new_tree_set,new_tree_set)
+            val _ = Ut.reset()
         in
             result
         end
@@ -91,8 +92,9 @@ struct
             val neg = List.concat (List.map (fn ((_,neg),_) => neg) results)
             val pos = List.map (fn (t1,t2) => (t1,SOME t2)) pos
             val neg = List.map (fn t1 => (t1,NONE)) neg
+            val results = (List.null neg,pos@neg) 
         in
-            (List.null neg,pos@neg)
+            results 
         end
     
     fun mod_tree (tree,left_rule,right_rule) = 
@@ -137,6 +139,7 @@ struct
 
     fun cut_grade_reduction (cut_rule,(con,rulesL,rulesR),cut_formula,weakening) = 
         let
+            val _ = Ut.set_to_1()
             fun mod_cut_rule (Dat.Rule(name,side,conc,prems),subs) = 
                 let
                     val new_prems = List.map (fn prem => App.apply_seq_Unifier(prem,subs)) prems
@@ -268,8 +271,10 @@ struct
 
 
             val (pos,neg) = (List.concat pos_l, List.concat neg_l)
+            val results = (List.null neg, pos@neg)
+            val _ = Ut.reset()
         in
-            (List.null neg, pos@neg)
+            results
         end
 
 
