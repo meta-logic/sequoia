@@ -24,6 +24,7 @@ const morgan       = require('morgan');
 const bodyParser   = require('body-parser');
 const hbs          = require('express-handlebars');
 const envm         = require('dotenv').config()
+const favicon = require('serve-favicon');
 
 
 //loading local files ===============================================
@@ -50,10 +51,11 @@ app.use('/sequoia/bower', express.static(path.join(__dirname, '/bower_components
 
 
 //Configurations =====================================================
-app.use(helmet()); // configuring headers to be secure
-app.use(morgan('dev')); // log every request to the console
-app.use(bodyParser.json()); // get information from html forms
-app.use(bodyParser.urlencoded({extended: false})); // get information from html forms
+app.use(favicon(__dirname + '/public/javascripts/sample_images/favicon.ico'));
+app.use(helmet()); 
+app.use(morgan('dev')); 
+app.use(bodyParser.json()); 
+app.use(bodyParser.urlencoded({extended: false})); 
 app.use(flash())
 app.use(session({
     secret: "process.env.SESSION_SECRET",
@@ -65,7 +67,7 @@ app.use(passport.session())
 
 
 //connecting to mongo database 
-mongoose.connect(database.local, {useNewUrlParser: true, useUnifiedTopology: true});
+mongoose.connect(database.local, {useNewUrlParser: true});
 
 
 //Api Routers ===========================================================
