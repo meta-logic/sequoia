@@ -24,7 +24,7 @@ const morgan       = require('morgan');
 const bodyParser   = require('body-parser');
 const hbs          = require('express-handlebars');
 const envm         = require('dotenv').config()
-const favicon = require('serve-favicon');
+const favicon      = require('serve-favicon');
 
 
 //loading local files ===============================================
@@ -67,7 +67,7 @@ app.use(passport.session())
 
 
 //connecting to mongo database 
-mongoose.connect(database.local, {useNewUrlParser: true});
+mongoose.connect(database.local, {useNewUrlParser: true, useUnifiedTopology: true });
 
 
 //Api Routers ===========================================================
