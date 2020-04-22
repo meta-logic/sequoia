@@ -14,6 +14,29 @@ struct
     structure Ut = Utilities
     structure P = Permute
     structure U = unifyImpl
+    
+    val color = "blue"
+    
+    
+    fun mod_cut_rule (Dat.Rule(name,side,conc,prems),subs) = 
+    let
+        val new_prems = List.map (fn prem => App.apply_seq_Unifier(prem,subs)) prems
+    in
+        Dat.Rule(name,side,conc,new_prems)
+    end
+    
+    
+    
+    fun set_color (x) = "{ \\color{"^color^"} "^x^" }"
+
+    fun set_color_form(Dat.Atom(x)) = Dat.Atom(set_color(x))
+       |set_color_form(Dat.AtomVar(x)) = Dat.Atom(set_color(x))
+       |set_color_form(Dat.FormVar(x)) = Dat.Atom(set_color(x))
+       |set_color_form(Dat.Form(c,fl)) = Dat.Form(c,List.map set_color_form fl)
+
+    fun create_color_sub (x) = [Dat.Fs(x,set_color_form(x))]
+
+    fun change_cut_form_color(cut_rule,cut_formula) = mod_cut_rule(cut_rule,create_color_sub(cut_formula))
 
     fun create_base (Dat.Rule(_,_,conc,_)) = 
                 Dat.DerTree("0",Ut.generic_ctx_var conc,NONE,[])
@@ -31,10 +54,14 @@ struct
     in
       base
     end
+
+    
+
     (* (App.apply_constraintL_Unifier (cons,sg)) *)
-    fun cut_axiom (cut_rule,axiom, weakening) = 
+    fun cut_axiom (cut_rule,cut_formula,axiom, weakening) = 
         let
             val _ = Ut.set_to_1()
+            val cut_rule = change_cut_form_color(cut_rule,cut_formula)
             fun check (cons,tree,(id,(u_sb,u_cons))) = 
                 let
                     val new_cons = App.apply_constraintL_Unifier (cons,u_sb)
@@ -85,8 +112,9 @@ struct
         end
 
     (* possible sollution *)
-    fun cut_rank_reduction (cut_rule,other_rule,weakening) = 
+    fun cut_rank_reduction (cut_rule,cut_formula,other_rule,weakening) = 
         let
+            val cut_rule = change_cut_form_color(cut_rule,cut_formula)
             val results = P.permute(cut_rule,other_rule,[],weakening)
             val pos = List.concat (List.map (fn ((pos,_),_) => pos) results)
             val neg = List.concat (List.map (fn ((_,neg),_) => neg) results)
@@ -140,12 +168,7 @@ struct
     fun cut_grade_reduction (cut_rule,(con,rulesL,rulesR),cut_formula,weakening) = 
         let
             val _ = Ut.set_to_1()
-            fun mod_cut_rule (Dat.Rule(name,side,conc,prems),subs) = 
-                let
-                    val new_prems = List.map (fn prem => App.apply_seq_Unifier(prem,subs)) prems
-                in
-                    Dat.Rule(name,side,conc,new_prems)
-                end
+            
             
 
             fun product (left_rules,right_rules) = List.concat (List.map 
@@ -256,7 +279,7 @@ struct
                       | _ => ())
 
             val chars = Char.ord #"A"
-            val subforms = List.tabulate(arity,(fn i => Dat.Atom(Char.toString(Char.chr(chars+i)))))
+            val subforms = List.tabulate(arity,(fn i => Dat.Atom(set_color(Char.toString(Char.chr(chars+i))))))
             val con_form = Dat.Form(con,subforms)
 
             val og_sub = [Dat.Fs(cut_formula,con_form)]
@@ -283,13 +306,13 @@ struct
             val (rule,formula) = cut_rule
             (* axioms *)
             val check = List.all (fn (bool,_) => bool)
-            val axioms = List.map (fn axiom => cut_axiom(rule,axiom,weakening)) axioms
+            val axioms = List.map (fn axiom => cut_axiom(rule,formula,axiom,weakening)) axioms
             val axioms_check = check axioms
             (* rank_reductions *)
             val all_rules = List.concat 
                 (List.map (fn (_,rulesL,rulesR) => rulesL@rulesR) connectives)
             val rank_reductions = List.map 
-                (fn rule2 => cut_rank_reduction(rule,rule2,weakening)) all_rules
+                (fn rule2 => cut_rank_reduction(rule,formula,rule2,weakening)) all_rules
             val rank_check = check rank_reductions
             (* grade_reductions *)
             val grade_reductions = List.map 

@@ -36,8 +36,8 @@ sig
 	val permute_print : D.rule * D.rule * D.rule list * (bool list * bool list) -> unit
 
 
-	val cut_axiom : D.rule * D.rule * (bool list * bool list) -> bool * proof list
-	val cut_rank_reduction : D.rule * D.rule * (bool list * bool list) -> bool * proof list
+	val cut_axiom : D.rule * D.form * D.rule * (bool list * bool list) -> bool * proof list
+	val cut_rank_reduction : D.rule * D.form * D.rule * (bool list * bool list) -> bool * proof list
 	val cut_grade_reduction : D.rule * (D.conn * D.rule list * D.rule list) * 
 	D.form * (bool list * bool list) -> bool * proof list
 
