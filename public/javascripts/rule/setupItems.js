@@ -16,6 +16,5 @@ $.get("/sequoia/api/calculus/"+calc_id, function (calc, status) {
     $("#description").html(calc.calculus.description + $("#description").html())
     $("#modify").attr("onclick", "insertTD(\""+calc.calculus.title+"\",\""+calc.calculus.description+"\")")
     get_rules_toPage()
-    get_rules_toPage()
     get_symbols_toTable("rule")
 })
