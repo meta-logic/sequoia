@@ -88,8 +88,8 @@ structure datatypesImpl : DATATYPES = struct
     
     
     fun const_toString (_,[],[]) = ""
-        | const_toString (_,y,[]) = ctx_varL_toString y ^" = "^ "EMPTY"
-        | const_toString (_,[],z) = ctx_varL_toString z ^" = "^ "EMPTY"
+        | const_toString (_,y,[]) = ctx_varL_toString y ^" = "^ "\\emptyset"
+        | const_toString (_,[],z) = ctx_varL_toString z ^" = "^ "\\emptyset"
         | const_toString (_,y,z) = ctx_varL_toString y ^" = "^ ctx_varL_toString z
 
     fun const_stringify (x,y,z) = 
