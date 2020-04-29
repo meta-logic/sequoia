@@ -1,0 +1,28 @@
+{{!-- Sequoia Copyright (C) 2020  Zan Naeem
+This program comes with ABSOLUTELY NO WARRANTY; for details see LICENSE.
+This is free software, and you are welcome to redistribute it
+under certain conditions; see LICENSE for details. --}}
+
+
+<div id="calc_id" hidden>{{calc_id}}</div>
+<div id="title" class="ui middle aligned center aligned huge teal header">Invertibility
+	<div id="description" class="sub header">Select a rule to check if it is invertible to all other rules in your calculus</div>
+</div>
+<div id="property" hidden>Invertibility</div>
+<br><br>
+<div class="ui container">
+	<div class="ui three special cards" id="rules"></div>
+	<br>
+	<div id="invert_button" class="ui disabled teal large button" onclick="invert()">Perform Check</div>
+	<div id="info_answer" class="ui message" style="visibility: hidden;">
+		<div id="info_header" class="header">TEMP</div>
+		<p id="info_text">TEMP</p>
+	</div>
+	<div class="ui divider"></div>
+	<div class="ui one centered cards" id="good_trees"></div>
+	<div class="ui one centered cards" id="bad_trees"></div>
+	<br><br>
+</div>
+<div id="loading" class="ui inactive inverted dimmer">
+	<div class="ui text loader">Loading</div>
+</div>

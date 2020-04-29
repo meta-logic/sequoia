@@ -45,7 +45,7 @@ struct
   	let
   		val name = ("\\Gamma_{"^ Int.toString(!t)^"}" ) before ( t:= !t +1)
   	in
-  		D.CtxVar(name)
+  		D.CtxVar(NONE,name)
   	end
 
   fun gamma_ctx_var ()= [generic_ctx_var()]
@@ -176,6 +176,19 @@ struct
   		D.Rule ("false L",D.Left,D.Seq(D.Single(D.Ctx(G,[pfalse])),con,C),[])
   	end
 
+	fun cutRule () = 
+	let
+		val A = generic_form_A()
+		val C = generic_right_ctx()
+		val G = gamma_ctx_var()
+
+		val conc = D.Seq(D.Single(D.Ctx(G,[])),con,C)		
+		val prem1 = D.Seq(D.Single(D.Ctx(G,[])),con,D.Single(D.Ctx([],[A])))
+		val prem2 = D.Seq(D.Single(D.Ctx(G,[A])),con,C)
+	in
+		(D.Rule("cut",D.None,conc,[prem1,prem2]),A)
+	end
+
   	val andR1 = [andR()]
   	val andR2 = [andR()]
   	
@@ -192,18 +205,22 @@ struct
 
   	val orL1 = [orL()] 
 	
+	val cut = [cutRule()]
+	
 	val A = generic_atom_P()
 	val B = generic_atom_P()
 
 	val weak_rule_list =  [andR(),andL(),impR(),impL(),orR1(),orR2(),orL(),trueR(), falseL(), id(), init()]
 	val init_rule_list = [id()]
-	val rule_pairs_no_init = [(andCon,[andR()],[andL()]),(impCon,[impR()],[impL()]),(orCon,[orR1(),orR2()],[orL()])]
+	val rule_pairs_no_init = [(andCon,[andL()],[andR()]),(impCon,[impL()],[impR()]),(orCon,[orL()],[orR1(),orR2()])]
 	val axiom_list = [trueR(), falseL()]
+
 
 	fun weak_test  () = P.weakening(weak_rule_list)
 
 	fun init_coherence_test () = P.init_coherence(rule_pairs_no_init,init_rule_list,axiom_list)
 
+	fun cut_test () = P.cut_elim_print' 1 (cut,rule_pairs_no_init,init_rule_list,weak_test())
 	val weak: (bool list * bool list) option ref = ref NONE
   	fun test([R1],nil) = raise Fail "no R2"
   		| test([R1],[R2]) = 

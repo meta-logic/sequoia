@@ -12,6 +12,7 @@ $("#Prooftree_icon").attr("href", "/sequoia/calculus/"+calc_id+"/apply")
 $("#Properties_icon").attr("href", "/sequoia/calculus/"+calc_id+"/properties")
 $.get("/sequoia/api/calculus/"+calc_id, function (calc, status) {
     get_rules_toPage()
+    get_cert_symbols_toTable()
     get_symbols_toTable("seq")
 })
 

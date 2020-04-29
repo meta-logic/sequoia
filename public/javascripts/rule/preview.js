@@ -128,9 +128,9 @@ function preview() {
             $("#submit").attr("class","ui disabled fluid large circular icon button green")
             return
         }
-        if (rule_connective == "" && rule_type == "Logical") {
+        if ((rule_connective == "" && rule_type == "Logical") || (rule_connective != "" && rule_type != "Logical")) {
             $("#warning_header").html("Main Connective Missing")
-            $("#warning_text").html("A Logical type rule must be associated with a main connective.")
+            $("#warning_text").html("A Logical type rule must be associated with a main connective, and all other type rules should not be associated to any main connective.")
             $("#warning").css("visibility","visible")
             $("#submit").attr("class","ui disabled fluid large circular icon button green")
             return

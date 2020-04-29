@@ -1,0 +1,33 @@
+{{!-- Sequoia Copyright (C) 2020  Zan Naeem
+This program comes with ABSOLUTELY NO WARRANTY; for details see LICENSE.
+This is free software, and you are welcome to redistribute it
+under certain conditions; see LICENSE for details. --}}
+
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{{title}}</title>
+    <link rel="stylesheet" type="text/css" href="/sequoia/bower/semantic/dist/semantic.min.css">
+  </head>
+  <div id = "style">
+    <style> 
+      ::-webkit-scrollbar {
+          width: 0px;
+          background: transparent; /* make scrollbar transparent */
+      }
+    </style>
+  </div>
+  <body>
+  	{{> navbar}}
+	{{{body}}}
+    {{!-- <script type="text/javascript" id="MathJax" async src="/sequoia/bower/MathJax/es5/tex-chtml.js"></script> --}}
+  	<script type="text/javascript" src="/sequoia/bower/MathJax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+	<script type="text/javascript" src="/sequoia/bower/jquery/dist/jquery.min.js"></script>
+	<script type="text/javascript" src="/sequoia/bower/pegjs/peg-0.10.0.min.js"></script>
+	<script type="text/javascript" src="/sequoia/bower/semantic/dist/semantic.min.js"></script>
+  <script type="text/javascript" src="/sequoia/static/javascripts/properties/displayRules.js"></script>
+	<script type="text/javascript" src="/sequoia/static/javascripts/properties/checkCut.js"></script>
+	<script type="text/javascript" src="/sequoia/static/javascripts/properties/setupItems.js"></script>
+  </body>
+</html>

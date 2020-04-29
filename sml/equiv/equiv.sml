@@ -6,11 +6,11 @@
 
 structure Equivalence  : EQUIVALENCE = 
 struct
-	structure Set = SplaySetFn(StringKey);
 	(*constraint form: String*ctx_var list*ctx_var list *)
 	structure Dat = datatypesImpl
 	structure H = helpersImpl
 	structure C = Check
+	structure Cons = Constraints
 
 	type constraint = Dat.ctx_var * Dat.ctx_var list * Dat.ctx_var list
 
@@ -23,7 +23,7 @@ struct
             x2
         end
 
-    fun ctx_var_to_fresh(Dat.CtxVar(x)) = Dat.CtxVar(string_to_fresh(x))
+    fun ctx_var_to_fresh(Dat.CtxVar(a,x)) = Dat.CtxVar(a,string_to_fresh(x))
 
 
 	(*given 2 sequents, check if they are equivalent*)
@@ -64,12 +64,7 @@ struct
 		Dat.conn_eq(connA,connB) andalso (ctx_struct_equiv_wk(leftA,leftB,wk_l)) andalso ctx_struct_equiv_wk(rightA,rightB,wk_r)
 	 
 
-	(*taken from: https://stackoverflow.com/questions/33597175/how-to-write-to-a-file-in-sml*)
-	fun writeFile filename content =
-	    let val fd = TextIO.openOut filename
-	        val _ = TextIO.output (fd, content) handle e => (TextIO.closeOut fd; raise e)
-	        val _ = TextIO.closeOut fd
-	    in () end
+	
 
 	fun list_to_vector ([],[]) = []
 		|list_to_vector (x,[]) = raise Fail ("there might be undefined vars\n"^Dat.ctx_varL_toString(x))
@@ -117,28 +112,48 @@ struct
 			val vars_list = t1_vars @ t2_vars
 			val line1 = Int.toString(cons_len)^" "^Int.toString(var_num)^" "^Int.toString(t1_var_num)^"\n"
 			val matrix = cons_to_matrix (new_cons,vars_list)
-			val line2 = row_list_to_string(List.map (fn Dat.CtxVar( x) => x) vars_list)
+			(* val line2 = row_list_to_string(List.map (fn Dat.CtxVar(a, x) => x) vars_list) *)
+			val line2 = ""
 			val final_str = ref (line1^line2^matrix)
 			val result = C.main_check(final_str)
 		in
 			result
 		end
 
-	fun pair_cons((a,b), (L1,L2)) = (a::L1,b::L2)
+	fun pair_cons((a,b), (L1,L2)) = (a@L1,b@L2)
 
 	fun pair_append ( (L1,L2),(L1',L2')) = (L1@ L1', L2 @ L2') 
 
-	fun fresh_CtxVar () = ctx_var_to_fresh(Dat.CtxVar("e"))
+	fun fresh_CtxVar () = ctx_var_to_fresh(Dat.CtxVar(NONE,"e"))
 	
+	fun weaken_constraints(cons_list) = 
+		(let
+			val new_cons = List.map 
+			(fn (a,b,c) => (a,(Cons.fresh_ctx_var(List.hd(b)))::b,c)) cons_list
+			val new_vars = List.map 
+			(fn (_,b,_) => List.hd(b)) new_cons
+		in
+			(new_cons,new_vars)
+		end)
+		handle (Empty) => raise Fail ("empty left side of constraint, not supposed to happen\n"
+								^"either fix constraint generation or weaken_constraints in equiv.sml")
   
 	(* TODO:  a not empty*)
 	fun extract_constraints'' (Dat.Ctx (a,_), Dat.Ctx (b,_),wk) = 
-		(case (wk) of
-		   (true) => let val A = fresh_CtxVar() in ((Dat.CtxVar("eq"),A::a,b),SOME A) end
-		 | (_) => ((Dat.CtxVar("eq"),a,b), NONE))
+		let
+			val (a_cons,b_cons) = Cons.get_constraints'(a,b)
+			val (a_cons,new_vars) = 
+			(case wk of
+			   false => (a_cons,[])
+			 | _ => weaken_constraints(a_cons) )
+			val full_cons = a_cons@b_cons
+			val new_con_vars = List.concat(List.map (fn (_,_,c) => c) a_cons)
+		in
+			(a_cons@b_cons,new_con_vars@new_vars)
+		end
 
 
-	fun extract_constraints' (Dat.Empty,Dat.Empty,_) : (constraint list * Dat.ctx_var option list) = ([],[])
+	fun extract_constraints' (Dat.Empty,Dat.Empty,_) : (constraint list * Dat.ctx_var list) = ([],[])
 		| extract_constraints' (Dat.Single a, Dat.Single b,wk) = 
 			(case wk of
 			   [] => pair_cons(extract_constraints'' (a,b,false),extract_constraints' (Dat.Empty,Dat.Empty,[]))
@@ -170,10 +185,10 @@ struct
 	(* returns : (tree,constraint,new_vars) list *)
 	fun set_leaves (assumed_leaves, tree, weak) = 
 		(case tree of
-		   Dat.DerTree (_,seq,Dat.NoRule,[]) => 
+		   Dat.DerTree (_,seq,NONE,[]) => 
 		   					(let
 								val possible_premises = List.filter (fn (_,y) => seq_equiv_wk (y,seq,weak)) assumed_leaves
-								val options = List.map (fn (name,seq2) => (Dat.DerTree(name,seq,Dat.NoRule,[]),extract_constraints_wk(seq2,seq,weak))) possible_premises
+								val options = List.map (fn (name,seq2) => (Dat.DerTree(name,seq,NONE,[]),extract_constraints_wk(seq2,seq,weak))) possible_premises
 							in 
 								options
 							end)
@@ -192,7 +207,7 @@ struct
 	fun check_premises_wk (assumed_leaves,conc,cons,weak,t1_vars,t2_vars) =
 		let
 			val new_trees = set_leaves (assumed_leaves,conc,weak)
-			val result = List.find (fn (_,(new_cons,new_vars)) => check_consistent(new_cons@cons,t1_vars,(List.mapPartial (fn x => x) new_vars)@t2_vars)) new_trees
+			val result = List.find (fn (_,(new_cons,new_vars)) => check_consistent(new_cons@cons,t1_vars,(new_vars)@t2_vars)) new_trees
 		in
 			Option.map (fn (tree,_) => tree ) result
 		end

@@ -12,7 +12,9 @@ structure treefuncImpl : TREEFUNC = struct
     structure App = applyunifierImpl
     structure U = unifyImpl
     structure E = Equivalence
-
+    structure Latex = latexImpl
+    structure Html = htmlImpl
+    structure Set = BinarySetFn(StringKey)
 
 
     type conn = Dat.conn
@@ -32,51 +34,14 @@ structure treefuncImpl : TREEFUNC = struct
 
     val get_index : unit -> int = U.get_index
 
-    fun fresh'(x:string):string = (x ^"^{"^ (Int.toString(get_index())) ^"}")
-
-    val hat::_ = String.explode("^")
-
-    fun remove_hat' (nil) = nil
-        |remove_hat' (x::L) = (case (x=hat) of true => [] | false => x::remove_hat'(L))
-
-    fun remove_hat (x) = String.implode(remove_hat'(String.explode(x)))
-    (* nuke version *)
-    fun fresh(x:string):string = fresh'(remove_hat(x))
-
-    val update_string = fresh
-
-    fun update_ctx_var (Dat.CtxVar(x)) = Dat.CtxVar(update_string(x))
-
-    fun update_form (Dat.Atom(x)) = Dat.Atom(x)
-        | update_form (Dat.AtomVar(x)) = Dat.AtomVar(update_string(x))
-        | update_form (Dat.FormVar(x)) = Dat.FormVar(update_string(x))
-        | update_form (Dat.Form(c,forms)) = Dat.Form(c, List.map update_form forms)
-
-    fun update_ctx (Dat.Ctx(ctx_vars,forms)) = Dat.Ctx(List.map update_ctx_var ctx_vars,List.map update_form forms)
-
-    fun update_ctx_struct (Dat.Empty) = Dat.Empty
-        | update_ctx_struct (Dat.Single(ctx)) = Dat.Single(update_ctx(ctx))
-        | update_ctx_struct (Dat.Mult(conn,ctx,ctx_strct)) = Dat.Mult(conn,update_ctx(ctx), update_ctx_struct(ctx_strct))
-
-    fun update_seq (Dat.Seq(l,conn,r)) = Dat.Seq(update_ctx_struct(l),conn,update_ctx_struct(r))
-
-    fun update_rule (Dat.Rule(nm,side,conc,prems)) =
-        let
-            val new_conc = update_seq(conc)
-            val new_prems = List.map update_seq prems
-            val _ = change_index(get_index() + 1)
-        in
-            Dat.Rule(nm,side,new_conc,new_prems)
-        end
-
     
     fun get_tree_height (Dat.DerTree(_,_,_,[])) = 0
         | get_tree_height (Dat.DerTree(_,_,_,prs)) = (List.foldl  Int.max 0 (List.map (get_tree_height) prs)) +1
 
-    fun get_open_prems(Dat.DerTree(id, sq,  Dat.NoRule, pq)) = [Dat.DerTree(id, sq,  Dat.NoRule, pq)]
+    fun get_open_prems(Dat.DerTree(id, sq, NONE, pq)) = [Dat.DerTree(id, sq, NONE, pq)]
         | get_open_prems(Dat.DerTree(id, sq, rq, pq)) = List.concat (List.map get_open_prems pq)
 
-    fun closed_tree(Dat.DerTree(id, sq,  Dat.NoRule, pq)) = false
+    fun closed_tree(Dat.DerTree(id, sq, NONE, pq)) = false
         | closed_tree(Dat.DerTree(id, sq, rq, pq)) = not (List.exists(fn p => not (closed_tree p))pq)
 
     fun atomic_transform(Dat.Seq(l,c,r)) = 
@@ -95,6 +60,9 @@ structure treefuncImpl : TREEFUNC = struct
         in
             Dat.Seq(ctx_struct_trans l, c, ctx_struct_trans r)
         end
+
+    fun get_form_vars(Dat.Form (_, fl)) = List.concat(List.map(get_form_vars)fl)
+        | get_form_vars (f) = [f]
 
     fun get_forms(Dat.Seq (l,_,r)) = 
         let 
@@ -116,7 +84,8 @@ structure treefuncImpl : TREEFUNC = struct
                 | bad_sub(Dat.CTXs(v1, Dat.Ctx(_, fl)), sequent) = 
                     List.exists(fn v2 => Dat.ctx_var_eq(v1,v2))(get_ctx_vars sequent)
                 | bad_sub(Dat.Fs(a1,_), sequent) = 
-                    List.exists(fn a2 => Dat.form_eq(a1,a2))(get_forms sequent)
+                    List.exists(fn a2 => Dat.form_eq(a1,a2))
+                    (List.concat(List.map(get_form_vars)(get_forms sequent)))
                 | bad_sub _ = false
         in 
             List.filter(fn (sb,_) => not (List.exists(fn s => bad_sub(s,sequent))sb))sigcons
@@ -144,32 +113,50 @@ structure treefuncImpl : TREEFUNC = struct
                     get_seq_of (child,sid)
                 end
 
-    fun check_rule_of(_,Dat.DerTree(id, _, Dat.NoRule, pq), sid) = not (id = sid)
+    fun check_rule_of(_,Dat.DerTree(id, _, NONE, pq), sid) = not (id = sid)
         | check_rule_of(cn, Dat.DerTree(id, _, rq, pq), sid) = if id = sid then true 
         else if not (String.isPrefix id sid) then true
         else List.foldl(fn (branch, bools) => bools andalso (check_rule_of(cn, branch,sid)))(true)pq
 
+    (* (List.map (fn Dat.CtxVar(_,x) => x) (get_ctx_vars base))@ (List.concat(List.map tree_to_vars prems)) *)
+
+    fun tree_to_vars' (Dat.DerTree(_,base,_,prems),set) = 
+        let
+            val new_set = List.foldr tree_to_vars' set prems
+            val base_vars = List.map (fn Dat.CtxVar(_,x) => x) (get_ctx_vars base)
+        in
+            List.foldr Set.add' new_set base_vars
+        end
+
+    fun tree_to_vars (tree:Dat.der_tree): string list =  
+        let
+            val final_set = tree_to_vars' (tree,Set.empty)
+        in
+            Set.listItems(final_set)
+        end
+
+
     (*  *)
     fun apply_rule((forms, cons, dt), rule, sid) =
         let 
-            (* val rule = update_rule(rule) *)
-            fun apply_rule_aux( Dat.DerTree(id, sq,  Dat.NoRule, []), Dat.Rule(name, s, conc, premises), sid) =
-                    if id <> sid then [(forms,NONE, Dat.DerTree(id, sq,  Dat.NoRule, []))] else 
+            fun apply_rule_aux( Dat.DerTree(id, sq, NONE, []), Dat.Rule(name, s, conc, premises), sid) =
+                    if id <> sid then [(forms,NONE, Dat.DerTree(id, sq, NONE, []))] else 
                     (case U.Unify_seq(conc, sq) of
                         SOME(sigscons) => 
                             let val formulas = get_forms(conc)
                                 val new_sigscons = filter_bad_subs(sigscons,sq)
-                                (* val _ = print ((Int.toString (List.length(sigscons)))^" to "^(Int.toString (List.length(new_sigscons)))^"\n") *)
-                                
+                                (* val _ = print("[" ^ (String.concatWith (" OR ")(List.map(fn a => "("^(String.concatWith ("; ")a) ^")")
+                                        (List.map(fn (a,b) => a)(U.print_sigs_cons (SOME new_sigscons))))) ^ "]")
+                                val _ = print ((Int.toString (List.length(sigscons)))^" to "^(Int.toString (List.length(new_sigscons)))^"\n") *)
                                 val next_ids = List.tabulate(List.length(premises), fn i => Int.toString(i))
                                 val prems_ids = ListPair.zip(premises, next_ids)
-                                val new_prems = List.map(fn (p, i) => Dat.DerTree(id^i,p, Dat.NoRule,[]))prems_ids
+                                val new_prems = List.map(fn (p, i) => Dat.DerTree(id^i,p, NONE,[]))prems_ids
                             in
-                                if List.length(new_sigscons) = 0 then [(forms,NONE, Dat.DerTree(id,sq, Dat.NoRule,[]))] else
+                                if List.length(new_sigscons) = 0 then [(forms,NONE, Dat.DerTree(id,sq, NONE,[]))] else
                                 List.map(fn (sg,cn) => let val frm = App.apply_formL_Unifier(formulas,sg) in
-                                (forms @ frm,SOME(sg,cn), Dat.DerTree(id,sq,Dat.RuleName(name),new_prems)) end)new_sigscons
+                                (forms @ frm,SOME(sg,cn), Dat.DerTree(id,sq,SOME(name),new_prems)) end)new_sigscons
                             end
-                        | NONE => [(forms,NONE, Dat.DerTree(id, sq,  Dat.NoRule, []))])
+                        | NONE => [(forms,NONE, Dat.DerTree(id, sq, NONE, []))])
                 | apply_rule_aux( Dat.DerTree(id, sq, rq, pq), rule, sid) =
                     if id = sid then [(forms,NONE, Dat.DerTree(id, sq, rq, pq))] else
                     let val new_prems_list = apply_rule_list(pq, rule, sid) in
@@ -185,7 +172,7 @@ structure treefuncImpl : TREEFUNC = struct
             (* fun print_seq (Dat.DerTree(_,sq,_,_)) = print(Dat.seq_toString(sq)) *)
         in 
             List.map   (fn (form, unif, dvt) => case unif of 
-                SOME((sg,cn)) => (form, cons @ cn, (App.apply_der_tree_Unifier(dvt, sg)))
+                SOME((sg,cn)) => (form, (App.apply_constraintL_Unifier (cons,sg)) @ cn, (App.apply_der_tree_Unifier(dvt, sg)))
                 | NONE => (form, cons, dvt))   (apply_rule_aux(dt, rule, sid))
         end
 
@@ -254,11 +241,11 @@ structure treefuncImpl : TREEFUNC = struct
 
     fun filter_constraints (cons) = List.filter (fn (_,l1,l2) => not (H.mset_eq(l1,l2,Dat.ctx_var_eq)) ) cons
 
-    fun translate_premises' fd (tree,rule,id, index) = 
+    fun translate_premises' fd (constraints,tree,rule,id,index) = 
         let val () = change_index(index)
-            val new_trees = List.map(fn (_,cn,tr) => (cn, tr))(apply_rule(([],[],tree),rule,id))
+            val new_trees = List.map(fn (_,cn,tr) => (cn, tr))(apply_rule(([],constraints,tree),rule,id))
             val filtered = List.filter(fn (cn, tr) => check_rule_of(cn,tr,id))new_trees
-            val Dat.DerTree (_,temp_conc,_,_) = tree
+            (* val Dat.DerTree (_,temp_conc,_,_) = tree
             val pre_conc = (get_seq_of(tree,id)) handle (NotFound) => temp_conc
             fun update_cons (cn,tr) = 
                 let
@@ -267,33 +254,30 @@ structure treefuncImpl : TREEFUNC = struct
                     val new_cons = filter_constraints new_cons
                 in
                     (new_cons@cn,tr)
-                end
+                end *)
         in
             (case filtered of 
             [] => writeFD fd "NOT APPLICABLE"
             | _ => 
                 let 
-                    val filtered = List.map (update_cons) filtered
-                    val new_premises = List.map(fn (cn, tr) => (cn, get_premises_of(tr,id))) filtered 
-                    fun prems_to_vars prems = List.map (fn Dat.CtxVar(x) => x) (List.concat (List.map get_ctx_vars prems))
+                    (* val filtered = List.map (update_cons) filtered *)
+                    val new_premises = List.map(fn (cn, tr) => (cn, Latex.der_tree_toLatex(tr), Html.der_tree_toHtml(tr), tr, get_premises_of(tr,id))) filtered 
+                    
                     fun hd (l) = List.hd(l) handle (List.Empty) => ""
                     fun tl (l) = List.tl(l) handle (List.Empty) => []
                 in
-                    (case new_premises of 
-                    [(_,[])] => writeFD 3 ("[{}@@{}@@{}@@{"^(Int.toString(get_index()))^"}]")
-                    | _ => 
-                        let val new_premises_strings = List.map (fn (cn_list, pr_list) => 
-                                (List.map (Dat.const_toString) cn_list, List.map (Dat.seq_toString) pr_list, prems_to_vars(pr_list) )) new_premises
-                            val new_premises_strings2 = List.map (fn (c, p, v): (string list * string list * string list) => 
-                                    "{"^(List.foldl (fn (str1,str2) => str2^"##"^str1) (hd(c)) (tl(c)))^"}@@"^
-                                    "{"^(List.foldl (fn (str1,str2) => str2^"##"^str1) (hd(p)) (tl(p)))^"}@@"^
-                                    "{"^(List.foldl (fn (str1,str2) => str2^"##"^str1) (hd(v)) (tl(v)))^"}@@"^
-                                    "{"^(Int.toString(get_index()))^"}"
-                                    )new_premises_strings
-                            val final_form = "["^(List.foldl (fn (str1,str2) => str1^" && "^str2) (List.hd(new_premises_strings2)) (List.tl(new_premises_strings2)))^"]"
-                        in 
-                            writeFD fd final_form
-                        end)
+                    let val new_premises_strings = List.map (fn (cn_list, latex_tree, html_tree, sml_tree, pr_list) => 
+                            (List.map (Dat.const_toString) cn_list, List.map (Dat.const_stringify) cn_list, List.map (Dat.seq_toString) pr_list, tree_to_vars(sml_tree), latex_tree, html_tree, Html.der_tree_toHtml2(sml_tree))) new_premises
+                        val new_premises_strings2 = List.map (fn (c, z, p, v, l, h, s): (string list * string list * string list * string list * string * string * string) => 
+                                "{"^(String.concatWith ("##")c)^"%%["^(String.concatWith (",")z)^"]}@@"^
+                                "{"^(String.concatWith ("##")p)^"%%"^l^"%%"^h^"%%"^s^"}@@"^
+                                "{"^(String.concatWith ("##")v)^"}@@"^
+                                "{"^(Int.toString(get_index()))^"}"
+                                )new_premises_strings
+                        val final_form = "["^(List.foldl (fn (str1,str2) => str1^" && "^str2) (List.hd(new_premises_strings2)) (List.tl(new_premises_strings2)))^"]"
+                    in 
+                        writeFD fd final_form
+                    end
                 end)
         end
     fun update_cut_rule (Dat.Rule(name,side,conc,prems),sub) = 
@@ -305,11 +289,11 @@ structure treefuncImpl : TREEFUNC = struct
             Dat.Rule(name,side,new_conc,new_prems)
         end
 
-    fun translate_premises_cut' fd (tree, rule, id , index, sub) = 
+    fun translate_premises_cut' fd (constraints, tree, rule, id , index, sub) = 
         let
             val new_rule = update_cut_rule (rule,sub) 
         in
-            translate_premises' fd (tree,new_rule,id,index)
+            translate_premises' fd (constraints,tree,new_rule,id,index)
         end
 
     fun translate_premises (input) = translate_premises_cut' 3 input

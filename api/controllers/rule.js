@@ -17,7 +17,9 @@ function createRule (req, res) {
     rule.sml_conc = req.body.parsed_conc
     rule.calculus = req.body.calculus
     rule.connective = req.body.connective
+    rule.type = req.body.type
     rule.side = req.body.side
+    rule.cutvar = req.body.cutvar
     rule.save(function (err) {
         if (err) {
             return res.status(400).json({
@@ -48,6 +50,7 @@ function createRules (req, res) {
         rule.connective = rls.connective
         rule.type = rls.type
         rule.side = rls.side
+        rule.cutvar = rls.cutvar
         rule.save(function (err) {
             if (err) {
                 return res.status(400).json({
@@ -74,8 +77,9 @@ function updateRule (req, res) {
             sml_conc : req.body.parsed_conc,
             calculus : req.body.calculus,
             connective : req.body.connective,
+            side : req.body.side,
             type : req.body.type,
-            side : req.body.side
+            cutvar : req.body.cutvar
         }, { new : true}, 
         function (err, rule) {
             if (err || rule == null) {
@@ -94,7 +98,6 @@ function updateRule (req, res) {
 
 function deleteRule (req, res) {
     Rule.remove({ _id : req.body.id}, function (err, rule) {
-        //if the rule does not exists
         if (err || rule == null) {
             return res.status(400).json({
                 "status"  : "failure",

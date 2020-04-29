@@ -19,7 +19,8 @@ var ruleSchema = new Schema({
     calculus    : String,
     connective  : String,
     type        : String,
-    side        : String
+    side        : String,
+    cutvar      : String
 })
 
 module.exports = mongoose.model("Rule", ruleSchema)

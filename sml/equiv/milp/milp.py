@@ -8,6 +8,8 @@
 import sys
 import os
 
+
+
 nl = open(os.devnull,'w')
 temp = sys.stdout
 temp2 = sys.stderr
@@ -46,9 +48,9 @@ w.write("_________________________________________________\n")
 
 row_num, var_num, t1_num = list(map(int,f.readline().split(" ")))
 
-variables = f.readline().strip().split(" ")
-w.write(" ".join(variables)+"\n")
-assert(len(variables)==var_num)
+# variables = f.readline().strip().split(" ")
+# w.write(" ".join(variables)+"\n")
+# assert(len(variables)==var_num)
 
 
 

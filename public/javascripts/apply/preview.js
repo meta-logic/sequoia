@@ -9,7 +9,6 @@ function preview() {
     var initial_sequent = $("#Sequent").val().replace(/\(/g, " ( ").replace(/\)/g, " ) ")
     if (initial_sequent == "")
         return
-    latex_tree.push({"conclusion" : initial_sequent, "rulename" : "", "premises" : []})
     $("#conc_0").html('$$'+initial_sequent+'$$')
     $("#conc_0").css("visibility","visible")
     MathJax.Hub.Queue([ "Typeset", MathJax.Hub, $("#prooftree_0")[0] ])

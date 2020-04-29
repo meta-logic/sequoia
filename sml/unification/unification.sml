@@ -9,6 +9,7 @@ structure unifyImpl : UNIFICATION = struct
     structure DAT = datatypesImpl
     structure Dat = DAT
     structure APP = applyunifierImpl
+    structure C = Constraints
 
 
     type sub = DAT.sub
@@ -20,22 +21,11 @@ structure unifyImpl : UNIFICATION = struct
 
     val init_fresh = ref 100;
 
-    val var_index = ref 1;
+    val change_index = C.change_index
 
-    fun change_index (x:int): unit = ignore (var_index := x)
+    val get_index = C.get_index
 
-    fun get_index ():int = !var_index
-
-    fun fresh'(x:string):string = (x ^"^{"^ (Int.toString(!var_index)) ^"}") before (var_index := !var_index + 1)
-
-    val hat::_ = String.explode("^")
-
-    fun remove_hat' (nil) = nil
-        |remove_hat' (x::L) = (case (x=hat) of true => [] | false => x::remove_hat'(L))
-
-    fun remove_hat (x) = String.implode(remove_hat'(String.explode(x)))
-    (* nuke version *)
-    fun fresh(x:string):string = fresh'(remove_hat(x))
+    val fresh = C.fresh
 
 
     (*TODO: remove duplicate or remove both*)
@@ -44,7 +34,7 @@ structure unifyImpl : UNIFICATION = struct
             List.map(fn ls => 
                 List.map(fn sb => 
                     (case sb of DAT.Fs(a,b) => (DAT.form_toString a ^ " => " ^ DAT.form_toString b)
-                            |  DAT.CTXs(a,b) =>  (DAT.ctx_var_toString a ^ " => " ^ DAT.ctx_toString b)
+                            |  DAT.CTXs(a,b) => (DAT.ctx_var_toString a ^ " => " ^ DAT.ctx_toString b)
                             |  DAT.CVs(a,b) => (DAT.ctx_var_toString a ^ " => " ^ DAT.ctx_var_toString b)
                     ))ls)sigma
 
@@ -152,19 +142,19 @@ structure unifyImpl : UNIFICATION = struct
         let
             
 
-            fun update_ctx_var (DAT.CtxVar(x)) = DAT.CtxVar(fresh(x))
+            fun update_ctx_var (DAT.CtxVar(a, x)) = DAT.CtxVar(a, fresh(x))
 
             
 
             fun get_constraint (g1, g2) =
                 let val () = () in init_fresh := !init_fresh + 1;
-                (DAT.CtxVar("Gamma_" ^ Int.toString(!init_fresh)), g1, g2) end
+                (DAT.CtxVar(NONE,"Gamma_" ^ Int.toString(!init_fresh)), g1, g2) end
 
             (* update variables in vl1 and vl2. Then, create an initial sub/constraint for that change *)
             
 
             fun post_ctx (sigma) = List.concat(List.map(fn DAT.CTXs(_, DAT.Ctx(cv, _)) => cv 
-                                                        | _ => raise Fail "post_ctx fun in Unify_ctx") sigma)
+                                    | _ => raise Fail "post_ctx fun in Unify_ctx") sigma)
 
             fun try_permutations (chosen_l1, chosen_l2) =
                 if List.length(chosen_l1) = 0 andalso List.length(chosen_l2) = 0 then [nil] else
@@ -178,25 +168,34 @@ structure unifyImpl : UNIFICATION = struct
                             )
                         )
 
+            fun context_conn_check (_, []) = true
+                | context_conn_check (DAT.CtxVar(NONE,cv), fl) = true
+                | context_conn_check (DAT.CtxVar(SOME(c1),cv), DAT.Form(c2, sfl) ::fl) = 
+                    DAT.conn_eq(c1,c2) andalso context_conn_check(DAT.CtxVar(SOME(c1),cv),fl)
+                | context_conn_check (_, _) = false
+
             fun part (vl1, fl1, vl2) =
                 if List.length(fl1) = 0 andalso List.length(vl2) = 0 then [nil] else
                     let val part = H.partition_into (List.length(vl2), fl1)
                         val vl_sigmas =
-                            List.map(fn pf =>
-                                List.map(fn (p,g) =>
-                                    if List.length(p) = 0 then
-                                        if List.length(vl1) = 0 then DAT.CTXs(g, DAT.Ctx([], []))
-                                        else DAT.CTXs(g, DAT.Ctx([g], [])) 
-                                    else 
-                                        if List.length(vl1) = 0 then DAT.CTXs(g, DAT.Ctx([], p))
-                                        else DAT.CTXs(g, DAT.Ctx([update_ctx_var(g)], p))
+                            List.map(fn pf => 
+                                List.map(fn (p,g) => 
+                                    if context_conn_check (g,p) then 
+                                        if List.length(p) = 0 then
+                                            if List.length(vl1) = 0 then SOME(DAT.CTXs(g, DAT.Ctx([], [])))
+                                            else SOME(DAT.CTXs(g, DAT.Ctx([g], [])))
+                                        else 
+                                            if List.length(vl1) = 0 then SOME(DAT.CTXs(g, DAT.Ctx([], p)))
+                                            else SOME(DAT.CTXs(g, DAT.Ctx([update_ctx_var(g)], p)))
+                                    else NONE
                                 )(ListPair.zip(pf, vl2))
                             )part
-                    in vl_sigmas end
-            
+                        val vl_return = List.map(fn some_list => List.map (Option.valOf)some_list) 
+                                            (List.filter(fn opt_list => List.all(Option.isSome)opt_list)vl_sigmas)
+                    in vl_return end
+
             fun filter_subs (subs) = (List.filter (fn DAT.CTXs(cx, DAT.Ctx(cxs, _)) => 
-                            (not (List.length(cxs) = 1 andalso DAT.ctx_var_eq (List.hd cxs, cx)))
-                                                            | _ => true ) subs)
+                (not (List.length(cxs) = 1 andalso DAT.ctx_var_eq (List.hd cxs, cx))) | _ => true ) subs)
 
             (* form_list1, variable_list1, form_list2, var_list2 ??? *)
             fun try_partitions (fl1, vl1, fl2, vl2) =
@@ -209,18 +208,13 @@ structure unifyImpl : UNIFICATION = struct
                         List.concat(
                             List.map(fn s1 => 
                                 List.map(fn s2 => 
-                                    let val (subs, (fresh_g, set1, set2)) = 
-                                        (filter_subs(s1 @ s2), get_constraint(post_ctx s1, post_ctx s2))
+                                    let val ( (cons,new_subs)) = 
+                                        ( C.get_constraints(post_ctx s1, post_ctx s2))
+                                        val (s1,s2) = (filter_subs s1, filter_subs s2)
+                                        val subs = s1@s2
+                                        val new_subs' = APP.UnifierComposition(subs,new_subs)
                                     in 
-                                        (case (List.length(set1),List.length(set2)) of
-                                           (0,0) => (subs, [])
-                                         | (1,_) => (
-                                        APP.UnifierComposition(subs,[DAT.CTXs(List.hd(set1),DAT.Ctx(set2,nil))])
-                                        ,[])
-                                         | (_,1) => (
-                                        APP.UnifierComposition(subs,[DAT.CTXs(List.hd(set2),DAT.Ctx(set1,nil))])
-                                        ,[])
-                                         | _ => (subs, [(fresh_g, set1, set2)]))
+                                        (new_subs',cons) 
                                     end
                                 )sigma1
                             )sigma2)
@@ -234,7 +228,7 @@ structure unifyImpl : UNIFICATION = struct
             fun unify_specific_k (vl1, fl1, vl2, fl2, i) =
                 let val k_fl1 = H.chooseK(fl1, i, DAT.form_eq)
                     val k_fl2 = H.chooseK(fl2, i, DAT.form_eq)
-                    val everyMatchOfK  = 
+                    val everyMatchOfK = 
                         List.concat(
                             List.map(fn (chosen_l2, left_l2) => 
                                 List.concat(
@@ -250,9 +244,7 @@ structure unifyImpl : UNIFICATION = struct
                                         end
                                     )k_fl1)
                             )k_fl2)
-                in
-                    everyMatchOfK
-                end
+                in everyMatchOfK end
 
             fun Unify_ctx_AUX (DAT.Ctx([], fl1), DAT.Ctx([], fl2)) = 
                     let val subs = try_permutations (fl1, fl2)
@@ -268,8 +260,7 @@ structure unifyImpl : UNIFICATION = struct
                 | Unify_ctx_AUX (DAT.Ctx(vl1, fl1), DAT.Ctx(vl2, fl2)) = 
                     let val minforms = Int.min(List.length fl1, List.length fl2)
                         val sc = List.concat(List.tabulate(minforms+1, fn i => 
-                                            unify_specific_k(vl1, fl1, vl2, fl2, i)))
-                    in SOME(sc) end
+                        unify_specific_k(vl1, fl1, vl2, fl2, i))) in SOME(sc) end
             val (fl1,fl2) = H.remove_similar (fl1, fl2, DAT.form_eq)
 
             val base_subs = List.map (fn (var) => DAT.CTXs(var,DAT.Ctx([update_ctx_var(var)],[]))) (vl1@vl2)
@@ -282,17 +273,17 @@ structure unifyImpl : UNIFICATION = struct
             val unification_result = Unify_ctx_AUX(DAT.Ctx(vl1, fl1), DAT.Ctx(vl2, fl2))
 
 
-            fun sub_toString (DAT.CTXs(DAT.CtxVar(a), b)) = (a ^"-->"^DAT.ctx_toString(b)^"_______\n")
+            fun sub_toString (DAT.CTXs(a, b)) = (DAT.ctx_var_toString(a) ^"-->"^DAT.ctx_toString(b)^"_______\n")
                 |sub_toString (_) = "_______________\n"
             
-            (* val _ = List.app (fn y => (List.app (fn x => ignore (print(sub_toString x))) y) before (print "\n\n||||||||||||||||\n\n")) (List.map #1 (Option.valOf unification_result)) handle (Option ) => ()
+            (* val _ = List.app (fn y => (List.app (fn x => ignore (print(sub_toString x))) y) before (print "\n\n||||||||||||||||\n\n")) (List.map #1 (Option.valOf unification_result)) handle (Option ) => () *)
                 
 
-            val _ = print ("//////////////////\n\n") *)
+            (* val _ = print ("//////////////////\n\n") *)
 
             val update_vars = (fn sub => APP.UnifierComposition(sub,base_subs))
 
-            fun update_var_list l = List.map (fn (vars,_) => List.hd(vars)) (APP.apply_ctx_varL_Unifier(l,base_subs))
+            fun update_var_list l = List.concat (List.map (fn (vars,_) => vars) (APP.apply_ctx_varL_Unifier(l,base_subs)))
             fun update_con_vars (name,l1,l2) = (name, update_var_list l1, update_var_list l2)
             fun update_cons_vars cons = List.map update_con_vars cons
 

@@ -6,32 +6,37 @@
 
 //server.js
 'use strict';
+const port = 8080
+
 
 //Loading Dependencies =============================================
-require('dotenv').config()
-var express      = require('express');
-var app = express();
-var passport     = require('passport')
-var session      = require('express-session')
-var flash        = require('express-flash')
-var path         = require('path');
-var helmet       = require('helmet');
-var mongoose     = require('mongoose');
-var morgan       = require('morgan');
-var bodyParser   = require('body-parser');
-var hbs          = require('express-handlebars');
+const https        = require('https');
+const fs           = require('fs');
+const express      = require('express');
+const app          = express();
+const passport     = require('passport')
+const session      = require('express-session')
+const flash        = require('express-flash')
+const path         = require('path');
+const helmet       = require('helmet');
+const mongoose     = require('mongoose');
+const morgan       = require('morgan');
+const bodyParser   = require('body-parser');
+const hbs          = require('express-handlebars');
+const envm         = require('dotenv').config()
+const favicon      = require('serve-favicon');
 
 
 //loading local files ===============================================
-var userRoutes     = require('./api/routes/user');
-var calculusRoutes = require('./api/routes/calculus');
-var ruleRoutes     = require('./api/routes/rule');
-var symbolsRoutes  = require('./api/routes/symbols');
-var database       = require('./config/db');
-var sml_command    = require('./sml/smlCommands');
-var initPassport   = require('./passport-config');
-var userModel      = require('./api/models/user');
-var calculusModel  = require('./api/models/calculus');
+const userRoutes     = require('./api/routes/user');
+const calculusRoutes = require('./api/routes/calculus');
+const ruleRoutes     = require('./api/routes/rule');
+const symbolsRoutes  = require('./api/routes/symbols');
+const database       = require('./config/db');
+const sml_command    = require('./sml/smlCommands');
+const initPassport   = require('./passport-config');
+const userModel      = require('./api/models/user');
+const calculusModel  = require('./api/models/calculus');
 initPassport(passport, userModel)
 
 
@@ -46,10 +51,11 @@ app.use('/sequoia/bower', express.static(path.join(__dirname, '/bower_components
 
 
 //Configurations =====================================================
-app.use(helmet()); // configuring headers to be secure
-app.use(morgan('dev')); // log every request to the console
-app.use(bodyParser.json()); // get information from html forms
-app.use(bodyParser.urlencoded({extended: false})); // get information from html forms
+app.use(favicon(__dirname + '/public/javascripts/sample_images/favicon.ico'));
+app.use(helmet()); 
+app.use(morgan('dev')); 
+app.use(bodyParser.json()); 
+app.use(bodyParser.urlencoded({extended: false})); 
 app.use(flash())
 app.use(session({
     secret: "process.env.SESSION_SECRET",
@@ -61,7 +67,7 @@ app.use(passport.session())
 
 
 //connecting to mongo database 
-mongoose.connect(database.local, {useNewUrlParser: true, useUnifiedTopology: true});
+mongoose.connect(database.local, {useNewUrlParser: true, useUnifiedTopology: true });
 
 
 //Api Routers ===========================================================
@@ -128,7 +134,7 @@ app.get('/sequoia/calculus/:calc_id/apply', checkAuthenticated, function (req, r
 });
 
 app.post('/sequoia/apply', checkAuthenticated, function (req, res) {
-	var result = sml_command.applyRule(req.body.rule, req.body.tree, req.body.node_id, req.body.index, req.body.subs, res);
+	var result = sml_command.applyRule(req.body.rule, req.body.constraints, req.body.tree, req.body.node_id, req.body.index, req.body.subs, res);
 });
 
 app.get('/sequoia/calculus/:calc_id/properties', checkAuthenticated, function (req, res) {
@@ -160,7 +166,15 @@ app.post('/sequoia/weakenSides', checkAuthenticated, function (req, res) {
 });
 
 app.get('/sequoia/calculus/:calc_id/properties/cut_admissability', checkAuthenticated, function (req, res) {
-	return res.render('temporary/index', {'title' : 'Sequoia', 'layout' : 'temporary'});
+	return res.render('properties/cutadmiss', {'title' : 'Sequoia - properties', 'layout' : 'cutadmiss', 'calc_id' : req.params.calc_id});
+});
+
+app.post('/sequoia/cutElim', checkAuthenticated, function (req, res) {
+	var result = sml_command.cutElim(req.body.rule1, req.body.formula, req.body.init_rules, req.body.conn_rules, req.body.wL, req.body.wR, res);
+});
+
+app.get('/sequoia/calculus/:calc_id/properties/invertibility', checkAuthenticated, function (req, res) {
+	return res.render('temporary/index', {'title' : 'Sequoia - properties', 'layout' : 'temporary'});
 });
 
 function checkAuthenticated (req, res, next) {
@@ -190,4 +204,10 @@ function checkNotAuthenticated (req, res, next) {
 
 
 //intiating server ==================================================
-app.listen(8080);
+app.listen(port);
+// const httpsServer = https.createServer({
+// 	key: fs.readFileSync('/afs/qatar.cmu.edu/course/15/logic/sequoia/certificates/logic.qatar.cmu.edu.key'),
+// 	cert: fs.readFileSync('/afs/qatar.cmu.edu/course/15/logic/sequoia/certificates/logic.qatar.cmu.edu.cert'),
+// 	ca: [fs.readFileSync('/afs/qatar.cmu.edu/course/15/logic/sequoia/certificates/intermediate_ca.cert')]
+// }, app);
+// httpsServer.listen(port, () => {console.log('HTTPS Server running on port 443');});

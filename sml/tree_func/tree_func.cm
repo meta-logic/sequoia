@@ -11,6 +11,8 @@ is
   ../basics/basics.cm
   ../applyunifier/applyunifier.cm
   ../unification/unification.cm
+  ../latex_exporter/latex_exporter.cm
+  ../html_exporter/html_exporter.cm
   ../equiv/equiv.cm
   tree_func.sig
   tree_func.sml

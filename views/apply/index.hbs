@@ -43,6 +43,11 @@ under certain conditions; see LICENSE for details. --}}
         <div id="warning_header" class="header">TEMP</div>
           <p id="warning_text">TEMP</p>
     </div>
+    <table id="cert_table" class= "ui sortable fixed single line celled table">
+      <thead><tr><th>Usable Symbols</th><th>Latex</th></tr></thead>
+      <tbody id="cert_table_head"></tbody>
+    </table>
+    <br>
     <table id="sym_table" class= "ui sortable fixed single line celled table" style="visibility: hidden;">
       <thead><tr><th>Sequent Term Symbols</th><th>Types</th></tr></thead>
       <tbody id="init"><tbody> 
@@ -66,10 +71,11 @@ under certain conditions; see LICENSE for details. --}}
         </tr>
       </tbody>
     </table>
+    <br>
   </div>
   <div class="three wide column">
       <div class="ui two attached buttons">
-        <button id="export" class="ui disabled fluid huge icon button green" onclick="sendEmail(latex_tree[0])">
+        <button id="export" class="ui disabled fluid huge icon button green" onclick="sendEmail()">
           <i class="icon download"></i>Export to Latex
         </button>
         <button id="undo" class="ui disabled fluid huge icon button red" onclick="undo()">
@@ -92,16 +98,12 @@ under certain conditions; see LICENSE for details. --}}
   </div>
 </div>
 <div id ="modal2" class="ui special modal">
-  <div class="header">Cut Formulas</div>
+  <div class="header">Cut Formula</div>
   <div id = "change warning" class="content">
-    <p>Please provide the substitutions needed for the cut, from the cut formula variable to the intended cut formula.</p>
+    <p>Please provide the intended cut formula.</p>
     <p id= "cut_rule"></p>
     <div class="ui form">
       <div class="two fields">
-        <div class="field">
-          <label>Variable</label>
-          <input id="var" type="text">
-        </div>
         <div class="field">
           <label>Formula</label>
           <input id="form" type="text">

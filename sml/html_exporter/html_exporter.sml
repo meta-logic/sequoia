@@ -7,54 +7,40 @@
 structure htmlImpl : EXPORTHTML = struct
 
     structure Dat = datatypesImpl
+    structure D = Dat
 
     type der_tree = Dat.der_tree
-    
+
     structure App = applyunifierImpl
 
-    fun der_tree_toHtml(Dat.DerTree(id, s, Dat.NoRule, pq)) = 
-    "<table>\n"^
-        "<tr>\n"^
-            "<td></td>\n"^
-            "<td class=\"rulename\" rowspan=\"2\">\n"^
-                "<div class=\"rulename\"></div>\n"^
-            "</td>\n"^
-        "</tr>\n"^
-        "<tr>\n"^
-            "<td class=\"prem\">"^Dat.seq_toString s^"</td>\n"^
-        "</tr>\n"^
-    "</table>\n"
-    | der_tree_toHtml(Dat.DerTree(id, s, Dat.RuleName nm, [])) = 
-    "<table>\n"^
-        "<tr>\n"^
-            "<td></td>\n"^
-            "<td class=\"rulename\" rowspan=\"2\">\n"^
-                "<div class=\"rulename\">"^nm^"</div>\n"^
-            "</td>\n"^
-        "</tr>\n"^
-        "<tr>\n"^
-            "<td class=\"conc\">"^Dat.seq_toString s^"</td>\n"^
-        "</tr>\n"^
-    "</table>\n"
-    | der_tree_toHtml(Dat.DerTree(id, s, Dat.RuleName nm, pq)) = 
-        "<table>\n"^
-            "<tr>\n"^
-            List.foldl(fn (prem, txt) => txt^
-                "<td>\n"^der_tree_toHtml prem^"</td>\n")("")pq^
-            "<td class=\"rulename\" rowspan=\"2\">\n"^
-                    "<div class=\"rulename\">"^nm^"</div>\n"^
-                "</td>\n"^
-            "</tr>\n"^
-            "<tr>\n"^
-                "<td class=\"conc\" colspan="^Int.toString(List.length(pq))^">"^Dat.seq_toString s^"</td>\n"^
-            "</tr>\n"^
-        "</table>\n"
+    fun der_tree_toHtml (D.DerTree(id, s, NONE, pq)) =
+            "<div id=\"prooftree_"^id^"\" class=\"tree\">"^
+                "<div id=\"exp_"^id^"\" class=\"sequence\">"^
+                    "<div id=\"conc_"^id^"\" class=\"leaf\">$$"^(D.seq_toString s)^"$$</div>"^
+                "</div>"^
+            "</div>"
+        | der_tree_toHtml (D.DerTree(id, s, SOME nm, [])) = 
+            "<div id=\"prooftree_"^id^"\" class=\"tree\">"^
+                "<div id=\"exp_"^id^"\" class=\"sequence\">"^
+                    "<div id=\"delete_"^id^"\" class=\"premises\"></div>"^
+                    "<div id=\"conc_"^id^"\" class=\"conclusion\">$$"^(D.seq_toString s)^"$$</div>"^
+                "</div>"^
+                "<div id=\"applied_"^id^"\" class=\"rule\">$$\\scriptsize{"^nm^"}$$</div>"^
+            "</div>"
+        | der_tree_toHtml (D.DerTree(id, s, SOME nm, pq)) = 
+            "<div id=\"prooftree_"^id^"\" class=\"tree\">"^
+                "<div id=\"exp_"^id^"\" class=\"sequence\">"^
+                    "<div id=\"delete_"^id^"\" class=\"premises\">"^(List.foldl(fn (prem, st) => st^(der_tree_toHtml prem))("")pq)^"</div>"^
+                    "<div id=\"conc_"^id^"\" class=\"conclusion\">$$"^(D.seq_toString s)^"$$</div>"^
+                "</div>"^
+                "<div id=\"applied_"^id^"\" class=\"rule\">$$\\scriptsize{"^nm^"}$$</div>"^
+            "</div>"
 
-    fun export_toHtml filename tree =
-        let val fd = TextIO.openOut filename
-            val html_tree = (der_tree_toHtml tree)
-            val _ = TextIO.output (fd, html_tree) handle e => (TextIO.closeOut fd; raise e)
-            val _ = TextIO.closeOut fd
-        in () end
+    fun der_tree_toHtml2 (D.DerTree(id, s, NONE, pq)) =
+            "DerTree(\""^id^"\", "^(D.seq_stringify s)^", NONE, [])"
+        | der_tree_toHtml2 (D.DerTree(id, s, SOME nm, [])) = 
+            "DerTree(\""^id^"\", "^(D.seq_stringify s)^", SOME(\""^nm^"\"), [])"
+        | der_tree_toHtml2 (D.DerTree(id, s, SOME nm, pq)) = 
+            "DerTree(\""^id^"\", "^(D.seq_stringify s)^", SOME(\""^nm^"\"), ["^(String.concatWith (",") (List.map(der_tree_toHtml2)pq))^"])"
 
 end

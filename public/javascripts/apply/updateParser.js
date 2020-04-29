@@ -21,11 +21,11 @@ function updateParser(new_symbols, callback) {
     var context_variables = []
     for (var symbol in new_symbols) {
         if (symbol.includes("\\")) {
-            symbol = "\\" + symbol
+            symbol = symbol.replace(/\\/g, "\\\\")
         }
         context_variables.push(symbol)
     }
-    $.get("/sequoia/api/cert_symbols/"+calc_id, function(sb, status) {
+    $.get("/sequoia/api/parsing_symbols/"+calc_id, function(sb, status) {
         var syms = sb.symbols
         syms = syms.sort(function(a, b){
             return b.symbol.length - a.symbol.length
@@ -33,9 +33,7 @@ function updateParser(new_symbols, callback) {
         for (var i = 0; i < syms.length; i++) {
             var symbol = syms[i].symbol
             var type = syms[i].type
-            if (symbol.includes("\\")) {
-                symbol = "\\" + symbol
-            }
+            symbol = symbol.replace(/\\/g, "\\\\")
             if (type == "sequent sign") {
                 arrow += "/ \"" + symbol + "\" "
             }

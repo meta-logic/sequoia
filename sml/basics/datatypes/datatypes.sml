@@ -9,13 +9,15 @@ structure datatypesImpl : DATATYPES = struct
 
     datatype conn = Con of string
     fun conn_toString(Con(a)) = a
+
+    fun conn_stringify(Con(a)) = "Con(\""^a^"\")"
+
     fun conn_eq (Con(a), Con(b)) = a=b
 
 
     datatype form = Atom of string | AtomVar of string | FormVar of string | Form of conn * form list
-    
     fun form_toString (Atom (s)) = s 
-        | form_toString (AtomVar(s)) = s 
+        | form_toString (AtomVar (s)) = s 
         | form_toString (FormVar (s)) = s
         | form_toString (Form (Con (c), fl)) = subforms_toString(c, fl)
     and subforms_toString (c, nil) = ""
@@ -30,6 +32,13 @@ structure datatypesImpl : DATATYPES = struct
                 Form (Con (cn), fl) => form_toString(x) ^ " " ^ c ^ " (" ^ form_toString(y) ^ ")"
                 | _ => form_toString(x) ^ " " ^ c ^ " " ^ form_toString(y)))
         | subforms_toString (c, l) = c ^ (ListFormat.fmt {init = "(", sep = ",", final = ")", fmt = form_toString} l)
+
+    fun form_stringify (Atom (s)) = "Atom (\""^s^"\")"
+        | form_stringify (AtomVar (s)) = "AtomVar (\""^s^"\")"
+        | form_stringify (FormVar (s)) = "FormVar (\""^s^"\")"
+        | form_stringify (Form (c, fl)) = 
+            "Form ("^conn_stringify(c)^", ["^(String.concatWith (",") (List.map(form_stringify)fl))^"])"
+
     fun form_eq (Atom(a), Atom(b)) = a=b
         | form_eq (AtomVar(a), AtomVar(b)) = a=b
         | form_eq (FormVar(a), FormVar(b)) = a=b
@@ -63,22 +72,39 @@ structure datatypesImpl : DATATYPES = struct
         | formL_toString (x::l) = form_toString(x) ^ ", " ^ formL_toString(l)
 
 
-    datatype ctx_var = CtxVar of string
-    fun ctx_var_toString (CtxVar(s)) = s
-    fun ctx_var_eq (CtxVar(a), CtxVar(b)) = a=b
+    datatype ctx_var = CtxVar of conn option * string
+    fun ctx_var_toString (CtxVar(NONE, s)) = s
+        | ctx_var_toString (CtxVar(SOME(c), s)) = conn_toString(c) ^ " " ^ s
+
+    fun ctx_var_stringify (CtxVar(NONE, s)) = "CtxVar(NONE,\""^s^"\")"
+        | ctx_var_stringify (CtxVar(SOME(c), s)) = "CtxVar(SOME("^conn_stringify(c)^"),\""^s^"\")"
+
+    fun ctx_var_eq (CtxVar(NONE,a), CtxVar(NONE,b)) = a=b
+        | ctx_var_eq (CtxVar(SOME(c1),a), CtxVar(SOME(c2),b)) = a=b andalso conn_eq (c1, c2)
+        | ctx_var_eq (_,_) = false
     fun ctx_varL_toString (nil) = ""
         | ctx_varL_toString ([x]) = ctx_var_toString(x)
         | ctx_varL_toString (x::l) = ctx_var_toString(x) ^ ", " ^ ctx_varL_toString (l)
+    
+    
     fun const_toString (_,[],[]) = ""
         | const_toString (_,y,[]) = ctx_varL_toString y ^" = "^ "EMPTY"
         | const_toString (_,[],z) = ctx_varL_toString z ^" = "^ "EMPTY"
         | const_toString (_,y,z) = ctx_varL_toString y ^" = "^ ctx_varL_toString z
+
+    fun const_stringify (x,y,z) = 
+        "("^ctx_var_stringify x^",["^(String.concatWith (",") (List.map(ctx_var_stringify)y))^"],["^(String.concatWith (",") (List.map(ctx_var_stringify)z))^"])"
 
     datatype ctx = Ctx of ctx_var list * form list
     fun ctx_toString (Ctx([],[])) = ""
         | ctx_toString (Ctx([],fl)) = formL_toString(fl)
         | ctx_toString (Ctx(vl,[])) = ctx_varL_toString(vl)
         | ctx_toString (Ctx(vl,fl)) = ctx_varL_toString(vl) ^ ", " ^ formL_toString(fl)
+
+    fun ctx_stringify (Ctx(vl,fl)) = 
+        "Ctx(["^(String.concatWith (",") (List.map(ctx_var_stringify)vl))^"]"
+        ^", ["^(String.concatWith (",") (List.map(form_stringify)fl))^"])"
+
     fun ctx_eq (Ctx(vl1,fl1), Ctx(vl2,fl2)) = H.mset_eq(vl1,vl2,ctx_var_eq) andalso H.mset_eq(fl1,fl2,form_eq)
     fun ctx_alpha_eq (Ctx(vl1,fl1), Ctx(vl2,fl2)) = H.mset_eq(fl1,fl2,form_eq)
 
@@ -88,6 +114,12 @@ structure datatypesImpl : DATATYPES = struct
         | ctx_struct_toString (Single ctx) = ctx_toString(ctx)
         | ctx_struct_toString (Mult (Con (c), ctx, rest)) = 
             ctx_toString(ctx) ^ " " ^ c ^ " " ^ ctx_struct_toString(rest)
+
+    fun ctx_struct_stringify (Empty) = "Empty"
+        | ctx_struct_stringify (Single ctx) = "Single("^ctx_stringify(ctx)^")"
+        | ctx_struct_stringify (Mult (c, ctx, rest)) = 
+            "Mult("^conn_stringify(c)^", "^ctx_stringify(ctx)^","^ctx_struct_stringify(rest)^")"
+
     fun ctx_struct_eq (Empty, Empty) = true
         | ctx_struct_eq (Single(ctx1), Single(ctx2)) = ctx_eq(ctx1, ctx2)
         | ctx_struct_eq (Mult(c1,ctx1,rest1), Mult(c2,ctx2,rest2)) = 
@@ -99,12 +131,18 @@ structure datatypesImpl : DATATYPES = struct
             conn_eq(c1,c2) andalso ctx_alpha_eq(ctx1, ctx2) andalso ctx_struct_alpha_eq(rest1,rest2)
         | ctx_struct_alpha_eq (_, _) = false
 
+
     datatype seq = Seq of ctx_struct * conn * ctx_struct
     fun seq_toString (Seq(ctx1, Con (c), ctx2)) = ctx_struct_toString(ctx1) ^ " " ^ c ^ " " ^ ctx_struct_toString(ctx2)
+
+    fun seq_stringify (Seq(ctx1, c, ctx2)) = 
+        "Seq("^ctx_struct_stringify(ctx1)^","^conn_stringify(c)^","^ctx_struct_stringify(ctx2)^")"
+
     fun seq_eq (Seq(ctxL1,conn1,ctxR1), Seq(ctxL2,conn2,ctxR2)) = 
         conn_eq(conn1, conn2) andalso ctx_struct_eq(ctxL1, ctxL2) andalso ctx_struct_eq(ctxR1, ctxR2)
     fun seq_alpha_eq (Seq(ctxL1,conn1,ctxR1), Seq(ctxL2,conn2,ctxR2)) = 
         conn_eq(conn1, conn2) andalso ctx_struct_alpha_eq(ctxL1, ctxL2) andalso ctx_struct_alpha_eq(ctxR1, ctxR2)
+
 
     datatype side = Left | Right | None
     datatype rule = Rule of string * side * seq * seq list
@@ -126,7 +164,7 @@ structure datatypesImpl : DATATYPES = struct
         | sub_prefix_eq (CTXs(a,_), CTXs(b,_)) = ctx_var_eq(a,b)
         | sub_prefix_eq (_, _) = false
 
-    datatype rule_name = NoRule | RuleName of string
+    type rule_name = string option
     datatype der_tree = DerTree of string * seq * rule_name * der_tree list
 
 end

@@ -1,0 +1,34 @@
+{{!-- Sequoia Copyright (C) 2020  Zan Naeem
+This program comes with ABSOLUTELY NO WARRANTY; for details see LICENSE.
+This is free software, and you are welcome to redistribute it
+under certain conditions; see LICENSE for details. --}}
+
+
+<div id="calc_id" hidden>{{calc_id}}</div>
+<div id="title" class="ui middle aligned center aligned huge teal header">Cut Admissibility
+    <div id="description" class="sub header">Select a cut rule to check if it is admissibile in your calculus</div>
+</div>
+<div id="property" hidden>Cut Admissibility</div>
+<br><br>
+<div class="ui container">
+    <div class="ui three special cards" id="rules"></div>
+    <br>
+    <div id="cut_button" class="ui disabled teal large button" onclick="checkCut()">Perform Check</div>
+    <div id="info_answer" class="ui message" style="visibility: hidden;">
+        <div id="info_header" class="header">TEMP</div>
+        <p id="info_text">TEMP</p>
+    </div>
+    <div class="ui divider"></div>
+    <div id="results" style="visibility: hidden;">
+        <div class="ui header">Axiom</div>
+        <div class="ui one centered cards" id="axiom"></div>
+        <div class="ui header">Rank Reduction</div>
+        <div class="ui one centered cards" id="rank"></div>
+        <div class="ui header">Grade Reduction</div>
+        <div class="ui one centered cards" id="grade"></div>
+    </div>
+    <br><br>
+</div>
+<div id="loading" class="ui inactive inverted dimmer">
+    <div class="ui text loader">Loading</div>
+</div>

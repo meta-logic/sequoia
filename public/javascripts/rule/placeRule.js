@@ -6,6 +6,56 @@
 
 var parser_copy = pt
 
+function cutSelect(opt, conc, prem, parsed_conc, parsed_prem, calc_id) {
+    $('#modal3').modal({
+        onApprove: function () {
+            var v = $("#var").val()
+            if (v == "") {
+                return
+            } else {
+                $("#var").val("")
+                sendRule(opt, "FormVar(\""+v+"\")", conc, prem, parsed_conc, parsed_prem, calc_id)
+            }
+        }
+    })
+    .modal('setting', 'closable', false).modal('show')
+}
+
+
+function sendRule(opt, cutvar, conc, prem, parsed_conc, parsed_prem, calc_id) {
+    if (opt == "Add") {
+        $.post("/sequoia/api/rule", {rule : rule_name, conclusion : conc, premises : JSON.stringify(prem),
+            parsed_conc : parsed_conc, parsed_prem : JSON.stringify(parsed_prem) , calculus : calc_id,
+            connective : rule_connective, side : rule_side, type : rule_type, cutvar : cutvar})
+    } else if (opt == "Update") {
+        var rule_id = $("#rule_id").text()
+        $.get("/sequoia/api/rules/"+calc_id, function (rls, status) {
+            var rules = rls.rules
+            var still_exists = false
+            for (var i = 0; i < rules.length; i++) {
+                if (rule_id == rules[i]._id) {
+                    still_exists = true
+                }
+            }
+            if (!still_exists) {
+                $.post("/sequoia/api/rule", {rule : rule_name, conclusion : conc, premises : JSON.stringify(prem),
+                    parsed_conc : parsed_conc, parsed_prem : JSON.stringify(parsed_prem) , calculus : calc_id, 
+                    connective : rule_connective, side : rule_side, type : rule_type, cutvar : cutvar})
+            } else {
+                $.ajax({
+                    url: "/sequoia/api/rule",
+                    type: "PUT",
+                    data : { id : rule_id, rule : rule_name, 
+                        conclusion : conc, premises : JSON.stringify(prem), parsed_conc : parsed_conc, 
+                        parsed_prem : JSON.stringify(parsed_prem), calculus : calc_id, 
+                        connective : rule_connective, side : rule_side, type : rule_type, cutvar : cutvar}, function(data) {}})
+            }
+        })
+    }
+    window.location.href = "/sequoia/calculus/"+calc_id
+}
+
+
 function placeRule(opt) {
     var parser_text = parser_copy
     var arrow = "SeqSign = \"NO-ARROW\" "
@@ -52,12 +102,12 @@ function placeRule(opt) {
     var extra_text = "\n" + arrow + "\n" + sep + "\n" + conn + "\n" + set + "\n" + form + "\n" + atom_var + "\n" + atom + "\n" 
     parser_text += extra_text
     var parser = peg.generate(parser_text)
-    parse_and_place(parser, opt)
+    parse_and_check(parser, opt)
     })
 }
 
 
-function parse_and_place(parser, opt) {
+function parse_and_check(parser, opt) {
     var calc_id = $("#calc_id").text()
     var prem = rule_premises
     var parsed_prem = []
@@ -79,42 +129,17 @@ function parse_and_place(parser, opt) {
     }
     var conc = rule_conclusion
     try {
-        var conc_final = parser.parse(conc)
-    }   
+        var parsed_conc = parser.parse(conc)
+    }
     catch(error) {
         $("#warning_header").html("Rule Parsing Error")
         $("#warning_text").html("Rule sequents must be structurally valid and contain symbols from the rule symbols table.")
         $("#warning").css("visibility","visible")
         return
     }
-    if (opt == "Add") {
-        $.post("/sequoia/api/rule", {rule : rule_name, conclusion : conc, premises : JSON.stringify(prem),
-            parsed_conc : conc_final ,parsed_prem : JSON.stringify(parsed_prem) , calculus : calc_id,
-            connective : rule_connective, side : rule_side, type : rule_type})
-    } else if (opt == "Update") {
-        var rule_id = $("#rule_id").text()
-        $.get("/sequoia/api/rules/"+calc_id, function (rls, status) {
-            var rules = rls.rules
-            var still_exists = false
-            for (var i = 0; i < rules.length; i++) {
-                if (rule_id == rules[i]._id) {
-                    still_exists = true
-                }
-            }
-            if (!still_exists) {
-                $.post("/sequoia/api/rule", {rule : rule_name, conclusion : conc, premises : JSON.stringify(prem),
-                    parsed_conc : conc_final ,parsed_prem : JSON.stringify(parsed_prem) , calculus : calc_id, 
-                    connective : rule_connective, side : rule_side, type : rule_type})
-            } else {
-                $.ajax({
-                    url: "/sequoia/api/rule",
-                    type: "PUT",
-                    data : { id : rule_id, rule : rule_name, 
-                        conclusion : conc, premises : JSON.stringify(prem), parsed_conc : conc_final, 
-                        parsed_prem : JSON.stringify(parsed_prem), calculus : calc_id, 
-                        connective : rule_connective, side : rule_side, type : rule_type}, function(data) {}})
-            }
-        })
+    if (rule_type == "Cut") {
+        cutSelect(opt, conc, prem, parsed_conc, parsed_prem, calc_id)
+    } else {
+        sendRule(opt, "NONE", conc, prem, parsed_conc, parsed_prem, calc_id)
     }
-    window.location.href = "/sequoia/calculus/"+calc_id
 }

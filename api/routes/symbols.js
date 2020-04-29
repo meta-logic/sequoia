@@ -16,6 +16,7 @@ router.post("/symbols_init", controller.addSymbols)
 router.delete("/symbols", controller.deleteSymbol)
 router.get("/rule_symbols/:calc_id", controller.getRuleSymbols)
 router.get("/seq_symbols/:calc_id", controller.getSeqSymbols)
+router.get("/parsing_symbols/:calc_id", controller.getParsingSymbols)
 router.get("/cert_symbols/:calc_id", controller.getCertainSymbols)
 
 

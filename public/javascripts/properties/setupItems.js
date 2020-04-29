@@ -16,11 +16,23 @@ if (property == "Main Page") {
     $("#prop2").attr("href", "/sequoia/calculus/"+calc_id+"/properties/weak_admissability")
     $("#prop3").attr("href", "/sequoia/calculus/"+calc_id+"/properties/permutability")
     $("#prop4").attr("href", "/sequoia/calculus/"+calc_id+"/properties/cut_admissability")
+    $("#prop5").attr("href", "/sequoia/calculus/"+calc_id+"/properties/invertibility")
 }
 if (property == "Permutability") {
-    $.get("/sequoia/api/calculus/"+calc_id, function (calc, status) {
-        get_rules_toPage()
-    })
+    get_rules_toPage()
+} else if (property == "Cut Admissibility") {
+    get_cuts_toPage()
+}
+
+
+function unzip(item_list) {
+    var item1 = []
+    var item2 = []
+    for (var j = 0; j < item_list.length; j++) {
+        item1.push(item_list[j][0])
+        item2.push(item_list[j][1])
+    }
+    return [item1,item2]
 }
 
 
