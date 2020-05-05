@@ -4,13 +4,17 @@
 // under certain conditions; see LICENSE for details.
 
 
-function showProof(side, index, on) {
+function showProof(side, index, on, num) {
     if (on == "yes") {
-        $("#"+side+index).attr("onClick", "showProof('"+side+"',"+index+",'no')")
-        $("#"+side+"proof"+index).css("display", "none")
+        $("#"+side+index).attr("onClick", "showProof('"+side+"',"+index+",'no',"+num+")")
+        for (var i = 0; i < num; i++) {
+            $("#"+side+"proof"+index+""+i).css("display", "none")
+        }
     } else {
-        $("#"+side+index).attr("onClick", "showProof('"+side+"',"+index+",'yes')")
-        $("#"+side+"proof"+index).css("display", "flex")
+        $("#"+side+index).attr("onClick", "showProof('"+side+"',"+index+",'yes',"+num+")")
+        for (var i = 0; i < num; i++) {
+            $("#"+side+"proof"+index+""+i).css("display", "flex")
+        }
     }
 }
 
@@ -72,25 +76,22 @@ function checkWeak() {
                     if (tempL[0] == "T") {
                         color = "green"
                     }
+                    var proofs_list = tempL[1].split("&&&")
                     var newString = setLabel(left_bools, right_bools, i, 'L')
                     lt.append(
                         '<div class="'+color+' card">'+
                             '<div class="content">'+
                                 '<div class="header">'+newString+'</div>'+
                             '</div>'+
-                            '<div id="L'+i+'" class="ui bottom attached button" onClick=showProof("L",'+i+',"no")>'+
+                            '<div id="L'+i+'" class="ui bottom attached button" onClick=showProof("L",'+i+',"no",'+proofs_list.length+')>'+
                                 '<i class="question icon"></i>'+
                             '</div>'+
-                        '</div>'+
-                        '<div class="ui one cards" id="Lproof'+i+'" style="display: none;">'+
                         '</div>'
                     )
-                    var proofs_list = tempL[1].split("&&&")
-                    var left_proofs = $("#Lproof"+i)
                     for (var j = 0; j < proofs_list.length; j++) {
                         if (proofs_list[j] != "") {
-                            left_proofs.append(
-                                '<div class="ui card">'+
+                            lt.append(
+                                '<div class="ui card" id="Lproof'+i+""+j+'" style="display: none;>'+
                                     '<div class="content">'+
                                         '<div class="header">'+proofs_list[j]+'</div>'+
                                     '</div>'+
@@ -108,25 +109,22 @@ function checkWeak() {
                     if (tempR[0] == "T") {
                         color = "green"
                     }
+                    var proofs_list = tempR[1].split("&&&")
                     var newString = setLabel(left_bools, right_bools, i, 'R')
                     rt.append( 
-                        '<div id="rweak_card'+i+'" class="'+color+' card">'+
+                        '<div class="'+color+' card">'+
                             '<div class="content">'+
                                 '<div class="header">'+newString+'</div>'+
                             '</div>'+
-                            '<div id="R'+i+'" class="ui bottom attached button" onClick=showProof("R",'+i+',"no")>'+
+                            '<div id="R'+i+'" class="ui bottom attached button" onClick=showProof("R",'+i+',"no",'+proofs_list.length+')>'+
                                 '<i class="question icon"></i>'+
                             '</div>'+
-                        '</div>'+
-                        '<div class="ui one cards" id="Rproof'+i+'" style="display: none;">'+
                         '</div>'
                     )
-                    var proofs_list = tempR[1].split("&&&")
-                    var right_proofs = $("#Rproof"+i)
                     for (var j = 0; j < proofs_list.length; j++) {
                         if (proofs_list[j] != "") {
-                            right_proofs.append(
-                                '<div class="ui card">'+
+                            rt.append(
+                                '<div class="ui card" id="Rproof'+i+""+j+'" style="display: none;>'+
                                     '<div class="content">'+
                                         '<div class="header">'+proofs_list[j]+'</div>'+
                                     '</div>'+

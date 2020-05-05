@@ -26,13 +26,17 @@ function selectRule(bl, i) {
 }
 
 
-function showProof(type, index, on) {
+function showProof(type, index, on, num) {
     if (on == "yes") {
-        $("#"+type+index).attr("onClick", "showProof('"+type+"',"+index+",'no')")
-        $("#"+type+"proof"+index).css("display", "none")
+        $("#"+type+index).attr("onClick", "showProof('"+type+"',"+index+",'no',"+num+")")
+        for (var i = 0; i < num; i++) {
+            $("#"+type+"proof"+index+""+i).css("display", "none")
+        }
     } else {
-        $("#"+type+index).attr("onClick", "showProof('"+type+"',"+index+",'yes')")
-        $("#"+type+"proof"+index).css("display", "flex")
+        $("#"+type+index).attr("onClick", "showProof('"+type+"',"+index+",'yes',"+num+")")
+        for (var i = 0; i < num; i++) {
+            $("#"+type+"proof"+index+""+i).css("display", "flex")
+        }
     }
 }
 
@@ -70,24 +74,21 @@ function checkCut() {
                 if (temp[0] == "T") {
                     color = "green"
                 }
+                var proofs_list = temp[1].split("&&&")
                 ax.append( 
                     '<div class="'+color+' card">'+
                         '<div class="content">'+
                             '<div class="header">$$'+it_ordered[i]+'$$</div>'+
                         '</div>'+
-                        '<div id="AX'+i+'" class="ui bottom attached button" onClick=showProof("AX",'+i+',"no")>'+
+                        '<div id="AX'+i+'" class="ui bottom attached button" onClick=showProof("AX",'+i+',"no",'+proofs_list.length+')>'+
                             '<i class="question icon"></i>'+
                         '</div>'+
-                    '</div>'+
-                    '<div class="ui one cards" id="AXproof'+i+'" style="display: none;">'+
                     '</div>'
                 )
-                var proofs_list = temp[1].split("&&&")
-                var ax_proofs = $("#AXproof"+i)
                 for (var j = 0; j < proofs_list.length; j++) {
                     if (proofs_list[j] != "") {
-                        ax_proofs.append(
-                            '<div class="ui card">'+
+                        ax.append(
+                            '<div class="ui card" id="AXproof'+i+""+j+'" style="display: none;>'+
                                 '<div class="content">'+
                                     '<div class="header">'+proofs_list[j]+'</div>'+
                                 '</div>'+
@@ -106,24 +107,21 @@ function checkCut() {
                 if (temp[0] == "T") {
                     color = "green"
                 }
+                var proofs_list = temp[1].split("&&&")
                 rk.append( 
                     '<div class="'+color+' card">'+
                         '<div class="content">'+
                             '<div class="header">$$'+rl_ordered[i]+'$$</div>'+
                         '</div>'+
-                        '<div id="RK'+i+'" class="ui bottom attached button" onClick=showProof("RK",'+i+',"no")>'+
+                        '<div id="RK'+i+'" class="ui bottom attached button" onClick=showProof("RK",'+i+',"no",'+proofs_list.length+')>'+
                             '<i class="question icon"></i>'+
                         '</div>'+
-                    '</div>'+
-                    '<div class="ui one cards" id="RKproof'+i+'" style="display: none;">'+
                     '</div>'
                 )
-                var proofs_list = temp[1].split("&&&")
-                var rk_proofs = $("#RKproof"+i)
                 for (var j = 0; j < proofs_list.length; j++) {
                     if (proofs_list[j] != "") {
-                        rk_proofs.append(
-                            '<div class="ui card">'+
+                        rk.append(
+                            '<div class="ui card" id="RKproof'+i+""+j+'" style="display: none;>'+
                                 '<div class="content">'+
                                     '<div class="header">'+proofs_list[j]+'</div>'+
                                 '</div>'+
@@ -142,24 +140,21 @@ function checkCut() {
                 if (temp[0] == "T") {
                     color = "green"
                 }
+                var proofs_list = temp[1].split("&&&")
                 gd.append( 
                     '<div class="'+color+' card">'+
                         '<div class="content">'+
                             '<div class="header">$$'+con_ordered[i]+'$$</div>'+
                         '</div>'+
-                        '<div id="GD'+i+'" class="ui bottom attached button" onClick=showProof("GD",'+i+',"no")>'+
+                        '<div id="GD'+i+'" class="ui bottom attached button" onClick=showProof("GD",'+i+',"no",'+proofs_list.length+')>'+
                             '<i class="question icon"></i>'+
                         '</div>'+
-                    '</div>'+
-                    '<div class="ui one cards" id="GDproof'+i+'" style="display: none;">'+
                     '</div>'
                 )
-                var proofs_list = temp[1].split("&&&")
-                var gd_proofs = $("#GDproof"+i)
                 for (var j = 0; j < proofs_list.length; j++) {
                     if (proofs_list[j] != "") {
-                        gd_proofs.append(
-                            '<div class="ui card">'+
+                        gd.append(
+                            '<div class="ui card" id="GDproof'+i+""+j+'" style="display: none;>'+
                                 '<div class="content">'+
                                     '<div class="header">'+proofs_list[j]+'</div>'+
                                 '</div>'+

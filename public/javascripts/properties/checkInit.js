@@ -89,7 +89,7 @@ function checkInit() {
                     if (temp[0] == "T") {
                         color = "green"
                     }
-                    cp.append( 
+                    cp.append(
                         '<div class="'+color+' card">'+
                             '<div class="content">'+
                                 '<div class="header">$$'+con_ordered[i]+'$$</div>'+
@@ -98,11 +98,9 @@ function checkInit() {
                                 '<i class="question icon"></i>'+
                             '</div>'+
                         '</div>'+
-                        '<div class="ui one cards" id="proof'+i+'" style="display: none;">'+
-                            '<div class="ui card">'+
-                                '<div class="content">'+
-                                    '<div class="header">'+temp[1]+'</div>'+
-                                '</div>'+
+                        '<div class="ui card" id="proof'+i+'" style="display: none;">'+
+                            '<div class="content">'+
+                                '<div class="header">'+temp[1]+'</div>'+
                             '</div>'+
                         '</div>'
                     )
