@@ -4,9 +4,10 @@
 // under certain conditions; see LICENSE for details.
 
 
-function insertTD(title,description) {
-    console.log(title)
-    console.log(description)
+var calcTitle = ""
+var calcDesc = ""
+
+function insertTD() {
     $("#editArea").html(
         '<div class="row">'+
             '<div class="ui input">'+
@@ -17,36 +18,36 @@ function insertTD(title,description) {
         '<div class="row">'+
             '<div class="ui fluid input">'+
                 '<input id="description" type="text" placeholder="Description">'+
-                '<button class="tiny ui button" onclick="updateTD(\''+title+'\',\''+description+'\')">'+
+                '<button class="tiny ui button" onclick="updateTD()">'+
                     '<i class="grey check icon"></i>'+
                 '</button>'+
             '</div>'+
         '</div>'
     )
-    $("#title").val(title)
-    $("#description").val(description)
+    $("#title").val(calcTitle)
+    $("#description").val(calcDesc)
 }
 
 
-function updateTD(title,description) {
+function updateTD() {
     var newtitle = $("#title").val().trim()
     var newdescription = $("#description").val().trim()
     if (newtitle != "" && newdescription != "") {
-        title = newtitle
-        description = newdescription
-        $.ajax({
-            url: "/sequoia/api/calculus",
-            type: "PUT",
-            data : { id : $("#calc_id").text(), title : title, description : description, function(data) {}}})
+        calcTitle = newtitle
+        calcDesc = newdescription
     }
     $("#editArea").html(
-        '<div id="title" class="ui middle aligned center aligned huge teal header">'+title+
-            '<div id="description" class="sub header">'+description+
-                '<button class="tiny ui button" onclick="insertTD(\''+title+'\',\''+description+'\')" style="margin-left: 10px;">'+
+        '<div id="title" class="ui middle aligned center aligned huge teal header">'+calcTitle+
+            '<div id="description" class="sub header">'+calcDesc+
+                '<button class="tiny ui button" onclick="insertTD()" style="margin-left: 10px;">'+
                     '<i class="grey pencil alternate icon"></i>'+
                 '</button>'+
             '</div>'+
         '</div>'+
         '<br>'
     )
+    $.ajax({
+        url: "/sequoia/api/calculus",
+        type: "PUT",
+        data : { id : $("#calc_id").text(), title : calcTitle, description : calcDesc, function(data) {}}})
 }
