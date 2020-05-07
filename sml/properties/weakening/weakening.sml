@@ -15,7 +15,7 @@ struct
         let
             val _ = Ut.set_to_1()
             val res = false
-            val weak_form = Dat.Atom "W^*"
+            val weak_form = Dat.Atom (Ut.set_color("W^*"))
 
             fun add_to_ctx(Dat.Empty,1) = Dat.Empty
                 | add_to_ctx(Dat.Single(Dat.Ctx(vars,forms)),1) = Dat.Single(Dat.Ctx(vars,weak_form::forms))
