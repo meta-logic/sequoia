@@ -5,12 +5,18 @@
 *)
 
 Group
-  signature HELPERS
-  structure helpersImpl
   Library($/basis.cm)
   Library($SMLNJ-LIB/Util/smlnj-lib.cm)
+  signature HELPERS
+  structure helpersImpl
   signature DATATYPES
   structure datatypesImpl
+  structure StringKey
+  structure CtxVarKey
+  structure CtxVarConKey
 is
   helpers/helpers.cm
   datatypes/datatypes.cm
+  ord_keys/stringkey.sml
+  ord_keys/ctxvarkey.sml
+  ord_keys/ctxvarconkey.sml
