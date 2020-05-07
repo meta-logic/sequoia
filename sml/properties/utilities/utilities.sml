@@ -36,8 +36,8 @@ struct
 
     val color = "blue"
     val color2 = "red"
-    fun set_color (x) = "{ \\color{"^color^"} "^x^" }"
-    fun set_color2 (x) = "{ \\color{"^color2^"} "^x^" }"
+    fun set_color (x) = "{ \\color{"^color^"} {"^x^"} }"
+    fun set_color2 (x) = "{ \\color{"^color2^"} {"^x^"} }"
 
 
     fun constraintL_toString(l)=
