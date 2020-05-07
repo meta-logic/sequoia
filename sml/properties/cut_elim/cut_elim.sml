@@ -15,7 +15,7 @@ struct
     structure P = Permute
     structure U = unifyImpl
     
-    val color = "blue"
+    
     
     
     fun mod_cut_rule (Dat.Rule(name,side,conc,prems),subs) = 
@@ -27,7 +27,7 @@ struct
     
     
     
-    fun set_color (x) = "{ \\color{"^color^"} "^x^" }"
+    val set_color = Ut.set_color
 
     fun set_color_form(Dat.Atom(x)) = Dat.Atom(set_color(x))
        |set_color_form(Dat.AtomVar(x)) = Dat.Atom(set_color(x))
@@ -50,7 +50,7 @@ struct
         val prems_pairs = ListPair.zip(prems_i,prems)
         val prems = List.map (fn (i,seq) => Dat.DerTree("0"^i,seq,NONE,[])) prems_pairs 
         val base = Dat.DerTree("0",conc,(SOME name), prems)
-        
+        val base = Ut.fresh_tree(base)
     in
       base
     end
@@ -137,6 +137,12 @@ struct
                 in
                     (new_tree,fresh_base new_base,cons)
                 end
+            
+            fun check_needed''(Dat.Ctx(_,fl)) = not (List.null(fl) )
+            fun check_needed'(Dat.Empty) = false
+                |check_needed' (Dat.Single(ctx)) = check_needed''(ctx)
+                |check_needed' (Dat.Mult(_,ctx,ctx_struct))= check_needed''(ctx) orelse (check_needed'(ctx_struct))
+            fun check_needed(Dat.Seq(l,_,r)) = check_needed'(l) orelse check_needed'(r)
 
             val Dat.Rule(_,_,l_conc,_) = left_rule
             val Dat.Seq(_,_,r) = l_conc
@@ -157,9 +163,12 @@ struct
 
             val unifier = U.Unify_seq(fake_seq,fake_seq2)
 
-            val result =  (case unifier of
-               NONE => (tree,fresh_base conc,[])
-             | SOME (u::_) => apply_unifier(tree,u))
+            val needed = check_needed(fake_seq)
+
+            val result =  (case (needed,unifier) of
+               (false,_) => (tree,fresh_base conc,[])
+             | (_,NONE) => (tree,fresh_base conc,[])
+             | (_,SOME (u::_)) => apply_unifier(tree,u))
 
         in
             result
