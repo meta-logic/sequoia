@@ -8,14 +8,13 @@ var rule1 = ""
 var rule2 = ""
 
 function selectRule(bl, i) {
-    $("#info_answer").css("visibility","hidden")
     if (bl && (rule1 == "" || rule2 == "")) {
         if (rule1 == "") {
             rule1 = "r"+i
         } else if (rule2 == "") {
             rule2 = "r"+i
         }
-        $("#rule_card"+i).attr("class", "ui raised card")
+        $("#rule_card"+i).attr("class", "ui raised teal card")
         $("#b"+i).attr("class", "ui active bottom attached button")
         $("#b"+i).attr("onClick", "selectRule(false,"+i+")")
         $("#i"+i).attr("class", "close icon")
@@ -59,11 +58,10 @@ function permRules() {
         var trees = output[1].split("&&&")
         var goodtrees = trees[0].split("###")
         var badtrees = trees[1].split("###")
-        var message = $("#info_answer")
-        message.attr("class", "ui info message")
         $("#info_header").html(answer[0])
         $("#info_text").html(answer[1])
-        message.css("visibility","visible")
+        $("#info_answer").attr("class", "ui info message")
+        $("#info_answer").css("visibility","visible")
         var gtrees = $("#good_trees")
         for (var i = 0; i < goodtrees.length; i++) {
             if (goodtrees[i] != "") {
@@ -84,19 +82,6 @@ function permRules() {
                 )
             }
         }
-        var r1 = rule1.slice(1,rule1.length)
-        $("#rule_card"+r1).attr("class", "ui card")
-        $("#b"+r1).attr("class", "ui bottom attached button")
-        $("#b"+r1).attr("onClick", 'selectRule("true",'+r1+')')
-        $("#i"+r1).attr("class", 'add icon')
-        var r2 = rule2.slice(1,rule2.length)
-        $("#rule_card"+r2).attr("class", "ui card")
-        $("#b"+r2).attr("class", "ui bottom attached button")
-        $("#b"+r2).attr("onClick", 'selectRule("true",'+r2+')')
-        $("#i"+r2).attr("class", 'add icon')
-        $("#perm_button").attr("class", "ui disabled teal large button")
-        rule1 = ""
-        rule2 = ""
         MathJax.Hub.Queue(["Typeset",MathJax.Hub,gtrees[0]], function () { 
             MathJax.Hub.Queue(["Typeset",MathJax.Hub,btrees[0]], function () {
                 $("#loading").attr("class", "ui inactive inverted dimmer")

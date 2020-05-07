@@ -4,12 +4,12 @@
 // under certain conditions; see LICENSE for details.
 
 
-function showProof(index, on) {
+function showProofInit(index, on) {
     if (on == "yes") {
-        $("#I"+index).attr("onClick", "showProof("+index+",'no')")
+        $("#I"+index).attr("onClick", "showProofInit("+index+",'no')")
         $("#proof"+index).css("display", "none")
     } else {
-        $("#I"+index).attr("onClick", "showProof("+index+",'yes')")
+        $("#I"+index).attr("onClick", "showProofInit("+index+",'yes')")
         $("#proof"+index).css("display", "flex")
     }
 }
@@ -63,7 +63,6 @@ function checkInit() {
             return
         }
         $.post("/sequoia/initRules", { first: conn_strings, second: init_strings, third: "[]"}, function(data, status) {
-            $("#init_button").css("display", "none")
             var output = data.output.split("%%%")
             var result = output[0]
             if (result == "Arity Problem") {
@@ -94,7 +93,7 @@ function checkInit() {
                             '<div class="content">'+
                                 '<div class="header">$$'+con_ordered[i]+'$$</div>'+
                             '</div>'+
-                            '<div id="I'+i+'" class="ui bottom attached button" onClick=showProof('+i+',"no")>'+
+                            '<div id="I'+i+'" class="ui bottom attached button" onClick=showProofInit('+i+',"no")>'+
                                 '<i class="question icon"></i>'+
                             '</div>'+
                         '</div>'+

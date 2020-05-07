@@ -7,10 +7,15 @@
 var rule1 = ""
 
 function selectRule(bl, i) {
-    $("#info_answer").css("visibility","hidden")
-    if (bl && rule1 == "") {
+    if (bl) {
+        var r1 = rule1.slice(1,rule1.length)
+        $("#rule_card"+r1).attr("class", "ui card")
+        $("#b"+r1).attr("class", "ui bottom attached button")
+        $("#b"+r1).attr("onClick", 'selectRule("true",'+r1+')')
+        $("#i"+r1).attr("class", 'add icon')
+        $("#cut_button").attr("class", "ui disabled teal large button")
         rule1 = "r"+i
-        $("#rule_card"+i).attr("class", "ui raised card")
+        $("#rule_card"+i).attr("class", "ui raised teal card")
         $("#b"+i).attr("class", "ui active bottom attached button")
         $("#b"+i).attr("onClick", "selectRule(false,"+i+")")
         $("#i"+i).attr("class", "close icon")
@@ -26,14 +31,14 @@ function selectRule(bl, i) {
 }
 
 
-function showProof(type, index, on, num) {
+function showProofCut(type, index, on, num) {
     if (on == "yes") {
-        $("#"+type+index).attr("onClick", "showProof('"+type+"',"+index+",'no',"+num+")")
+        $("#"+type+index).attr("onClick", "showProofCut('"+type+"',"+index+",'no',"+num+")")
         for (var i = 0; i < num; i++) {
             $("#"+type+"proof"+index+""+i).css("display", "none")
         }
     } else {
-        $("#"+type+index).attr("onClick", "showProof('"+type+"',"+index+",'yes',"+num+")")
+        $("#"+type+index).attr("onClick", "showProofCut('"+type+"',"+index+",'yes',"+num+")")
         for (var i = 0; i < num; i++) {
             $("#"+type+"proof"+index+""+i).css("display", "flex")
         }
@@ -61,11 +66,10 @@ function checkCut() {
         var axioms = output[1].split("@@@")
         var ranks = output[2].split("@@@")
         var grades = output[3].split("@@@")
-        var message = $("#info_answer")
-        message.attr("class", "ui info message")
         $("#info_header").html(answer[0])
         $("#info_text").html(answer[1])
-        message.css("visibility","visible")
+        $("#info_answer").attr("class", "ui info message")
+        $("#info_answer").css("visibility","visible")
         var ax = $("#axiom")
         for (var i = 0; i < axioms.length; i++) {
             if (axioms[i] != "") {
@@ -80,7 +84,7 @@ function checkCut() {
                         '<div class="content">'+
                             '<div class="header">$$'+it_ordered[i]+'$$</div>'+
                         '</div>'+
-                        '<div id="AX'+i+'" class="ui bottom attached button" onClick=showProof("AX",'+i+',"no",'+proofs_list.length+')>'+
+                        '<div id="AX'+i+'" class="ui bottom attached button" onClick=showProofCut("AX",'+i+',"no",'+proofs_list.length+')>'+
                             '<i class="question icon"></i>'+
                         '</div>'+
                     '</div>'
@@ -113,7 +117,7 @@ function checkCut() {
                         '<div class="content">'+
                             '<div class="header">$$'+rl_ordered[i]+'$$</div>'+
                         '</div>'+
-                        '<div id="RK'+i+'" class="ui bottom attached button" onClick=showProof("RK",'+i+',"no",'+proofs_list.length+')>'+
+                        '<div id="RK'+i+'" class="ui bottom attached button" onClick=showProofCut("RK",'+i+',"no",'+proofs_list.length+')>'+
                             '<i class="question icon"></i>'+
                         '</div>'+
                     '</div>'
@@ -146,7 +150,7 @@ function checkCut() {
                         '<div class="content">'+
                             '<div class="header">$$'+con_ordered[i]+'$$</div>'+
                         '</div>'+
-                        '<div id="GD'+i+'" class="ui bottom attached button" onClick=showProof("GD",'+i+',"no",'+proofs_list.length+')>'+
+                        '<div id="GD'+i+'" class="ui bottom attached button" onClick=showProofCut("GD",'+i+',"no",'+proofs_list.length+')>'+
                             '<i class="question icon"></i>'+
                         '</div>'+
                     '</div>'
@@ -165,13 +169,6 @@ function checkCut() {
                 
             }
         }
-        var r1 = rule1.slice(1,rule1.length)
-        $("#rule_card"+r1).attr("class", "ui card")
-        $("#b"+r1).attr("class", "ui bottom attached button")
-        $("#b"+r1).attr("onClick", 'selectRule("true",'+r1+')')
-        $("#i"+r1).attr("class", 'add icon')
-        $("#cut_button").attr("class", "ui disabled teal large button")
-        rule1 = ""
         MathJax.Hub.Queue(["Typeset",MathJax.Hub,ax[0]], function () { 
             MathJax.Hub.Queue(["Typeset",MathJax.Hub,rk[0]], function () {
                 MathJax.Hub.Queue(["Typeset",MathJax.Hub,gd[0]], function () {
