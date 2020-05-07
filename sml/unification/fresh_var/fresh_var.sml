@@ -3,6 +3,8 @@
     This is free software, and you are welcome to redistribute it
     under certain conditions; see LICENSE for details.
 *)
+
+
 signature FRESHVAR =
 sig
     val get_index : unit -> int
@@ -12,13 +14,34 @@ end
 
 structure FreshVar =
 struct
+    structure Map = BinaryMapFn(StringKey)
+    
     val var_index = ref 1;
 
-    fun change_index (x:int): unit = ignore (var_index := x)
+    val map: int Map.map ref = ref (Map.empty)
 
-    fun get_index ():int = !var_index
 
-    fun fresh'(x:string):string = (x ^"^{"^ (Int.toString(!var_index)) ^"}") before (var_index := !var_index + 1)
+    fun change_index (x:int): unit = (var_index := x) before (map := Map.empty)
+
+    fun get_index ():int =
+        let
+            val inds = Map.listItems(!map)
+        in
+            List.foldr Int.max 0 inds
+        end
+
+    fun add_index (x:string,i:int):string = (x ^"^{"^ Int.toString(i) ^"}") 
+
+    fun fresh'(x:string):string = 
+        let
+            val ind = (case Map.find(!map,x) of
+               NONE => !var_index
+             | SOME index => index)
+            val new_string = add_index(x,ind)
+            val () = map:= ( Map.insert(!map,x,ind+1) )
+        in
+            new_string
+        end
 
     val hat = #"^"
 

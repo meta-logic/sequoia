@@ -40,8 +40,9 @@ struct
                       | _ => ())
 
             val chars = Char.ord #"A"
+            fun create_name (num) = Ut.set_color(Char.toString(Char.chr(num)))
 
-            val con_form = Dat.Form(con,List.tabulate(arity,(fn i => Dat.Atom(Char.toString(Char.chr(chars+i))))))
+            val con_form = Dat.Form(con,List.tabulate(arity,(fn i => Dat.Atom(create_name(chars+i) ) ) ) )
 
 
             val init_conc = Ut.seq_to_fresh(init_conc)
