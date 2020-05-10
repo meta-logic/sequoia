@@ -112,33 +112,7 @@ struct
 
     fun seq_to_fresh(D.Seq(ctx_s,con,ctx_s2)) = D.Seq(ctx_struct_to_fresh(ctx_s),con,ctx_struct_to_fresh(ctx_s2))
 
-    val update_string = fresh
-
-    fun update_ctx_var (Dat.CtxVar(a,x)) = Dat.CtxVar(a,update_string(x))
-
-    fun update_form (Dat.Atom(x)) = Dat.Atom(x)
-        | update_form (Dat.AtomVar(x)) = Dat.AtomVar(update_string(x))
-        | update_form (Dat.FormVar(x)) = Dat.FormVar(update_string(x))
-        | update_form (Dat.Form(c,forms)) = Dat.Form(c, List.map update_form forms)
-
-    fun update_ctx (Dat.Ctx(ctx_vars,forms)) = Dat.Ctx(List.map update_ctx_var ctx_vars,List.map update_form forms)
-
-    fun update_ctx_struct (Dat.Empty) = Dat.Empty
-        | update_ctx_struct (Dat.Single(ctx)) = Dat.Single(update_ctx(ctx))
-        | update_ctx_struct (Dat.Mult(conn,ctx,ctx_strct)) = Dat.Mult(conn,update_ctx(ctx), update_ctx_struct(ctx_strct))
-
-    fun update_seq (Dat.Seq(l,conn,r)) = Dat.Seq(update_ctx_struct(l),conn,update_ctx_struct(r))
-
-    fun update_rule (Dat.Rule(nm,side,conc,prems)) =
-        let
-            val new_conc = update_seq(conc)
-            val new_prems = List.map update_seq prems
-            val _ = index := ((!index) + 1)
-        in
-            Dat.Rule(nm,side,new_conc,new_prems)
-        end
     
-
 
     fun print_seq_list (nil) = print "\n_______________________________\n"
         | print_seq_list (x::L) = let
@@ -211,6 +185,34 @@ struct
         in
             App.apply_der_tree_Unifier(tree,subs)
         end
+
+    fun update_ctx_var (Dat.CtxVar(a,x)) = Dat.CtxVar(a,C.fresh(x))
+
+    fun update_form (Dat.Atom(x),_) = Dat.Atom(x)
+        | update_form (Dat.AtomVar(x),f) = Dat.AtomVar(f x)
+        | update_form (Dat.FormVar(x),f) = Dat.FormVar(f x)
+        | update_form (Dat.Form(c,forms),f) = Dat.Form(c, List.map (fn x =>
+        update_form(x,f)) forms)
+
+    fun update_ctx (Dat.Ctx(ctx_vars,forms),f) = Dat.Ctx(ctx_vars,List.map (fn x
+      => update_form(x,f)) forms)
+
+    fun update_ctx_struct (Dat.Empty,_) = Dat.Empty
+        | update_ctx_struct (Dat.Single(ctx),f) = Dat.Single(update_ctx(ctx,f))
+        | update_ctx_struct (Dat.Mult(conn,ctx,ctx_strct),f) =
+        Dat.Mult(conn,update_ctx(ctx,f), update_ctx_struct(ctx_strct,f))
+
+    fun update_seq (Dat.Seq(l,conn,r),f) =
+      Dat.Seq(update_ctx_struct(l,f),conn,update_ctx_struct(r,f))
+
+    fun update_rule (Dat.Rule(nm,side,conc,prems),f) =
+        let
+            val new_conc = update_seq(conc,f)
+            val new_prems = List.map (fn x => update_seq(x,f)) prems
+        in
+            Dat.Rule(nm,side,new_conc,new_prems)
+        end
+    
 
 
 
