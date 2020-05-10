@@ -9,14 +9,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/AboudFayad/sequoia.git"
+    "url": "git+https://github.com/meta-logic/sequoia.git"
   },
-  "author": "AbdulRahman Alfayad",
+  "author": "Giselle Reis",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/AboudFayad/sequoia/issues"
+    "url": "https://github.com/meta-logic/sequoia/issues"
   },
-  "homepage": "https://github.com/AboudFayad/sequoia#readme",
+  "homepage": "https://github.com/meta-logic/sequoia#readme",
   "dependencies": {
     "bcrypt": "^3.0.7",
     "body-parser": "^1.18.3",
