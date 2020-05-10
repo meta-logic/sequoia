@@ -18,7 +18,11 @@ if (property == "Main Page") {
     $("#prop4").attr("href", "/sequoia/calculus/"+calc_id+"/properties/cut_admissability")
     $("#prop5").attr("href", "/sequoia/calculus/"+calc_id+"/properties/invertibility")
 }
-if (property == "Permutability") {
+if (property == "Initial Coherence") {
+    checkInit()
+} else if (property == "Weak Admissability") {
+    checkWeak()
+} else if (property == "Permutability") {
     get_rules_toPage()
 } else if (property == "Cut Admissibility") {
     get_cuts_toPage()

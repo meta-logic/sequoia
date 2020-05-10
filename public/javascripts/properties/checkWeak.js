@@ -4,14 +4,14 @@
 // under certain conditions; see LICENSE for details.
 
 
-function showProof(side, index, on, num) {
+function showProofWeak(side, index, on, num) {
     if (on == "yes") {
-        $("#"+side+index).attr("onClick", "showProof('"+side+"',"+index+",'no',"+num+")")
+        $("#"+side+index).attr("onClick", "showProofWeak('"+side+"',"+index+",'no',"+num+")")
         for (var i = 0; i < num; i++) {
             $("#"+side+"proof"+index+""+i).css("display", "none")
         }
     } else {
-        $("#"+side+index).attr("onClick", "showProof('"+side+"',"+index+",'yes',"+num+")")
+        $("#"+side+index).attr("onClick", "showProofWeak('"+side+"',"+index+",'yes',"+num+")")
         for (var i = 0; i < num; i++) {
             $("#"+side+"proof"+index+""+i).css("display", "flex")
         }
@@ -64,17 +64,19 @@ function checkWeak() {
         }
         var rule_strings = list_to_string(rule_list)
         $.post("/sequoia/weakenSides", { rules: rule_strings }, function(data, status) {
-            $("#weak_button").css("display", "none")
             var output = data.output.split("%%%")
             var left_bools = output[0].split("@@@")
+            var left_result = true
             var right_bools = output[1].split("@@@")
+            var right_result = true
             var lt = $("#left_sides")
             for (var i = 0; i < left_bools.length; i++) {
                 if (left_bools[i] != "") {
                     var tempL = left_bools[i].split("###")
-                    var color = "red"
-                    if (tempL[0] == "T") {
-                        color = "green"
+                    var color = "green"
+                    if (tempL[0] == "F") {
+                        color = "red"
+                        left_result = false
                     }
                     var proofs_list = tempL[1].split("&&&")
                     var newString = setLabel(left_bools, right_bools, i, 'L')
@@ -83,7 +85,7 @@ function checkWeak() {
                             '<div class="content">'+
                                 '<div class="header">'+newString+'</div>'+
                             '</div>'+
-                            '<div id="L'+i+'" class="ui bottom attached button" onClick=showProof("L",'+i+',"no",'+proofs_list.length+')>'+
+                            '<div id="L'+i+'" class="ui bottom attached button" onClick=showProofWeak("L",'+i+',"no",'+proofs_list.length+')>'+
                                 '<i class="question icon"></i>'+
                             '</div>'+
                         '</div>'
@@ -105,9 +107,10 @@ function checkWeak() {
             for (var i = 0; i < right_bools.length; i++) {
                 if (right_bools[i] != "") {
                     var tempR = right_bools[i].split("###")
-                    var color = "red"
-                    if (tempR[0] == "T") {
-                        color = "green"
+                    var color = "green"
+                    if (tempR[0] == "F") {
+                        color = "red"
+                        right_result = false
                     }
                     var proofs_list = tempR[1].split("&&&")
                     var newString = setLabel(left_bools, right_bools, i, 'R')
@@ -116,7 +119,7 @@ function checkWeak() {
                             '<div class="content">'+
                                 '<div class="header">'+newString+'</div>'+
                             '</div>'+
-                            '<div id="R'+i+'" class="ui bottom attached button" onClick=showProof("R",'+i+',"no",'+proofs_list.length+')>'+
+                            '<div id="R'+i+'" class="ui bottom attached button" onClick=showProofWeak("R",'+i+',"no",'+proofs_list.length+')>'+
                                 '<i class="question icon"></i>'+
                             '</div>'+
                         '</div>'
@@ -134,6 +137,18 @@ function checkWeak() {
                     }
                 }
             }
+            var answer = ["",""]
+            if (left_result && right_result) {
+                answer[0] = "Weakening Admissiblity Test Succeeds for All Contexts"
+                answer[1] = "For all contexts weakening is admissibile. The proof tree transformations are shown below. Each position of the Gamma symbol in the sequents corresponds to the context in that position."
+            } else {
+                answer[0] = "Weakening Admissiblity Test Fails for Some Contexts"
+                answer[1] = "For some contexts weakening might not be admissibile. There are proof tree transformations that could not be found. Each position of the Gamma symbol in the sequents corresponds to the context in that position."
+            }
+            $("#info_header").html(answer[0])
+            $("#info_text").html(answer[1])
+            $("#info_answer").attr("class", "ui info message")
+            $("#info_answer").css("display", "block")
             MathJax.Hub.Queue(["Typeset",MathJax.Hub,lt[0]], function () { 
                 MathJax.Hub.Queue(["Typeset",MathJax.Hub,rt[0]], function () {
                     $("#loading").attr("class", "ui inactive inverted dimmer")
