@@ -17,7 +17,6 @@ function useSequent() {
     var form = "FormVar = \"NO-FORM\" "
     var atom_var = "AtomVar = \"NO-ATOMVAR\" "
     var atom = "Atom = \"NO-ATOM\" "
-    var calc_id = $("#calc_id").text()
     $.get("/sequoia/api/parsing_symbols/"+calc_id, function(sb, status) {
         var syms = sb.symbols
         syms = syms.sort(function(a, b){

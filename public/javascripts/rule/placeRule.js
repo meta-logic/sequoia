@@ -28,7 +28,6 @@ function sendRule(opt, cutvar, conc, prem, parsed_conc, parsed_prem, calc_id) {
             parsed_conc : parsed_conc, parsed_prem : JSON.stringify(parsed_prem) , calculus : calc_id,
             connective : rule_connective, side : rule_side, type : rule_type, cutvar : cutvar})
     } else if (opt == "Update") {
-        var rule_id = $("#rule_id").text()
         $.get("/sequoia/api/rules/"+calc_id, function (rls, status) {
             var rules = rls.rules
             var still_exists = false
@@ -65,7 +64,6 @@ function placeRule(opt) {
     var form = "FormVar = \"NO-FORM\" "
     var atom_var = "AtomVar = \"NO-ATOMVAR\" "
     var atom = "Atom = \"NO-ATOM\" "
-    var calc_id = $("#calc_id").text()
     $.get("/sequoia/api/rule_symbols/"+calc_id, function(sb, status) {
         var syms = sb.symbols
         syms = syms.sort(function(a, b){
@@ -108,7 +106,6 @@ function placeRule(opt) {
 
 
 function parse_and_check(parser, opt) {
-    var calc_id = $("#calc_id").text()
     var prem = rule_premises
     var parsed_prem = []
     if (prem[0] != "" && prem[0].replace(/\s\s+/g, " ") ==  " ") {

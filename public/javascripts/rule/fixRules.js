@@ -15,7 +15,6 @@ function fixRules(callback) {
     var form = "FormVar = \"NO-FORM\" "
     var atom_var = "AtomVar = \"NO-ATOMVAR\" "
     var atom = "Atom = \"NO-ATOM\" "
-    var calc_id = $("#calc_id").text()
     $.get("/sequoia/api/rule_symbols/"+calc_id, function(sb, status) {
         var syms = sb.symbols
         syms = syms.sort(function(a, b){
@@ -52,7 +51,7 @@ function fixRules(callback) {
     var extra_text = "\n" + arrow + "\n" + sep + "\n" + conn + "\n" + set + "\n" + form + "\n" + atom_var + "\n" + atom + "\n" 
     parser_text += extra_text
     var parser = peg.generate(parser_text)
-    $.get("/sequoia/api/rules/"+$("#calc_id").text(), function (rls, status) {
+    $.get("/sequoia/api/rules/"+calc_id, function (rls, status) {
         var rules = rls.rules
             for (var i = 0; i < rules.length; i++) {
                 parse_and_fix(parser, rules[i])
@@ -64,7 +63,6 @@ function fixRules(callback) {
 
 
 function parse_and_fix(parser, rule) {
-    var calc_id = $("#calc_id").text()
     var prem = rule.premises
     var parsed_prem = []
     if (prem[0] != ""){

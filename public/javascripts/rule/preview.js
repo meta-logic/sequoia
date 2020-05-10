@@ -70,7 +70,6 @@ function removePremise(index) {
 
 function preview() {
     $("#warning").css("visibility","hidden")
-    var calc_id = $("#calc_id").text()
     $.get("/sequoia/api/rules/"+calc_id, function (rls, status) {
         var rules = rls.rules
         rule_name = $("#rule_name").val()
@@ -104,7 +103,7 @@ function preview() {
                     $("#submit").attr("class","ui disabled fluid large circular icon button green")
                     return
                 }
-                else if (opt == "Update" && $("#rule_id").text() != rules[i]._id){
+                else if (opt == "Update" && rule_id != rules[i]._id){
                     $("#warning_header").html("Redundant Names")
                     $("#warning_text").html("A rule with that name is already defined.")
                     $("#warning").css("visibility","visible")

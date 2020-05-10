@@ -16,7 +16,7 @@ function get_rules_toPage() {
             entry.remove()
         }
     }
-    $.get("/sequoia/api/rules/"+$("#calc_id").text(), function (rls, status) {
+    $.get("/sequoia/api/rules/"+calc_id, function (rls, status) {
         var rules = rls.rules
         for (var i = 0; i < rules.length; i++) {
             var card_content = '$$\\frac{'+rules[i].premises.join(" \\quad \\quad ")+'}{'+rules[i].conclusion+'}'+rules[i].rule+'$$'

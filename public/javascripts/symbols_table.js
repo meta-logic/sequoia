@@ -24,7 +24,7 @@ function get_symbols_toTable(tbl) {
             entry.remove()
         }
     }
-    $.get("/sequoia/api/"+tbl+"_symbols/"+$("#calc_id").text(), function(sb, status) {
+    $.get("/sequoia/api/"+tbl+"_symbols/"+calc_id, function(sb, status) {
         var syms = sb.symbols
         for (var i = 0; i < syms.length; i++) {
             var sym = syms[i].symbol
@@ -53,7 +53,7 @@ function get_symbols_toTable(tbl) {
 
 function get_cert_symbols_toTable() {
     var sym_table = $("#cert_table_head")
-    $.get("/sequoia/api/cert_symbols/"+$("#calc_id").text(), function(sb, status) {
+    $.get("/sequoia/api/cert_symbols/"+calc_id, function(sb, status) {
         var syms = sb.symbols
         for (var i = 0; i < syms.length; i++) {
             var sym = syms[i].symbol
@@ -79,7 +79,6 @@ function add_symbol_toTable(tbl) {
     var sym_table = $("#table_head")
     var symb = $("#sym").val().trim()
     var typ = $("#typ").val()
-    calc_id = $("#calc_id").text()
     if (symb.includes("^") || symb.includes("'") || symb.includes('"') || symb.includes('*')) {
         $("#warning_header").html("Invalid Character")
         $("#warning_text").html("Please refrain from using superscripts when naming variables.")
@@ -152,7 +151,7 @@ function delete_symbol_fromTable(update, card_id, mongo_id, tbl) {
         data : {"id" : mongo_id},
         success: function(result) {
             if (update) {
-                $.post("/sequoia/api/symbols", {symbol : $("#sym").val(), type : $("#typ").val(), group : tbl, calculus : $("#calc_id").text()}, 
+                $.post("/sequoia/api/symbols", {symbol : $("#sym").val(), type : $("#typ").val(), group : tbl, calculus : calc_id}, 
                 function(data, status) {
                     if (tbl == "rule") {
                         fixRules(get_rules_toPage)

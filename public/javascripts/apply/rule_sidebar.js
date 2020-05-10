@@ -14,7 +14,6 @@ function get_rules_toPage() {
             entry.remove()
         }
     }
-    var calc_id = $("#calc_id").text()
     $.get("/sequoia/api/rules/"+calc_id, function (rls, status) {
         var rules = rls.rules
         for (var i = 0; i < rules.length; i++) {

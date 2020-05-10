@@ -15,7 +15,6 @@ var it_ordered = []
 
 function get_rules_toPage() {
     var rules_container = $("#rules")
-    var calc_id = $("#calc_id").text()
     $.get("/sequoia/api/rules/"+calc_id, function (rls, status) {
         var rules = rls.rules
         var init_list = []
@@ -53,7 +52,6 @@ function get_rules_toPage() {
 
 function get_cuts_toPage() {
     var rules_container = $("#rules")
-    var calc_id = $("#calc_id").text()
     $.get("/sequoia/api/rules/"+calc_id, function (rls, status) {
         var rules = rls.rules
         var init_list = []

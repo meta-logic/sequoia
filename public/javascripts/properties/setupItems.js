@@ -4,9 +4,9 @@
 // under certain conditions; see LICENSE for details.
 
 
+var calc_id = $("#calc_id").text()
 $("#main-menu").sticky({});
 $("#Properties_icon").attr("class", "active item")
-var calc_id = $("#calc_id").text()
 $("#Calculus_icon").attr("href", "/sequoia/calculus/"+calc_id)
 $("#Prooftree_icon").attr("href", "/sequoia/calculus/"+calc_id+"/apply")
 $("#Properties_icon").attr("href", "/sequoia/calculus/"+calc_id+"/properties")
