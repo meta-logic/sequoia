@@ -9,12 +9,16 @@ var rule2 = ""
 
 function selectRule(bl, i) {
     if (bl && (rule1 == "" || rule2 == "")) {
+        var card_color = "teal"
+        if ((rule1 == "" && rule2 != "") || (rule1 != "" && rule2 == "")) {
+            card_color = "orange"
+        }
         if (rule1 == "") {
             rule1 = "r"+i
         } else if (rule2 == "") {
             rule2 = "r"+i
         }
-        $("#rule_card"+i).attr("class", "ui raised teal card")
+        $("#rule_card"+i).attr("class", "ui raised "+card_color+" card")
         $("#b"+i).attr("class", "ui active bottom attached button")
         $("#b"+i).attr("onClick", "selectRule(false,"+i+")")
         $("#i"+i).attr("class", "close icon")
