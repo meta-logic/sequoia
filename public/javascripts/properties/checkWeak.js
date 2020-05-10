@@ -140,10 +140,10 @@ function checkWeak() {
             var answer = ["",""]
             if (left_result && right_result) {
                 answer[0] = "Weakening Admissiblity Test Succeeds for All Contexts"
-                answer[1] = "For all contexts weakening is admissibile. The proof tree transformations are shown below. Each position of the Gamma symbol in the sequents corresponds to the context in that position."
+                answer[1] = "For all contexts weakening is admissibile. The tree transformation proofs are shown below. Each position of the Gamma symbol in the sequents corresponds to the context in that position."
             } else {
                 answer[0] = "Weakening Admissiblity Test Fails for Some Contexts"
-                answer[1] = "For some contexts weakening might not be admissibile. There are proof tree transformations that could not be found. Each position of the Gamma symbol in the sequents corresponds to the context in that position."
+                answer[1] = "For some contexts weakening might not be admissibile. There are tree transformation proofs that could not be found. Each position of the Gamma symbol in the sequents corresponds to the context in that position."
             }
             $("#info_header").html(answer[0])
             $("#info_text").html(answer[1])
