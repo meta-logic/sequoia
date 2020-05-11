@@ -5,12 +5,21 @@ under certain conditions; see LICENSE for details. --}}
 
 
 <div id="calc_id" hidden>{{calc_id}}</div>
-<div id="title" class="ui middle aligned center aligned huge teal header">Permutability
-	<div id="description" class="sub header">Select two rules to check if the first permutes up the second</div>
-</div>
 <div id="property" hidden>Permutability</div>
-<br><br>
+<div id="title" class="ui middle aligned center aligned huge teal header">Permutability</div>
 <div class="ui container">
+	<div id="description" class="sub header">
+		<div class="theorem" text = "Permutability">
+			Let $T_1$ be the proof tree $\cfrac{\cfrac{\cdots}{\cdots} r_2}{S} r_1$. 
+			If $T_1$ implies the existence of a proof tree $T_2$ = $\cfrac{\cfrac{\cdots}{\cdots} r_1}{S} r_2$, 
+			then we say that $r_1$ permutes up $r_2$.
+		</div>
+	</div>
+	<br>
+	<div id="description" class="middle aligned center aligned sub header">
+		Select two rules to check if the first permutes up the second.
+	</div>
+	<br>
 	<div class="ui three special cards" id="rules"></div>
 	<br>
 	<div id="perm_button" class="ui disabled teal large button" onclick="permRules()">Perform Check</div>

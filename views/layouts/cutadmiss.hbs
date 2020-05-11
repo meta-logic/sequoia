@@ -16,6 +16,18 @@ under certain conditions; see LICENSE for details. --}}
           width: 0px;
           background: transparent; /* make scrollbar transparent */
       }
+      .theorem {
+      display: block;
+      font-style: italic;
+      }
+      .theorem:before {
+      content: "Theorem. ";
+      font-weight: bold;
+      font-style: normal;
+      }
+      .theorem[text]:before {
+      content: "Theorem (" attr(text) "): ";
+      }
     </style>
   </div>
   <body>

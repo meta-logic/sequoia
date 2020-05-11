@@ -5,12 +5,20 @@ under certain conditions; see LICENSE for details. --}}
 
 
 <div id="calc_id" hidden>{{calc_id}}</div>
-<div id="title" class="ui middle aligned center aligned huge teal header">Cut Admissibility
-    <div id="description" class="sub header">Select a cut rule to check if it is admissibile in your calculus</div>
-</div>
 <div id="property" hidden>Cut Admissibility</div>
+<div id="title" class="ui middle aligned center aligned huge teal header">Cut Admissibility</div>
 <br><br>
 <div class="ui container">
+    <div id="description" class="sub header">
+        <div class="theorem" text = "Cut Admissibility">
+            The cut rule(s) can be removed from proofs without affecting provability by using the rewrite rules proposed by Gentzen.
+        </div>
+    </div>
+    <br><br>
+    <div id="description" class="sub header">
+        Select a cut rule to check if it is admissibile in your calculus.
+    </div>
+    <br>
     <div class="ui three special cards" id="rules"></div>
     <br>
     <div id="cut_button" class="ui disabled teal large button" onclick="checkCut()">Perform Check</div>

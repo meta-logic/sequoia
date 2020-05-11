@@ -18,15 +18,20 @@ if (property == "Main Page") {
     $("#prop4").attr("href", "/sequoia/calculus/"+calc_id+"/properties/cut_admissability")
     $("#prop5").attr("href", "/sequoia/calculus/"+calc_id+"/properties/invertibility")
 }
-if (property == "Initial Coherence") {
+else {
+    MathJax.Hub.Config({tex2jax: {inlineMath: [ ['$','$'] ]}});
+    MathJax.Hub.Queue([ "Typeset", MathJax.Hub, $("#description")[0]])
+    if (property == "Initial Coherence") {
     checkInit()
-} else if (property == "Weak Admissability") {
-    checkWeak()
-} else if (property == "Permutability") {
-    get_rules_toPage()
-} else if (property == "Cut Admissibility") {
-    get_cuts_toPage()
+    } else if (property == "Weak Admissability") {
+        checkWeak()
+    } else if (property == "Permutability") {
+        get_rules_toPage()
+    } else if (property == "Cut Admissibility") {
+        get_cuts_toPage()
+    }
 }
+
 
 
 function unzip(item_list) {
