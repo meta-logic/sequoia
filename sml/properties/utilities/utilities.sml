@@ -36,8 +36,8 @@ struct
 
     val color = "blue"
     val color2 = "red"
-    fun set_color (x) = "{ \\color{"^color^"} {"^x^"} }"
-    fun set_color2 (x) = "{ \\color{"^color2^"} {"^x^"} }"
+    fun set_color (x) = "\\color{"^color^"} {"^x^"}"
+    fun set_color2 (x) = "\\color{"^color2^"} {"^x^"}"
 
 
     fun constraintL_toString(l)=
@@ -83,7 +83,9 @@ struct
         end
 
 
-    fun fresh'(x:string):string = (x ^"^{p"^ (Int.toString(!index)) ^"}")
+    fun set_u_index(x) = index := x
+
+    fun fresh'(x:string):string = (x ^"^{"^ (Int.toString(!index)) ^"}")
 
     val hat = #"^"
 
@@ -189,9 +191,9 @@ struct
     fun update_ctx_var (Dat.CtxVar(a,x)) = Dat.CtxVar(a,C.fresh(x))
 
     fun update_form (Dat.Atom(x),_) = Dat.Atom(x)
-        | update_form (Dat.AtomVar(x),f) = Dat.AtomVar(f x)
-        | update_form (Dat.FormVar(x),f) = Dat.FormVar(f x)
-        | update_form (Dat.Form(c,forms),f) = Dat.Form(c, List.map (fn x =>
+        | update_form (Dat.AtomVar(x),f) = Dat.AtomVar(f(fresh x))
+        | update_form (Dat.FormVar(x),f) = Dat.FormVar(f(fresh x))
+        | update_form (Dat.Form(Dat.Con(c),forms),f) = Dat.Form(Dat.Con(f c), List.map (fn x =>
         update_form(x,f)) forms)
 
     fun update_ctx (Dat.Ctx(ctx_vars,forms),f) = Dat.Ctx(ctx_vars,List.map (fn x
@@ -209,8 +211,9 @@ struct
         let
             val new_conc = update_seq(conc,f)
             val new_prems = List.map (fn x => update_seq(x,f)) prems
+            val () = index := !index +1
         in
-            Dat.Rule(nm,side,new_conc,new_prems)
+            Dat.Rule(f nm,side,new_conc,new_prems)
         end
     
 
