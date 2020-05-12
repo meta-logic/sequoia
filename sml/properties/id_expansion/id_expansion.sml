@@ -134,8 +134,8 @@ struct
                 val t = List.map(fn (bl,pf) => if bl 
                     then "T###"^print_helper(pf) else "F###"^print_helper(pf)) out
                 val p = List.foldr (fn (a,b) => a^"@@@"^b) "" t
-                val b = if bol then "Identity Expansion Test Succeeds###Identity expansion is a property of this calculus system. For each connective the tree transformation proofs are shown below." 
-                                else "Identity Expansion Test Fails###Identity expansion is not a property of this calculus system. For certain connectives there are tree transformation proofs that could not be found."
+                val b = if bol then "Identity Expansion proof succeeds###Identity expansion is a property of this calculus system. The proof proceeds by structural induction on P, and for each connective the proof tree transformation is shown below." 
+                                else "Identity Expansion proof fails###Identity expansion may not be a property of this calculus system. The proof proceeds by structural induction on P, and for certain connectives the proof tree transformation could not be found."
                 val bp = b^"%%%"^p
             in Ut.writeFD 3 bp end
         end)
