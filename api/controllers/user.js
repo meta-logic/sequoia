@@ -18,7 +18,7 @@ async function createUser (req, res) {
     user.password = await bcrypt.hash(req.body.password, 10)
     user.email = req.body.email
     user.occupation = req.body.occupation
-    user.save(function (err) {
+    user.save(function(err) {
         if (err) {
             return res.status(400).json({
                 "status"  : "failure",
@@ -35,10 +35,10 @@ async function createUser (req, res) {
 
 
 function deleteUser (req, res) {
-    User.deleteOne({_id : req.body.id}, function (err, user) {
-        Calculus.remove({user : req.body.id}, function (err, clcs) {})
-        Symbols.remove({user : req.body.id}, function (err, symbs) {})
-        Rule.remove({user : req.body.id}, function (err, rls) {})
+    User.deleteOne({_id : req.body.id}, function(err, user) {
+        Calculus.remove({user : req.body.id}, function(err, clcs) {})
+        Symbols.remove({user : req.body.id}, function(err, symbs) {})
+        Rule.remove({user : req.body.id}, function(err, rls) {})
         if (err || user == null) {
             return res.status(400).json({
                 "status"  : "failure",
@@ -54,7 +54,7 @@ function deleteUser (req, res) {
 
 
 function getUser (req, res) {
-    User.findById(req.params.user_id, function (err, user) {
+    User.findById(req.params.user_id, function(err, user) {
         if (err || user == null) {
             return res.status(400).json({
                 "status"  : "failure",
@@ -70,7 +70,7 @@ function getUser (req, res) {
 
 
 function checkUser (req, res) {
-    User.find({'username' : req.params.username}, function (err, user) {
+    User.find({'username' : req.params.username}, function(err, user) {
         if (user.length == 0) {
             return res.status(200).json({
                 "status"  : "failure",

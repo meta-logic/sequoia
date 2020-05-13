@@ -6,7 +6,7 @@
 
 function preview() {
     $("#warning").css("visibility", "hidden")
-    var initial_sequent = $("#Sequent").val().trim().replace(/\(/g, " ( ").replace(/\)/g, " ) ")
+    var initial_sequent = escape_latex($("#Sequent").val().trim().replace(/\(/g, " ( ").replace(/\)/g, " ) "))
     if (initial_sequent == "")
         return
     $("#conc_0").html('$$'+initial_sequent+'$$')

@@ -40,8 +40,8 @@ function cutSelect(type, callback) {
         callback()
     } else {
         $('#modal2').modal({
-            onApprove: function () {
-                var f = $("#form").val()
+            onApprove: function() {
+                var f = escape_latex($("#form").val().trim())
                 if (f == "") {
                     $("#modal_warning").css("visibility", "visible")
                     return false

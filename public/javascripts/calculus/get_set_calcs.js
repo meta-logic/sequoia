@@ -37,8 +37,8 @@ function get_calculi_toPage() {
 
 function addCalculus() {
     var calculi_container = $("#calculi")
-    var title = $("#title").val().trim()
-    var description = $("#description").val().trim()
+    var title = escape_norm($("#title").val().trim())
+    var description = escape_norm($("#description").val().trim())
     if (title != "" && description != "") {
         $.post("/sequoia/api/calculus", {title : title, description : description, user : user_id}, function(data, status) {
             calculi_container.append(

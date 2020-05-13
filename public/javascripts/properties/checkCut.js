@@ -174,9 +174,9 @@ function checkCut() {
                 }
             }
         }
-        MathJax.Hub.Queue(["Typeset", MathJax.Hub, ax[0]], function () { 
-            MathJax.Hub.Queue(["Typeset", MathJax.Hub, rk[0]], function () {
-                MathJax.Hub.Queue(["Typeset", MathJax.Hub, gd[0]], function () {
+        MathJax.Hub.Queue(["Typeset", MathJax.Hub, ax[0]], function() { 
+            MathJax.Hub.Queue(["Typeset", MathJax.Hub, rk[0]], function() {
+                MathJax.Hub.Queue(["Typeset", MathJax.Hub, gd[0]], function() {
                     $("#loading").attr("class", "ui inactive inverted dimmer")
                 })
             })

@@ -19,7 +19,7 @@ function useSequent() {
     var atom = "Atom = \"NO-ATOM\" "
     $.get("/sequoia/api/parsing_symbols/"+calc_id, function(sb, status) {
         var syms = sb.symbols
-        syms = syms.sort(function(a, b){
+        syms = syms.sort(function(a, b) {
             return b.symbol.length - a.symbol.length
         })
         for (var i = 0; i < syms.length; i++) {

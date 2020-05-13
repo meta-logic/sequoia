@@ -70,22 +70,22 @@ function removePremise(index) {
 
 function preview() {
     $("#warning").css("visibility", "hidden")
-    $.get("/sequoia/api/rules/"+calc_id, function (rls, status) {
+    $.get("/sequoia/api/rules/"+calc_id, function(rls, status) {
         var rules = rls.rules
-        rule_name = $("#rule_name").val()
-        rule_type = $("#kind").val()
-        rule_side = $("#side").val()
-        rule_connective = $("#connective").val()
-        temp_premises = $("#i0").val().replace(/\s\s+/g, " ")
-        rule_premises = [($("#i0").val())]
+        rule_name = escape_latex($("#rule_name").val().trim())
+        rule_type = escape_latex($("#kind").val().trim())
+        rule_side = escape_latex($("#side").val().trim())
+        rule_connective = escape_latex($("#connective").val().trim())
+        temp_premises = escape_latex($("#i0").val().trim())
+        rule_premises = [temp_premises]
         for (var i = 1; i <= v; i++) {
-            var prem_seq = $("#i"+i).val()
+            var prem_seq = escape_latex($("#i"+i).val())
             if (prem_seq.trim() != "") {
                 temp_premises += " \\quad \\quad " + prem_seq
                 rule_premises.push(prem_seq)
             }
         }
-        rule_conclusion = $("#conclusion").val()
+        rule_conclusion = escape_latex($("#conclusion").val().trim())
         var opt = $("#page").text()
         if (rule_name == "") {
             $("#warning_header").html("Rule Name Missing")
@@ -103,7 +103,7 @@ function preview() {
                     $("#submit").attr("class", "ui disabled fluid large circular icon button green")
                     return
                 }
-                else if (opt == "Update" && rule_id != rules[i]._id){
+                else if (opt == "Update" && rule_id != rules[i]._id) {
                     $("#warning_header").html("Redundant Names")
                     $("#warning_text").html("A rule with that name is already defined.")
                     $("#warning").css("visibility", "visible")
@@ -134,7 +134,7 @@ function preview() {
             $("#submit").attr("class", "ui disabled fluid large circular icon button green")
             return
         }
-        if (rule_conclusion.trim() == "") {
+        if (rule_conclusion == "") {
             $("#warning_header").html("Conclusion Missing")
             $("#warning_text").html("A rule must have a non-empty conclusion.")
             $("#warning").css("visibility", "visible")

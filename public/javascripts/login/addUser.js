@@ -9,11 +9,11 @@ function addUser() {
     $("#p1").attr("class", "required field")
     $("#p2").attr("class", "required field")
     $("#u").attr("class", "required field")
-    var username = $("#username").val().trim()
-    var password1 = $("#password1").val().trim()
-    var password2 = $("#password2").val().trim()
-    var email = $("#email").val().trim()
-    var occupation = $("#occupation").val()
+    var username = escape_norm($("#username").val().trim())
+    var password1 = escape_norm($("#password1").val().trim())
+    var password2 = escape_norm($("#password2").val().trim())
+    var email = escape_norm($("#email").val().trim())
+    var occupation = escape_latex($("#occupation").val().trim())
     if (username == "" || password1 == "" || password2 == "") {
         if (username == "") {
             $("#u").attr("class", "required field error")

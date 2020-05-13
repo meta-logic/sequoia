@@ -49,7 +49,7 @@ function setLabel(left_bools, right_bools, index, side) {
 
 function checkWeak() {
     $("#loading").attr("class", "ui active inverted dimmer")
-    $.get("/sequoia/api/rules/"+calc_id, function (rls, status) { 
+    $.get("/sequoia/api/rules/"+calc_id, function(rls, status) { 
         var rules = rls.rules
         var rule_list = []
         for (var i = 0; i < rules.length; i++) {

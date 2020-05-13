@@ -10,7 +10,7 @@ function escape_norm(text) {
         '<': '&lt;',
         '>': '&gt;'
     };
-    return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+    return text.replace(/[&<>]/g, function(m) { return map[m]; });
 }
 
 
@@ -20,8 +20,7 @@ function escape_latex(text) {
         '<': '&lt;',
         '>': '&gt;',
         '"': '&quot;',
-        "'": '&apos;',
-        '\\': '\\\\'
+        "'": '&apos;'
     };
-    return text.replace(/[&<>"'\\]/g, function(m) { return map[m]; });
+    return text.replace(/[&<>"']/g, function(m) { return map[m]; });
 }

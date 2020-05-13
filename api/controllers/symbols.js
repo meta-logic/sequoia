@@ -14,7 +14,7 @@ function addSymbol (req, res) {
     symbol.type       = req.body.type
     symbol.group      = req.body.group
     symbol.calculus   = req.body.calculus
-    symbol.save(function (err) {
+    symbol.save(function(err) {
         if (err) {
             return res.status(400).json({
                 "status"  : "failure",
@@ -39,7 +39,7 @@ function addSymbols (req, res) {
         symbol.type       = syms.type
         symbol.group      = syms.group
         symbol.calculus   = syms.calculus
-        symbol.save(function (err) {
+        symbol.save(function(err) {
             if (err) {
                 return res.status(400).json({
                     "status"  : "failure",
@@ -57,7 +57,7 @@ function addSymbols (req, res) {
 
 
 function deleteSymbol (req, res) {
-    Symbols.remove({ _id : req.body.id}, function (err, symbol) {
+    Symbols.remove({ _id : req.body.id}, function(err, symbol) {
         if (err || symbol == null) {
             return res.status(400).json({
                 "status"  : "failure",
@@ -75,7 +75,7 @@ function deleteSymbol (req, res) {
 
 function getRuleSymbols (req, res) {
     Symbols.find({ $and: [{'calculus': req.params.calc_id}, {group : "rule"}]}, 
-    function (err, symbols) {
+    function(err, symbols) {
         if (err || symbols == null) {
             return res.status(400).json({
                 "status"  : "failure",
@@ -92,7 +92,7 @@ function getRuleSymbols (req, res) {
 
 function getSeqSymbols (req, res) {
     Symbols.find({ $and: [{'calculus': req.params.calc_id}, {group : "seq"}]}, 
-    function (err, symbols) {
+    function(err, symbols) {
         if (err || symbols == null) {
             return res.status(400).json({
                 "status"  : "failure",
@@ -110,7 +110,7 @@ function getSeqSymbols (req, res) {
 function getParsingSymbols (req, res) {
     Symbols.find({ $and: [{'calculus': req.params.calc_id}, 
     {$or:[{group: "seq"},{type : {$in: ["connective", "sequent sign", "context separator", "empty"]}}]}]}, 
-    function (err, symbols) {
+    function(err, symbols) {
         if (err || symbols == null) {
             return res.status(400).json({
                 "status"  : "failure",
@@ -128,7 +128,7 @@ function getParsingSymbols (req, res) {
 function getCertainSymbols (req, res) {
     Symbols.find({ $and: [{'calculus': req.params.calc_id}, 
     {type : {$in: ["connective", "sequent sign", "context separator", "empty"]}}]}, 
-    function (err, symbols) {
+    function(err, symbols) {
         if (err || symbols == null) {
             return res.status(400).json({
                 "status"  : "failure",

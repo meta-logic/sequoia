@@ -30,8 +30,8 @@ function insertTD() {
 
 
 function updateTD() {
-    var newtitle = $("#title").val().trim()
-    var newdescription = $("#description").val().trim()
+    var newtitle = escape_norm($("#title").val().trim())
+    var newdescription = escape_norm($("#description").val().trim())
     if (newtitle != "" && newdescription != "") {
         calcTitle = newtitle
         calcDesc = newdescription

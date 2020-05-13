@@ -8,7 +8,7 @@ var s = 0
 
 function showInfo(update, card_id, mongo_id, tbl) {
     $("#modal1").modal({
-        onApprove: function(){
+        onApprove: function() {
             delete_symbol_fromTable(update, card_id, mongo_id, tbl)
         }
     })
@@ -42,7 +42,7 @@ function get_symbols_toTable(tbl) {
                     '</button>'+
                 '</td>'
             )
-            MathJax.Hub.Queue(["Typeset",MathJax.Hub,sym])
+            MathJax.Hub.Queue(["Typeset", MathJax.Hub, sym])
         }
         s = syms.length
         $("#sym").val("")
@@ -65,7 +65,7 @@ function get_cert_symbols_toTable() {
                 '<td id="cert_sym'+i+'" value='+sym+'>$$'+sym+'$$</td>'+
                 '<td id="cert_ltx'+i+'" value='+sym+'>'+sym+'</td>'
             )
-            MathJax.Hub.Queue(["Typeset",MathJax.Hub,sym])
+            MathJax.Hub.Queue(["Typeset", MathJax.Hub, sym])
         }
     })
 }
@@ -77,16 +77,16 @@ function add_symbol_toTable(tbl) {
         other = "rule"
     }
     var sym_table = $("#table_head")
-    var symb = $("#sym").val().trim()
-    var typ = $("#typ").val()
+    var symb = escape_latex($("#sym").val().trim())
+    var typ = escape_latex($("#typ").val().trim())
     if (symb.includes("^") || symb.includes("'") || symb.includes('"') || symb.includes('*')) {
         $("#warning_header").html("Invalid Character")
         $("#warning_text").html("Please refrain from using superscripts when naming variables.")
-        $("#warning").css("visibility","visible")
+        $("#warning").css("visibility", "visible")
         return
     }
-    $("#warning").css("visibility","hidden")
-    if (symb.replace(/\s/g, '').length > 0 && typ != "") {
+    $("#warning").css("visibility", "hidden")
+    if (symb != "" && typ != "") {
         $.get("/sequoia/api/"+tbl+"_symbols/"+calc_id, function(sb, status) {
             var syms = sb.symbols 
             var ind = -1
@@ -112,13 +112,12 @@ function add_symbol_toTable(tbl) {
                             }
                             $("#warning_header").html("Symbol in Use")
                             $("#warning_text").html("This symbol already exists in the "+table+" symbols table. Try using a differnt one.")
-                            $("#warning").css("visibility","visible")
+                            $("#warning").css("visibility", "visible")
                             return
                         }
                     }
-                    $("#warning").css("visibility","hidden")
-                    $.post("/sequoia/api/symbols", {symbol : symb, type : typ, group : tbl, calculus : calc_id}, 
-                    function(data, status) {
+                    $("#warning").css("visibility", "hidden")
+                    $.post("/sequoia/api/symbols", {symbol : symb, type : typ, group : tbl, calculus : calc_id}, function(data, status) {
                         var row = document.createElement("tr")
                         row.setAttribute("id", "row"+s)
                         sym_table.after(row, $("#row"+(s-1)))
@@ -135,7 +134,7 @@ function add_symbol_toTable(tbl) {
                         s++
                         $("#sym").val("")
                         $("#typ").val("")
-                        MathJax.Hub.Queue(["Typeset",MathJax.Hub,symb])
+                        MathJax.Hub.Queue(["Typeset", MathJax.Hub, symb])
                     })
                 })
             }
@@ -151,8 +150,7 @@ function delete_symbol_fromTable(update, card_id, mongo_id, tbl) {
         data : {"id" : mongo_id},
         success: function(result) {
             if (update) {
-                $.post("/sequoia/api/symbols", {symbol : $("#sym").val(), type : $("#typ").val(), group : tbl, calculus : calc_id}, 
-                function(data, status) {
+                $.post("/sequoia/api/symbols", {symbol : $("#sym").val(), type : $("#typ").val(), group : tbl, calculus : calc_id}, function(data, status) {
                     if (tbl == "rule") {
                         fixRules(get_rules_toPage)
                     }

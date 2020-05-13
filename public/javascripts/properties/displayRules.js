@@ -15,7 +15,7 @@ var it_ordered = []
 
 function get_rules_toPage() {
     var rules_container = $("#rules")
-    $.get("/sequoia/api/rules/"+calc_id, function (rls, status) {
+    $.get("/sequoia/api/rules/"+calc_id, function(rls, status) {
         var rules = rls.rules
         var init_list = []
         for (var i = 0; i < rules.length; i++) {
@@ -143,7 +143,7 @@ function initWeak(calc_id) {
                 for (var i = 0; i < left_bools.length; i++) {
                     if (left_bools[i] != "") {
                         bl = left_bools[i].split("###")[0]
-                        if (bl == "F"){
+                        if (bl == "F") {
                             bl = "false"
                         } else {
                             bl = "true"
@@ -158,7 +158,7 @@ function initWeak(calc_id) {
                 for (var i = 0; i < right_bools.length; i++) {
                     if (right_bools[i] != "") {
                         bl = right_bools[i].split("###")[0]
-                        if (bl == "F"){
+                        if (bl == "F") {
                             bl = "false"
                         } else {
                             bl = "true"
