@@ -68,12 +68,11 @@ function checkWeak() {
             var result = output[0]
             var answer = ["",""]
             if (result == "T") {
-                answer[0] = "Weakening Admissiblity Test Succeeds for All Contexts"
-                answer[1] = "For all contexts weakening is admissibile. The tree transformation proofs are shown below. Each position of the Gamma symbol in the sequents corresponds to the context in that position. This check is sound but not complete."
+                answer[0] = "Weakening Admissiblity Proof Succeeds for All Contexts"
             } else if (result == "F") {
-                answer[0] = "Weakening Admissiblity Test Fails for Some Contexts"
-                answer[1] = "For some contexts weakening might not be admissibile. There are tree transformation proofs that could not be found. Each position of the Gamma symbol in the sequents corresponds to the context in that position. This check is sound but not complete."
+                answer[0] = "Weakening Admissiblity Proof Fails for Some Contexts"
             }
+            answer[1] = "Each card below contains the cases for the proof of weakening admissibility on the explicit &nbsp;&#x1D6AA;.&nbsp; When a case succeeds, the proof tree transformation is shown. This check is sound but not complete."
             $("#info_header").html(answer[0])
             $("#info_text").html(answer[1])
             $("#info_answer").attr("class", "ui info message")
@@ -148,6 +147,10 @@ function checkWeak() {
                     }
                 }
             }
+            $("#info_header").html(answer[0])
+            $("#info_text").html(answer[1])
+            $("#info_answer").attr("class", "ui info message")
+            $("#info_answer").css("display", "block")
             MathJax.Hub.Queue(["Typeset",MathJax.Hub,lt[0]], function () { 
                 MathJax.Hub.Queue(["Typeset",MathJax.Hub,rt[0]], function () {
                     $("#loading").attr("class", "ui inactive inverted dimmer")

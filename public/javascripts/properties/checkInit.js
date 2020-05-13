@@ -75,10 +75,10 @@ function checkInit() {
             } else {
                 var answer = ["",""]
                 if (result == "T") {
-                    answer[0] = "Identity Expansion Test Succeeds"
+                    answer[0] = "Identity Expansion Proof Succeeds"
                     answer[1] = "Identity expansion is a property of this calculus system. For each connective the tree transformation proofs are shown below."
                 } else if (result == "F") {
-                    answer[0] = "Identity Expansion Test Fails"
+                    answer[0] = "Identity Expansion Proof Fails"
                     answer[1] = "Identity expansion is not a property of this calculus system. For certain connectives there are tree transformation proofs that could not be found."
                 }
                 $("#info_header").html(answer[0])
