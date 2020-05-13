@@ -24,7 +24,7 @@ function get_calculi_toPage() {
                         '<div class="description">'+calculi[i].description+'</div>'+
                     '</div>'+
                     '<div class="ui bottom attached buttons">'+
-                        '<a class="ui basic blue button" href=/sequoia/calculus/'+calculi[i]._id+'>Edit</a>'+
+                        '<a class="ui basic blue button" href=/sequoia/calculus/'+calculi[i]._id+'>Select</a>'+
                         '<a id="delete_'+i+'" class="ui basic red button" onClick=deleteCalculus('+i+',"'+calculi[i]._id+'")>Delete</a>'+
                     '</div>'+
                 '</div>'
@@ -49,7 +49,7 @@ function addCalculus() {
                         '<div class="description">'+data.calculus.description+'</div>'+
                     '</div>'+
                     '<div class="ui bottom attached buttons">'+
-                        '<a class="ui basic blue button" href=/sequoia/calculus/'+data.calculus._id+'>Edit</a>'+
+                        '<a class="ui basic blue button" href=/sequoia/calculus/'+data.calculus._id+'>Select</a>'+
                         '<a id="delete_'+c+'" class="ui basic red button" onClick=deleteCalculus('+c+',"'+data.calculus._id+'")>Delete</a>'+
                     '</div>'+
                 '</div>'
@@ -78,7 +78,7 @@ function addSomeCalculus(num) {
                             '<div class="description">'+sampleCalc.description+'</div>'+
                         '</div>'+
                         '<div class="ui bottom attached buttons">'+
-                            '<a class="ui basic blue button" href=/sequoia/calculus/'+sampleCalc._id+'>Edit</a>'+
+                            '<a class="ui basic blue button" href=/sequoia/calculus/'+sampleCalc._id+'>Select</a>'+
                             '<a id="delete_'+c+'" class="ui basic red button" onClick=deleteCalculus('+c+',"'+sampleCalc._id+'")>Delete</a>'+
                         '</div>'+
                     '</div>'

@@ -65,11 +65,11 @@ function checkCut() {
         var result = output[0]
         var answer = ["",""]
         if (result == "T") {
-            answer[0] = "Cut Admissibility Proof Succeeds"
-            answer[1] = "The selected cut rule is admissible in this calculus. For each rule and connective the tree transformation proofs are shown below. This check is sound but not complete."
+            answer[0] = "Cut admissibility proof succeeds"
+            answer[1] = "The selected cut rule is admissible in this calculus. For each rule and connective the proof tree transformations are shown below."
         } else if (result == "F") {
-            answer[0] = "Cut Admissibility Proof Fails"
-            answer[1] = "The selected cut rule might not be admissible in this calculus. For certain rules or connectives there are tree transformation proofs that could not be found. This check is sound but not complete."
+            answer[0] = "Cut admissibility proof fails"
+            answer[1] = "The selected cut rule might not be admissible in this calculus. For certain rules or connectives proof tree transformations could not be found. This check is sound but not complete."
         }
         $("#info_header").html(answer[0])
         $("#info_text").html(answer[1])

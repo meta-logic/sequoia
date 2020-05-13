@@ -63,13 +63,13 @@ function permRules() {
             answer[0] = "N/A"
             answer[1] = "These rules are not capable of permuting."
         } else if (result == "1") {
-            answer[0] = "The Rule Permutes"
+            answer[0] = "The rule permutes"
             answer[1] = "The first rule always permutes up the second. All permutation tree transformations were found and are shown below."
         } else if (result == "2") {
-            answer[0] = "The Rule Does Not Permute"
+            answer[0] = "The rule does not permute"
             answer[1] = "The first rule never permutes up the second. No permutation tree transformations were found."
         } else if (result == "3") {
-            answer[0] = "The Rule Permutes Sometimes"
+            answer[0] = "The rule permutes sometimes"
             answer[1] = "The first rule sometimes permutes up the second. Permutation tree transformations were found for some cases and are shown below, while no permutation transformations were found for the rest."
         }
         $("#info_header").html(answer[0])

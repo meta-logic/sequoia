@@ -68,9 +68,9 @@ function checkWeak() {
             var result = output[0]
             var answer = ["",""]
             if (result == "T") {
-                answer[0] = "Weakening Admissiblity Proof Succeeds for All Contexts"
+                answer[0] = "Weakening admissiblity proof succeeds for all contexts"
             } else if (result == "F") {
-                answer[0] = "Weakening Admissiblity Proof Fails for Some Contexts"
+                answer[0] = "Weakening admissiblity proof fails for some contexts"
             }
             answer[1] = "Each card below contains the cases for the proof of weakening admissibility on the explicit &nbsp;&#x1D6AA;.&nbsp; When a case succeeds, the proof tree transformation is shown. This check is sound but not complete."
             $("#info_header").html(answer[0])
