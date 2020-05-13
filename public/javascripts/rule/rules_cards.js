@@ -29,7 +29,7 @@ function get_rules_toPage() {
                     '</div>'+
                 '</div>'
             )
-            MathJax.Hub.Queue(["Typeset",MathJax.Hub,card_content])
+            MathJax.Hub.Queue(["Typeset", MathJax.Hub, card_content])
         }
         r = rules.length
     })

@@ -4,15 +4,15 @@
 // under certain conditions; see LICENSE for details.
 
 
-function addUser () {
-    $("#warning").css("visibility","hidden")
+function addUser() {
+    $("#warning").css("visibility", "hidden")
     $("#p1").attr("class", "required field")
     $("#p2").attr("class", "required field")
     $("#u").attr("class", "required field")
     var username = $("#username").val().trim()
-    var password1 = $("#password1").val()
-    var password2 = $("#password2").val()
-    var email = $("#email").val()
+    var password1 = $("#password1").val().trim()
+    var password2 = $("#password2").val().trim()
+    var email = $("#email").val().trim()
     var occupation = $("#occupation").val()
     if (username == "" || password1 == "" || password2 == "") {
         if (username == "") {
@@ -36,21 +36,21 @@ function addUser () {
             $("#p2").attr("class", "required field error")
         }
         $("#warning_header").html("Username and passwords must be at least eight characters long.")
-        $("#warning").css("visibility","visible")
+        $("#warning").css("visibility", "visible")
         return
     } else {
-        $.get("/sequoia/api/users/"+username, function (data, status) {
+        $.get("/sequoia/api/users/"+username, function(data, status) {
             if (data.status == "success") {
                 $("#u").attr("class", "required field error")
                 $("#warning_header").html("Username already exists.")
-                $("#warning").css("visibility","visible")
+                $("#warning").css("visibility", "visible")
                 return
             } else {
                 if (password1 != password2) {
                     $("#p1").attr("class", "required field error")
                     $("#p2").attr("class", "required field error")
                     $("#warning_header").html("Passwords are not the same.")
-                    $("#warning").css("visibility","visible")
+                    $("#warning").css("visibility", "visible")
                     return
                 } else {
                     $.post("/sequoia/api/user", {username : username, password : password1, 

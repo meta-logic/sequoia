@@ -17,7 +17,7 @@ function showProofInit(index, on) {
 
 function checkInit() {
     $("#loading").attr("class", "ui active inverted dimmer")
-    $.get("/sequoia/api/rules/"+calc_id, function (rls, status) { 
+    $.get("/sequoia/api/rules/"+calc_id, function(rls, status) { 
         var rules = rls.rules
         var init_list = []
         var connective_rules = []
@@ -41,7 +41,7 @@ function checkInit() {
                 if (rule_conn in connective_dict) {
                     connective_dict[rule_conn][1].push(rule_sml)
                 } else {
-                    connective_dict[rule_conn] =[[], [rule_sml]]
+                    connective_dict[rule_conn] = [[], [rule_sml]]
                 }
             } else if (rule_type == "Axiom") {
                 init_list.push(rule_sml)
@@ -62,7 +62,7 @@ function checkInit() {
             $("#info_answer").css("display", "block")
             return
         }
-        $.post("/sequoia/initRules", { first: conn_strings, second: init_strings, third: "[]"}, function(data, status) {
+        $.post("/sequoia/initRules", {first : conn_strings, second : init_strings, third : "[]"}, function(data, status) {
             var output = data.output.split("%%%")
             var result = output[0]
             if (result == "Arity Problem") {
@@ -112,7 +112,7 @@ function checkInit() {
                     )
                 }
             }
-            MathJax.Hub.Queue(["Typeset",MathJax.Hub,cp[0]], function () {
+            MathJax.Hub.Queue(["Typeset", MathJax.Hub, cp[0]], function() {
                 $("#loading").attr("class", "ui inactive inverted dimmer")
             })
         })

@@ -26,7 +26,7 @@ function updateParser(new_symbols, callback) {
     }
     $.get("/sequoia/api/parsing_symbols/"+calc_id, function(sb, status) {
         var syms = sb.symbols
-        syms = syms.sort(function(a, b){
+        syms = syms.sort(function(a, b) {
             return b.symbol.length - a.symbol.length
         })
         for (var i = 0; i < syms.length; i++) {
@@ -56,10 +56,10 @@ function updateParser(new_symbols, callback) {
             }
         }
 
-        context_variables = context_variables.sort(function(a, b){
+        context_variables = context_variables.sort(function(a, b) {
             return b.length - a.length
         })
-        for (var i = 0; i < context_variables.length; i ++) {
+        for (var i = 0; i < context_variables.length; i++) {
             set += "/ \"" + context_variables[i] + "\" "
         }
 

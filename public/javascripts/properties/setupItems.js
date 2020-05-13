@@ -19,8 +19,8 @@ if (property == "Main Page") {
     $("#prop5").attr("href", "/sequoia/calculus/"+calc_id+"/properties/invertibility")
 }
 else {
-    MathJax.Hub.Config({tex2jax: {inlineMath: [ ['$','$'] ]}});
-    MathJax.Hub.Queue([ "Typeset", MathJax.Hub, $("#description")[0]])
+    MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$']]}});
+    MathJax.Hub.Queue(["Typeset", MathJax.Hub, $("#description")[0]])
     if (property == "Initial Coherence") {
     checkInit()
     } else if (property == "Weak Admissability") {

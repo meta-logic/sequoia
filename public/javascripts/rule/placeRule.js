@@ -8,7 +8,7 @@ var parser_copy = pt
 
 function cutSelect(opt, conc, prem, parsed_conc, parsed_prem, calc_id) {
     $('#modal3').modal({
-        onApprove: function () {
+        onApprove: function() {
             var v = $("#var").val()
             if (v == "") {
                 return
@@ -44,7 +44,7 @@ function sendRule(opt, cutvar, conc, prem, parsed_conc, parsed_prem, calc_id) {
                 $.ajax({
                     url: "/sequoia/api/rule",
                     type: "PUT",
-                    data : { id : rule_id, rule : rule_name, 
+                    data : {id : rule_id, rule : rule_name, 
                         conclusion : conc, premises : JSON.stringify(prem), parsed_conc : parsed_conc, 
                         parsed_prem : JSON.stringify(parsed_prem), calculus : calc_id, 
                         connective : rule_connective, side : rule_side, type : rule_type, cutvar : cutvar}, function(data) {}})
@@ -66,7 +66,7 @@ function placeRule(opt) {
     var atom = "Atom = \"NO-ATOM\" "
     $.get("/sequoia/api/rule_symbols/"+calc_id, function(sb, status) {
         var syms = sb.symbols
-        syms = syms.sort(function(a, b){
+        syms = syms.sort(function(a, b) {
             return b.symbol.length - a.symbol.length
         })
         for (var i = 0; i < syms.length; i++) {
@@ -108,7 +108,7 @@ function placeRule(opt) {
 function parse_and_check(parser, opt) {
     var prem = rule_premises
     var parsed_prem = []
-    if (prem[0] != "" && prem[0].replace(/\s\s+/g, " ") ==  " ") {
+    if (prem[0] != "" && prem[0].replace(/\s\s+/g, " ") == " ") {
         prem[0] = ""
     }
     if (prem[0] != ""){
@@ -119,7 +119,7 @@ function parse_and_check(parser, opt) {
             catch(error) {
                 $("#warning_header").html("Rule Parsing Error")
                 $("#warning_text").html("Rule sequents must be structurally valid and contain symbols from the rule symbols table.")
-                $("#warning").css("visibility","visible")
+                $("#warning").css("visibility", "visible")
                 return
             }
         }
@@ -131,7 +131,7 @@ function parse_and_check(parser, opt) {
     catch(error) {
         $("#warning_header").html("Rule Parsing Error")
         $("#warning_text").html("Rule sequents must be structurally valid and contain symbols from the rule symbols table.")
-        $("#warning").css("visibility","visible")
+        $("#warning").css("visibility", "visible")
         return
     }
     if (rule_type == "Cut") {

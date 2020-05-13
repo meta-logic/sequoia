@@ -43,7 +43,7 @@ function get_rules_toPage() {
             }
         }
         init_strings = list_to_string(init_list)
-        MathJax.Hub.Queue(["Typeset",MathJax.Hub,rules_container[0]])
+        MathJax.Hub.Queue(["Typeset", MathJax.Hub, rules_container[0]])
         r = rules.length
         initWeak(calc_id)
     })
@@ -52,7 +52,7 @@ function get_rules_toPage() {
 
 function get_cuts_toPage() {
     var rules_container = $("#rules")
-    $.get("/sequoia/api/rules/"+calc_id, function (rls, status) {
+    $.get("/sequoia/api/rules/"+calc_id, function(rls, status) {
         var rules = rls.rules
         var init_list = []
         var connective_rules = []
@@ -111,7 +111,7 @@ function get_cuts_toPage() {
         }
         init_strings = list_to_string(init_list)
         conn_strings = list_to_string(connective_rules)
-        MathJax.Hub.Queue(["Typeset",MathJax.Hub,rules_container[0]])
+        MathJax.Hub.Queue(["Typeset", MathJax.Hub, rules_container[0]])
         r = rules.length
         initWeak(calc_id)
     })
@@ -120,7 +120,7 @@ function get_cuts_toPage() {
 
 function initWeak(calc_id) {
     $("#loading").attr("class", "ui active inverted dimmer")
-    $.get("/sequoia/api/rules/"+calc_id, function (rls, status) { 
+    $.get("/sequoia/api/rules/"+calc_id, function(rls, status) { 
         var rules = rls.rules
         var rule_list = []
         for (var i = 0; i < rules.length; i++) {
@@ -134,7 +134,7 @@ function initWeak(calc_id) {
             }
         }
         var rule_strings = list_to_string(rule_list)
-        $.post("/sequoia/weakenSides", { rules: rule_strings }, function(data, status) {
+        $.post("/sequoia/weakenSides", {rules: rule_strings}, function(data, status) {
             var output = data.output.split("%%%")
             var left_bools = output[0].split("@@@")
             var right_bools = output[1].split("@@@")

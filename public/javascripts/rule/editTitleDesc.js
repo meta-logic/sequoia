@@ -49,5 +49,5 @@ function updateTD() {
     $.ajax({
         url: "/sequoia/api/calculus",
         type: "PUT",
-        data : { id : calc_id, title : calcTitle, description : calcDesc, function(data) {}}})
+        data : {id : calc_id, title : calcTitle, description : calcDesc, function(data) {}}})
 }

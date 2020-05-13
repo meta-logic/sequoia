@@ -13,7 +13,7 @@ $("#Prooftree_icon").attr("href", "/sequoia/calculus/"+calc_id+"/apply")
 $("#Properties_icon").attr("href", "/sequoia/calculus/"+calc_id+"/properties")
 if ($("#page").text() == "Update") {
     rule_id = $("#rule_id").text()
-    $("#prev button").attr("onclick", "preview('Update')") 
+    $("#prev button").attr("onclick", "preview('Update')")
     $.get("/sequoia/api/rule/"+rule_id, function (data, status) {
         $("#rule_id").val(data.rule._id)
         $("#rule_name").val(data.rule.rule)

@@ -151,8 +151,8 @@ function checkWeak() {
             $("#info_text").html(answer[1])
             $("#info_answer").attr("class", "ui info message")
             $("#info_answer").css("display", "block")
-            MathJax.Hub.Queue(["Typeset",MathJax.Hub,lt[0]], function () { 
-                MathJax.Hub.Queue(["Typeset",MathJax.Hub,rt[0]], function () {
+            MathJax.Hub.Queue(["Typeset", MathJax.Hub, lt[0]], function() { 
+                MathJax.Hub.Queue(["Typeset", MathJax.Hub, rt[0]], function() {
                     $("#loading").attr("class", "ui inactive inverted dimmer")
                 })
             })

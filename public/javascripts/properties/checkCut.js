@@ -47,7 +47,7 @@ function showProofCut(type, index, on, num) {
 
 
 function checkCut() {
-    $("#results").css("visibility","hidden")
+    $("#results").css("visibility", "hidden")
     $("#loading").attr("class", "ui active inverted dimmer")
     $("#axiom").html("")
     $("#rank").html("")
@@ -59,8 +59,8 @@ function checkCut() {
     var premises1 = ruletemp1.attr("premises")
     var rule_sml1 = "Rule(\""+name1+"\","+side1+","+conclusion1+","+premises1+")"
     var cutform = ruletemp1.attr("cutvar")
-    $.post("/sequoia/cutElim", { rule1: rule_sml1, formula: cutform, init_rules: init_strings, conn_rules: conn_strings, wL: weak_l, wR: weak_r }, function(data, status) {
-        $("#results").css("visibility","visible")
+    $.post("/sequoia/cutElim", {rule1 : rule_sml1, formula : cutform, init_rules : init_strings, conn_rules : conn_strings, wL : weak_l, wR : weak_r}, function(data, status) {
+        $("#results").css("visibility", "visible")
         var output = data.output.split("%%%")
         var result = output[0]
         var answer = ["",""]
@@ -74,7 +74,7 @@ function checkCut() {
         $("#info_header").html(answer[0])
         $("#info_text").html(answer[1])
         $("#info_answer").attr("class", "ui info message")
-        $("#info_answer").css("visibility","visible")
+        $("#info_answer").css("visibility", "visible")
         var axioms = output[1].split("@@@")
         var ranks = output[2].split("@@@")
         var grades = output[3].split("@@@")
@@ -174,9 +174,9 @@ function checkCut() {
                 }
             }
         }
-        MathJax.Hub.Queue(["Typeset",MathJax.Hub,ax[0]], function () { 
-            MathJax.Hub.Queue(["Typeset",MathJax.Hub,rk[0]], function () {
-                MathJax.Hub.Queue(["Typeset",MathJax.Hub,gd[0]], function () {
+        MathJax.Hub.Queue(["Typeset", MathJax.Hub, ax[0]], function () { 
+            MathJax.Hub.Queue(["Typeset", MathJax.Hub, rk[0]], function () {
+                MathJax.Hub.Queue(["Typeset", MathJax.Hub, gd[0]], function () {
                     $("#loading").attr("class", "ui inactive inverted dimmer")
                 })
             })

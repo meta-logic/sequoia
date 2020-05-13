@@ -14,7 +14,7 @@ function get_calculi_toPage() {
             entry.remove()
         }
     }
-    $.get("/sequoia/api/calculi/"+user_id, function (calcs, status) {
+    $.get("/sequoia/api/calculi/"+user_id, function(calcs, status) {
         var calculi = calcs.calculi
         for (var i = 0; i < calculi.length; i++) {
             calculi_container.append(
@@ -40,8 +40,7 @@ function addCalculus() {
     var title = $("#title").val().trim()
     var description = $("#description").val().trim()
     if (title != "" && description != "") {
-        $.post("/sequoia/api/calculus", {title : title, description : description, user : user_id}, 
-        function(data, status) {
+        $.post("/sequoia/api/calculus", {title : title, description : description, user : user_id}, function(data, status) {
             calculi_container.append(
                 '<div id="calc_'+c+'" class="card">'+
                     '<div class="content">'+
@@ -63,14 +62,15 @@ function addCalculus() {
 
 
 function addSomeCalculus(num) {
-    var sample = ["LJ", "LK", "S4","Lax"][num]
     var calculi_container = $("#calculi")
-    $.post("/sequoia/api/calculus", {title : sample, description : "This is a sample calculus with some basic rules. Try it out!", user : user_id}, 
-    function(data, status) {
+    var sample = ["LJ", "LK", "S4","Lax"][num]
+    var title = sample
+    var description = "This is a sample calculus with some basic rules. Try it out!"
+    $.post("/sequoia/api/calculus", {title : title, description : description, user : user_id}, function(data, status) {
         var sampleCalc = data.calculus
-        syms_rules = sample_calc(sample, sampleCalc._id)
-        $.post("/sequoia/api/symbols_init", {items : JSON.stringify(syms_rules[0])}, function(data, status){
-            $.post("/sequoia/api/rules_init", {items : JSON.stringify(syms_rules[1])}, function(data, status){
+        var syms_rules = sample_calc(sample, sampleCalc._id)
+        $.post("/sequoia/api/symbols_init", {items : JSON.stringify(syms_rules[0])}, function(data, status) {
+            $.post("/sequoia/api/rules_init", {items : JSON.stringify(syms_rules[1])}, function(data, status) {
                 calculi_container.append(
                     '<div id="calc_'+c+'" class="card">'+
                         '<div class="content">'+
@@ -94,13 +94,13 @@ function addSomeCalculus(num) {
 
 function deleteCalculus(card_id, mongo_id) {
     $("#modal1").modal({
-        onApprove: function(){
+        onApprove: function() {
             $.ajax({
                 url: "/sequoia/api/calculus",
                 type: "DELETE",
                 data : {"id" : mongo_id},
                 success: function(result) {
-                    $("#calc_"+card_id).hide('slow', function(){$("#calc_"+card_id).remove()})
+                    $("#calc_"+card_id).hide('slow', function() {$("#calc_"+card_id).remove()})
                     for (var i = card_id+1; i < c; i++) {
                         var delete_text = $("#delete_"+i).attr("onClick").split(",")[1]
                         var new_delete_text = "deleteCalculus("+(i-1)+","+delete_text

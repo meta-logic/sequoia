@@ -64,21 +64,21 @@ function parse_and_use(temp_parser) {
     catch(error) {
         $("#warning_header").html("Sequent Parsing Error")
         $("#warning_text").html("Sequents must be structurally valid and contain term symbols from the sequent term symbols table.")
-        $("#warning").css("visibility","visible")
+        $("#warning").css("visibility", "visible")
         return
     }
-    $("#seq").css("display","none")
-    $("#submit").css("visibility","hidden")
-    $("#warning").css("visibility","hidden")
-    $("#export").attr("class","ui fluid huge icon button green")
-    $("#undo").attr("class","ui fluid huge icon button red")
+    $("#seq").css("display", "none")
+    $("#submit").css("visibility", "hidden")
+    $("#warning").css("visibility", "hidden")
+    $("#export").attr("class", "ui fluid huge icon button green")
+    $("#undo").attr("class", "ui fluid huge icon button red")
     parser = temp_parser
     $(".leaf").click(function() {
         leaf_id = this.id.split("_")[1]
         seq_text = $(this).find("script")[0].innerText
-        $("#warning").css("visibility","hidden")
+        $("#warning").css("visibility", "hidden")
     })
-    var stree = "DerTree(\"0\","+sml_seq+", NONE, [])"
+    var stree = "DerTree(\"0\","+sml_seq+",NONE,[])"
     sml_history.push(stree)
     var ltree ="\\deduce[]{"+sequent+"}{0}"
     latex_history.push(ltree)

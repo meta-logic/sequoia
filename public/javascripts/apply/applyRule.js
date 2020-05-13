@@ -24,7 +24,7 @@ function sendEmail() {
         $("#latex").append("<br><br> Constraints: <br>["+latex_constraints+"]")
     }
     $('#modal3').modal({
-        onApprove: function () {
+        onApprove: function() {
             var email = $("#email").val()
             window.open('mailto:'+encodeURIComponent(email)+
             '?subject='+encodeURIComponent("Sequoia Latex Proof Tree")+
@@ -34,8 +34,8 @@ function sendEmail() {
 }
 
 
-function cutSelect (type, callback) {
-    $("#modal_warning").css("visibility","hidden")
+function cutSelect(type, callback) {
+    $("#modal_warning").css("visibility", "hidden")
     if (type != "Cut") {
         callback()
     } else {
@@ -43,7 +43,7 @@ function cutSelect (type, callback) {
             onApprove: function () {
                 var f = $("#form").val()
                 if (f == "") {
-                    $("#modal_warning").css("visibility","visible")
+                    $("#modal_warning").css("visibility", "visible")
                     return false
                 } else {
                     cut_form = f
@@ -58,8 +58,8 @@ function cutSelect (type, callback) {
 
 
 function applyRule(i) {
-    $("#warning").css("visibility","hidden")
-    $("#info").css("display","none")
+    $("#warning").css("visibility", "hidden")
+    $("#info").css("display", "none")
     if (leaf_id == "-1") return
     if ($("#conc_"+leaf_id).attr("class") == "conclusion") return
     var ruletemp = $("#r"+i)
@@ -69,30 +69,30 @@ function applyRule(i) {
     var cutvar = ruletemp.attr("cutvar")
     var conclusion = ruletemp.attr("conclusion")
     var premises = ruletemp.attr("premises")
-    cutSelect (type, function () { 
+    cutSelect(type, function() { 
         updateParser(fresh_symbols, function() {
             try {
                 var sequent = parser.parse(seq_text).replace(/\\/g, "\\\\")
             } catch(error) {
                 $("#warning_header").html("Sequent Parsing Error")
                 $("#warning_text").html("Sequents must be structurally valid and contain term symbols from the sequent symbols table.")
-                $("#warning").css("visibility","visible")
+                $("#warning").css("visibility", "visible")
                 return
             }
             var rule_sml = "Rule(\""+name+"\",None,"+conclusion+","+premises+")"
             var tree_sml = sml_history[sml_history.length-1]
             var constraints_sml = smlconstraint_history[smlconstraint_history.length-1]
-            var params = { rule: rule_sml, constraints: constraints_sml, tree: tree_sml, node_id: "\""+leaf_id+"\"", index : rng_index, subs: "[]" }
+            var params = {rule : rule_sml, constraints : constraints_sml, tree : tree_sml, node_id : "\""+leaf_id+"\"", index : rng_index, subs : "[]"}
             if (type == "Cut") {
                 try {
                     var cF = formula_parser.parse(cut_form).replace(/\\/g, "\\\\")
                 } catch(error) {
                     $("#warning_header").html("Formula Parsing Error")
                     $("#warning_text").html("Cut formulas must be structurally valid and contain term symbols from the sequent symbols table.")
-                    $("#warning").css("visibility","visible")
+                    $("#warning").css("visibility", "visible")
                     return
                 }
-                params = { rule: rule_sml, constraints: constraints_sml, tree: tree_sml, node_id: "\""+leaf_id+"\"", index : rng_index, subs: "[Fs("+cutvar+","+cF+")]" }
+                params = {rule : rule_sml, constraints : constraints_sml, tree : tree_sml, node_id : "\""+leaf_id+"\"", index : rng_index, subs : "[Fs("+cutvar+","+cF+")]"}
             }
             $.post("/sequoia/apply", params, function(data, status) {
                 cut_var = ""
@@ -101,7 +101,7 @@ function applyRule(i) {
                 if (data.output == "NOT APPLICABLE") {
                     $("#warning_header").html("Rule and Premise Mismatch")
                     $("#warning_text").html("This rule cannot be applied to the selected premise.")
-                    $("#warning").css("visibility","visible")
+                    $("#warning").css("visibility", "visible")
                     return
                 }
                 var cons_set = []
@@ -130,7 +130,7 @@ function applyRule(i) {
                 }
                 if (prem_set.length == 1) {
                     var index = 0
-                    insert_new_tree(cons_set[index],new_sml_cons[index],new_latex_trees[index],new_html_trees[index],new_sml_trees[index])
+                    insert_new_tree(cons_set[index], new_sml_cons[index], new_latex_trees[index], new_html_trees[index], new_sml_trees[index])
                 } else {
                     var choice = $("#choice")
                     choice.html("")
@@ -138,12 +138,12 @@ function applyRule(i) {
                         var display_prem = prem_set[i].join("\\qquad ")
                         choice.append('<div id="select" num='+i+' class="ui attahced secondary basic button select">$$'+display_prem+'$$</div>')
                     }
-                    MathJax.Hub.Queue([ "Typeset",MathJax.Hub,choice[0]])
-                    $("#info").css("display","block")
+                    MathJax.Hub.Queue(["Typeset", MathJax.Hub, choice[0]])
+                    $("#info").css("display", "block")
                     $(".select").click(function() {
                         var index = parseInt(this.getAttribute("num"))
-                        $("#info").css("display","none")
-                        insert_new_tree(cons_set[index],new_sml_cons[index],new_latex_trees[index],new_html_trees[index],new_sml_trees[index])
+                        $("#info").css("display", "none")
+                        insert_new_tree(cons_set[index], new_sml_cons[index], new_latex_trees[index], new_html_trees[index], new_sml_trees[index])
                     })
                 }
             })
@@ -153,8 +153,8 @@ function applyRule(i) {
 
 
 function undo() {
-    $("#warning").css("visibility","hidden")
-    $("#info").css("display","none")
+    $("#warning").css("visibility", "hidden")
+    $("#info").css("display", "none")
     if (tree_history.length > 1) {
         insert_old_tree()
     }

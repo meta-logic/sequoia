@@ -17,7 +17,7 @@ function fixRules(callback) {
     var atom = "Atom = \"NO-ATOM\" "
     $.get("/sequoia/api/rule_symbols/"+calc_id, function(sb, status) {
         var syms = sb.symbols
-        syms = syms.sort(function(a, b){
+        syms = syms.sort(function(a, b) {
             return b.symbol.length - a.symbol.length
         })
         for (var i = 0; i < syms.length; i++) {
@@ -87,7 +87,7 @@ function parse_and_fix(parser, rule) {
     $.ajax({
         url: "/sequoia/api/rule",
         type: "PUT",
-        data : { id : rule._id, rule : rule.rule, 
+        data : {id : rule._id, rule : rule.rule, 
             conclusion : conc, premises : JSON.stringify(prem), parsed_conc : conc_final, 
             parsed_prem : JSON.stringify(parsed_prem), calculus : calc_id, 
             connective : rule.connective, side : rule.side, type : rule.type, function(data) {}}})

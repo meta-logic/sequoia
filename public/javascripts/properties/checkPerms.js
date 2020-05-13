@@ -55,7 +55,7 @@ function permRules() {
     var conclusion2 = ruletemp2.attr("conclusion")
     var premises2 = ruletemp2.attr("premises")
     var rule_sml2 = "Rule(\""+name2+"\","+side2+","+conclusion2+","+premises2+")"
-    $.post("/sequoia/permute", { rule1: rule_sml1, rule2: rule_sml2, init_rules: init_strings, wL: weak_l, wR: weak_r}, function(data, status) {
+    $.post("/sequoia/permute", {rule1 : rule_sml1, rule2 : rule_sml2, init_rules : init_strings, wL : weak_l, wR : weak_r}, function(data, status) {
         var output = data.output.split("%%%")
         var result = output[0]
         var answer = ["",""]
@@ -75,7 +75,7 @@ function permRules() {
         $("#info_header").html(answer[0])
         $("#info_text").html(answer[1])
         $("#info_answer").attr("class", "ui info message")
-        $("#info_answer").css("visibility","visible")
+        $("#info_answer").css("visibility", "visible")
         var trees = output[1].split("&&&")
         var goodtrees = trees[0].split("###")
         var badtrees = trees[1].split("###")
@@ -99,8 +99,8 @@ function permRules() {
                 )
             }
         }
-        MathJax.Hub.Queue(["Typeset",MathJax.Hub,gtrees[0]], function () { 
-            MathJax.Hub.Queue(["Typeset",MathJax.Hub,btrees[0]], function () {
+        MathJax.Hub.Queue(["Typeset", MathJax.Hub, gtrees[0]], function() { 
+            MathJax.Hub.Queue(["Typeset", MathJax.Hub, btrees[0]], function() {
                 $("#loading").attr("class", "ui inactive inverted dimmer")
             })
         })
