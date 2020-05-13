@@ -19,12 +19,13 @@ function get_calculi_toPage() {
         for (var i = 0; i < calculi.length; i++) {
             calculi_container.append(
                 '<div id="calc_'+i+'" class="card">'+
-                    '<a class="content" href=/sequoia/calculus/'+calculi[i]._id+'>'+
+                    '<div class="content">'+
                         '<div class="header">'+calculi[i].title+'</div>'+
                         '<div class="description">'+calculi[i].description+'</div>'+
-                    '</a>'+
-                    '<div id="delete_'+i+'" class="ui red bottom attached button" onClick=deleteCalculus('+i+',"'+calculi[i]._id+'")>'+
-                        '<i class="close icon"></i>Delete'+
+                    '</div>'+
+                    '<div class="ui bottom attached buttons">'+
+                        '<a class="ui basic blue button" href=/sequoia/calculus/'+calculi[i]._id+'>Edit</a>'+
+                        '<a id="delete_'+i+'" class="ui basic red button" onClick=deleteCalculus('+i+',"'+calculi[i]._id+'")>Delete</a>'+
                     '</div>'+
                 '</div>'
             )
@@ -43,12 +44,13 @@ function addCalculus() {
         function(data, status) {
             calculi_container.append(
                 '<div id="calc_'+c+'" class="card">'+
-                    '<a class="content" href=/sequoia/calculus/'+data.calculus._id+'>'+
+                    '<div class="content">'+
                         '<div class="header">'+data.calculus.title+'</div>'+
                         '<div class="description">'+data.calculus.description+'</div>'+
-                    '</a>'+
-                    '<div id="delete_'+c+'" class="ui red bottom attached button" onClick=deleteCalculus('+c+',"'+data.calculus._id+'")>'+
-                        '<i class="close icon"></i>Delete'+
+                    '</div>'+
+                    '<div class="ui bottom attached buttons">'+
+                        '<a class="ui basic blue button" href=/sequoia/calculus/'+data.calculus._id+'>Edit</a>'+
+                        '<a id="delete_'+c+'" class="ui basic red button" onClick=deleteCalculus('+c+',"'+data.calculus._id+'")>Delete</a>'+
                     '</div>'+
                 '</div>'
             )
@@ -66,17 +68,18 @@ function addSomeCalculus(num) {
     $.post("/sequoia/api/calculus", {title : sample, description : "This is a sample calculus with some basic rules. Try it out!", user : user_id}, 
     function(data, status) {
         var sampleCalc = data.calculus
-        syms_rules = sample_calc(sample, data.calculus._id)
+        syms_rules = sample_calc(sample, sampleCalc._id)
         $.post("/sequoia/api/symbols_init", {items : JSON.stringify(syms_rules[0])}, function(data, status){
             $.post("/sequoia/api/rules_init", {items : JSON.stringify(syms_rules[1])}, function(data, status){
                 calculi_container.append(
                     '<div id="calc_'+c+'" class="card">'+
-                        '<a class="content" href=/sequoia/calculus/'+sampleCalc._id+'>'+
+                        '<div class="content">'+
                             '<div class="header">'+sampleCalc.title+'</div>'+
                             '<div class="description">'+sampleCalc.description+'</div>'+
-                        '</a>'+
-                        '<div id="delete_'+c+'" class="ui red bottom attached button" onClick=deleteCalculus('+c+',"'+sampleCalc._id+'")>'+
-                            '<i class="close icon"></i>Delete'+
+                        '</div>'+
+                        '<div class="ui bottom attached buttons">'+
+                            '<a class="ui basic blue button" href=/sequoia/calculus/'+sampleCalc._id+'>Edit</a>'+
+                            '<a id="delete_'+c+'" class="ui basic red button" onClick=deleteCalculus('+c+',"'+sampleCalc._id+'")>Delete</a>'+
                         '</div>'+
                     '</div>'
                 )
