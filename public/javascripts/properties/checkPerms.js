@@ -12,7 +12,7 @@ function selectRule(bl, i) {
         var card_color = ""
         if (rule1 == "") {
             rule1 = "r"+i
-            card_color = "teal"
+            card_color = "blue"
         } else if (rule2 == "") {
             rule2 = "r"+i
             card_color = "orange"
