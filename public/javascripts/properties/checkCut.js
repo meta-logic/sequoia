@@ -62,14 +62,22 @@ function checkCut() {
     $.post("/sequoia/cutElim", { rule1: rule_sml1, formula: cutform, init_rules: init_strings, conn_rules: conn_strings, wL: weak_l, wR: weak_r }, function(data, status) {
         $("#results").css("visibility","visible")
         var output = data.output.split("%%%")
-        var answer = output[0].split("@@@")
-        var axioms = output[1].split("@@@")
-        var ranks = output[2].split("@@@")
-        var grades = output[3].split("@@@")
+        var result = output[0]
+        var answer = ["",""]
+        if (result == "T") {
+            answer[0] = "Cut Admissibility Test Succeeds"
+            answer[1] = "The selected cut rule is admissible in this calculus. For each rule and connective the tree transformation proofs are shown below. This check is sound but not complete."
+        } else if (result == "F") {
+            answer[0] = "Cut Admissibility Test Fails"
+            answer[1] = "The selected cut rule might not be admissible in this calculus. For certain rules or connectives there are tree transformation proofs that could not be found. This check is sound but not complete."
+        }
         $("#info_header").html(answer[0])
         $("#info_text").html(answer[1])
         $("#info_answer").attr("class", "ui info message")
         $("#info_answer").css("visibility","visible")
+        var axioms = output[1].split("@@@")
+        var ranks = output[2].split("@@@")
+        var grades = output[3].split("@@@")
         var ax = $("#axiom")
         for (var i = 0; i < axioms.length; i++) {
             if (axioms[i] != "") {
@@ -100,7 +108,6 @@ function checkCut() {
                         )
                     }
                 }
-                
             }
         }
         var rk = $("#rank")
@@ -133,7 +140,6 @@ function checkCut() {
                         )
                     }
                 }
-                
             }
         }
         var gd = $("#grade")
@@ -166,7 +172,6 @@ function checkCut() {
                         )
                     }
                 }
-                
             }
         }
         MathJax.Hub.Queue(["Typeset",MathJax.Hub,ax[0]], function () { 

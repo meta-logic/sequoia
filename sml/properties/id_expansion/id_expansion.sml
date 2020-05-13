@@ -130,12 +130,11 @@ struct
         (let
             val print_helper = Ut.print_helper
         in
-            let val (bol, out) = init_coherence(a,b,c)
+            let val (bool, out) = init_coherence(a,b,c)
                 val t = List.map(fn (bl,pf) => if bl 
                     then "T###"^print_helper(pf) else "F###"^print_helper(pf)) out
                 val p = List.foldr (fn (a,b) => a^"@@@"^b) "" t
-                val b = if bol then "Identity Expansion Test Succeeds###Identity expansion is a property of this calculus system. For each connective the tree transformation proofs are shown below." 
-                                else "Identity Expansion Test Fails###Identity expansion is not a property of this calculus system. For certain connectives there are tree transformation proofs that could not be found."
+                val b = if bool then "T" else "F"
                 val bp = b^"%%%"^p
             in Ut.writeFD 3 bp end
         end)

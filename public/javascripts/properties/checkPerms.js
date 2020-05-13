@@ -9,14 +9,13 @@ var rule2 = ""
 
 function selectRule(bl, i) {
     if (bl && (rule1 == "" || rule2 == "")) {
-        var card_color = "teal"
-        if ((rule1 == "" && rule2 != "") || (rule1 != "" && rule2 == "")) {
-            card_color = "orange"
-        }
+        var card_color = ""
         if (rule1 == "") {
             rule1 = "r"+i
+            card_color = "teal"
         } else if (rule2 == "") {
             rule2 = "r"+i
+            card_color = "orange"
         }
         $("#rule_card"+i).attr("class", "ui raised "+card_color+" card")
         $("#b"+i).attr("class", "ui active bottom attached button")
@@ -58,14 +57,28 @@ function permRules() {
     var rule_sml2 = "Rule(\""+name2+"\","+side2+","+conclusion2+","+premises2+")"
     $.post("/sequoia/permute", { rule1: rule_sml1, rule2: rule_sml2, init_rules: init_strings, wL: weak_l, wR: weak_r}, function(data, status) {
         var output = data.output.split("%%%")
-        var answer = output[0].split("@@@")
-        var trees = output[1].split("&&&")
-        var goodtrees = trees[0].split("###")
-        var badtrees = trees[1].split("###")
+        var result = output[0]
+        var answer = ["",""]
+        if (result == "0") {
+            answer[0] = "N/A"
+            answer[1] = "These rules are not capable of permuting."
+        } else if (result == "1") {
+            answer[0] = "The Rule Permutes"
+            answer[1] = "The first rule always permutes up the second. All permutation tree transformations were found and are shown below."
+        } else if (result == "2") {
+            answer[0] = "The Rule Does Not Permute"
+            answer[1] = "The first rule never permutes up the second. No permutation tree transformations were found."
+        } else if (result == "3") {
+            answer[0] = "The Rule Permutes Sometimes"
+            answer[1] = "The first rule sometimes permutes up the second. Permutation tree transformations were found for some cases and are shown below, while no permutation transformations were found for the rest."
+        }
         $("#info_header").html(answer[0])
         $("#info_text").html(answer[1])
         $("#info_answer").attr("class", "ui info message")
         $("#info_answer").css("visibility","visible")
+        var trees = output[1].split("&&&")
+        var goodtrees = trees[0].split("###")
+        var badtrees = trees[1].split("###")
         var gtrees = $("#good_trees")
         for (var i = 0; i < goodtrees.length; i++) {
             if (goodtrees[i] != "") {
