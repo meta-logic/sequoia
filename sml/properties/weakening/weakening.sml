@@ -118,9 +118,11 @@ struct
                 val tR = List.map(fn (bl,pfs) => if bl 
                         then "T###"^(List.foldr (fn (a,b) => print_helper(a)^"&&&"^b) "" pfs)
                         else "F###"^(List.foldr (fn (a,b) => print_helper(a)^"&&&"^b) "" pfs)) R
+                val bool = if (List.all (fn ((bl,pfs)) => bl) L) andalso (List.all (fn ((bl,pfs)) => bl) R)
+                        then "T" else "F"
                 val pL = List.foldr (fn (a,b) => a^"@@@"^b) "" tL
                 val pR = List.foldr (fn (a,b) => a^"@@@"^b) "" tR
-                val pLR = pL ^ "%%%" ^ pR
+                val pLR = bool ^ "%%%" ^ pL ^ "%%%" ^ pR
             in Ut.writeFD 3 pLR end
         end
 

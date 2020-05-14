@@ -151,11 +151,10 @@ struct
 
     fun permute_res ((right,wrong)) = 
         (case (List.length(right),List.length(wrong)) of
-            ( 0 , 0 ) => "N/A@@@These rules are not capable of permuting."
-            | (_ , 0) => "The Rule Permutes@@@The first rule always permutes up the second. All permutation tree transformations were found and are shown below."
-            | (0,_) => "The Rule Does Not Permute@@@The first rule never permutes up the second. No permutation tree transformations were found."
-            | (_,_) => "The Rule Permutes Sometimes@@@The first rule sometimes permutes up the second. Permutation tree transformations were found for some cases and are shown below, while no permutation transformations were found for the rest.")
-    
+            ( 0 , 0 ) => "0"
+            | (_ , 0) => "1"
+            | (0,_) => "2"
+            | (_,_) => "3")
     fun permute_res_to_string (res) = 
         let
             val remove_set2 = List.map (fn ((a,b),c) => (a,b)) res

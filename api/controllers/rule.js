@@ -20,7 +20,7 @@ function createRule (req, res) {
     rule.type = req.body.type
     rule.side = req.body.side
     rule.cutvar = req.body.cutvar
-    rule.save(function (err) {
+    rule.save(function(err) {
         if (err) {
             return res.status(400).json({
                 "status"  : "failure",
@@ -51,7 +51,7 @@ function createRules (req, res) {
         rule.type = rls.type
         rule.side = rls.side
         rule.cutvar = rls.cutvar
-        rule.save(function (err) {
+        rule.save(function(err) {
             if (err) {
                 return res.status(400).json({
                     "status"  : "failure",
@@ -81,7 +81,7 @@ function updateRule (req, res) {
             type : req.body.type,
             cutvar : req.body.cutvar
         }, { new : true}, 
-        function (err, rule) {
+        function(err, rule) {
             if (err || rule == null) {
                 return res.status(400).json({
                     "status"  : "failure",
@@ -97,7 +97,7 @@ function updateRule (req, res) {
 
 
 function deleteRule (req, res) {
-    Rule.remove({ _id : req.body.id}, function (err, rule) {
+    Rule.remove({ _id : req.body.id}, function(err, rule) {
         if (err || rule == null) {
             return res.status(400).json({
                 "status"  : "failure",
@@ -114,7 +114,7 @@ function deleteRule (req, res) {
 
 
 function getRule (req, res) {
-    Rule.findById(req.params.rule_id, function (err, rule) {
+    Rule.findById(req.params.rule_id, function(err, rule) {
         if (err || rule == null) {
             return res.status(400).json({
                 "status"  : "failure",
@@ -130,7 +130,7 @@ function getRule (req, res) {
 
 
 function getRules (req, res) {
-    Rule.find({'calculus': req.params.calc_id}, function (err, rules) {
+    Rule.find({'calculus': req.params.calc_id}, function(err, rules) {
         if (err || rules == null) {
             return res.status(400).json({
                 "status"  : "failure",

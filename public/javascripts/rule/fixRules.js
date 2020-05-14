@@ -17,7 +17,7 @@ function fixRules(callback) {
     var atom = "Atom = \"NO-ATOM\" "
     $.get("/sequoia/api/rule_symbols/"+calc_id, function(sb, status) {
         var syms = sb.symbols
-        syms = syms.sort(function(a, b){
+        syms = syms.sort(function(a, b) {
             return b.symbol.length - a.symbol.length
         })
         for (var i = 0; i < syms.length; i++) {
@@ -51,7 +51,7 @@ function fixRules(callback) {
     var extra_text = "\n" + arrow + "\n" + sep + "\n" + conn + "\n" + set + "\n" + form + "\n" + atom_var + "\n" + atom + "\n" 
     parser_text += extra_text
     var parser = peg.generate(parser_text)
-    $.get("/sequoia/api/rules/"+calc_id, function (rls, status) {
+    $.get("/sequoia/api/rules/"+calc_id, function(rls, status) {
         var rules = rls.rules
             for (var i = 0; i < rules.length; i++) {
                 parse_and_fix(parser, rules[i])
@@ -65,13 +65,13 @@ function fixRules(callback) {
 function parse_and_fix(parser, rule) {
     var prem = rule.premises
     var parsed_prem = []
-    if (prem[0] != ""){
+    if (prem[0] != "") {
         for (var i = 0; i < prem.length; i++) {
             try {
                 parsed_prem.push(parser.parse(prem[i]))
             }   
             catch(error) {
-                deleteRule (-1,rule._id)
+                deleteRule(-1,rule._id)
                 return
             }
         }
@@ -81,13 +81,13 @@ function parse_and_fix(parser, rule) {
         var conc_final = parser.parse(conc)
     }   
     catch(error) {
-        deleteRule (-1,rule._id)
+        deleteRule(-1,rule._id)
         return
     }
     $.ajax({
         url: "/sequoia/api/rule",
         type: "PUT",
-        data : { id : rule._id, rule : rule.rule, 
+        data : {id : rule._id, rule : rule.rule, 
             conclusion : conc, premises : JSON.stringify(prem), parsed_conc : conc_final, 
             parsed_prem : JSON.stringify(parsed_prem), calculus : calc_id, 
             connective : rule.connective, side : rule.side, type : rule.type, function(data) {}}})

@@ -13,7 +13,7 @@ function insert_new_tree(cn, cz, lt, ht, st) {
     $(".leaf").click(function() {
         leaf_id = this.id.split("_")[1]
         seq_text = $(this).find("script")[0].innerText
-        $("#warning").css("visibility","hidden")
+        $("#warning").css("visibility", "hidden")
     })
     constraint_history.push(cn)
     smlconstraint_history.push(cz.replace(/\\/g, "\\\\"))
@@ -27,15 +27,15 @@ function insert_new_tree(cn, cz, lt, ht, st) {
                     constraints.append('<p>$$'+the_constraints[i]+'$$</p>')  
                 }
             }
-            $("#left_menu").css("visibility","visible")
-            MathJax.Hub.Queue(["Typeset",MathJax.Hub,constraints[0]])
+            $("#left_menu").css("visibility", "visible")
+            MathJax.Hub.Queue(["Typeset", MathJax.Hub, constraints[0]])
         }
     } else {
-        $("#left_menu").css("visibility","hidden")
+        $("#left_menu").css("visibility", "hidden")
     }
     seq_text = ""
     leaf_id = "-1"
-    MathJax.Hub.Queue(["Typeset",MathJax.Hub,main_tree[0]])
+    MathJax.Hub.Queue(["Typeset", MathJax.Hub, main_tree[0]])
 }
 
 
@@ -48,7 +48,7 @@ function insert_old_tree() {
     $(".leaf").click(function() {
         leaf_id = this.id.split("_")[1]
         seq_text = $(this).find("script")[0].innerText
-        $("#warning").css("visibility","hidden")
+        $("#warning").css("visibility", "hidden")
     })
     constraint_history.pop()
     smlconstraint_history.pop()
@@ -62,13 +62,13 @@ function insert_old_tree() {
                     constraints.append('<p>$$'+the_constraints[i]+'$$</p>')  
                 }
             }
-            $("#left_menu").css("visibility","visible")
-            MathJax.Hub.Queue(["Typeset",MathJax.Hub,constraints[0]])
+            $("#left_menu").css("visibility", "visible")
+            MathJax.Hub.Queue(["Typeset", MathJax.Hub, constraints[0]])
         }
     } else {
-        $("#left_menu").css("visibility","hidden")
+        $("#left_menu").css("visibility", "hidden")
     }
     seq_text = ""
     leaf_id = "-1"
-    MathJax.Hub.Queue(["Typeset",MathJax.Hub,main_tree[0]])
+    MathJax.Hub.Queue(["Typeset", MathJax.Hub, main_tree[0]])
 }

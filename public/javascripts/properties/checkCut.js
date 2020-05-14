@@ -15,7 +15,7 @@ function selectRule(bl, i) {
         $("#i"+r1).attr("class", 'add icon')
         $("#cut_button").attr("class", "ui disabled teal large button")
         rule1 = "r"+i
-        $("#rule_card"+i).attr("class", "ui raised teal card")
+        $("#rule_card"+i).attr("class", "ui raised blue card")
         $("#b"+i).attr("class", "ui active bottom attached button")
         $("#b"+i).attr("onClick", "selectRule(false,"+i+")")
         $("#i"+i).attr("class", "close icon")
@@ -47,7 +47,7 @@ function showProofCut(type, index, on, num) {
 
 
 function checkCut() {
-    $("#results").css("visibility","hidden")
+    $("#results").css("visibility", "hidden")
     $("#loading").attr("class", "ui active inverted dimmer")
     $("#axiom").html("")
     $("#rank").html("")
@@ -59,17 +59,25 @@ function checkCut() {
     var premises1 = ruletemp1.attr("premises")
     var rule_sml1 = "Rule(\""+name1+"\","+side1+","+conclusion1+","+premises1+")"
     var cutform = ruletemp1.attr("cutvar")
-    $.post("/sequoia/cutElim", { rule1: rule_sml1, formula: cutform, init_rules: init_strings, conn_rules: conn_strings, wL: weak_l, wR: weak_r }, function(data, status) {
-        $("#results").css("visibility","visible")
+    $.post("/sequoia/cutElim", {rule1 : rule_sml1, formula : cutform, init_rules : init_strings, conn_rules : conn_strings, wL : weak_l, wR : weak_r}, function(data, status) {
+        $("#results").css("visibility", "visible")
         var output = data.output.split("%%%")
-        var answer = output[0].split("@@@")
-        var axioms = output[1].split("@@@")
-        var ranks = output[2].split("@@@")
-        var grades = output[3].split("@@@")
+        var result = output[0]
+        var answer = ["",""]
+        if (result == "T") {
+            answer[0] = "Cut admissibility proof succeeds"
+            answer[1] = "The selected cut rule is admissible in this calculus. For each rule and connective the proof tree transformations are shown below."
+        } else if (result == "F") {
+            answer[0] = "Cut admissibility proof fails"
+            answer[1] = "The selected cut rule might not be admissible in this calculus. For certain rules or connectives proof tree transformations could not be found. This check is sound but not complete."
+        }
         $("#info_header").html(answer[0])
         $("#info_text").html(answer[1])
         $("#info_answer").attr("class", "ui info message")
-        $("#info_answer").css("visibility","visible")
+        $("#info_answer").css("visibility", "visible")
+        var axioms = output[1].split("@@@")
+        var ranks = output[2].split("@@@")
+        var grades = output[3].split("@@@")
         var ax = $("#axiom")
         for (var i = 0; i < axioms.length; i++) {
             if (axioms[i] != "") {
@@ -100,7 +108,6 @@ function checkCut() {
                         )
                     }
                 }
-                
             }
         }
         var rk = $("#rank")
@@ -133,7 +140,6 @@ function checkCut() {
                         )
                     }
                 }
-                
             }
         }
         var gd = $("#grade")
@@ -166,12 +172,11 @@ function checkCut() {
                         )
                     }
                 }
-                
             }
         }
-        MathJax.Hub.Queue(["Typeset",MathJax.Hub,ax[0]], function () { 
-            MathJax.Hub.Queue(["Typeset",MathJax.Hub,rk[0]], function () {
-                MathJax.Hub.Queue(["Typeset",MathJax.Hub,gd[0]], function () {
+        MathJax.Hub.Queue(["Typeset", MathJax.Hub, ax[0]], function() { 
+            MathJax.Hub.Queue(["Typeset", MathJax.Hub, rk[0]], function() {
+                MathJax.Hub.Queue(["Typeset", MathJax.Hub, gd[0]], function() {
                     $("#loading").attr("class", "ui inactive inverted dimmer")
                 })
             })

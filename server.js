@@ -78,18 +78,18 @@ app.use('/sequoia/api', symbolsRoutes);
 
 
 //Page Routes ===========================================================
-app.get('/sequoia', function (req, res) {
+app.get('/sequoia', function(req, res) {
 	if (req.isAuthenticated()) {
 		return res.render('login/landing', {'layout' : 'landing_in', 'page' : "in"});
 	}
 	return res.render('login/landing', {'layout' : 'landing_out', 'page' : "out"});
 });
 
-app.get('/sequoia/home', checkAuthenticated, function (req, res) {
+app.get('/sequoia/home', checkAuthenticated, function(req, res) {
 	return res.render('main/index', {'title' : 'Sequoia','layout' : 'main', 'user_id' : req.user._id, 'username' : req.user.username});
 });
 
-app.get('/sequoia/login', function (req, res) {
+app.get('/sequoia/login', function(req, res) {
 	if (req.isAuthenticated()) {
 		return res.redirect('/sequoia/home')
 	}
@@ -111,76 +111,76 @@ app.get('/sequoia/logout', checkAuthenticated, function(req, res) {
     res.redirect('/sequoia/login')
 });
 
-app.get('/sequoia/register', checkNotAuthenticated, function (req, res) {
+app.get('/sequoia/register', checkNotAuthenticated, function(req, res) {
 	return res.render('login/register', {'title' : 'Sequoia - register','layout' : 'login'});
 });
 
-app.get('/sequoia/calculus/:calc_id', checkAuthenticated, function (req, res) {
+app.get('/sequoia/calculus/:calc_id', checkAuthenticated, function(req, res) {
 	return res.render('calculus/index', {'title' : 'Sequoia - calculus', 'layout' : 'calculus', 'calc_id' : req.params.calc_id});
 });
 
-app.get('/sequoia/calculus/:calc_id/add-rule', checkAuthenticated, function (req, res) {
+app.get('/sequoia/calculus/:calc_id/add-rule', checkAuthenticated, function(req, res) {
 	return res.render('rule/index', {'title' : 'Sequoia - add rule', 'layout' : 'rule', 'calc_id' : req.params.calc_id,
 						'page' : 'Add'});
 });
 
-app.get('/sequoia/calculus/:calc_id/edit-rule/:rule_id', checkAuthenticated, function (req, res) {
+app.get('/sequoia/calculus/:calc_id/edit-rule/:rule_id', checkAuthenticated, function(req, res) {
 	return res.render('rule/index', {'title' : 'Sequoia - edit rule', 'layout' : 'rule', 'calc_id' : req.params.calc_id, 
 					'rule_id' : req.params.rule_id, 'page' : 'Update'});
 });
 
-app.get('/sequoia/calculus/:calc_id/apply', checkAuthenticated, function (req, res) {
+app.get('/sequoia/calculus/:calc_id/apply', checkAuthenticated, function(req, res) {
 	return res.render('apply/index', {'title' : 'Sequoia - apply', 'layout' : 'apply', 'calc_id' : req.params.calc_id});
 });
 
-app.post('/sequoia/apply', checkAuthenticated, function (req, res) {
+app.post('/sequoia/apply', checkAuthenticated, function(req, res) {
 	var result = sml_command.applyRule(req.body.rule, req.body.constraints, req.body.tree, req.body.node_id, req.body.index, req.body.subs, res);
 });
 
-app.get('/sequoia/calculus/:calc_id/properties', checkAuthenticated, function (req, res) {
+app.get('/sequoia/calculus/:calc_id/properties', checkAuthenticated, function(req, res) {
 	return res.render('properties/index', {'title' : 'Sequoia - properties', 'layout' : 'properties', 'calc_id' : req.params.calc_id});
 });
 
-app.get('/sequoia/calculus/:calc_id/properties/permutability', checkAuthenticated, function (req, res) {
+app.get('/sequoia/calculus/:calc_id/properties/permutability', checkAuthenticated, function(req, res) {
 	return res.render('properties/permutability', {'title' : 'Sequoia - properties', 'layout' : 'permutability', 'calc_id' : req.params.calc_id});
 });
 
-app.post('/sequoia/permute', checkAuthenticated, function (req, res) {
+app.post('/sequoia/permute', checkAuthenticated, function(req, res) {
 	var result = sml_command.permuteRules(req.body.rule1, req.body.rule2, req.body.init_rules, req.body.wL, req.body.wR, res);
 });
 
-app.get('/sequoia/calculus/:calc_id/properties/init_coherence', checkAuthenticated, function (req, res) {
+app.get('/sequoia/calculus/:calc_id/properties/init_coherence', checkAuthenticated, function(req, res) {
 	return res.render('properties/initcoherence', {'title' : 'Sequoia - properties', 'layout' : 'initcoherence', 'calc_id' : req.params.calc_id});
 });
 
-app.post('/sequoia/initRules', checkAuthenticated, function (req, res) {
+app.post('/sequoia/initRules', checkAuthenticated, function(req, res) {
 	var result = sml_command.initRules(req.body.first, req.body.second, req.body.third, res);
 });
 
-app.get('/sequoia/calculus/:calc_id/properties/weak_admissability', checkAuthenticated, function (req, res) {
+app.get('/sequoia/calculus/:calc_id/properties/weak_admissability', checkAuthenticated, function(req, res) {
 	return res.render('properties/weakadmiss', {'title' : 'Sequoia - properties', 'layout' : 'weakadmiss', 'calc_id' : req.params.calc_id});
 });
 
-app.post('/sequoia/weakenSides', checkAuthenticated, function (req, res) {
+app.post('/sequoia/weakenSides', checkAuthenticated, function(req, res) {
 	var result = sml_command.weakenSides(req.body.rules, res);
 });
 
-app.get('/sequoia/calculus/:calc_id/properties/cut_admissability', checkAuthenticated, function (req, res) {
+app.get('/sequoia/calculus/:calc_id/properties/cut_admissability', checkAuthenticated, function(req, res) {
 	return res.render('properties/cutadmiss', {'title' : 'Sequoia - properties', 'layout' : 'cutadmiss', 'calc_id' : req.params.calc_id});
 });
 
-app.post('/sequoia/cutElim', checkAuthenticated, function (req, res) {
+app.post('/sequoia/cutElim', checkAuthenticated, function(req, res) {
 	var result = sml_command.cutElim(req.body.rule1, req.body.formula, req.body.init_rules, req.body.conn_rules, req.body.wL, req.body.wR, res);
 });
 
-app.get('/sequoia/calculus/:calc_id/properties/invertibility', checkAuthenticated, function (req, res) {
+app.get('/sequoia/calculus/:calc_id/properties/invertibility', checkAuthenticated, function(req, res) {
 	return res.render('temporary/index', {'title' : 'Sequoia - properties', 'layout' : 'temporary'});
 });
 
 function checkAuthenticated (req, res, next) {
     if (req.isAuthenticated()) {
 		if (req.params.calc_id != null) {
-			calculusModel.find({_id : req.params.calc_id, user : req.user._id}, function (err, calculus) {
+			calculusModel.find({_id : req.params.calc_id, user : req.user._id}, function(err, calculus) {
 				if (err || calculus.length == 0) {
 					return res.status(403).json();
 				} else {
@@ -205,9 +205,3 @@ function checkNotAuthenticated (req, res, next) {
 
 //intiating server ==================================================
 app.listen(port);
-// const httpsServer = https.createServer({
-// 	key: fs.readFileSync('/afs/qatar.cmu.edu/course/15/logic/sequoia/certificates/logic.qatar.cmu.edu.key'),
-// 	cert: fs.readFileSync('/afs/qatar.cmu.edu/course/15/logic/sequoia/certificates/logic.qatar.cmu.edu.cert'),
-// 	ca: [fs.readFileSync('/afs/qatar.cmu.edu/course/15/logic/sequoia/certificates/intermediate_ca.cert')]
-// }, app);
-// httpsServer.listen(port, () => {console.log('HTTPS Server running on port 443');});

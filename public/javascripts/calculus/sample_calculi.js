@@ -9,19 +9,19 @@ function sample_calc(name, id) {
         var ret =
         [
             [
-                { "symbol" : "A", "type" : "formula variable", "group" : "rule", "calculus" :  id },
-                { "symbol" : "B", "type" : "formula variable", "group" : "rule", "calculus" :  id },
-                { "symbol" : "\\wedge", "type" : "connective", "group" : "rule", "calculus" :  id },
-                { "symbol" : "\\vee", "type" : "connective", "group" : "rule", "calculus" :  id },
-                { "symbol" : "\\rightarrow", "type" : "connective", "group" : "rule", "calculus" :  id },
-                { "symbol" : "\\neg", "type" : "connective", "group" : "rule", "calculus" :  id },
-                { "symbol" : "\\vdash", "type" : "sequent sign", "group" : "rule", "calculus" :  id },
-                { "symbol" : "\\Gamma", "type" : "context variable", "group" : "rule", "calculus" :  id },
-                { "symbol" : "\\Gamma_1", "type" : "context variable", "group" : "rule", "calculus" :  id },
-                { "symbol" : "\\Gamma_2", "type" : "context variable", "group" : "rule", "calculus" :  id },
-                { "symbol" : "\\Delta", "type" : "context variable", "group" : "rule", "calculus" :  id },
-                { "symbol" : "\\Delta_1", "type" : "context variable", "group" : "rule", "calculus" :  id },
-                { "symbol" : "\\Delta_2", "type" : "context variable", "group" : "rule", "calculus" :  id }
+                { "symbol" : "A", "type" : "formula variable", "group" : "rule", "calculus" : id },
+                { "symbol" : "B", "type" : "formula variable", "group" : "rule", "calculus" : id },
+                { "symbol" : "\\wedge", "type" : "connective", "group" : "rule", "calculus" : id },
+                { "symbol" : "\\vee", "type" : "connective", "group" : "rule", "calculus" : id },
+                { "symbol" : "\\rightarrow", "type" : "connective", "group" : "rule", "calculus" : id },
+                { "symbol" : "\\neg", "type" : "connective", "group" : "rule", "calculus" : id },
+                { "symbol" : "\\vdash", "type" : "sequent sign", "group" : "rule", "calculus" : id },
+                { "symbol" : "\\Gamma", "type" : "context variable", "group" : "rule", "calculus" : id },
+                { "symbol" : "\\Gamma_1", "type" : "context variable", "group" : "rule", "calculus" : id },
+                { "symbol" : "\\Gamma_2", "type" : "context variable", "group" : "rule", "calculus" : id },
+                { "symbol" : "\\Delta", "type" : "context variable", "group" : "rule", "calculus" : id },
+                { "symbol" : "\\Delta_1", "type" : "context variable", "group" : "rule", "calculus" : id },
+                { "symbol" : "\\Delta_2", "type" : "context variable", "group" : "rule", "calculus" : id }
             ],
             [
                 { "premises" : JSON.stringify([ "" ]), "parsed_prem" : JSON.stringify([ ]), "rule" : "I", "conclusion" : "A \\vdash A", "parsed_conc" : "Seq (Single (Ctx ([], [FormVar (\"A\")])), Con (\"\\vdash\"), Single (Ctx ([], [FormVar (\"A\")])))", "calculus" : id, "connective" : "", "side" : "None", "type" : "Axiom", "cutvar" : "NONE" },

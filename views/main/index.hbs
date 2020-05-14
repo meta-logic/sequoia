@@ -6,7 +6,10 @@ under certain conditions; see LICENSE for details. --}}
 
 <div id="user_id" hidden>{{user_id}}</div>
 <div id="section" class="ui middle aligned center aligned teal huge header">{{username}}'s Calculi</div>
+<br>
 <div class="ui container">
+	<div class="ui four grid cards" id="calculi"></div>
+	<h3 class="ui header">Create your own calculus:</h3>
 	<div class="row">
 		<div class="ui input">
 			<input id="title" type="text" placeholder="Title">
@@ -20,12 +23,14 @@ under certain conditions; see LICENSE for details. --}}
 	</div>
 	<br>
 	<a class="ui large green button" onclick="addCalculus()">Add Custom Calculus</a>
+	<div class="ui horizontal divider">OR</div>
+	<h3 class="ui header">Try one of the built-in calculi (you can edit them as you like):</h3>
+	<br>
 	<a class="ui large green button" onclick="addSomeCalculus(0)">LJ System</a>
 	<a class="ui large green button" onclick="addSomeCalculus(1)">LK System</a>
 	<a class="ui large green button" onclick="addSomeCalculus(2)">S4 System</a>
 	<a class="ui large green button" onclick="addSomeCalculus(3)">Lax System</a>
 	<br><br><br><br>
-	<div class="ui four grid cards" id="calculi"></div>
 </div>
 <div id ="modal1" class="ui special modal">
 	<div class="header">Calculus Deletion</div>

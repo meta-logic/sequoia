@@ -4,16 +4,16 @@
 // under certain conditions; see LICENSE for details.
 
 
-function addUser () {
-    $("#warning").css("visibility","hidden")
+function addUser() {
+    $("#warning").css("visibility", "hidden")
     $("#p1").attr("class", "required field")
     $("#p2").attr("class", "required field")
     $("#u").attr("class", "required field")
-    var username = $("#username").val().trim()
-    var password1 = $("#password1").val()
-    var password2 = $("#password2").val()
-    var email = $("#email").val()
-    var occupation = $("#occupation").val()
+    var username = escape_norm($("#username").val().trim())
+    var password1 = escape_norm($("#password1").val().trim())
+    var password2 = escape_norm($("#password2").val().trim())
+    var email = escape_norm($("#email").val().trim())
+    var occupation = escape_latex($("#occupation").val().trim())
     if (username == "" || password1 == "" || password2 == "") {
         if (username == "") {
             $("#u").attr("class", "required field error")
@@ -36,21 +36,21 @@ function addUser () {
             $("#p2").attr("class", "required field error")
         }
         $("#warning_header").html("Username and passwords must be at least eight characters long.")
-        $("#warning").css("visibility","visible")
+        $("#warning").css("visibility", "visible")
         return
     } else {
-        $.get("/sequoia/api/users/"+username, function (data, status) {
+        $.get("/sequoia/api/users/"+username, function(data, status) {
             if (data.status == "success") {
                 $("#u").attr("class", "required field error")
                 $("#warning_header").html("Username already exists.")
-                $("#warning").css("visibility","visible")
+                $("#warning").css("visibility", "visible")
                 return
             } else {
                 if (password1 != password2) {
                     $("#p1").attr("class", "required field error")
                     $("#p2").attr("class", "required field error")
                     $("#warning_header").html("Passwords are not the same.")
-                    $("#warning").css("visibility","visible")
+                    $("#warning").css("visibility", "visible")
                     return
                 } else {
                     $.post("/sequoia/api/user", {username : username, password : password1, 

@@ -14,13 +14,13 @@ function get_rules_toPage() {
             entry.remove()
         }
     }
-    $.get("/sequoia/api/rules/"+calc_id, function (rls, status) {
+    $.get("/sequoia/api/rules/"+calc_id, function(rls, status) {
         var rules = rls.rules
         for (var i = 0; i < rules.length; i++) {
             var rule_cutvar = rules[i].cutvar.replace(/\\/g, "\\\\").replace(/'/g, "&apos;").replace(/"/g, "&quot;")
             var rule_conc = rules[i].sml_conc.replace(/\\/g, "\\\\").replace(/'/g, "&apos;").replace(/"/g, "&quot;")
             var rule_prem = list_to_string(rules[i].sml_prem).replace(/\\/g, "\\\\").replace(/'/g, "&apos;").replace(/"/g, "&quot;")
-            rules_container.append( 
+            rules_container.append(
                 '<div id="rule_card"'+i+'" class="card">'+
                     '<button class="ui button basic black" id="r'+i+'" onClick=applyRule("'+i+'") type="'+rules[i].type+'"'+
                     ' rule_name="'+rules[i].rule+'" side="'+rules[i].side+'" conclusion="'+rule_conc+'" premises="'+rule_prem+'" cutvar="'+rule_cutvar+'">'+
@@ -29,7 +29,7 @@ function get_rules_toPage() {
                 '</div>'
             )
         }
-        MathJax.Hub.Queue(["Typeset",MathJax.Hub,rules_container[0]])
+        MathJax.Hub.Queue(["Typeset", MathJax.Hub, rules_container[0]])
         r = rules.length
     })
 }

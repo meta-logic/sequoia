@@ -16,7 +16,7 @@ function get_rules_toPage() {
             entry.remove()
         }
     }
-    $.get("/sequoia/api/rules/"+calc_id, function (rls, status) {
+    $.get("/sequoia/api/rules/"+calc_id, function(rls, status) {
         var rules = rls.rules
         for (var i = 0; i < rules.length; i++) {
             var card_content = '$$\\frac{'+rules[i].premises.join(" \\quad \\quad ")+'}{'+rules[i].conclusion+'}'+rules[i].rule+'$$'
@@ -29,7 +29,7 @@ function get_rules_toPage() {
                     '</div>'+
                 '</div>'
             )
-            MathJax.Hub.Queue(["Typeset",MathJax.Hub,card_content])
+            MathJax.Hub.Queue(["Typeset", MathJax.Hub, card_content])
         }
         r = rules.length
     })
@@ -43,7 +43,7 @@ function deleteRule(card_id, mongo_id) {
         data : {"id" : mongo_id},
         success: function(result) {
             if (card_id != -1) {
-                $("#rule_"+card_id).hide('slow', function(){$("#rule_"+card_id).remove()})
+                $("#rule_"+card_id).hide('slow', function() {$("#rule_"+card_id).remove()})
                 for (var i = card_id+1; i < r; i++) {
                     var delete_text = $("#deleteR_"+i).attr("onClick").split(",")[1]
                     var new_delete_text = "deleteRule("+(i-1)+","+delete_text

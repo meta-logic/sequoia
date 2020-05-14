@@ -17,7 +17,7 @@ function createCalculus (req, res) {
     calculus.rules = []
     calculus.symbols = []
     calculus.user = req.body.user
-    calculus.save(function (err) {
+    calculus.save(function(err) {
         if (err) {
             return res.status(400).json({
                 "status"  : "failure",
@@ -38,7 +38,7 @@ function updateCalculus (req, res) {
         {   title : req.body.title, 
             description :req.body.description
         }, { new : true}, 
-        function (err, calculus) {
+        function(err, calculus) {
             if (err || calculus == null) {
                 return res.status(400).json({
                     "status"  : "failure",
@@ -54,9 +54,9 @@ function updateCalculus (req, res) {
 
 
 function deleteCalculus (req, res) {
-    Calculus.deleteOne({ _id : req.body.id}, function (err, calc) {
-        Symbols.remove({calculus : req.body.id}, function (err, symbs) {})
-        Rule.remove({ calculus : req.body.id}, function (err, rls) {})
+    Calculus.deleteOne({ _id : req.body.id}, function(err, calc) {
+        Symbols.remove({calculus : req.body.id}, function(err, symbs) {})
+        Rule.remove({ calculus : req.body.id}, function(err, rls) {})
         if (err || calc == null) {
             return res.status(400).json({
                 "status"  : "failure",
@@ -72,7 +72,7 @@ function deleteCalculus (req, res) {
 
 
 function getCalculus (req, res) {
-    Calculus.findById(req.params.calc_id, function (err, calculus) {
+    Calculus.findById(req.params.calc_id, function(err, calculus) {
         if (err || calculus == null) {
             return res.status(400).json({
                 "status"  : "failure",
@@ -88,7 +88,7 @@ function getCalculus (req, res) {
 
 
 function getCalculi (req, res) {
-    Calculus.find({user : req.params.user_id}, function (err, calculi) {
+    Calculus.find({user : req.params.user_id}, function(err, calculi) {
         if (err || calculi == null) {
             return res.status(400).json({
                 "status"  : "failure",
