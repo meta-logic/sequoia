@@ -34,8 +34,8 @@ struct
     exception Arity
 
 
-    val color = "blue"
-    val color2 = "red"
+    val color2 = "blue"
+    val color = "red"
     fun set_color (x) = "\\color{"^color^"} {"^x^"}"
     fun set_color2 (x) = "\\color{"^color2^"} {"^x^"}"
 
