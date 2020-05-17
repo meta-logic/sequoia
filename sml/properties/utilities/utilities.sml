@@ -18,7 +18,7 @@ struct
     structure U = unifyImpl
     structure E = Equivalence
     structure Set = SplaySetFn(CtxVarKey);
-
+    structure FSet = SplaySetFn(FormKey);
     val index = ref 1;
 
     val ind = ref 1;
@@ -188,36 +188,102 @@ struct
             App.apply_der_tree_Unifier(tree,subs)
         end
 
-    fun update_ctx_var (Dat.CtxVar(a,x)) = Dat.CtxVar(a,C.fresh(x))
+    (****************************************************)
+    fun get_start_char () = ref (#"A",0)
 
-    fun update_form (Dat.Atom(x),_) = Dat.Atom(x)
-        | update_form (Dat.AtomVar(x),f) = Dat.AtomVar(f(fresh x))
-        | update_form (Dat.FormVar(x),f) = Dat.FormVar(f(fresh x))
-        | update_form (Dat.Form(Dat.Con(c),forms),f) = Dat.Form(Dat.Con(f c), List.map (fn x =>
-        update_form(x,f)) forms)
+    fun char_succ (x) = 
+        (case !x of
+            (#"Z",i) => x := (#"A",i+1)
+            | (c,i) => x := (Char.succ(c),i))
 
-    fun update_ctx (Dat.Ctx(ctx_vars,forms),f) = Dat.Ctx(ctx_vars,List.map (fn x
-      => update_form(x,f)) forms)
 
-    fun update_ctx_struct (Dat.Empty,_) = Dat.Empty
-        | update_ctx_struct (Dat.Single(ctx),f) = Dat.Single(update_ctx(ctx,f))
-        | update_ctx_struct (Dat.Mult(conn,ctx,ctx_strct),f) =
-        Dat.Mult(conn,update_ctx(ctx,f), update_ctx_struct(ctx_strct,f))
+    fun char_to_string (x) = 
+        (case !x of
+            (c,0) => Char.toString(c)
+           |(c,i) => (Char.toString(c))^"^{"^(Int.toString(i))^"}")
 
-    fun update_seq (Dat.Seq(l,conn,r),f) =
-      Dat.Seq(update_ctx_struct(l,f),conn,update_ctx_struct(r,f))
-
-    fun update_rule (Dat.Rule(nm,side,conc,prems),f) =
+    fun get_char_update_func () = 
         let
-            val new_conc = update_seq(conc,f)
-            val new_prems = List.map (fn x => update_seq(x,f)) prems
-            val () = index := !index +1
+            val start = get_start_char()
+            fun change_str x = (char_to_string(start)) before (char_succ(start))
         in
-            Dat.Rule(f nm,side,new_conc,new_prems)
+            change_str
         end
-    
+
+    fun set_insert(set,form) = set := (FSet.add(!set,form))
+
+    fun form_insert(set,form) =
+        (case form of
+              Dat.AtomVar(x) => set_insert(set,form)
+            | Dat.FormVar(x) => set_insert(set,form)
+            | Dat.Form(_,fl) => ignore(List.map (fn form => form_insert(set,form)) fl)
+            | _ => ())
+
+    fun form_insert2(set,form) = 
+        (case form of
+              Dat.Form(_) => form_insert(set,form)
+            | _ => ())
+ 
+    fun form_to_sub(form,update) = 
+        (case form of
+              f as Dat.AtomVar(x) => Dat.Fs(f,Dat.AtomVar(update x))
+             | f as Dat.FormVar(x) => Dat.Fs(f,Dat.FormVar(update x))
+             | _ => raise Fail "unexpected formula, form_to_sub, utilities"
+        )
+
+    fun collect_ctx (Dat.Ctx(_,fl),(set,insert)) = ignore (List.map (fn form =>
+      insert(set,form)) fl)
+
+    fun collect_ctx_struct (Dat.Empty,_) = ()
+      | collect_ctx_struct (Dat.Single(ctx),f) = collect_ctx(ctx,f)
+      | collect_ctx_struct (Dat.Mult(_,ctx,ctx_struct),f) = (collect_ctx(ctx,f))
+      before (collect_ctx_struct(ctx_struct,f))
+
+    fun collect(Dat.Seq(l,_,r),f) =
+      (collect_ctx_struct(l,f);collect_ctx_struct(r,f))
+
+    fun color_form (Dat.Form(Dat.Con(c),fl),color) = Dat.Form(Dat.Con(color c),fl)
+      | color_form (f , _ ) = f
+
+    fun color_ctx (Dat.Ctx(vl,fl),color) = Dat.Ctx(vl,List.map (fn form =>
+      color_form(form,color)) fl)
+
+    fun color_ctx_struct (Dat.Empty,_) = Dat.Empty
+      | color_ctx_struct (Dat.Single(ctx),color) =
+      Dat.Single(color_ctx(ctx,color))
+      | color_ctx_struct (Dat.Mult(c,ctx,ctx_struct),color)=
+      Dat.Mult (c,color_ctx(ctx,color),color_ctx_struct(ctx_struct,color))
+
+    fun color_seq(Dat.Seq(l,con,r),color) =
+      Dat.Seq(color_ctx_struct(l,color),con,color_ctx_struct(r,color))
 
 
+
+    fun update_rule(Dat.Rule(nm,side,conc,prems),insert,update) = 
+        let
+            val set = ref FSet.empty
+            val _ = List.map (fn seq => collect(seq,(set,insert))) (conc::prems)
+            val vars = FSet.listItems(!set)
+            val subs = List.map (fn var => form_to_sub(var,update)) vars
+            val new_conc = App.apply_seq_Unifier(conc,subs)
+            val new_prems = List.map (fn seq => App.apply_seq_Unifier(seq,subs)) prems
+        in
+            Dat.Rule(nm,side,new_conc,new_prems)
+        end
+
+    fun update_rule_characters(rule, update) = update_rule(rule,form_insert,update)
+
+    fun update_rule_colors(rule,color_fn) = 
+        let
+            val Dat.Rule(nm,side,conc,prems) = update_rule(rule,form_insert2,color_fn)
+            val conc = color_seq(conc,color_fn)
+            val prems = List.map (fn seq => color_seq(seq,color_fn)) prems
+            val nm = color_fn nm
+        in
+            Dat.Rule(nm,side,conc,prems)
+        end
+
+    (******************************************************)
 
     fun atomize(Dat.Atom(x)) = Dat.Atom(x)
       | atomize(Dat.AtomVar(x)) = Dat.Atom(x)

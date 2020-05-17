@@ -16,8 +16,6 @@ struct
         let
             val _ = Ut.set_to_1()
             val Dat.Rule (_,_,init_conc,_) = init_rule
-            (* changing names of context variables in rule and conclusion of rule *)
-            val init_rule = Ut.update_rule(init_rule, (fn x:string => x) ) 
             (* val init_rule = atomize_rule(init_rule) *)
 
             val Dat.Rule (_,_,check_rule,_) = 

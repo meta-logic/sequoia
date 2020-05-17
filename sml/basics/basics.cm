@@ -14,9 +14,11 @@ Group
   structure StringKey
   structure CtxVarKey
   structure CtxVarConKey
+  structure FormKey
 is
   helpers/helpers.cm
   datatypes/datatypes.cm
-  ord_keys/stringkey.sml
-  ord_keys/ctxvarkey.sml
-  ord_keys/ctxvarconkey.sml
+  ord_keys/string_key.sml
+  ord_keys/ctx_var_key.sml
+  ord_keys/ctx_var_con_key.sml
+  ord_keys/form_key.sml

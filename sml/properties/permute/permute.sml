@@ -106,8 +106,12 @@ struct
             val D.Rule(name1, side1, conc1, premises1) = rule1
             val D.Rule(name2, side2, conc2, premises2) = rule2
             val () = Ut.set_u_index(1)
-            val rule1 = Ut.update_rule(rule1, Ut.set_color)
-            val rule2 = Ut.update_rule(rule2, Ut.set_color2)
+            
+            val update_name = Ut.get_char_update_func()
+            val rule1 = Ut.update_rule_characters(rule1, update_name)
+            val rule1 = Ut.update_rule_colors(rule1,Ut.set_color)
+            val rule2 = Ut.update_rule_characters(rule2, update_name)
+            val rule2 = Ut.update_rule_colors(rule2,Ut.set_color2)
 
             val bases = (create_base(rule1, rule2))
             (* val _ = print("\n ________base : || " ^ (Dat.seq_toString(List.hd(bases))) ^ " || ___________\n") *)
