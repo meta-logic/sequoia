@@ -1,0 +1,3 @@
+[submodule "sml/qcheck"]
+	path = sml/qcheck
+	url = https://github.com/league/qcheck.git
