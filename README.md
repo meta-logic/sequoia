@@ -36,4 +36,4 @@ Then, run the server
 ```
 npm start
 ```
-The application should now be running on [localhost:3000](http://localhost:3000/).
+The application should now be running on [localhost:8080/sequoia](http://localhost:8080/sequoia).
