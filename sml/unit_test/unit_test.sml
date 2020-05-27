@@ -6,6 +6,21 @@ struct
     structure V = Vector
 
 
+    (*takes 2 generators and appends them*)
+    fun gen_composition (g2) (g1) =
+        let
+            fun compose r =
+                let
+                    val (res,r') = g1 r
+                in 
+                    (g2 res) r'
+                end
+        in
+            compose
+        end
+
+        
+
     fun vec_to_L v = V.foldr op:: [] v
     (*list of variable names*)
     val var_names =  #["A","B","C","D","E","F","G"]
@@ -27,15 +42,8 @@ struct
     fun form_gen' 0 = Q.Gen.choose #[atom_gen,atom_var_gen,form_var_gen]
       | form_gen' n = Q.Gen.choose' #[(1,form_gen' 0),(4,Q.Gen.map D.Form
       (con_to_gen n))]
-    and con_to_gen n r= 
-        (let
-            val ((con,arity),r') = con_gen r
-            val (f_list,r'') = (len_to_list (arity,n)) r'
-         in
-           ((con,f_list),r'')
-         end
-         )
-    and len_to_list (arity,n) = Q.Gen.map (vec_to_L) (Q.Gen.vector
+    and con_to_gen n r= gen_composition (len_to_list n) (con_gen)
+    and len_to_list n (con,arity) = Q.Gen.map (fn l => (con,vec_to_L l)) (Q.Gen.vector
     Vector.tabulate (Q.Gen.range(arity,arity),form_gen' (n-1)))
 
     fun form_gen r = 
@@ -45,6 +53,7 @@ struct
             form_gen' i r'
         end
 
+    (*form list generator*)
   
     val t = 5;
 end
