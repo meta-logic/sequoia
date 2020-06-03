@@ -1,6 +1,15 @@
 Group
+  structure Gen
   structure UnitTest
+  structure U_Pred
+  structure App_Pred
 is
   ../basics/basics.cm
+  ../applyunifier/applyunifier.cm
+  ../unification/unification.cm
+  ../equiv/equiv.cm
   ../qcheck/qcheck.cm
+  generators/gen.sml
+  unification_pred/unification_pred.sml
+  apply_sub_pred/apply_sub_pred.sml
   unit_test.sml
