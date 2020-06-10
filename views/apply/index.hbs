@@ -5,12 +5,20 @@ under certain conditions; see LICENSE for details. --}}
 
 
 <div id="calc_id" hidden>{{calc_id}}</div>
+<br>
 <div id="main_grid" class="ui grid">
-  <div class="three wide column" id="left_menu" style="margin-top: 2px;visibility: hidden;">
-      <div class="ui top attached huge center aligned header">Constraints:</div>
-      <div class="ui attached segment" id="side_menu_L"></div>
+  <div class="three wide column" id="left_menu" style="margin-top: 2px; visibility: hidden;">
+    <div class="ui top attached huge center aligned header">Constraints:</div>
+    <div class="ui attached segment" id="side_menu_L"></div>
   </div>
-  <div id="tree_grid" class="ten wide column" style="margin-top: 26px;">
+  <div id="tree_grid" class="ten wide column">
+    <div id="note" class="ui basic message">
+      <div class="header">Specify the initial sequent</div>
+      <div class="content">
+        <p>All term symbols that appear in the initial sequent must be defined in the 
+          sequent term symbols table below and disjoint from the term symbols used in the rules.</p>
+      </div>
+    </div>
     <div id="seq" style="display: inline">
       <div class="ui input fluid">
         <input type="text" id="Sequent" placeholder="Sequent">
@@ -29,7 +37,7 @@ under certain conditions; see LICENSE for details. --}}
       </div>
       <ul id="choice" class="list"></ul>
     </div>
-      <br><br>
+    <br><br>
     <div id="main_tree" style="text-align: center;">
       <div id="prooftree_0" class="tree">
         <div id="exp_0" class="sequence">
@@ -38,7 +46,7 @@ under certain conditions; see LICENSE for details. --}}
       </div>
     </div>
     <br><br>
-    <a id ="submit" class="ui fluid large circular icon button teal" onclick="useSequent()" style="visibility: hidden;">Start Building Tree</a>
+    <a id="submit" class="ui fluid large circular icon button teal" onclick="useSequent()" style="visibility: hidden;">Start Building Tree</a>
     <div id="warning" class="ui negative message" style="visibility: hidden;">
         <div id="warning_header" class="header">TEMP</div>
           <p id="warning_text">TEMP</p>
@@ -48,7 +56,7 @@ under certain conditions; see LICENSE for details. --}}
       <tbody id="cert_table_head"></tbody>
     </table>
     <br>
-    <table id="sym_table" class= "ui sortable fixed single line celled table" style="visibility: hidden;">
+    <table id="sym_table" class= "ui sortable fixed single line celled table">
       <thead><tr><th>Sequent Term Symbols</th><th>Types</th></tr></thead>
       <tbody id="init"><tbody> 
       <tbody id="table_head"> 
@@ -59,7 +67,7 @@ under certain conditions; see LICENSE for details. --}}
             </div>
           </td>
           <td id="select_field">
-            <select class="ui search dropdown" style="visibility: hidden;" id="typ">
+            <select class="ui search dropdown" id="typ">
               <option value="">Type</option>
               <option value="atom">atom</option>
               <option value="atom variable">atom variable</option>
@@ -69,23 +77,40 @@ under certain conditions; see LICENSE for details. --}}
             <button class="ui large green right floated button" onclick="add_symbol_toTable('seq')">Add Symbol</button>
           </td>
         </tr>
+        <tr>
+          <td id="atom_row"></td>
+          <td>atom</td>
+        </tr>
+        <tr>
+          <td id="atom_variable_row"></td>
+          <td>atom variable</td>
+        </tr>
+        <tr>
+          <td id="formula_variable_row"></td>
+          <td>formula variable</td>
+        </tr>
+        <tr>
+          <td id="context_variable_row"></td>
+          <td>context variable</td>
+        </tr>
       </tbody>
     </table>
-    <br>
   </div>
   <div class="three wide column">
-      <div class="ui two attached buttons">
-        <button id="export" class="ui disabled fluid huge icon button green" onclick="sendEmail()">
-          <i class="icon download"></i>Export to Latex
-        </button>
-        <button id="undo" class="ui disabled fluid huge icon button red" onclick="undo()">
-          <i class="icon undo"></i>Undo Apply
-        </button>
-      </div>
-      <div class="ui attached huge borderless menu" id="side_menu_R" style="padding-top: 14px;">
-          <div id="rules" class="ui one cards"></div>
-      </div>
+    <div class="ui two attached buttons">
+      <button id="export" class="ui disabled fluid huge icon button green" onclick="sendEmail()">
+        <i class="icon download"></i>Export to Latex
+      </button>
+      <button id="undo" class="ui disabled fluid huge icon button red" onclick="undo()">
+        <i class="icon undo"></i>Undo Apply
+      </button>
+    </div>
+    <div class="ui attached huge borderless menu" id="side_menu_R" style="padding-top: 14px;">
+        <div id="rules" class="ui one cards"></div>
+    </div>
+  </div>
 </div>
+<br><br><br>
 <div id ="modal1" class="ui special modal">
   <div class="header">Sequents Affected</div>
     <div id = "change warning" class="content">

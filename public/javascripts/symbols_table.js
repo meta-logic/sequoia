@@ -17,31 +17,28 @@ function showInfo(update, card_id, mongo_id, tbl) {
 
 
 function get_symbols_toTable(tbl) {
-    var sym_table = $("#table_head")
-    for (i = 0; i < s; i++) {
-        var entry = $("#row"+i)
-        if (entry != null) {
-            entry.remove()
-        }
-    }
+    $("#atom_row").html("")
+    $("#atom_variable_row").html("")
+    $("#formula_variable_row").html("")
+    $("#context_variable_row").html("")
+    $("#connective_row").html("")
+    $("#sequent_sign_row").html("")
+    $("#context_separator_row").html("")
     $.get("/sequoia/api/"+tbl+"_symbols/"+calc_id, function(sb, status) {
         var syms = sb.symbols
         for (var i = 0; i < syms.length; i++) {
             var sym = syms[i].symbol
             var typ = syms[i].type
-            var row = document.createElement("tr")
-            row.setAttribute("id", "row"+i)
-            sym_table.after(row, $("#row"+(i-1)))
-            row = $("#row"+i)
-            var button_action = 'showInfo(false,'+i+',\''+syms[i]._id+'\',\''+tbl+'\')'
-            row.html(
-                '<td id="sym'+i+'" value='+sym+'>$$'+sym+'$$</td>'+
-                '<td id="typ'+i+'" value='+typ+'>'+typ+
-                    '<button id="deleteS_'+i+'" onclick="'+button_action+'" class="ui right floated circular red icon button">'+
-                        '<i class="icon close"></i>'+
-                    '</button>'+
-                '</td>'
-            )
+            typ = typ.split(" ").join("_")
+            $("#"+typ+"_row").append(
+            '<div class="ui animated basic button" onclick="showInfo(false,'+i+',\''+syms[i]._id+'\',\''+tbl+'\')">'+
+                '<div class="visible black content">'+
+                    '<h4 class="ui basic black header">$$'+sym+'$$</h4>'+
+                '</div>'+
+                '<div class="hidden content">'+
+                    '<i class="red close icon"></i>'+
+                '</div>'+
+            '</div>')
             MathJax.Hub.Queue(["Typeset", MathJax.Hub, sym])
         }
         s = syms.length
@@ -76,7 +73,6 @@ function add_symbol_toTable(tbl) {
     if (tbl == "seq") {
         other = "rule"
     }
-    var sym_table = $("#table_head")
     var symb = escape_latex($("#sym").val().trim())
     var typ = escape_latex($("#typ").val().trim())
     if (symb.includes("^") || symb.includes("'") || symb.includes('"') || symb.includes('*')) {
@@ -102,7 +98,6 @@ function add_symbol_toTable(tbl) {
             } else {
                 $.get("/sequoia/api/"+other+"_symbols/"+calc_id, function(sb, status) {
                     var syms = sb.symbols
-                    var exists = false
                     for (var i = 0; i < syms.length; i++) {
                         if (symb == syms[i].symbol) {
                             if (other = "seq") {
@@ -118,19 +113,16 @@ function add_symbol_toTable(tbl) {
                     }
                     $("#warning").css("visibility", "hidden")
                     $.post("/sequoia/api/symbols", {symbol : symb, type : typ, group : tbl, calculus : calc_id}, function(data, status) {
-                        var row = document.createElement("tr")
-                        row.setAttribute("id", "row"+s)
-                        sym_table.after(row, $("#row"+(s-1)))
-                        row = $("#row"+s)
-                        var button_action = 'showInfo(false,'+s+',\''+data.symbol._id+'\',\''+tbl+'\')'
-                        row.html(
-                            '<td id="sym'+s+'" value='+symb+'>$$'+symb+'$$</td>'+
-                            '<td id ="typ'+s+'" value='+typ+'>'+typ+
-                                '<button id="deleteS_'+s+'" onclick="'+button_action+'" class="ui right floated circular red icon button">'+
-                                    '<i class="icon close"></i>'+
-                                '</button>'+
-                            '</td>'
-                        )
+                        typ = typ.split(" ").join("_")
+                        $("#"+typ+"_row").append(
+                        '<div class="ui animated basic button" onclick="showInfo(false,'+s+',\''+data.symbol._id+'\',\''+tbl+'\')">'+
+                            '<div class="visible black content">'+
+                                '<h4 class="ui basic black header">$$'+symb+'$$</h4>'+
+                            '</div>'+
+                            '<div class="hidden content">'+
+                                '<i class="red close icon"></i>'+
+                            '</div>'+
+                        '</div>')
                         s++
                         $("#sym").val("")
                         $("#typ").val("")
