@@ -29,8 +29,10 @@ struct
         of (NONE, t) => (* Child *)
        (( case t
            of PIPE_W => Posix.IO.dup2 { old = readfd2, new = Posix.FileSys.stdin }
-            | PIPE_R => Posix.IO.dup2 { old = writefd, new = Posix.FileSys.stdout }
-            | PIPE_RW => ( Posix.IO.dup2 { old = writefd, new = Posix.FileSys.stdout }
+            | PIPE_R => Posix.IO.dup2 { old = writefd, new =
+            Posix.FileSys.wordToFD 0w10 }
+            | PIPE_RW => ( Posix.IO.dup2 { old = writefd, new =
+            Posix.FileSys.wordToFD 0w10 }
                          ; Posix.IO.dup2 { old = readfd2, new = Posix.FileSys.stdin })
         ; Posix.IO.close writefd
         ; Posix.IO.close readfd
@@ -85,10 +87,10 @@ struct
     val f = Popen.popen(cmd, Popen.PIPE_RW)
     val _ = Posix.IO.writeVec (#infd f, Word8VectorSlice.full (Byte.stringToBytes (!inp)));
     val _ = Posix.Process.waitpid_nh (Posix.Process.W_ANY_CHILD, [])
-    val output =  Substring.full (Byte.bytesToString (Posix.IO.readVec (#outfd f,10000)))
-    
+    val output =  Byte.bytesToString (Posix.IO.readVec (#outfd f,10000))
+    val output_substring = Substring.full output
     val _ = Popen.pclose f
-    val res = Substring.isSubstring "1" output
+    val res = Substring.isSubstring "1" output_substring
   in
     res
   end
