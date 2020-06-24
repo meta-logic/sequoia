@@ -27,6 +27,7 @@ function sendRule(opt, cutvar, conc, prem, parsed_conc, parsed_prem, calc_id) {
         $.post("/sequoia/api/rule", {rule : rule_name, conclusion : conc, premises : JSON.stringify(prem),
             parsed_conc : parsed_conc, parsed_prem : JSON.stringify(parsed_prem) , calculus : calc_id,
             connective : rule_connective, side : rule_side, type : rule_type, cutvar : cutvar})
+        window.location.href = "/sequoia/calculus/"+calc_id
     } else if (opt == "Update") {
         $.get("/sequoia/api/rules/"+calc_id, function(rls, status) {
             var rules = rls.rules
@@ -40,6 +41,7 @@ function sendRule(opt, cutvar, conc, prem, parsed_conc, parsed_prem, calc_id) {
                 $.post("/sequoia/api/rule", {rule : rule_name, conclusion : conc, premises : JSON.stringify(prem),
                     parsed_conc : parsed_conc, parsed_prem : JSON.stringify(parsed_prem) , calculus : calc_id, 
                     connective : rule_connective, side : rule_side, type : rule_type, cutvar : cutvar})
+                window.location.href = "/sequoia/calculus/"+calc_id
             } else {
                 $.ajax({
                     url: "/sequoia/api/rule",
@@ -47,11 +49,11 @@ function sendRule(opt, cutvar, conc, prem, parsed_conc, parsed_prem, calc_id) {
                     data : {id : rule_id, rule : rule_name, 
                         conclusion : conc, premises : JSON.stringify(prem), parsed_conc : parsed_conc, 
                         parsed_prem : JSON.stringify(parsed_prem), calculus : calc_id, 
-                        connective : rule_connective, side : rule_side, type : rule_type, cutvar : cutvar}, function(data) {}})
+                        connective : rule_connective, side : rule_side, type : rule_type, cutvar : cutvar}, function() {}})
+                window.location.href = "/sequoia/calculus/"+calc_id
             }
         })
     }
-    window.location.href = "/sequoia/calculus/"+calc_id
 }
 
 
