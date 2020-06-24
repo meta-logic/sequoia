@@ -102,7 +102,7 @@ struct
 			row^rest
 		end
 
-	(*goal has atleast one constraint*)
+    (*goal has atleast one constraint*)
 	fun check_consistent (constraints,t1_vars,t2_vars) =
 		let
 			val new_cons = constraints
@@ -125,7 +125,7 @@ struct
 	fun pair_append ( (L1,L2),(L1',L2')) = (L1@ L1', L2 @ L2') 
 
 	fun fresh_CtxVar () = ctx_var_to_fresh(Dat.CtxVar(NONE,"e"))
-	
+
 	fun weaken_constraints(cons_list) = 
 		(let
 			val new_cons = List.map 

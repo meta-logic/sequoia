@@ -15,8 +15,8 @@ function selectRule(bl, i) {
         $("#i"+r1).attr("class", 'add icon')
         $("#cut_button").attr("class", "ui disabled teal large button")
         rule1 = "r"+i
-        $("#rule_card"+i).attr("class", "ui raised blue card")
-        $("#b"+i).attr("class", "ui active bottom attached button")
+        $("#rule_card"+i).attr("class", "ui raised card")
+        $("#b"+i).attr("class", "ui active blue bottom attached button")
         $("#b"+i).attr("onClick", "selectRule(false,"+i+")")
         $("#i"+i).attr("class", "close icon")
         $("#cut_button").attr("class", "ui teal large button")

@@ -90,5 +90,5 @@ function parse_and_fix(parser, rule) {
         data : {id : rule._id, rule : rule.rule, 
             conclusion : conc, premises : JSON.stringify(prem), parsed_conc : conc_final, 
             parsed_prem : JSON.stringify(parsed_prem), calculus : calc_id, 
-            connective : rule.connective, side : rule.side, type : rule.type, function(data) {}}})
+            connective : rule.connective, side : rule.side, type : rule.type, cutvar : rule.cutvar, function(data) {}}})
 }

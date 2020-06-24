@@ -17,7 +17,7 @@ function insert_new_tree(cn, cz, lt, ht, st) {
     })
     constraint_history.push(cn)
     smlconstraint_history.push(cz.replace(/\\/g, "\\\\"))
-    if (constraint_history.length > 0) {
+    if (constraint_history.join() != "") {
         var the_constraints = constraint_history[constraint_history.length-1]
         if (the_constraints[0] != "") {
             var constraints = $("#side_menu_L")
@@ -52,7 +52,7 @@ function insert_old_tree() {
     })
     constraint_history.pop()
     smlconstraint_history.pop()
-    if (constraint_history.length > 0) {
+    if (constraint_history.join() != "") {
         var the_constraints = constraint_history[constraint_history.length-1]
         if (the_constraints[0] != "") {
             var constraints = $("#side_menu_L")

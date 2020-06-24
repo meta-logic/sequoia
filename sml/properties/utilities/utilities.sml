@@ -149,6 +149,14 @@ struct
 
     fun rename_ids (cons,dvt) = (cons,rename_ids_h(dvt,ref (#"D")))
 
+    
+    fun print_var_list (l) = print ((ListFormat.listToString
+      (Dat.ctx_var_toString) l)^"\n")
+
+    fun print_cons (_,l1,l2) = (print "[\n";print_var_list l1;print
+      "=\n";print_var_list l2; print "]\n")
+    fun print_consL l = (List.app print_cons l; print "_____\n_____\n")
+
     fun check_premises'((cn1,dvt1),(cn2,dvt2),weak) =
         let
             val D.DerTree(_,sq1,_,_) = dvt1
@@ -159,18 +167,23 @@ struct
             val constraints = cn1@cn2
             (*val _ = last1 := dvt1*)
             (*val _ = last2 := dvt2*)
-
-
-            (* TODO  change this to take into account connectives*)
+           
+            val goal_cons = E.extract_constraints(sq1,sq2)
+            val constraints = goal_cons@constraints
+            val cn1 = goal_cons@cn1
 
 
             val t1_vars = (get_ctx_vars_der_tree(dvt1)@get_ctx_vars_from_constraints(cn1))
             val t2_vars = (get_ctx_vars_der_tree(dvt2)@get_ctx_vars_from_constraints(cn2))
-            val t1_vars = Set.listItems(Set.addList(Set.empty,t1_vars))
-            val t2_vars = Set.listItems(Set.addList(Set.empty,t2_vars))
+            val t1_vars = Set.addList(Set.empty,t1_vars)   
+            val t2_vars = Set.addList(Set.empty,t2_vars)
+            val t1_vars = Set.difference(t1_vars,t2_vars)
+            val t1_vars = Set.listItems t1_vars
+            val t2_vars = Set.listItems t2_vars
             (* val _ = print_seq_list(t1_prems)
             val _ = print_seq_list(t2_prems)
             val _ = print ("\n\n\n") *)
+           
             val res = E.check_premises_wk(t1_prems,dvt2,constraints,weak,t1_vars,t2_vars)
             (* val _ = if res then print("true\n\n\n\n\n\n\n") else print("false\n\n\n\n\n\n\n") *)
         in

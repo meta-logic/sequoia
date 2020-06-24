@@ -9,6 +9,13 @@ under certain conditions; see LICENSE for details. --}}
 <div id="page" hidden>{{page}}</div>
 <br>
 <div class="ui container">
+	<div class="ui basic message">
+		<div class="header">Specify the rule</div>
+		<div class="content">
+			<p>All symbols that appear in the sequents of the rule
+				must be defined in the rule symbols table below.</p>
+		</div>
+	</div>
 	<div class="row">
 		<div class="ui input">
 			<input id="rule_name" type="text" placeholder="Rule Name">
@@ -55,7 +62,7 @@ under certain conditions; see LICENSE for details. --}}
 		<div id="warning_header" class="header">TEMP</div>
 		<p id="warning_text">TEMP</p>
 	</div>
-	<table id="sym_table" class= "ui sortable fixed single line celled table" style="visibility: hidden;">
+	<table id="sym_table" class= "ui sortable fixed celled table">
 		<thead><tr><th>Rule Symbols</th><th>Types</th></tr></thead> 
 		<tbody id="init"><tbody> 
 		<tbody id="table_head"> 
@@ -66,17 +73,41 @@ under certain conditions; see LICENSE for details. --}}
 					</div>
 				</td>
 				<td id="select_field">
-					<select class="ui search dropdown" style="visibility: hidden;" id="typ">
+					<select class="ui search dropdown" id="typ">
 						<option value="">Type</option>
 						<option value="atom variable">atom variable</option>
 						<option value="formula variable">formula variable</option>
-						<option value="connective">connective</option>
 						<option value="context variable">context variable</option>
+						<option value="connective">connective</option>
 						<option value="sequent sign">sequent sign</option>
 						<option value="context separator">context separator</option>
 					</select>
 					<button class="ui large green right floated button" onclick="add_symbol_toTable('rule')">Add Symbol</button>
 				</td>
+			</tr>
+			<tr>
+				<td id="atom_variable_row"></td>
+				<td>atom variable</td>
+			</tr>
+			<tr>
+				<td id="formula_variable_row"></td>
+				<td>formula variable</td>
+			</tr>
+			<tr>
+				<td id="context_variable_row"></td>
+				<td>context variable</td>
+			</tr>
+			<tr>
+				<td id="connective_row"></td>
+				<td>connective</td>
+			</tr>
+			<tr>
+				<td id="sequent_sign_row"></td>
+				<td>sequent sign</td>
+			</tr>
+			<tr>
+				<td id="context_separator_row"></td>
+				<td>context separator</td>
 			</tr>
 		</tbody>
 	</table>
@@ -103,21 +134,21 @@ under certain conditions; see LICENSE for details. --}}
 	</div>
 </div>
 <div id ="modal3" class="ui special modal">
-    <div class="header">Cut Formula Variable</div>
-    <div id = "change warning" class="content">
-        <p>Please indicate the cut formula variable.</p>
-        <p id= "cut_rule"></p>
-        <div class="ui form">
-            <div class="two fields">
-                <div class="field">
-                    <label>Variable</label>
-                    <input id="var" type="text">
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="actions">
-        <div id="yes_button" class="ui approve button">Confirm</div>
-        <div id="no_button" class="ui cancel button">Cancel</div>
-    </div>
+	<div class="header">Cut Formula Variable</div>
+	<div id = "change warning" class="content">
+		<p>Please indicate the cut formula variable.</p>
+		<p id= "cut_rule"></p>
+		<div class="ui form">
+			<div class="two fields">
+				<div class="field">
+					<label>Variable</label>
+					<input id="var" type="text">
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="actions">
+		<div id="yes_button" class="ui approve button">Confirm</div>
+		<div id="no_button" class="ui cancel button">Cancel</div>
+	</div>
 </div>
