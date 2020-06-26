@@ -9,13 +9,25 @@ import sys
 import os
 
 
+def get_out():
+    try:
+        return os.fdopen(10,'w')
+    except OSError:
+        return os.fdopen(1,'w')
 
-nl = open(os.devnull,'w')
-temp = sys.stdout
-temp2 = sys.stderr
 
-sys.stdout = nl 
-sys.stderr = nl
+nl = os.open(os.devnull,os.O_WRONLY)
+temp = 15
+temp2 = 16
+
+stdout = 1
+stderr = 2
+
+os.dup2(stdout,temp)
+os.dup2(nl,stdout)
+
+os.dup2(stderr,temp2)
+os.dup2(nl,stderr)
 
 
 
@@ -24,6 +36,7 @@ from mip.constants import *
 
 
 
+#print(os.listdir('/proc/self/fd'))
 
 
 
@@ -33,7 +46,7 @@ if (len(sys.argv)>=3):
 	file = sys.argv[2]
 	f = open(file,"r")	
 
-w = nl
+w = os.fdopen(nl,'w')
 if len(sys.argv)>=2:
 	log = sys.argv[1]
 	w = open(log,"a")
@@ -96,17 +109,22 @@ for i in range(t1_num):
 m.emphasis=1
 status = m.optimize()
 
-sys.stdout = temp
-sys.stderr = temp2
+os.dup2(temp,stdout)
+os.dup2(temp2,stderr)
 
 
 solved = (status == OptimizationStatus.OPTIMAL) or (status == OptimizationStatus.FEASIBLE)
 
-print(int(solved))
+sml_out = get_out()
+res = ("%d\n"%(int(solved)))
+sml_out.write(res)
+sml_out.close()
 w.write(str(solved) + "\n")
 if (solved):
 	unifier = list(map((lambda x : list(map(lambda y: int(y.x),x))),unifier))
 	for i in range(len(unifier)):
 		w.write(" ".join(map(str,unifier[i])) +"\n")
+
 w.close()
-nl.close()
+if (os.isatty(nl)):
+    os.close(nl)

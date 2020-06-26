@@ -25,8 +25,8 @@ function addUser() {
             $("#p2").attr("class", "required field error")
         }
         return
-    } else if (username.length < 8 || password1.length < 8 || password2.length < 8) {
-        if (username.length < 8) {
+    } else if (username.length < 3 || password1.length < 8 || password2.length < 8) {
+        if (username.length < 3) {
             $("#u").attr("class", "required field error")
         }
         if (password1.length < 8 ) {
@@ -35,7 +35,7 @@ function addUser() {
         if (password2.length < 8) {
             $("#p2").attr("class", "required field error")
         }
-        $("#warning_header").html("Username and passwords must be at least eight characters long.")
+        $("#warning_header").html("Usernames must be at least three characters long, and passwords must be at least eight characters long.")
         $("#warning").css("visibility", "visible")
         return
     } else {

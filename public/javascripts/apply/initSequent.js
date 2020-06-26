@@ -68,6 +68,7 @@ function parse_and_use(temp_parser) {
         return
     }
     $("#seq").css("display", "none")
+    $("#note").css("visibility", "hidden")
     $("#submit").css("visibility", "hidden")
     $("#warning").css("visibility", "hidden")
     $("#export").attr("class", "ui fluid huge icon button green")
