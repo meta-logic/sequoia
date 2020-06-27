@@ -21,11 +21,21 @@ function seeLatex() {
     var latex_constraints = ""
     $("#latex").html("Tree: <br>"+latex_tree)
     if (constraint_history.length > 0) {
-        latex_constraints = ((constraint_history[constraint_history.length-1]).join(","))
-        $("#latex").append("<br><br> Constraints: <br>["+latex_constraints+"]")
+        latex_constraints = ((constraint_history[constraint_history.length-1]).join(" AND "))
+        $("#latex").append("<br><br> Constraints: <br>"+latex_constraints+"")
     }
     $('#modal3').modal({
         onApprove: function() {
+            var tree_content = latex_history[latex_history.length-1]
+            var constraint_content = "NONE"
+            if (constraint_history.length != 0) {
+                constraint_content = constraint_history[constraint_history.length-1].join("\/")
+                if (constraint_content == "") {
+                    constraint_content = "NONE"
+                }
+            } 
+            proof_content["tree"] = tree_content
+            proof_content["constraints"] = constraint_content
             download("LatexTree")
         }
     }).modal('setting', 'closable', false).modal('show')
@@ -144,16 +154,6 @@ function applyRule(i) {
                         insert_new_tree(cons_set[index], new_sml_cons[index], new_latex_trees[index], new_html_trees[index], new_sml_trees[index])
                     })
                 }
-                var tree_content = latex_history[latex_history.length-1]
-                var constraint_content = "NONE"
-                if (constraint_history.length != 0) {
-                    constraint_content = constraint_history[constraint_history.length-1].join(",")
-                    if (constraint_content == "") {
-                        constraint_content = "NONE"
-                    }
-                } 
-                proof_content["tree"] = tree_content
-                proof_content["constraints"] = constraint_content
             })
         })
     })
