@@ -4,14 +4,18 @@
 // under certain conditions; see LICENSE for details.
 
 
+var proof_content = {}
+
 function showProofWeak(side, index, on, num) {
     if (on == "yes") {
         $("#"+side+index).attr("onClick", "showProofWeak('"+side+"',"+index+",'no',"+num+")")
+        $("#Arrow"+side+index).attr("class", "caret down icon")
         for (var i = 0; i < num; i++) {
             $("#"+side+"proof"+index+""+i).css("display", "none")
         }
     } else {
         $("#"+side+index).attr("onClick", "showProofWeak('"+side+"',"+index+",'yes',"+num+")")
+        $("#Arrow"+side+index).attr("class", "caret up icon")
         for (var i = 0; i < num; i++) {
             $("#"+side+"proof"+index+""+i).css("display", "flex")
         }
@@ -96,7 +100,7 @@ function checkWeak() {
                                 '<div class="header">'+newString+'</div>'+
                             '</div>'+
                             '<div id="L'+i+'" class="ui bottom attached button" onClick=showProofWeak("L",'+i+',"no",'+proofs_list.length+')>'+
-                                '<i class="question icon"></i>'+
+                                '<i id="ArrowL'+i+'" class="caret down icon"></i>'+
                             '</div>'+
                         '</div>'
                     )
@@ -130,7 +134,7 @@ function checkWeak() {
                                 '<div class="header">'+newString+'</div>'+
                             '</div>'+
                             '<div id="R'+i+'" class="ui bottom attached button" onClick=showProofWeak("R",'+i+',"no",'+proofs_list.length+')>'+
-                                '<i class="question icon"></i>'+
+                                '<i id="ArrowR'+i+'" class="caret down icon"></i>'+
                             '</div>'+
                         '</div>'
                     )
@@ -147,10 +151,8 @@ function checkWeak() {
                     }
                 }
             }
-            $("#info_header").html(answer[0])
-            $("#info_text").html(answer[1])
-            $("#info_answer").attr("class", "ui info message")
-            $("#info_answer").css("display", "block")
+            // $("#download").css("display", "block")
+            // $("#download").attr("onclick", "download(\"Weakening_Admissibility\")")
             MathJax.Hub.Queue(["Typeset", MathJax.Hub, lt[0]], function() { 
                 MathJax.Hub.Queue(["Typeset", MathJax.Hub, rt[0]], function() {
                     $("#loading").attr("class", "ui inactive inverted dimmer")

@@ -4,6 +4,7 @@
 // under certain conditions; see LICENSE for details.
 
 
+var proof_content = {}
 var rule1 = ""
 
 function selectRule(bl, i) {
@@ -34,11 +35,13 @@ function selectRule(bl, i) {
 function showProofCut(type, index, on, num) {
     if (on == "yes") {
         $("#"+type+index).attr("onClick", "showProofCut('"+type+"',"+index+",'no',"+num+")")
+        $("#Arrow"+type+index).attr("class", "caret down icon")
         for (var i = 0; i < num; i++) {
             $("#"+type+"proof"+index+""+i).css("display", "none")
         }
     } else {
         $("#"+type+index).attr("onClick", "showProofCut('"+type+"',"+index+",'yes',"+num+")")
+        $("#Arrow"+type+index).attr("class", "caret up icon")
         for (var i = 0; i < num; i++) {
             $("#"+type+"proof"+index+""+i).css("display", "flex")
         }
@@ -93,7 +96,7 @@ function checkCut() {
                             '<div class="header">$$'+it_ordered[i]+'$$</div>'+
                         '</div>'+
                         '<div id="AX'+i+'" class="ui bottom attached button" onClick=showProofCut("AX",'+i+',"no",'+proofs_list.length+')>'+
-                            '<i class="question icon"></i>'+
+                            '<i id="ArrowAX'+i+'" class="caret down icon"></i>'+
                         '</div>'+
                     '</div>'
                 )
@@ -125,7 +128,7 @@ function checkCut() {
                             '<div class="header">$$'+rl_ordered[i]+'$$</div>'+
                         '</div>'+
                         '<div id="RK'+i+'" class="ui bottom attached button" onClick=showProofCut("RK",'+i+',"no",'+proofs_list.length+')>'+
-                            '<i class="question icon"></i>'+
+                            '<i id="ArrowRK'+i+'" class="caret down icon"></i>'+
                         '</div>'+
                     '</div>'
                 )
@@ -157,7 +160,7 @@ function checkCut() {
                             '<div class="header">$$'+con_ordered[i]+'$$</div>'+
                         '</div>'+
                         '<div id="GD'+i+'" class="ui bottom attached button" onClick=showProofCut("GD",'+i+',"no",'+proofs_list.length+')>'+
-                            '<i class="question icon"></i>'+
+                            '<i id="ArrowGD'+i+'" class="caret down icon"></i>'+
                         '</div>'+
                     '</div>'
                 )
@@ -174,6 +177,8 @@ function checkCut() {
                 }
             }
         }
+        // $("#download").css("display", "block")
+        // $("#download").attr("onclick", "download(\"Cut_Admissibility\")")
         MathJax.Hub.Queue(["Typeset", MathJax.Hub, ax[0]], function() { 
             MathJax.Hub.Queue(["Typeset", MathJax.Hub, rk[0]], function() {
                 MathJax.Hub.Queue(["Typeset", MathJax.Hub, gd[0]], function() {

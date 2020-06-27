@@ -4,12 +4,16 @@
 // under certain conditions; see LICENSE for details.
 
 
+var proof_content = {}
+
 function showProofInit(index, on) {
     if (on == "yes") {
         $("#I"+index).attr("onClick", "showProofInit("+index+",'no')")
+        $("#Arrow"+index).attr("class", "caret down icon")
         $("#proof"+index).css("display", "none")
     } else {
         $("#I"+index).attr("onClick", "showProofInit("+index+",'yes')")
+        $("#Arrow"+index).attr("class", "caret up icon")
         $("#proof"+index).css("display", "flex")
     }
 }
@@ -101,7 +105,7 @@ function checkInit() {
                                 '<div class="header">$$'+con_ordered[i]+'$$</div>'+
                             '</div>'+
                             '<div id="I'+i+'" class="ui bottom attached button" onClick=showProofInit('+i+',"no")>'+
-                                '<i class="question icon"></i>'+
+                                '<i id="Arrow'+i+'" class="caret down icon"></i>'+
                             '</div>'+
                         '</div>'+
                         '<div class="ui card" id="proof'+i+'" style="display: none;">'+
@@ -112,6 +116,8 @@ function checkInit() {
                     )
                 }
             }
+            // $("#download").css("display", "block")
+            // $("#download").attr("onclick", "download(\"Identity_Expansion\")")
             MathJax.Hub.Queue(["Typeset", MathJax.Hub, cp[0]], function() {
                 $("#loading").attr("class", "ui inactive inverted dimmer")
             })
