@@ -55,18 +55,22 @@ function checkWeak() {
     $("#loading").attr("class", "ui active inverted dimmer")
     $.get("/sequoia/api/rules/"+calc_id, function(rls, status) { 
         var rules = rls.rules
-        var rule_list = []
+        var logical_list = []
+        var init_list = []
         for (var i = 0; i < rules.length; i++) {
-            if (rules[i].type != "Structural") {
-                var rule_name = rules[i].rule.replace(/\\/g, "\\\\")
-                var rule_side = rules[i].side
-                var rule_conc = rules[i].sml_conc.replace(/\\/g, "\\\\")
-                var rule_prem = list_to_string(rules[i].sml_prem).replace(/\\/g, "\\\\")
-                var rule_sml = "Rule(\""+rule_name+"\","+rule_side+","+rule_conc+","+rule_prem+")"
-                rule_list.push(rule_sml)
+            var rule_name = rules[i].rule.replace(/\\/g, "\\\\")
+            var rule_type = rules[i].type
+            var rule_side = rules[i].side
+            var rule_conc = rules[i].sml_conc.replace(/\\/g, "\\\\")
+            var rule_prem = list_to_string(rules[i].sml_prem).replace(/\\/g, "\\\\")
+            var rule_sml = "Rule(\""+rule_name+"\","+rule_side+","+rule_conc+","+rule_prem+")"
+            if (rule_type == "Logical") {
+                logical_list.push(rule_sml)
+            } else if (rule_type == "Axiom") {
+                init_list.push(rule_sml)
             }
         }
-        var rule_strings = list_to_string(rule_list)
+        var rule_strings = list_to_string(init_list.concat(logical_list))
         $.post("/sequoia/weakenSides", { rules: rule_strings }, function(data, status) {
             var output = data.output.split("%%%")
             var result = output[0]

@@ -147,7 +147,9 @@ struct
         in
             let val true_strings = List.map (latex_res) true_list
                 val fail_strings = List.map (fn (cl,dvt) => "$$"^Latex.der_tree_toLatex2(dvt)^"$$"
-                                                            ^"$$"^Ut.constraintL_toString(cl)^"$$") fail_list
+                                                            ^"$$"^Ut.constraintL_toString(cl)^"$$"
+                                                            ^"$$ \\leadsto $$"
+                                                            ^"$$ ? $$") fail_list
                 val true_string = List.foldr (fn (x,y) => x^"###"^y) "" true_strings
                 val fail_string = List.foldr (fn (x,y) => x^"###"^y) "" fail_strings
             in true_string^"&&&"^fail_string end

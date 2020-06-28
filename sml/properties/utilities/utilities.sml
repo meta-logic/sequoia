@@ -359,6 +359,8 @@ struct
     | print_helper((clist1,tree1),NONE) = 
         "$$"^Latex.der_tree_toLatex2(tree1)^"$$"
         ^"$$"^constraintL_toString(clist1)^"$$"
+        ^"$$ \\leadsto $$"
+        ^"$$ ? $$"
 
 
 end
