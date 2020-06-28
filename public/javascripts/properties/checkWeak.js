@@ -55,8 +55,8 @@ function checkWeak() {
     $("#loading").attr("class", "ui active inverted dimmer")
     $.get("/sequoia/api/rules/"+calc_id, function(rls, status) { 
         var rules = rls.rules
-        var logical_list = []
         var init_list = []
+        var logical_list = []
         for (var i = 0; i < rules.length; i++) {
             var rule_name = rules[i].rule.replace(/\\/g, "\\\\")
             var rule_type = rules[i].type
