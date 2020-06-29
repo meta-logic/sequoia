@@ -24,7 +24,7 @@ function checkInit() {
     $.get("/sequoia/api/rules/"+calc_id, function(rls, status) { 
         var rules = rls.rules
         var init_list = []
-        var connective_rules = []
+        var logical_list = []
         var connective_dict = {}
         var con_ordered = []
         for (var i = 0; i < rules.length; i++) {
@@ -54,10 +54,10 @@ function checkInit() {
         for (var key in connective_dict) {
             con_ordered.push("\\"+key)
             var temp = "(Con(\""+key+"\"),"+list_to_string(connective_dict[key][0])+","+list_to_string(connective_dict[key][1])+")"
-            connective_rules.push(temp)
+            logical_list.push(temp)
         }
         var init_strings = list_to_string(init_list)
-        var conn_strings = list_to_string(connective_rules)
+        var logical_strings = list_to_string(logical_list)
         if (init_list.length == 0) {
             $("#info_header").html("Rules Missing")
             $("#info_text").html("No initial or axiom rules are defined for this calculus system. Therefore, identity expansion cannot be checked.")
@@ -66,7 +66,7 @@ function checkInit() {
             $("#info_answer").css("display", "block")
             return
         }
-        $.post("/sequoia/initRules", {first : conn_strings, second : init_strings, third : "[]"}, function(data, status) {
+        $.post("/sequoia/initRules", {first : logical_strings, second : init_strings, third : "[]"}, function(data, status) {
             var output = data.output.split("%%%")
             var result = output[0]
             if (result == "Arity Problem") {

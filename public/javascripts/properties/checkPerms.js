@@ -13,10 +13,10 @@ function selectRule(bl, i) {
         var card_color = ""
         if (rule1 == "") {
             rule1 = "r"+i
-            card_color = "red"
+            card_color = "blue"
         } else if (rule2 == "") {
             rule2 = "r"+i
-            card_color = "blue"
+            card_color = "red"
         }
         $("#rule_card"+i).attr("class", "ui raised card")
         $("#b"+i).attr("class", "ui active "+card_color+" bottom attached button")
