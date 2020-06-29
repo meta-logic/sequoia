@@ -4,14 +4,18 @@
 // under certain conditions; see LICENSE for details.
 
 
+var proof_content = {}
+
 function showProofWeak(side, index, on, num) {
     if (on == "yes") {
         $("#"+side+index).attr("onClick", "showProofWeak('"+side+"',"+index+",'no',"+num+")")
+        $("#Arrow"+side+index).attr("class", "caret down icon")
         for (var i = 0; i < num; i++) {
             $("#"+side+"proof"+index+""+i).css("display", "none")
         }
     } else {
         $("#"+side+index).attr("onClick", "showProofWeak('"+side+"',"+index+",'yes',"+num+")")
+        $("#Arrow"+side+index).attr("class", "caret up icon")
         for (var i = 0; i < num; i++) {
             $("#"+side+"proof"+index+""+i).css("display", "flex")
         }
@@ -51,18 +55,22 @@ function checkWeak() {
     $("#loading").attr("class", "ui active inverted dimmer")
     $.get("/sequoia/api/rules/"+calc_id, function(rls, status) { 
         var rules = rls.rules
-        var rule_list = []
+        var init_list = []
+        var logical_list = []
         for (var i = 0; i < rules.length; i++) {
-            if (rules[i].type != "Structural") {
-                var rule_name = rules[i].rule.replace(/\\/g, "\\\\")
-                var rule_side = rules[i].side
-                var rule_conc = rules[i].sml_conc.replace(/\\/g, "\\\\")
-                var rule_prem = list_to_string(rules[i].sml_prem).replace(/\\/g, "\\\\")
-                var rule_sml = "Rule(\""+rule_name+"\","+rule_side+","+rule_conc+","+rule_prem+")"
-                rule_list.push(rule_sml)
+            var rule_name = rules[i].rule.replace(/\\/g, "\\\\")
+            var rule_type = rules[i].type
+            var rule_side = rules[i].side
+            var rule_conc = rules[i].sml_conc.replace(/\\/g, "\\\\")
+            var rule_prem = list_to_string(rules[i].sml_prem).replace(/\\/g, "\\\\")
+            var rule_sml = "Rule(\""+rule_name+"\","+rule_side+","+rule_conc+","+rule_prem+")"
+            if (rule_type == "Logical") {
+                logical_list.push(rule_sml)
+            } else if (rule_type == "Axiom") {
+                init_list.push(rule_sml)
             }
         }
-        var rule_strings = list_to_string(rule_list)
+        var rule_strings = list_to_string(init_list.concat(logical_list))
         $.post("/sequoia/weakenSides", { rules: rule_strings }, function(data, status) {
             var output = data.output.split("%%%")
             var result = output[0]
@@ -96,7 +104,7 @@ function checkWeak() {
                                 '<div class="header">'+newString+'</div>'+
                             '</div>'+
                             '<div id="L'+i+'" class="ui bottom attached button" onClick=showProofWeak("L",'+i+',"no",'+proofs_list.length+')>'+
-                                '<i class="question icon"></i>'+
+                                '<i id="ArrowL'+i+'" class="caret down icon"></i>'+
                             '</div>'+
                         '</div>'
                     )
@@ -130,7 +138,7 @@ function checkWeak() {
                                 '<div class="header">'+newString+'</div>'+
                             '</div>'+
                             '<div id="R'+i+'" class="ui bottom attached button" onClick=showProofWeak("R",'+i+',"no",'+proofs_list.length+')>'+
-                                '<i class="question icon"></i>'+
+                                '<i id="ArrowR'+i+'" class="caret down icon"></i>'+
                             '</div>'+
                         '</div>'
                     )
@@ -147,10 +155,8 @@ function checkWeak() {
                     }
                 }
             }
-            $("#info_header").html(answer[0])
-            $("#info_text").html(answer[1])
-            $("#info_answer").attr("class", "ui info message")
-            $("#info_answer").css("display", "block")
+            // $("#download").css("display", "block")
+            // $("#download").attr("onclick", "download(\"Weakening_Admissibility\")")
             MathJax.Hub.Queue(["Typeset", MathJax.Hub, lt[0]], function() { 
                 MathJax.Hub.Queue(["Typeset", MathJax.Hub, rt[0]], function() {
                     $("#loading").attr("class", "ui inactive inverted dimmer")

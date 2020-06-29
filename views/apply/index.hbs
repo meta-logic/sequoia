@@ -98,8 +98,8 @@ under certain conditions; see LICENSE for details. --}}
   </div>
   <div class="three wide column">
     <div class="ui two attached buttons">
-      <button id="export" class="ui disabled fluid huge icon button green" onclick="sendEmail()">
-        <i class="icon download"></i><br>See Latex
+      <button id="export" class="ui disabled fluid huge icon button green" onclick="seeLatex()">
+        <i class="icon file alternate"></i><br>See Latex
       </button>
       <button id="undo" class="ui disabled fluid huge icon button red" onclick="undo()">
         <i class="icon undo"></i><br>Undo Apply
@@ -146,18 +146,12 @@ under certain conditions; see LICENSE for details. --}}
   </div>
 </div>
 <div id ="modal3" class="ui special modal">
-  <div class="header">Send to Email</div>
+  <div class="header">Download Tree in Latex</div>
   <div class="content">
     <p id="latex"></p>
-    <div class="ui form">
-      <div class="field">
-        <label>Email</label>
-        <input id="email" type="text">
-      </div>
-    </div>
   </div>
   <div class="actions">
-      <div id="yes_button" class="ui approve button">Send</div>
+      <div id="yes_button" class="ui approve button">Download</div>
       <div id="no_button" class="ui cancel button">Cancel</div>
     </div>
 </div>

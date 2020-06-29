@@ -96,7 +96,7 @@ function getCalculi (req, res) {
             })
         }
         return res.status(200).json({
-            "status"      : "success",
+            "status"   : "success",
             "calculi"  : calculi
         })
     })

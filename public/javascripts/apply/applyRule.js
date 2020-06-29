@@ -14,21 +14,29 @@ var latex_history = []
 var tree_history = []
 var smlconstraint_history = ["nil"]
 var constraint_history = []
+var proof_content = {}
 
-function sendEmail() {
+function seeLatex() {
     var latex_tree = latex_history[latex_history.length-1]
     var latex_constraints = ""
     $("#latex").html("Tree: <br>"+latex_tree)
     if (constraint_history.length > 0) {
-        latex_constraints = ((constraint_history[constraint_history.length-1]).join(","))
-        $("#latex").append("<br><br> Constraints: <br>["+latex_constraints+"]")
+        latex_constraints = ((constraint_history[constraint_history.length-1]).join(" AND "))
+        $("#latex").append("<br><br> Constraints: <br>"+latex_constraints+"")
     }
     $('#modal3').modal({
         onApprove: function() {
-            var email = $("#email").val()
-            window.open('mailto:'+encodeURIComponent(email)+
-            '?subject='+encodeURIComponent("Sequoia Latex Proof Tree")+
-            '&body='+encodeURIComponent("Tree: \n"+latex_tree+"\n\n"+"Constraints: \n"+latex_constraints));
+            var tree_content = latex_history[latex_history.length-1]
+            var constraint_content = "NONE"
+            if (constraint_history.length != 0) {
+                constraint_content = constraint_history[constraint_history.length-1].join("\/")
+                if (constraint_content == "") {
+                    constraint_content = "NONE"
+                }
+            } 
+            proof_content["tree"] = tree_content
+            proof_content["constraints"] = constraint_content
+            download("LatexTree")
         }
     }).modal('setting', 'closable', false).modal('show')
 }
