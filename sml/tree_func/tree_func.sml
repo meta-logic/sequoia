@@ -86,7 +86,6 @@ structure treefuncImpl : TREEFUNC = struct
                 | bad_sub(Dat.Fs(a1,_), sequent) = 
                     List.exists(fn a2 => Dat.form_eq(a1,a2))
                     (List.concat(List.map(get_form_vars)(get_forms sequent)))
-                | bad_sub _ = false
         in 
             List.filter(fn (sb,_) => not (List.exists(fn s => bad_sub(s,sequent))sb))sigcons
         end
