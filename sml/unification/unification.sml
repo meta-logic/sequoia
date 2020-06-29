@@ -345,7 +345,10 @@ structure unifyImpl : UNIFICATION = struct
                                                         (APP.UnifierComposition(sub1, subs), con1 @ cons))sc
                                                 )sc_list)
                                 in
-                                    SOME(combo)
+                                    (case combo of 
+                                          _::_ => SOME combo
+                                        | _ => NONE
+                                    )
                                 end))
 
 end
