@@ -23,9 +23,9 @@ struct
     val sub_var_names = #["C","D","E"]
     val sub_var_name_gen = Q.Gen.select sub_var_names
     (* (con,arity) pairs*)
-    val connectives = #[(D.Con("/\\"),2),
-                                   (D.Con("\\/"),2),
-                                   (D.Con("->"),2)]
+    val (con1,con2,con3) = ((D.Con("\\wedge"),2), (D.Con("\\vee"),2), (D.Con("\\supset"),2)) 
+    val connectives = #[con1,con2,con3]
+
     val con_gen = Q.Gen.select connectives
     
     fun atom_gen name_gen = Q.Gen.map (fn nm => D.Atom(nm)) name_gen
@@ -59,7 +59,7 @@ struct
         end
 
     (*list generators*)
-    fun ctx_var_l_gen range = gen_to_L range context_var_gen
+    fun ctx_var_l_gen range = gen_to_L (0,2) context_var_gen
    
     fun form_l_gen range = gen_to_L range (form_gen var_name_gen)
     
