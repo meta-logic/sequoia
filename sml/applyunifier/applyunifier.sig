@@ -10,6 +10,7 @@ signature APPLYUNIFIER = sig
     type sub = DAT.sub
     type form = DAT.form
     type ctx_var = DAT.ctx_var
+    type ctx = DAT.ctx
     type ctx_struct = DAT.ctx_struct
     type seq = DAT.seq
     type der_tree = DAT.der_tree
@@ -23,6 +24,9 @@ signature APPLYUNIFIER = sig
     val apply_ctx_varL_Unifier : ctx_var list * sub list -> (ctx_var list * form list) list
     val apply_ctx_varL_allUnifiers : ctx_var list * sub list list -> (ctx_var list * form list) list list
     
+    val apply_ctx_Unifier : ctx * sub list -> ctx
+    val apply_ctx_allUnifier : ctx * sub list list -> ctx list
+
     val apply_ctx_struct_Unifier : ctx_struct * sub list -> ctx_struct
     val apply_ctx_struct_allUnifiers : ctx_struct * sub list list -> ctx_struct list
     
