@@ -59,5 +59,6 @@ signature DATATYPES = sig
 
     val sub_eq : sub * sub -> bool
     val sub_prefix_eq : sub * sub -> bool
-
+    val sub_to_string : sub -> string
+    val subs_to_string : sub list -> string
 end

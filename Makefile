@@ -11,3 +11,6 @@ install:
 
 compile:
 	echo $(EOF) | sml -m "sml/unify.cm"
+
+test:
+	sml -m "sml/unit_test/unit_test.cm"

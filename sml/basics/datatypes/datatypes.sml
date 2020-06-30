@@ -167,6 +167,7 @@ structure datatypesImpl : DATATYPES = struct
         List.all(fn (a,b) => seq_eq(a,b))(ListPair.zip(pq1,pq2))
         | rule_eq(Rule(name1, None, sq1, []), Rule(name2, None, sq2, [])) =
         name1 = name2 andalso seq_eq(sq1,sq2)
+        | rule_eq(_,_) = false
 
 
     datatype sub = Fs of form * form | CTXs of ctx_var * ctx 
@@ -176,6 +177,11 @@ structure datatypesImpl : DATATYPES = struct
     fun sub_prefix_eq (Fs(a,_), Fs(b,_)) = form_eq(a,b)
         | sub_prefix_eq (CTXs(a,_), CTXs(b,_)) = ctx_var_eq(a,b)
         | sub_prefix_eq (_, _) = false
+    fun sub_to_string (Fs(a,b)) = form_stringify(a) ^ "-->" ^ form_stringify(b)
+        | sub_to_string (CTXs(a,b)) = ctx_var_stringify(a) ^ "-->" ^ ctx_stringify(b)
+    val subs_to_string_fmt = {init = "\n___start___\n",sep = "\n",
+                     final = "\n___end___\n", fmt = sub_to_string}
+    fun subs_to_string (subs) = ListFormat.fmt subs_to_string_fmt subs
 
     type rule_name = string option
     datatype der_tree = DerTree of string * seq * rule_name * der_tree list

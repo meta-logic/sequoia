@@ -90,6 +90,13 @@ struct
     val form_sub_gen = Q.Gen.map D.Fs (Q.Gen.zip (sub_var_gen, form_gen
     var_name_gen))
 
+    val ctx_var_sub_gen = Q.Gen.map D.CTXs (Q.Gen.zip (context_var_gen,context_gen))
+
+    val sub_gen = Q.Gen.choose' (#[
+                (4,form_sub_gen),
+                (1,ctx_var_sub_gen)
+    ])
+
 
 
 end
