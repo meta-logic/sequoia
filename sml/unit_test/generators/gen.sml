@@ -59,7 +59,7 @@ struct
         end
 
     (*list generators*)
-    fun ctx_var_l_gen range = gen_to_L (0,2) context_var_gen
+    fun ctx_var_l_gen range = Q.Gen.choose (#[ gen_to_L (1,1) context_var_gen ,gen_to_L (0,2) context_var_gen])
    
     fun form_l_gen range = gen_to_L range (form_gen var_name_gen)
     
