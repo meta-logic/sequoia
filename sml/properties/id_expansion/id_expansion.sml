@@ -142,6 +142,7 @@ struct
     fun init_coherence_print' fd (a,b,c) = 
         ((let
             val print_sep = "&&&"
+            val base_case_sep = "~~~"
             val proof_list_fmt = {init="",sep=print_sep,final="",fmt = Ut.print_helper}
             val proof_list_fmt2 = {init="",sep=print_sep,final="",fmt = Ut.print_helper2}
             val print_helper = ListFormat.fmt proof_list_fmt
@@ -153,8 +154,8 @@ struct
                     then "T###"^print_helper2(pf) else "F###"^print_helper2(pf)
         in
             let 
-                val t = (base_case_to_str base)::(List.map (case_to_str) out)
-                val p = List.foldr (fn (a,b) => a^"@@@"^b) "" t
+                val (t',t) = ((base_case_to_str base),(List.map (case_to_str) out))
+                val p = (t')^base_case_sep^(List.foldr (fn (a,b) => a^"@@@"^b) "" t)
                 val b = if bool then "T" else "F"
                 val bp = b^"%%%"^p
             in Ut.writeFD fd bp end
