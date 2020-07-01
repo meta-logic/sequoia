@@ -11,8 +11,21 @@ struct
     structure Latex = latexImpl
     structure Ut = Utilities
 
+
+    fun base_cases(rule_list) =
+        let
+            fun rule_to_tree (Dat.Rule(name,_,conc,_)) = Dat.DerTree("0",conc,SOME name, [])
+            val rule_list = List.map (Ut.update_all_rule_colors Ut.set_color) rule_list
+            val rule_trees = List.map rule_to_tree rule_list
+            val rule_trees_cons = List.map (fn tree => ([],tree)) rule_trees
+            val res = List.map (fn tree => ((tree,NONE))) rule_trees_cons
+        in
+            (true,res)
+        end
+
       (* check which formula  *)
-    fun init_coherence_con ((con:Dat.conn, rulesL: Dat.rule list, rulesR: Dat.rule list), init_rule: Dat.rule, axioms: Dat.rule list)=
+    fun init_coherence_con ((con:Dat.conn, rulesL: Dat.rule list, rulesR: Dat.rule list),
+                     init_rule: Dat.rule,init_rules:Dat.rule list, axioms: Dat.rule list)=
         let
             val _ = Ut.set_to_1()
             val Dat.Rule (_,_,init_conc,_) = init_rule
@@ -87,7 +100,8 @@ struct
                0 => rules_applied
              | _ => List.concat (List.map (fn x => T.apply_multiple_rules_all_ways(x,axioms)) rules_applied))
             
-            val init_applied = List.concat (List.map (fn (_,_,x) => T.apply_rule_everywhere(([],[],x),init_rule) ) axioms_applied)
+            fun init_applied' rule = List.concat (List.map (fn (_,_,x) => T.apply_rule_everywhere(([],[],x),rule) ) axioms_applied)
+            val init_applied = List.concat (List.map (init_applied') init_rules)
 
             val init_applied_trees = List.filter (fn (forms,_,_)=> List.all (fn x => Ut.subformula (x,con_form) ) forms )  (init_applied)
             val init_applied_trees = List.map (fn (_,cons,tree) => (cons,tree)) init_applied_trees
@@ -108,33 +122,45 @@ struct
 
     fun init_coherence_mult_init ((forms,rulesL,rulesR), init_rules, axioms) = 
         let
-            val results = List.map (fn rule => init_coherence_con((forms,rulesL,rulesR),rule,axioms)) init_rules
+            val results = List.map (fn rule => init_coherence_con((forms,rulesL,rulesR),rule,init_rules,axioms)) init_rules
+            val (bools,proofs) = ListPair.unzip results
         in
-            (case List.find (fn (x,_) => x) results of
-               SOME x => x
-             | NONE => List.hd(results) )
+            (List.all (fn x => x) bools ,proofs)
         end
 
-    fun init_coherence ([]: (Dat.conn *Dat.rule list * Dat.rule list) list,_: Dat.rule list,_: Dat.rule list) = (true , [])
-      | init_coherence (first_con::con_list,init_rules,axioms) = 
+    fun init_coherence (con_list: (Dat.conn *Dat.rule list * Dat.rule list) list,init: Dat.rule list,axioms: Dat.rule list) =
         let
-            val (rest,proofs) = init_coherence(con_list,init_rules,axioms)
-            val res as (result,_) = init_coherence_mult_init(first_con,init_rules,axioms) 
+            val con_results = List.map (fn con => init_coherence_mult_init(con,init,axioms)) con_list
+            val base_case = base_cases(init)
+            val all_cases = base_case::con_results
+            val bool = List.all (fn (x,_) => x) all_cases
         in
-          (rest andalso result , res::proofs)
+            (bool,all_cases)
         end
 
-    fun init_coherence_print (a,b,c) = 
-        (let
-            val print_helper = Ut.print_helper
+    (* base cases first, then each connective in the same order as input *)
+    fun init_coherence_print' fd (a,b,c) = 
+        ((let
+            val print_sep = "&&&"
+            val proof_list_fmt = {init="",sep=print_sep,final="",fmt = Ut.print_helper}
+            val proof_list_fmt2 = {init="",sep=print_sep,final="",fmt = Ut.print_helper2}
+            val print_helper = ListFormat.fmt proof_list_fmt
+            val print_helper2 = ListFormat.fmt proof_list_fmt2
+            val (bool, base :: out) = init_coherence(a,b,c)
+            fun case_to_str (bl,pf) =  if bl 
+                    then "T###"^print_helper(pf) else "F###"^print_helper(pf)
+            fun base_case_to_str (bl,pf) =  if bl 
+                    then "T###"^print_helper2(pf) else "F###"^print_helper2(pf)
         in
-            let val (bool, out) = init_coherence(a,b,c)
-                val t = List.map(fn (bl,pf) => if bl 
-                    then "T###"^print_helper(pf) else "F###"^print_helper(pf)) out
+            let 
+                val t = (base_case_to_str base)::(List.map (case_to_str) out)
                 val p = List.foldr (fn (a,b) => a^"@@@"^b) "" t
                 val b = if bool then "T" else "F"
                 val bp = b^"%%%"^p
-            in Ut.writeFD 3 bp end
+            in Ut.writeFD fd bp end
         end)
-        handle (Ut.Arity) => Ut.writeFD 3 "Arity Problem%%%Temp"
+        handle (Ut.Arity) => Ut.writeFD fd "Arity Problem%%%Temp")
+        handle (Bind) => Ut.writeFD fd "Unexpected Output%%%Temp"
+
+    val init_coherence_print = init_coherence_print' 3
 end
