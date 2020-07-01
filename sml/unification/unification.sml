@@ -35,7 +35,6 @@ structure unifyImpl : UNIFICATION = struct
                 List.map(fn sb => 
                     (case sb of DAT.Fs(a,b) => (DAT.form_toString a ^ " => " ^ DAT.form_toString b)
                             |  DAT.CTXs(a,b) => (DAT.ctx_var_toString a ^ " => " ^ DAT.ctx_toString b)
-                            |  DAT.CVs(a,b) => (DAT.ctx_var_toString a ^ " => " ^ DAT.ctx_var_toString b)
                     ))ls)sigma
 
     fun printS ([]) = []
@@ -44,7 +43,6 @@ structure unifyImpl : UNIFICATION = struct
                 List.map(fn sb => 
                     (case sb of DAT.Fs(a,b) => (DAT.form_toString a ^ " => " ^ DAT.form_toString b)
                             |  DAT.CTXs(a,b) => (DAT.ctx_var_toString a ^ " => " ^ DAT.ctx_toString b)
-                            |  DAT.CVs(a,b) => (DAT.ctx_var_toString a ^ " => " ^ DAT.ctx_var_toString b)
                     ))ls)sigma
 
     fun printC ([]) = []
@@ -345,7 +343,10 @@ structure unifyImpl : UNIFICATION = struct
                                                         (APP.UnifierComposition(sub1, subs), con1 @ cons))sc
                                                 )sc_list)
                                 in
-                                    SOME(combo)
+                                    (case combo of 
+                                          _::_ => SOME combo
+                                        | _ => NONE
+                                    )
                                 end))
 
 end

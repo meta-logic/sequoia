@@ -30,25 +30,31 @@ structure applyunifierImpl : APPLYUNIFIER = struct
     fun apply_ctx_varL_allUnifiers (itemL, subsL) = List.map(fn sb => apply_ctx_varL_Unifier(itemL, sb))subsL
 
 
+    fun apply_ctx_Unifier (DAT.Ctx(cL,fL),subs) = 
+        let 
+                val form_app = apply_formL_Unifier(fL, subs)
+                val (clist, flist) = ListPair.unzip(apply_ctx_varL_Unifier(cL, subs))
+            in 
+                DAT.Ctx(List.concat clist, List.concat flist @ form_app)
+            end
+    fun apply_ctx_allUnifier (ctx,subs_l) = List.map 
+        (fn subs => apply_ctx_Unifier(ctx,subs)) subs_l
+
     type ctx_struct = DAT.ctx_struct
     fun apply_ctx_struct_Unifier (DAT.Empty, subs) = DAT.Empty
-        | apply_ctx_struct_Unifier (DAT.Single(DAT.Ctx(cL, fL)), subs) = 
+        | apply_ctx_struct_Unifier (DAT.Single(ctx), subs) = 
+            DAT.Single(apply_ctx_Unifier(ctx,subs))
+        | apply_ctx_struct_Unifier (DAT.Mult(con, ctx, ctxStruct), subs) = 
             let 
-                val form_app = apply_formL_Unifier(fL, subs)
-                val (clist, flist) = ListPair.unzip(apply_ctx_varL_Unifier(cL, subs))
-            in 
-                DAT.Single(DAT.Ctx(List.concat clist, List.concat flist @ form_app))
-            end
-        | apply_ctx_struct_Unifier (DAT.Mult(con, DAT.Ctx(cL, fL), ctxStruct), subs) = 
-            let 
-                val form_app = apply_formL_Unifier(fL, subs)
-                val (clist, flist) = ListPair.unzip(apply_ctx_varL_Unifier(cL, subs))
+                val new_ctx = apply_ctx_Unifier (ctx,subs)
                 val new_ctxStruct = apply_ctx_struct_Unifier (ctxStruct, subs)
             in 
-                DAT.Mult(con, DAT.Ctx(List.concat clist, List.concat flist @ form_app), new_ctxStruct)
+                DAT.Mult(con, new_ctx, new_ctxStruct)
             end
+
     fun apply_ctx_struct_allUnifiers (ctx_struct, []) = [ctx_struct]
-        | apply_ctx_struct_allUnifiers (ctx_struct, subsL) = List.map(fn sb => apply_ctx_struct_Unifier(ctx_struct, sb))subsL
+        | apply_ctx_struct_allUnifiers (ctx_struct, subsL) = 
+        List.map (fn sb => apply_ctx_struct_Unifier (ctx_struct, sb) ) subsL
 
 
     type constraint = DAT.ctx_var * DAT.ctx_var list * DAT.ctx_var list

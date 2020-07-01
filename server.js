@@ -107,8 +107,15 @@ app.post('/sequoia/login', checkNotAuthenticated, passport.authenticate('local',
 ));
 
 app.get('/sequoia/logout', checkAuthenticated, function(req, res) {
+	fs.unlink(__dirname+"/tempProofs/"+req.user._id, function (err) {
+		if (err) {
+			console.log("File deletion request fail")
+		} else {
+			console.log("File deletion request successful")
+		}
+	})
 	req.logout()
-    res.redirect('/sequoia/login')
+	res.redirect('/sequoia/login')
 });
 
 app.get('/sequoia/register', checkNotAuthenticated, function(req, res) {
@@ -141,14 +148,6 @@ app.get('/sequoia/calculus/:calc_id/properties', checkAuthenticated, function(re
 	return res.render('properties/index', {'title' : 'Sequoia - properties', 'layout' : 'properties', 'calc_id' : req.params.calc_id});
 });
 
-app.get('/sequoia/calculus/:calc_id/properties/permutability', checkAuthenticated, function(req, res) {
-	return res.render('properties/permutability', {'title' : 'Sequoia - properties', 'layout' : 'permutability', 'calc_id' : req.params.calc_id});
-});
-
-app.post('/sequoia/permute', checkAuthenticated, function(req, res) {
-	var result = sml_command.permuteRules(req.body.rule1, req.body.rule2, req.body.init_rules, req.body.wL, req.body.wR, res);
-});
-
 app.get('/sequoia/calculus/:calc_id/properties/init_coherence', checkAuthenticated, function(req, res) {
 	return res.render('properties/initcoherence', {'title' : 'Sequoia - properties', 'layout' : 'initcoherence', 'calc_id' : req.params.calc_id});
 });
@@ -165,6 +164,14 @@ app.post('/sequoia/weakenSides', checkAuthenticated, function(req, res) {
 	var result = sml_command.weakenSides(req.body.rules, res);
 });
 
+app.get('/sequoia/calculus/:calc_id/properties/permutability', checkAuthenticated, function(req, res) {
+	return res.render('properties/permutability', {'title' : 'Sequoia - properties', 'layout' : 'permutability', 'calc_id' : req.params.calc_id});
+});
+
+app.post('/sequoia/permute', checkAuthenticated, function(req, res) {
+	var result = sml_command.permuteRules(req.body.rule1, req.body.rule2, req.body.init_rules, req.body.wL, req.body.wR, res);
+});
+
 app.get('/sequoia/calculus/:calc_id/properties/cut_admissability', checkAuthenticated, function(req, res) {
 	return res.render('properties/cutadmiss', {'title' : 'Sequoia - properties', 'layout' : 'cutadmiss', 'calc_id' : req.params.calc_id});
 });
@@ -175,6 +182,39 @@ app.post('/sequoia/cutElim', checkAuthenticated, function(req, res) {
 
 app.get('/sequoia/calculus/:calc_id/properties/invertibility', checkAuthenticated, function(req, res) {
 	return res.render('temporary/index', {'title' : 'Sequoia - properties', 'layout' : 'temporary'});
+});
+
+app.post('/sequoia/generate', checkAuthenticated, function(req, res) {
+	var data = req.body.proof
+	fs.writeFile(__dirname+"/tempProofs/"+req.user._id, data, function (err) {
+		if (err) {
+			res.status(400).send("Proof genereation request fail")
+		} else {
+			res.status(200).send("Proof genereation request successful")
+		}
+	})
+});
+
+app.get('/sequoia/fetch/:property', checkAuthenticated, function(req, res) {
+	var fileName = req.params.property
+	res.set({"Content-Disposition":"attachment; filename=\""+fileName+".txt\""});
+	res.sendFile(__dirname+"/tempProofs/"+req.user._id, function (err) {
+		if (err) {
+			console.log(err)
+		} else {
+			console.log('File sent.')
+		}
+	})
+});
+
+app.post('/sequoia/remove/', checkAuthenticated, function(req, res) {
+	fs.unlink(__dirname+"/tempProofs/"+req.user._id, function (err) {
+		if (err) {
+			res.status(200).send("File deletion request fail")
+		} else {
+			res.status(200).send("File deletion request successful")
+		}
+	})
 });
 
 function checkAuthenticated (req, res, next) {

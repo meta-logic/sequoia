@@ -4,6 +4,7 @@
 // under certain conditions; see LICENSE for details.
 
 
+var proof_content = {}
 var rule1 = ""
 var rule2 = ""
 
@@ -12,10 +13,10 @@ function selectRule(bl, i) {
         var card_color = ""
         if (rule1 == "") {
             rule1 = "r"+i
-            card_color = "red"
+            card_color = "blue"
         } else if (rule2 == "") {
             rule2 = "r"+i
-            card_color = "blue"
+            card_color = "red"
         }
         $("#rule_card"+i).attr("class", "ui raised card")
         $("#b"+i).attr("class", "ui active "+card_color+" bottom attached button")
@@ -99,6 +100,8 @@ function permRules() {
                 )
             }
         }
+        // $("#download").css("display", "block")
+        // $("#download").attr("onclick", "download(\"Permutability\")")
         MathJax.Hub.Queue(["Typeset", MathJax.Hub, gtrees[0]], function() { 
             MathJax.Hub.Queue(["Typeset", MathJax.Hub, btrees[0]], function() {
                 $("#loading").attr("class", "ui inactive inverted dimmer")
