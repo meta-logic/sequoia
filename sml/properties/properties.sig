@@ -12,14 +12,15 @@ sig
 	type proof = tree * (tree option)
 	
 	(* formula with connective * (left rules * right rules) * init rule * axioms*)
-	val init_coherence_con : ((D.conn * D.rule list * D.rule list) * D.rule* D.rule list) -> bool * proof
+	val init_coherence_con : ((D.conn * D.rule list * D.rule list) * D.rule * D.rule list * D.rule list) -> bool * proof
 
 	(* formula with connective * (left rules * right rules) * init rules * axioms*)
 	(* checks init_coherence_con for each init rule *)
-	val init_coherence_mult_init : ((D.conn * D.rule list * D.rule list) * D.rule list* D.rule list) -> bool * proof
+	val init_coherence_mult_init : ((D.conn * D.rule list * D.rule list) * D.rule list* D.rule list) -> (bool * proof list)
 
 	(* checks if init_coherence_con is true for all connectives for each init rule *)
-	val init_coherence : ((D.conn * D.rule list * D.rule list) list * D.rule list* D.rule list) -> bool * (bool * proof) list
+	val init_coherence : ((D.conn * D.rule list * D.rule list) list * D.rule list* D.rule list) -> bool * (bool * proof list) list
+	val init_coherence_print' : int -> ((D.conn * D.rule list * D.rule list) list * D.rule list* D.rule list) -> unit
 	val init_coherence_print : ((D.conn * D.rule list * D.rule list) list * D.rule list* D.rule list) -> unit
 	
 	val weakening_rule_context : (D.rule * (D.side * int)) -> bool * proof list
