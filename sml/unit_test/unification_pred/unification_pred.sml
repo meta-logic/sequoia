@@ -30,6 +30,9 @@ struct
                                                       D.ctx_struct_update update ctx_str2)
     fun seq_pair_update (s1,s2) = (D.seq_update update s1,D.seq_update update s2)
     
+    fun gen_to_pair_gen gen = Q.Gen.choose' (#[
+                                (9,Q.Gen.zip(gen,gen)),
+                                (1,Q.Gen.map (fn x => (x,x)) gen)])
 
     fun eq_check uni_fn uni_res_mod app_fn eq_fn (a,b) = 
         let
@@ -50,7 +53,7 @@ struct
     fun form_unification_test () = 
         let
             val form_gen = G.form_gen G.var_name_gen
-            val form_pair_gen = Q.Gen.zip (form_gen,form_gen)
+            val form_pair_gen = gen_to_pair_gen (form_gen)
             val form_pair_print = SOME (print_to_pair D.form_stringify)
             val form_pair_reader = (form_pair_gen,form_pair_print)
 
@@ -67,7 +70,7 @@ struct
     fun formL_unification_test () = 
         let
             val formL_gen = G.form_l_gen (4,5)
-            val formL_pair_gen = Q.Gen.zip (formL_gen,formL_gen)
+            val formL_pair_gen = gen_to_pair_gen (formL_gen)
             val formL_pair_print = SOME (print_to_pair D.formL_toString)
             val formL_pair_reader = (formL_pair_gen,formL_pair_print)
 
@@ -83,7 +86,7 @@ struct
     fun ctx_unification_test () = 
         let
             val ctx_gen = G.context_gen
-            val ctx_pair_gen' = Q.Gen.zip (ctx_gen,ctx_gen)
+            val ctx_pair_gen' = gen_to_pair_gen (ctx_gen)
             val ctx_pair_gen = Q.Gen.map ctx_pair_update ctx_pair_gen'
             val ctx_pair_print = SOME (print_to_pair D.ctx_toString)
             val ctx_pair_reader = (ctx_pair_gen,ctx_pair_print)
@@ -100,7 +103,7 @@ struct
     fun ctx_struct_unification_test () = 
         let
             val ctx_struct_gen = G.context_struct_gen
-            val ctx_struct_pair_gen' = Q.Gen.zip (ctx_struct_gen,ctx_struct_gen)
+            val ctx_struct_pair_gen' = gen_to_pair_gen (ctx_struct_gen)
             val ctx_struct_pair_gen = Q.Gen.map ctx_struct_pair_update ctx_struct_pair_gen'
             val ctx_struct_pair_print = SOME (print_to_pair D.ctx_struct_toString)
             val ctx_struct_pair_reader = (ctx_struct_pair_gen,ctx_struct_pair_print)
@@ -118,7 +121,7 @@ struct
     fun seq_unification_test () = 
         let
             val seq_gen = G.seq_gen
-            val seq_pair_gen' = Q.Gen.zip (seq_gen,seq_gen)
+            val seq_pair_gen' = gen_to_pair_gen  (seq_gen)
             val seq_pair_gen = Q.Gen.map seq_pair_update seq_pair_gen'
             val seq_pair_print = SOME (print_to_pair D.seq_toString)
             val seq_pair_reader = (seq_pair_gen,seq_pair_print)

@@ -85,8 +85,8 @@ struct
     (Q.Gen.zip3(context_struct_gen,Q.Gen.lift (D.Con("\\vdash")),context_struct_gen)) 
 
 
-    val sub_var_gen = Q.Gen.choose #[atom_var_gen sub_var_name_gen,form_var_gen
-                                                sub_var_name_gen]
+    val sub_var_gen = Q.Gen.choose' #[(1,atom_var_gen sub_var_name_gen),(5,form_var_gen
+                                                sub_var_name_gen)]
     val form_sub_gen = Q.Gen.map D.Fs (Q.Gen.zip (sub_var_gen, form_gen
     var_name_gen))
 
