@@ -61,7 +61,16 @@ struct
 
     fun seq_equiv subs (seq1,seq2) = D.seq_eq(App.apply_seq_Unifier(seq1,subs),seq2)
 
-    val subL_gen = Gen.gen_to_L (1,20) Gen.sub_gen
+    fun filter x l = List.filter (fn y => not (D.sub_prefix_eq(x,y))) l
+    fun remove_dup ([]) = []
+        | remove_dup (x::l) = x::(remove_dup(filter x l))
+    fun bad_check (D.Fs(D.AtomVar(_),D.Form(_))) = false
+        |bad_check (D.Fs(D.AtomVar(_),D.FormVar(_))) = false
+        |bad_check (_) = true    
+    fun remove_bad_subs (l) = List.filter bad_check l
+    val subL_gen'' = Gen.gen_to_L (1,20) Gen.sub_gen
+    val subL_gen' = Q.Gen.map remove_dup subL_gen''
+    val subL_gen = Q.Gen.map remove_bad_subs subL_gen'
     val formL_gen = Gen.gen_to_L (1,5) (Gen.form_gen Gen.var_name_gen) 
     
     fun apply_form_Unifier_test () = 
@@ -207,7 +216,7 @@ struct
                     D.seq_eq (subs_applied_sec,subs_applied_both)
                 end
             val case_gen = Q.Gen.zip3 (Gen.seq_gen,subL_gen,subL_gen)
-            fun case_print (seq,subs1,subs2) = "case:\n"^(D.seq_toString(seq))
+            fun case_print (seq,subs1,subs2) = "case:\n"^(D.seq_stringify(seq))
                         ^(D.subs_to_string(subs1))^(D.subs_to_string(subs2))
             val case_reader = (case_gen,SOME case_print)
             val prop = ("UnifierComposition test", Q.pred check)
