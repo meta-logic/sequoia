@@ -29,6 +29,7 @@ struct
 	
 	val init_coherence = Id.init_coherence
 
+    val init_coherence_print' = Id.init_coherence_print'   
     val init_coherence_print = Id.init_coherence_print    
 
     val weakening_rule_context = W.weakening_rule_context

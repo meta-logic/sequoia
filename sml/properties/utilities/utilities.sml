@@ -295,6 +295,16 @@ struct
         in
             Dat.Rule(nm,side,conc,prems)
         end
+    
+    fun update_all_rule_colors (color_fn) rule = 
+        let
+            val Dat.Rule(nm,side,conc,prems) = update_rule(rule,form_insert,color_fn)
+            val conc = color_seq(conc,color_fn)
+            val prems = List.map (fn seq => color_seq(seq,color_fn)) prems
+            val nm = color_fn nm
+        in
+            Dat.Rule(nm,side,conc,prems)
+        end
 
     (******************************************************)
 
@@ -361,6 +371,17 @@ struct
         ^"$$"^constraintL_toString(clist1)^"$$"
         ^"$$ \\leadsto $$"
         ^"$$ ? $$"
+    
+    fun print_helper2((clist1,tree1),SOME((clist2,tree2))) = 
+        "$$"^Latex.der_tree_toLatex2(tree1)^"$$"
+        ^"$$"^constraintL_toString(clist1)^"$$"
+        ^"$$ \\leadsto $$"
+        ^"$$"^Latex.der_tree_toLatex2(tree2)^"$$"
+        ^"$$"^constraintL_toString(clist2)^"$$"
+    | print_helper2((clist1,tree1),NONE) = 
+        "$$"^Latex.der_tree_toLatex2(tree1)^"$$"
+        ^"$$"^constraintL_toString(clist1)^"$$"
+        
 
 
 end
