@@ -23,31 +23,32 @@ function showProofWeak(side, index, on, num) {
 }
 
 
-function setLabel(left_bools, right_bools, index, side) {
-    var label_string = ""
+function setLabel(left_bools, right_bools, index, side, sequent_sign, context_sep) {
+    var label_left = ""
     for (var j = 0; j < left_bools.length -1; j++) {
-        var space = "\\_"
+        var space = "\\Gamma_"+(j+1)
         if (side == "L" && j == index) {
-            space = "\\Gamma"
+            space += ", W^*"
         } 
         if (j == left_bools.length-2) {
-            label_string += space+" \\vdash"
+            label_left += space+" "
         } else {
-            label_string += space+","
+            label_left += space+context_sep
         }
     }
+    var label_right = ""
     for (var j = 0; j < right_bools.length -1; j++) {
-        var space = "\\_"
+        var space = "\\Delta_"+(j+1)
         if (side == "R" && j == index) {
-            space = "\\Gamma"
+            space += ", W^*"
         } 
         if (j == right_bools.length-2) {
-            label_string += " "+space
+            label_right += " "+space
         } else {
-            label_string += space+","
+            label_right += space+context_sep
         }
     }
-    return "$$"+label_string+"$$"
+    return "$$"+label_left+sequent_sign+label_right+"$$"
 }
 
 
@@ -87,79 +88,91 @@ function checkWeak() {
             $("#info_answer").css("display", "block")
             var left_bools = output[1].split("@@@")
             var right_bools = output[2].split("@@@")
-            var lt = $("#left_sides")
-            for (var i = 0; i < left_bools.length; i++) {
-                if (left_bools[i] != "") {
-                    var tempL = left_bools[i].split("###")
-                    var color = "green"
-                    if (tempL[0] == "F") {
-                        color = "red"
-                        left_result = false
+            $.get("/sequoia/api/cert_symbols/"+calc_id, function(sb, status) {
+                var syms = sb.symbols
+                var sequent_sign = ""
+                var context_sep = ""
+                for (var i = 0; i < syms.length; i++) {
+                    if (syms[i].type == "sequent sign") {
+                        sequent_sign = syms[i].symbol
+                    } else if (syms[i].type == "context separator") {
+                        context_sep = syms[i].symbol
                     }
-                    var proofs_list = tempL[1].split("&&&")
-                    var newString = setLabel(left_bools, right_bools, i, 'L')
-                    lt.append(
-                        '<div class="'+color+' card">'+
-                            '<div class="content">'+
-                                '<div class="header">'+newString+'</div>'+
-                            '</div>'+
-                            '<div id="L'+i+'" class="ui bottom attached button" onClick=showProofWeak("L",'+i+',"no",'+proofs_list.length+')>'+
-                                '<i id="ArrowL'+i+'" class="caret down icon"></i>'+
-                            '</div>'+
-                        '</div>'
-                    )
-                    for (var j = 0; j < proofs_list.length; j++) {
-                        if (proofs_list[j] != "") {
-                            lt.append(
-                                '<div class="ui card" id="Lproof'+i+""+j+'" style="display: none;>'+
-                                    '<div class="content">'+
-                                        '<div class="header">'+proofs_list[j]+'</div>'+
-                                    '</div>'+
-                                '</div>'
-                            )
+                }
+                var lt = $("#left_sides")
+                for (var i = 0; i < left_bools.length; i++) {
+                    if (left_bools[i] != "") {
+                        var tempL = left_bools[i].split("###")
+                        var color = "green"
+                        if (tempL[0] == "F") {
+                            color = "red"
+                            left_result = false
+                        }
+                        var proofs_list = tempL[1].split("&&&")
+                        var newString = setLabel(left_bools, right_bools, i, 'L', sequent_sign, context_sep)
+                        lt.append(
+                            '<div class="'+color+' card">'+
+                                '<div class="content">'+
+                                    '<div class="header">'+newString+'</div>'+
+                                '</div>'+
+                                '<div id="L'+i+'" class="ui bottom attached button" onClick=showProofWeak("L",'+i+',"no",'+proofs_list.length+')>'+
+                                    '<i id="ArrowL'+i+'" class="caret down icon"></i>'+
+                                '</div>'+
+                            '</div>'
+                        )
+                        for (var j = 0; j < proofs_list.length; j++) {
+                            if (proofs_list[j] != "") {
+                                lt.append(
+                                    '<div class="ui card" id="Lproof'+i+""+j+'" style="display: none;>'+
+                                        '<div class="content">'+
+                                            '<div class="header">'+proofs_list[j]+'</div>'+
+                                        '</div>'+
+                                    '</div>'
+                                )
+                            }
                         }
                     }
                 }
-            }
-            var rt = $("#right_sides")
-            for (var i = 0; i < right_bools.length; i++) {
-                if (right_bools[i] != "") {
-                    var tempR = right_bools[i].split("###")
-                    var color = "green"
-                    if (tempR[0] == "F") {
-                        color = "red"
-                        right_result = false
-                    }
-                    var proofs_list = tempR[1].split("&&&")
-                    var newString = setLabel(left_bools, right_bools, i, 'R')
-                    rt.append( 
-                        '<div class="'+color+' card">'+
-                            '<div class="content">'+
-                                '<div class="header">'+newString+'</div>'+
-                            '</div>'+
-                            '<div id="R'+i+'" class="ui bottom attached button" onClick=showProofWeak("R",'+i+',"no",'+proofs_list.length+')>'+
-                                '<i id="ArrowR'+i+'" class="caret down icon"></i>'+
-                            '</div>'+
-                        '</div>'
-                    )
-                    for (var j = 0; j < proofs_list.length; j++) {
-                        if (proofs_list[j] != "") {
-                            rt.append(
-                                '<div class="ui card" id="Rproof'+i+""+j+'" style="display: none;>'+
-                                    '<div class="content">'+
-                                        '<div class="header">'+proofs_list[j]+'</div>'+
-                                    '</div>'+
-                                '</div>'
-                            )
+                var rt = $("#right_sides")
+                for (var i = 0; i < right_bools.length; i++) {
+                    if (right_bools[i] != "") {
+                        var tempR = right_bools[i].split("###")
+                        var color = "green"
+                        if (tempR[0] == "F") {
+                            color = "red"
+                            right_result = false
+                        }
+                        var proofs_list = tempR[1].split("&&&")
+                        var newString = setLabel(left_bools, right_bools, i, 'R', sequent_sign, context_sep)
+                        rt.append( 
+                            '<div class="'+color+' card">'+
+                                '<div class="content">'+
+                                    '<div class="header">'+newString+'</div>'+
+                                '</div>'+
+                                '<div id="R'+i+'" class="ui bottom attached button" onClick=showProofWeak("R",'+i+',"no",'+proofs_list.length+')>'+
+                                    '<i id="ArrowR'+i+'" class="caret down icon"></i>'+
+                                '</div>'+
+                            '</div>'
+                        )
+                        for (var j = 0; j < proofs_list.length; j++) {
+                            if (proofs_list[j] != "") {
+                                rt.append(
+                                    '<div class="ui card" id="Rproof'+i+""+j+'" style="display: none;>'+
+                                        '<div class="content">'+
+                                            '<div class="header">'+proofs_list[j]+'</div>'+
+                                        '</div>'+
+                                    '</div>'
+                                )
+                            }
                         }
                     }
                 }
-            }
-            // $("#download").css("display", "block")
-            // $("#download").attr("onclick", "download(\"Weakening_Admissibility\")")
-            MathJax.Hub.Queue(["Typeset", MathJax.Hub, lt[0]], function() { 
-                MathJax.Hub.Queue(["Typeset", MathJax.Hub, rt[0]], function() {
-                    $("#loading").attr("class", "ui inactive inverted dimmer")
+                $("#download").css("display", "block")
+                $("#download").attr("onclick", "download(\"Weakening_Admissibility\")")
+                MathJax.Hub.Queue(["Typeset", MathJax.Hub, lt[0]], function() { 
+                    MathJax.Hub.Queue(["Typeset", MathJax.Hub, rt[0]], function() {
+                        $("#loading").attr("class", "ui inactive inverted dimmer")
+                    })
                 })
             })
         })

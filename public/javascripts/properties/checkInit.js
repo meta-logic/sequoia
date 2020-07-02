@@ -6,15 +6,19 @@
 
 var proof_content = {}
 
-function showProofInit(index, on) {
+function showProofInit(type, index, on, num) {
     if (on == "yes") {
-        $("#I"+index).attr("onClick", "showProofInit("+index+",'no')")
-        $("#Arrow"+index).attr("class", "caret down icon")
-        $("#proof"+index).css("display", "none")
+        $("#"+type+index).attr("onClick", "showProofCut('"+type+"',"+index+",'no',"+num+")")
+        $("#Arrow"+type+index).attr("class", "caret down icon")
+        for (var i = 0; i < num; i++) {
+            $("#"+type+"proof"+index+""+i).css("display", "none")
+        }
     } else {
-        $("#I"+index).attr("onClick", "showProofInit("+index+",'yes')")
-        $("#Arrow"+index).attr("class", "caret up icon")
-        $("#proof"+index).css("display", "flex")
+        $("#"+type+index).attr("onClick", "showProofCut('"+type+"',"+index+",'yes',"+num+")")
+        $("#Arrow"+type+index).attr("class", "caret up icon")
+        for (var i = 0; i < num; i++) {
+            $("#"+type+"proof"+index+""+i).css("display", "flex")
+        }
     }
 }
 
@@ -90,34 +94,74 @@ function checkInit() {
                 $("#info_answer").attr("class", "ui info message")
                 $("#info_answer").css("display", "block")
             }
-            var connective_out = output[1].split("@@@")
-            var cp = $("#proofs_connectives")
-            for (var i = 0; i < connective_out.length; i++) {
-                if (connective_out[i] != "") {
-                    var temp = connective_out[i].split("###")
+            var axioms = output[1].split("@@@")
+            var logicals = output[2].split("@@@")
+            var ax = $("#axiom")
+            for (var i = 0; i < axioms.length; i++) {
+                if (axioms[i] != "") {
+                    var temp = axioms[i].split("###")
                     var color = "red"
                     if (temp[0] == "T") {
                         color = "green"
                     }
-                    cp.append(
+                    var proofs_list = temp[1].split("&&&")
+                    ax.append(
                         '<div class="'+color+' card">'+
                             '<div class="content">'+
                                 '<div class="header">$$'+con_ordered[i]+'$$</div>'+
                             '</div>'+
-                            '<div id="I'+i+'" class="ui bottom attached button" onClick=showProofInit('+i+',"no")>'+
-                                '<i id="Arrow'+i+'" class="caret down icon"></i>'+
-                            '</div>'+
-                        '</div>'+
-                        '<div class="ui card" id="proof'+i+'" style="display: none;">'+
-                            '<div class="content">'+
-                                '<div class="header">'+temp[1]+'</div>'+
+                            '<div id="AX'+i+'" class="ui bottom attached button" onClick=showProofCut("AX",'+i+',"no",'+proofs_list.length+')>'+
+                                '<i id="ArrowAX'+i+'" class="caret down icon"></i>'+
                             '</div>'+
                         '</div>'
                     )
+                    for (var j = 0; j < proofs_list.length; j++) {
+                        if (proofs_list[j] != "") {
+                            ax.append(
+                                '<div class="ui card" id="AXproof'+i+""+j+'" style="display: none;>'+
+                                    '<div class="content">'+
+                                        '<div class="header">'+proofs_list[j]+'</div>'+
+                                    '</div>'+
+                                '</div>'
+                            )
+                        }
+                    }
                 }
             }
-            // $("#download").css("display", "block")
-            // $("#download").attr("onclick", "download(\"Identity_Expansion\")")
+            var lg = $("#logical")
+            for (var i = 0; i < logicals.length; i++) {
+                if (logicals[i] != "") {
+                    var temp = logicals[i].split("###")
+                    var color = "red"
+                    if (temp[0] == "T") {
+                        color = "green"
+                    }
+                    var proofs_list = temp[1].split("&&&")
+                    lg.append(
+                        '<div class="'+color+' card">'+
+                            '<div class="content">'+
+                                '<div class="header">$$'+con_ordered[i]+'$$</div>'+
+                            '</div>'+
+                            '<div id="LG'+i+'" class="ui bottom attached button" onClick=showProofCut("LG",'+i+',"no",'+proofs_list.length+')>'+
+                                '<i id="ArrowLG'+i+'" class="caret down icon"></i>'+
+                            '</div>'+
+                        '</div>'
+                    )
+                    for (var j = 0; j < proofs_list.length; j++) {
+                        if (proofs_list[j] != "") {
+                            lg.append(
+                                '<div class="ui card" id="LGproof'+i+""+j+'" style="display: none;>'+
+                                    '<div class="content">'+
+                                        '<div class="header">'+proofs_list[j]+'</div>'+
+                                    '</div>'+
+                                '</div>'
+                            )
+                        }
+                    }
+                }
+            }
+            $("#download").css("display", "block")
+            $("#download").attr("onclick", "download(\"Identity_Expansion\")")
             MathJax.Hub.Queue(["Typeset", MathJax.Hub, cp[0]], function() {
                 $("#loading").attr("class", "ui inactive inverted dimmer")
             })
