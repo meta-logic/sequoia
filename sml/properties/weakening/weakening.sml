@@ -109,19 +109,20 @@ struct
     fun weakening_print rules = 
         let 
             val print_helper = Ut.print_helper
+            val print_helper_latex = Ut.print_helper_latex
         in
             let val (L,R) = weakening_proofs(rules)
                 val tL = List.map(fn (bl,pfs) => if bl 
-                        then "T###"^(List.foldr (fn (a,b) => print_helper(a)^"&&&"^b) "" pfs)
-                        else "F###"^(List.foldr (fn (a,b) => print_helper(a)^"&&&"^b) "" pfs)) L
+                        then "T###"^(List.foldr (fn (a,b) => print_helper(a)^"~~~"^print_helper_latex(a)^"&&&"^b) "" pfs)
+                        else "F###"^(List.foldr (fn (a,b) => print_helper(a)^"~~~"^print_helper_latex(a)^"&&&"^b) "" pfs)) L
                 val tR = List.map(fn (bl,pfs) => if bl 
-                        then "T###"^(List.foldr (fn (a,b) => print_helper(a)^"&&&"^b) "" pfs)
-                        else "F###"^(List.foldr (fn (a,b) => print_helper(a)^"&&&"^b) "" pfs)) R
+                        then "T###"^(List.foldr (fn (a,b) => print_helper(a)^"~~~"^print_helper_latex(a)^"&&&"^b) "" pfs)
+                        else "F###"^(List.foldr (fn (a,b) => print_helper(a)^"~~~"^print_helper_latex(a)^"&&&"^b) "" pfs)) R
                 val bool = if (List.all (fn ((bl,pfs)) => bl) L) andalso (List.all (fn ((bl,pfs)) => bl) R)
                         then "T" else "F"
                 val pL = List.foldr (fn (a,b) => a^"@@@"^b) "" tL
                 val pR = List.foldr (fn (a,b) => a^"@@@"^b) "" tR
-                val pLR = bool ^ "%%%" ^ pL ^ "%%%" ^ pR
+                val pLR = bool^"%%%"^pL^"%%%"^pR
             in Ut.writeFD 3 pLR end
         end
 

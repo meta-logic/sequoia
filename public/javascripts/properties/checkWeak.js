@@ -4,7 +4,7 @@
 // under certain conditions; see LICENSE for details.
 
 
-var proof_content = {}
+var proof_content = {"cases":[],"proofs":[]}
 
 function showProofWeak(side, index, on, num) {
     if (on == "yes") {
@@ -81,7 +81,7 @@ function checkWeak() {
             } else if (result == "F") {
                 answer[0] = "Weakening admissiblity proof fails for some contexts"
             }
-            answer[1] = "Each card below contains the cases for the proof of weakening admissibility on the explicit &nbsp;&#x1D6AA;.&nbsp; When a case succeeds, the proof tree transformation is shown. This check is sound but not complete."
+            answer[1] = "Each card below contains the cases for the proof of weakening admissibility on the explicit context containing <b><i>W<sup>*</sup></i></b>. When a case succeeds, the proof tree transformation is shown. This check is sound but not complete."
             $("#info_header").html(answer[0])
             $("#info_text").html(answer[1])
             $("#info_answer").attr("class", "ui info message")
@@ -120,17 +120,21 @@ function checkWeak() {
                                 '</div>'+
                             '</div>'
                         )
+                        var set_proofs = []
                         for (var j = 0; j < proofs_list.length; j++) {
                             if (proofs_list[j] != "") {
+                                var display_proofs = proofs_list[j].split("~~~")
+                                set_proofs.push(display_proofs[1])
                                 lt.append(
                                     '<div class="ui card" id="Lproof'+i+""+j+'" style="display: none;>'+
                                         '<div class="content">'+
-                                            '<div class="header">'+proofs_list[j]+'</div>'+
+                                            '<div class="header">'+display_proofs[0]+'</div>'+
                                         '</div>'+
                                     '</div>'
                                 )
                             }
                         }
+                        proof_content["proofs"].push(set_proofs)
                     }
                 }
                 var rt = $("#right_sides")
@@ -154,21 +158,25 @@ function checkWeak() {
                                 '</div>'+
                             '</div>'
                         )
+                        var set_proofs = []
                         for (var j = 0; j < proofs_list.length; j++) {
                             if (proofs_list[j] != "") {
+                                var display_proofs = proofs_list[j].split("~~~")
+                                set_proofs.push(display_proofs[1])
                                 rt.append(
                                     '<div class="ui card" id="Rproof'+i+""+j+'" style="display: none;>'+
                                         '<div class="content">'+
-                                            '<div class="header">'+proofs_list[j]+'</div>'+
+                                            '<div class="header">'+display_proofs[0]+'</div>'+
                                         '</div>'+
                                     '</div>'
                                 )
                             }
                         }
+                        proof_content["proofs"].push(set_proofs)
                     }
                 }
-                $("#download").css("display", "block")
-                $("#download").attr("onclick", "download(\"Weakening_Admissibility\")")
+                // $("#download").css("display", "block")
+                // $("#download").attr("onclick", "download(\"Weakening_Admissibility\")")
                 MathJax.Hub.Queue(["Typeset", MathJax.Hub, lt[0]], function() { 
                     MathJax.Hub.Queue(["Typeset", MathJax.Hub, rt[0]], function() {
                         $("#loading").attr("class", "ui inactive inverted dimmer")

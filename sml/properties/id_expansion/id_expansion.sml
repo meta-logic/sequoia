@@ -141,23 +141,23 @@ struct
     (* base cases first, then each connective in the same order as input *)
     fun init_coherence_print' fd (a,b,c) = 
         ((let
-            val print_sep = "&&&"
-            val base_case_sep = "~~~"
-            val proof_list_fmt = {init="",sep=print_sep,final="",fmt = Ut.print_helper}
-            val proof_list_fmt2 = {init="",sep=print_sep,final="",fmt = Ut.print_helper2}
-            val print_helper = ListFormat.fmt proof_list_fmt
-            val print_helper2 = ListFormat.fmt proof_list_fmt2
-            val (bool, base :: out) = init_coherence(a,b,c)
-            fun case_to_str (bl,pf) =  if bl 
-                    then "T###"^print_helper(pf) else "F###"^print_helper(pf)
+            val print_helper = Ut.print_helper
+            val print_helper2 = Ut.print_helper2
+            val print_helper_latex = Ut.print_helper_latex
+            val print_helper_latex2 = Ut.print_helper_latex2
+            fun case_to_str (bl,pf) = if bl 
+                    then "T###"^(List.foldr (fn (a,b) => print_helper(a)^"~~~"^print_helper_latex(a)^"&&&"^b) "" pf)
+                    else "F###"^(List.foldr (fn (a,b) => print_helper(a)^"~~~"^print_helper_latex(a)^"&&&"^b) "" pf)
             fun base_case_to_str (bl,pf) =  if bl 
-                    then "T###"^print_helper2(pf) else "F###"^print_helper2(pf)
+                    then "T###"^(List.foldr (fn (a,b) => print_helper2(a)^"~~~"^print_helper_latex2(a)^"&&&"^b) "" pf)
+                    else "F###"^(List.foldr (fn (a,b) => print_helper2(a)^"~~~"^print_helper_latex2(a)^"&&&"^b) "" pf)
         in
-            let 
-                val (t',t) = ((base_case_to_str base),(List.map (case_to_str) out))
-                val p = (t')^base_case_sep^(List.foldr (fn (a,b) => a^"@@@"^b) "" t)
-                val b = if bool then "T" else "F"
-                val bp = b^"%%%"^p
+            let val (bl, base :: out) = init_coherence(a,b,c)
+                val bs = base_case_to_str base
+                val t = List.map (case_to_str) out
+                val bool = if bl then "T" else "F"
+                val p = List.foldr (fn (a,b) => a^"@@@"^b) "" t
+                val bp = bool^"%%%"^bs^"%%%"^p
             in Ut.writeFD fd bp end
         end)
         handle (Ut.Arity) => Ut.writeFD fd "Arity Problem%%%Temp")

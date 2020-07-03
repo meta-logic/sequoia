@@ -382,6 +382,27 @@ struct
         "$$"^Latex.der_tree_toLatex2(tree1)^"$$"
         ^"$$"^constraintL_toString(clist1)^"$$"
         
+    fun print_helper_latex((clist1,tree1),SOME((clist2,tree2))) = 
+        "$$"^Latex.der_tree_toLatex(tree1)^"$$"
+        ^"$$"^constraintL_toString(clist1)^"$$"
+        ^"$$ \\leadsto $$"
+        ^"$$"^Latex.der_tree_toLatex(tree2)^"$$"
+        ^"$$"^constraintL_toString(clist2)^"$$"
+    | print_helper_latex((clist1,tree1),NONE) = 
+        "$$"^Latex.der_tree_toLatex(tree1)^"$$"
+        ^"$$"^constraintL_toString(clist1)^"$$"
+        ^"$$ \\leadsto $$"
+        ^"$$ ? $$"
+    
+    fun print_helper_latex2((clist1,tree1),SOME((clist2,tree2))) = 
+        "$$"^Latex.der_tree_toLatex(tree1)^"$$"
+        ^"$$"^constraintL_toString(clist1)^"$$"
+        ^"$$ \\leadsto $$"
+        ^"$$"^Latex.der_tree_toLatex(tree2)^"$$"
+        ^"$$"^constraintL_toString(clist2)^"$$"
+    | print_helper_latex2((clist1,tree1),NONE) = 
+        "$$"^Latex.der_tree_toLatex(tree1)^"$$"
+        ^"$$"^constraintL_toString(clist1)^"$$"
 
 
 end

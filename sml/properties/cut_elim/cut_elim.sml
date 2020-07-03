@@ -335,47 +335,33 @@ struct
     fun cut_elim (cut_rules,connectives,axioms,weakening) = 
         List.map (fn rule => cut_elim'(rule,connectives,axioms,weakening)) cut_rules
 
-
-    (* ~~~: seperates cut rules *)
     (* %%% seperates bool/axioms/rank/grade for a cut rule*)
     (* @@@: seperates rules/connectives *)
     (* ### seperates bool from proofs*)
     (* &&& seperates proofs*)
-   
+
     (* Ut.print_helper *)
-    val proof_join_fmt = {init = "", sep = "&&&", final = "", fmt = Ut.print_helper }
-
-    fun rule_fmt (bool,proof_l) = 
-        let
-            val proof_l_string = ListFormat.fmt proof_join_fmt proof_l
-            val bool_string = if bool then "T" else "F"
-        in
-            bool_string^"###"^proof_l_string
-        end
     
+    val print_helper = Ut.print_helper
+    val print_helper_latex = Ut.print_helper_latex
 
-    val rule_join_fmt = {init = "", sep = "@@@", final = "", fmt = rule_fmt}
-
+    fun case_to_str (bl,pf) = if bl 
+            then "T###"^(List.foldr (fn (a,b) => print_helper(a)^"~~~"^print_helper_latex(a)^"&&&"^b) "" pf)
+            else "F###"^(List.foldr (fn (a,b) => print_helper(a)^"~~~"^print_helper_latex(a)^"&&&"^b) "" pf)
+    
     fun cut_rule_fmt (bool,axioms,rank,grade) =
         let
-            val axioms_string = ListFormat.fmt rule_join_fmt axioms
-            val rank_string = ListFormat.fmt rule_join_fmt rank
-            val grade_string = ListFormat.fmt rule_join_fmt grade
+            val axioms_string = List.foldr (fn (a,b) => a^"@@@"^b) "" (List.map (case_to_str) axioms)
+            val rank_string = List.foldr (fn (a,b) => a^"@@@"^b) "" (List.map (case_to_str) rank)
+            val grade_string = List.foldr (fn (a,b) => a^"@@@"^b) "" (List.map (case_to_str) grade)
             val bool_string = if bool then "T" else "F"
-            val connector = "%%%"
         in
-            bool_string^connector^axioms_string^connector^rank_string^connector^grade_string
+            bool_string^"%%%"^axioms_string^"%%%"^rank_string^"%%%"^grade_string
         end
-
-    val cut_rule_join_fmt = {init = "", sep = "~~~", final = "", fmt = cut_rule_fmt}
 
     fun cut_elim_print' fd input= 
         let
-
-
-            val result = cut_elim' input
-
-            val result = cut_rule_fmt result
+            val result = cut_rule_fmt (cut_elim' input)
         in
             Ut.writeFD fd result
         end

@@ -29,7 +29,7 @@ function seeLatex() {
             var tree_content = latex_history[latex_history.length-1]
             var constraint_content = "NONE"
             if (constraint_history.length != 0) {
-                constraint_content = constraint_history[constraint_history.length-1].join("\/")
+                constraint_content = constraint_history[constraint_history.length-1].join("\\quad\/\\quad")
                 if (constraint_content == "") {
                     constraint_content = "NONE"
                 }
@@ -119,22 +119,22 @@ function applyRule(i) {
                 var new_html_trees = []
                 var new_sml_trees = []
                 for (var k = 0; k < output.length; k++) {
-                    var prems_cons = output[k].split("@@")
-                    var cons_sml = prems_cons[0].trim().slice(1,-1).split("%%")
-                    cons_set.push(cons_sml[0].split("##"))
+                    var prems_cons = output[k].split("@@@")
+                    var cons_sml = prems_cons[0].trim().slice(1,-1).split("%%%")
+                    cons_set.push(cons_sml[0].split("###"))
                     new_sml_cons.push(cons_sml[1])
-                    var prems_latex_html_sml = prems_cons[1].trim().slice(1,-1).split("%%")
-                    prem_set.push(prems_latex_html_sml[0].split("##"))
+                    var prems_latex_html_sml = prems_cons[1].trim().slice(1,-1).split("%%%")
+                    prem_set.push(prems_latex_html_sml[0].split("###"))
                     new_latex_trees.push(prems_latex_html_sml[1])
                     new_html_trees.push(prems_latex_html_sml[2])
                     new_sml_trees.push(prems_latex_html_sml[3])
-                    fresh_list = prems_cons[2].trim().slice(1,-1).split("##")
+                    fresh_list = prems_cons[2].trim().slice(1,-1).split("###")
                     for (var y = 0; y < fresh_list.length; y++) {
                         if (fresh_list[y].length != 0) {
                             fresh_symbols[fresh_list[y]] = fresh_list[y]
                         }
                     }
-                    rng_index = prems_cons[3].trim().slice(1,-1).split("##")[0]
+                    rng_index = prems_cons[3].trim().slice(1,-1).split("###")[0]
                 }
                 if (prem_set.length == 1) {
                     var index = 0

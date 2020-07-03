@@ -4,7 +4,7 @@
 // under certain conditions; see LICENSE for details.
 
 
-var proof_content = {}
+var proof_content = {"trees":[]}
 var rule1 = ""
 var rule2 = ""
 
@@ -83,9 +83,11 @@ function permRules() {
         var gtrees = $("#good_trees")
         for (var i = 0; i < goodtrees.length; i++) {
             if (goodtrees[i] != "") {
+                var display_proofs = goodtrees[i].split("~~~")
+                proof_content["trees"].push(display_proofs[1])
                 gtrees.append( 
                     '<div id="gtree_card'+i+'" class="ui green card">'+
-                        '<div class="content">'+goodtrees[i]+'</div>'+
+                        '<div class="content">'+display_proofs[0]+'</div>'+
                     '</div>'
                 )
             }
@@ -93,9 +95,11 @@ function permRules() {
         var btrees = $("#bad_trees")
         for (var i = 0; i < badtrees.length; i++) {
             if (badtrees[i] != "") {
+                var display_proofs = badtrees[i].split("~~~")
+                proof_content["trees"].push(display_proofs[1])
                 btrees.append( 
                     '<div id="btree_card'+i+'" class="ui red card">'+
-                        '<div class="content">'+badtrees[i]+'</div>'+
+                        '<div class="content">'+display_proofs[0]+'</div>'+
                     '</div>'
                 )
             }

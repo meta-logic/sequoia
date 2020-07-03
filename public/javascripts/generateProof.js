@@ -7,7 +7,7 @@
 function generate(fname, title, next) {
     var content = 
             "\\documentclass[11pt]{article}\n"+
-            "\\n"+
+            "\n"+
             "\\usepackage[margin=2.0cm]{geometry}\n"+
             "\\usepackage{proof}\n"+
             "\\usepackage{amsmath,amsthm,amssymb}\n"+
@@ -27,11 +27,14 @@ function generate(fname, title, next) {
             "\n"+
             "\\begin{flushleft}\n"+
             "Constraints: \n"+
-            "\\\\$"+proof_content["constraints"]+"$\n"+
             "\\end{flushleft}\n"+
             "\n"+
+            "\\begin{align*}\n"+
+            proof_content["constraints"]+"\n"+
+            "\\end{align*}\n"+
+            "\n"+
             "\\end{document}\n"
-    } else if (fnam == "Identity_expansion") {
+    } else if (fname == "Identity_Expansion") {
         var base_cases = ""
         for (var i = 0; i < proof_content["base"].length; i++) {
             base_cases += "\\item\n\\["+proof_content["base"][i]+"\\]\n"
@@ -51,7 +54,7 @@ function generate(fname, title, next) {
             "\\maketitle\n"+
             "\n"+
             "\\begin{theorem}\n"+
-            "If the identity rules are restricted to atomic formulas, then for any"+
+            "If the identity rules are restricted to atomic formulas, then for any "+
             "proposition $P$ there are proofs of $P \\vdash P$.\n"+ 
             "\\end{theorem}\n"+
             "\n"+
@@ -63,7 +66,7 @@ function generate(fname, title, next) {
             "\\textbf{Base cases}\n"+
             "\n"+
             "\\begin{itemize}\n"+
-            base_cases
+            base_cases+
             "\\end{itemize}\n"+
             "\n"+
             "\\noindent\n"+
@@ -72,17 +75,17 @@ function generate(fname, title, next) {
             "Inductive Hypothesis: []"+
             "\n"+
             "\\begin{itemize}\n"+
-            inductive_cases
+            inductive_cases+
             "\\end{itemize}\n"+
             "\n"+
             "\\end{proof}\n"+
             "\\end{document}\n"
-    } else if (fnam == "Weakening_Admissibility") {
+    } else if (fname == "Weakening_Admissibility") {
         var contexts = ""
         for (var i = 0; i < proof_content["cases"]; i++) {
             cases = ""
-            for (var j = 0; j < proof_content["cases"][i]; j++) {
-                cases += "\\item\n\\["+proof_content["cases"][i][1][j]+"\\]\n"
+            for (var j = 0; j < proof_content["proofs"][i]; j++) {
+                cases += "\\item\n\\["+proof_content["cases"][i][j]+"\\]\n"
             }
             contexts +=
                 "\\noindent\n"+
@@ -113,7 +116,7 @@ function generate(fname, title, next) {
             "\n"+
             "\\end{proof}\n"+
             "\\end{document}\n"
-    } else if (fnam == "Permutability") {
+    } else if (fname == "Permutability") {
         var rules = ""
         for (var i = 0; i < proof_content["rules"].length; i++) {
             rules += "\\item\n\\["+proof_content["rules"][i]+"\\]\n"
@@ -133,7 +136,7 @@ function generate(fname, title, next) {
             "\\maketitle\n"+
             "\n"+
             "\\begin{theorem}\n"+
-            "Let $T_1$ be the proof tree $\\infer[r_1]{S}{\\infer[r_2]{\\cdots}{\\cdots}}&."+ 
+            "Let $T_1$ be the proof tree $\\infer[r_1]{S}{\\infer[r_2]{\\cdots}{\\cdots}}&. "+ 
             "If $T_1$ implies the existence of a proof tree $T_2$ = $\\infer[r_2]{S}{\\infer[r_1]{\\cdots}{\\cdots}}$,"+ 
             "then we say that $r_1$ permutes up $r_2$.\n"+ 
             "\\end{theorem}\n"+
@@ -141,14 +144,7 @@ function generate(fname, title, next) {
             "\\begin{proof}\n"+
             "\n"+
             "\\noindent\n"+
-            "\\textbf{Rules}\n"+
-            "\n"+
-            "\\begin{itemize}\n"+
-            rules+
-            "\\end{itemize}\n"+
-            "\n"+
-            "\\noindent\n"+
-            "\\textbf{Tree cases}\n"+
+            "\\textbf{Trees}\n"+
             "\n"+
             "\\begin{itemize}\n"+
             trees+
@@ -156,10 +152,10 @@ function generate(fname, title, next) {
             "\n"+
             "\\end{proof}\n"+
             "\\end{document}\n"
-    } else if (fnam == "Cut_Admissibility") {
+    } else if (fname == "Cut_Admissibility") {
         var base_cases = ""
-        for (var i = 0; i < proof_content["base"].length; i++) {
-            base_cases += "\\item\n\\["+proof_content["base"][i]+"\\]\n"
+        for (var i = 0; i < proof_content["axiom"].length; i++) {
+            base_cases += "\\item\n\\["+proof_content["axiom"][i]+"\\]\n"
         }
         var rank_cases = ""
         for (var i = 0; i < proof_content["rank"].length; i++) {
@@ -192,7 +188,7 @@ function generate(fname, title, next) {
             "\\textbf{Base cases}\n"+
             "\n"+
             "\\begin{itemize}\n"+
-            base_cases
+            base_cases+
             "\\end{itemize}\n"+
             "\n"+
             "\\noindent\n"+
@@ -201,7 +197,7 @@ function generate(fname, title, next) {
             "Inductive Hypothesis: []"+
             "\n"+
             "\\begin{itemize}\n"+
-            rank_cases
+            rank_cases+
             "\\end{itemize}\n"+
             "\n"+
             "\\noindent\n"+
@@ -210,7 +206,7 @@ function generate(fname, title, next) {
             "Inductive Hypothesis: []"+
             "\n"+
             "\\begin{itemize}\n"+
-            grade_cases
+            grade_cases+
             "\\end{itemize}\n"+
             "\n"+
             "\\end{proof}\n"+
