@@ -301,7 +301,7 @@ struct
             val Dat.Rule(nm,side,conc,prems) = update_rule(rule,form_insert,color_fn)
             val conc = color_seq(conc,color_fn)
             val prems = List.map (fn seq => color_seq(seq,color_fn)) prems
-            val nm = color_fn nm
+            val nm = nm
         in
             Dat.Rule(nm,side,conc,prems)
         end
