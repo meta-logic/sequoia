@@ -4,7 +4,7 @@
 // under certain conditions; see LICENSE for details.
 
 
-var proof_content = {"cases":[],"proofs":[]}
+var proof_content = {"contexts":[],"proofs":[]}
 
 function showProofWeak(side, index, on, num) {
     if (on == "yes") {
@@ -110,6 +110,7 @@ function checkWeak() {
                         }
                         var proofs_list = tempL[1].split("&&&")
                         var newString = setLabel(left_bools, right_bools, i, 'L', sequent_sign, context_sep)
+                        proof_content["contexts"].push(newString)
                         lt.append(
                             '<div class="'+color+' card">'+
                                 '<div class="content">'+
@@ -148,6 +149,7 @@ function checkWeak() {
                         }
                         var proofs_list = tempR[1].split("&&&")
                         var newString = setLabel(left_bools, right_bools, i, 'R', sequent_sign, context_sep)
+                        proof_content["contexts"].push(newString)
                         rt.append( 
                             '<div class="'+color+' card">'+
                                 '<div class="content">'+
@@ -175,8 +177,8 @@ function checkWeak() {
                         proof_content["proofs"].push(set_proofs)
                     }
                 }
-                // $("#download").css("display", "block")
-                // $("#download").attr("onclick", "download(\"Weakening_Admissibility\")")
+                $("#download").css("display", "block")
+                $("#download").attr("onclick", "download(\"Weakening_Admissibility\")")
                 MathJax.Hub.Queue(["Typeset", MathJax.Hub, lt[0]], function() { 
                     MathJax.Hub.Queue(["Typeset", MathJax.Hub, rt[0]], function() {
                         $("#loading").attr("class", "ui inactive inverted dimmer")

@@ -183,8 +183,8 @@ function checkCut() {
                 }
             }
         }
-        // $("#download").css("display", "block")
-        // $("#download").attr("onclick", "download(\"Cut_Admissibility\")")
+        $("#download").css("display", "block")
+        $("#download").attr("onclick", "download(\"Cut_Admissibility\")")
         MathJax.Hub.Queue(["Typeset", MathJax.Hub, ax[0]], function() { 
             MathJax.Hub.Queue(["Typeset", MathJax.Hub, rk[0]], function() {
                 MathJax.Hub.Queue(["Typeset", MathJax.Hub, gd[0]], function() {

@@ -150,16 +150,15 @@ struct
                 ^"$$ \\leadsto $$"
                 ^"$$ ? $$"
             fun print_helper_good_latex ((clist1,tree1),(clist2,tree2)) = 
-                "$$"^Latex.der_tree_toLatex(tree1)^"$$"
-                ^"$$"^Ut.constraintL_toString(clist1)^"$$"
-                ^"$$ \\leadsto $$"
-                ^"$$"^Latex.der_tree_toLatex(tree2)^"$$"
-                ^"$$"^Ut.constraintL_toString(clist2)^"$$"
+                "\\["^Latex.der_tree_toLatex(tree1)^"\\]"^
+                "\\["^Ut.constraintL_toString(clist1)^"\\]"^
+                "\\[\\leadsto\\]\\[\\]"^
+                "\\["^Latex.der_tree_toLatex(tree2)^"\\]"^
+                "\\["^Ut.constraintL_toString(clist2)^"\\]"
             fun print_helper_bad_latex (clist1,tree1) = 
-                "$$"^Latex.der_tree_toLatex(tree1)^"$$"
-                ^"$$"^Ut.constraintL_toString(clist1)^"$$"
-                ^"$$ \\leadsto $$"
-                ^"$$ ? $$"
+                "\\["^Latex.der_tree_toLatex(tree1)^"\\]"^
+                "\\["^Ut.constraintL_toString(clist1)^"\\]"^
+                "\\[\\leadsto\\]\\[\\]\\[?\\]"
         in
             let val true_strings = List.map (fn x => (print_helper_good x)^"~~~"^(print_helper_good_latex x)) true_list
                 val fail_strings = List.map (fn x => (print_helper_bad x)^"~~~"^(print_helper_bad_latex x)) fail_list

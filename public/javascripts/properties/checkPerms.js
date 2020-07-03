@@ -104,8 +104,8 @@ function permRules() {
                 )
             }
         }
-        // $("#download").css("display", "block")
-        // $("#download").attr("onclick", "download(\"Permutability\")")
+        $("#download").css("display", "block")
+        $("#download").attr("onclick", "download(\"Permutability\")")
         MathJax.Hub.Queue(["Typeset", MathJax.Hub, gtrees[0]], function() { 
             MathJax.Hub.Queue(["Typeset", MathJax.Hub, btrees[0]], function() {
                 $("#loading").attr("class", "ui inactive inverted dimmer")

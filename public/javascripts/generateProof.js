@@ -37,11 +37,11 @@ function generate(fname, title, next) {
     } else if (fname == "Identity_Expansion") {
         var base_cases = ""
         for (var i = 0; i < proof_content["base"].length; i++) {
-            base_cases += "\\item\n\\["+proof_content["base"][i]+"\\]\n"
+            base_cases += "\\item\n"+proof_content["base"][i]+"\n"
         }
         var inductive_cases = ""
         for (var i = 0; i < proof_content["induct"].length; i++) {
-            inductive_cases += "\\item\n\\["+proof_content["induct"][i]+"\\]\n"
+            inductive_cases += "\\item\n"+proof_content["induct"][i]+"\n"
         }
         content +=
             "\\newtheorem{theorem}{Theorem}\n"+
@@ -72,7 +72,7 @@ function generate(fname, title, next) {
             "\\noindent\n"+
             "\\textbf{Inductive cases}\n"+
             "\n"+
-            "Inductive Hypothesis: []"+
+            "Inductive Hypothesis: [ ]"+
             "\n"+
             "\\begin{itemize}\n"+
             inductive_cases+
@@ -82,14 +82,14 @@ function generate(fname, title, next) {
             "\\end{document}\n"
     } else if (fname == "Weakening_Admissibility") {
         var contexts = ""
-        for (var i = 0; i < proof_content["cases"]; i++) {
-            cases = ""
-            for (var j = 0; j < proof_content["proofs"][i]; j++) {
-                cases += "\\item\n\\["+proof_content["cases"][i][j]+"\\]\n"
+        for (var i = 0; i < proof_content["contexts"].length; i++) {
+            var cases = ""
+            for (var j = 0; j < proof_content["proofs"][i].length; j++) {
+                cases += "\\item\n"+proof_content["proofs"][i][j]+"\n"
             }
             contexts +=
                 "\\noindent\n"+
-                "\\textbf{"+proof_content["cases"][i][0]+"}\n"+
+                "\\textbf{"+proof_content["contexts"][i]+"}\n"+
                 "\n"+
                 "\\begin{itemize}\n"+
                 cases+
@@ -117,13 +117,9 @@ function generate(fname, title, next) {
             "\\end{proof}\n"+
             "\\end{document}\n"
     } else if (fname == "Permutability") {
-        var rules = ""
-        for (var i = 0; i < proof_content["rules"].length; i++) {
-            rules += "\\item\n\\["+proof_content["rules"][i]+"\\]\n"
-        }
         var trees = ""
         for (var i = 0; i < proof_content["trees"].length; i++) {
-            trees += "\\item\n\\["+proof_content["trees"][i]+"\\]\n"
+            trees += "\\item\n"+proof_content["trees"][i]+"\n"
         }
         content +=
             "\\newtheorem{theorem}{Theorem}\n"+
@@ -136,7 +132,7 @@ function generate(fname, title, next) {
             "\\maketitle\n"+
             "\n"+
             "\\begin{theorem}\n"+
-            "Let $T_1$ be the proof tree $\\infer[r_1]{S}{\\infer[r_2]{\\cdots}{\\cdots}}&. "+ 
+            "Let $T_1$ be the proof tree $\\infer[r_1]{S}{\\infer[r_2]{\\cdots}{\\cdots}}$. "+ 
             "If $T_1$ implies the existence of a proof tree $T_2$ = $\\infer[r_2]{S}{\\infer[r_1]{\\cdots}{\\cdots}}$,"+ 
             "then we say that $r_1$ permutes up $r_2$.\n"+ 
             "\\end{theorem}\n"+
@@ -144,7 +140,7 @@ function generate(fname, title, next) {
             "\\begin{proof}\n"+
             "\n"+
             "\\noindent\n"+
-            "\\textbf{Trees}\n"+
+            "\\textbf{Tree permutations}\n"+
             "\n"+
             "\\begin{itemize}\n"+
             trees+
@@ -155,15 +151,15 @@ function generate(fname, title, next) {
     } else if (fname == "Cut_Admissibility") {
         var base_cases = ""
         for (var i = 0; i < proof_content["axiom"].length; i++) {
-            base_cases += "\\item\n\\["+proof_content["axiom"][i]+"\\]\n"
+            base_cases += "\\item\n"+proof_content["axiom"][i]+"\n"
         }
         var rank_cases = ""
         for (var i = 0; i < proof_content["rank"].length; i++) {
-            rank_cases += "\\item\n\\["+proof_content["rank"][i]+"\\]\n"
+            rank_cases += "\\item\n"+proof_content["rank"][i]+"\n"
         }
         var grade_cases = ""
         for (var i = 0; i < proof_content["grade"].length; i++) {
-            grade_cases += "\\item\n\\["+proof_content["grade"][i]+"\\]\n"
+            grade_cases += "\\item\n"+proof_content["grade"][i]+"\n"
         }
         content +=
             "\\newtheorem{theorem}{Theorem}\n"+
@@ -183,7 +179,7 @@ function generate(fname, title, next) {
             "\\begin{proof}\n"+
             "\n"+
             "By induction on the structure of the formula $P$ in the sequent and the size of the tree.\n"+
-            "\\n"+
+            "\n"+
             "\\noindent\n"+
             "\\textbf{Base cases}\n"+
             "\n"+
@@ -194,7 +190,7 @@ function generate(fname, title, next) {
             "\\noindent\n"+
             "\\textbf{Rank reduction cases}\n"+
             "\n"+
-            "Inductive Hypothesis: []"+
+            "Inductive Hypothesis: [ ]"+
             "\n"+
             "\\begin{itemize}\n"+
             rank_cases+

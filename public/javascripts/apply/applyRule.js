@@ -29,7 +29,7 @@ function seeLatex() {
             var tree_content = latex_history[latex_history.length-1]
             var constraint_content = "NONE"
             if (constraint_history.length != 0) {
-                constraint_content = constraint_history[constraint_history.length-1].join("\\quad\/\\quad")
+                constraint_content = constraint_history[constraint_history.length-1].join(" \\quad \/ \\quad ")
                 if (constraint_content == "") {
                     constraint_content = "NONE"
                 }

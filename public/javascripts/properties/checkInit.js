@@ -167,8 +167,8 @@ function checkInit() {
                     }
                 }
             }
-            // $("#download").css("display", "block")
-            // $("#download").attr("onclick", "download(\"Identity_Expansion\")")
+            $("#download").css("display", "block")
+            $("#download").attr("onclick", "download(\"Identity_Expansion\")")
             MathJax.Hub.Queue(["Typeset", MathJax.Hub, ax[0]], function() { 
                 MathJax.Hub.Queue(["Typeset", MathJax.Hub, lg[0]], function() {
                     $("#loading").attr("class", "ui inactive inverted dimmer")
