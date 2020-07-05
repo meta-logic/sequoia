@@ -197,7 +197,7 @@ app.post('/sequoia/generate', checkAuthenticated, function(req, res) {
 
 app.get('/sequoia/fetch/:property', checkAuthenticated, function(req, res) {
 	var fileName = req.params.property
-	res.set({"Content-Disposition":"attachment; filename=\""+fileName+".txt\""});
+	res.set({"Content-Disposition":"attachment; filename=\""+fileName+".tex\""});
 	res.sendFile(__dirname+"/tempProofs/"+req.user._id, function (err) {
 		if (err) {
 			console.log(err)
