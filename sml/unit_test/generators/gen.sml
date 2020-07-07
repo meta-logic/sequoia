@@ -4,6 +4,7 @@ struct
     structure Set = SplaySetFn(FormKey);
     structure D = datatypesImpl
     structure V = Vector
+    structure R = Rules
 
 
     (*takes 2 generators and appends them*)
