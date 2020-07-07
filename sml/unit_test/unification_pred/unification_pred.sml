@@ -7,6 +7,7 @@ struct
     structure App = applyunifierImpl
     structure E = Equivalence
     structure H = helpersImpl
+    structure C = Constraints
 
     fun empty_sub (v) = D.CTXs(v,D.Ctx([],[]))
     fun con_to_subs ((_,l1,l2)) = 
@@ -33,6 +34,60 @@ struct
     fun gen_to_pair_gen gen = Q.Gen.choose' (#[
                                 (9,Q.Gen.zip(gen,gen)),
                                 (1,Q.Gen.map (fn x => (x,x)) gen)])
+
+    
+    val hat = #"^"
+
+    fun remove_hat' (nil) = nil
+        |remove_hat' (x::L) = if (x=hat) then [] else x::remove_hat'(L)
+
+    fun remove_hat (x) = String.implode(remove_hat'(String.explode(x)))
+
+    fun remove_hat_ctx_var (D.CtxVar(a,b)) = D.CtxVar(a,remove_hat b)
+    fun remove_hat_constraint ((a,b,c)) = (a,List.map remove_hat_ctx_var b,List.map remove_hat_ctx_var c)
+    fun ctx_var_l_eq (a,b) = H.mset_eq(a,b,D.ctx_var_eq)
+    fun constraint_eq ((_,a1,b1),(_,a2,b2)) = 
+        ((ctx_var_l_eq(a1,a2)) andalso (ctx_var_l_eq(b1,b2))) orelse 
+        ((ctx_var_l_eq(a1,b2)) andalso (ctx_var_l_eq(b1,a2)))
+    fun constraint_list_eq' (a,b) = H.mset_eq(a,b,constraint_eq)
+    fun constraint_list_eq (a,b) = 
+        let
+            val a' = List.map remove_hat_constraint a
+            val b' = List.map remove_hat_constraint b
+        in
+            constraint_list_eq' (a',b')
+        end
+    
+    fun ctx_struct_to_ctx_list (D.Empty) = []
+        |ctx_struct_to_ctx_list (D.Single(ctx)) = [ctx]
+        |ctx_struct_to_ctx_list (D.Mult(_,ctx,c_struct)) = (ctx::(ctx_struct_to_ctx_list c_struct))
+    
+    fun seq_to_ctx_list (D.Seq(a,_,b)) = (ctx_struct_to_ctx_list a)@(ctx_struct_to_ctx_list b)
+
+    fun constraint_gen_ctx(D.Ctx(a,_),D.Ctx(b,_)) = 
+        let
+            val (cons,subs) = C.get_constraints(a,b)
+        in
+            cons
+        end
+    
+    fun constraint_gen_ctx_struct (a,b) = 
+        let
+            val ctx_list_a = ctx_struct_to_ctx_list(a)
+            val ctx_list_b = ctx_struct_to_ctx_list(b)
+            val pair = ListPair.zip (ctx_list_a,ctx_list_b)
+        in
+            List.concat (List.map constraint_gen_ctx pair)
+        end
+    
+    fun constraint_gen_seq (a,b) = 
+        let
+            val ctx_list_a = seq_to_ctx_list(a)
+            val ctx_list_b = seq_to_ctx_list(b)
+            val pair = ListPair.zip (ctx_list_a,ctx_list_b)
+        in
+            List.concat (List.map constraint_gen_ctx pair)
+        end
 
     fun eq_check uni_fn uni_res_mod app_fn eq_fn (a,b) = 
         let
@@ -83,6 +138,24 @@ struct
         in
             Q.checkGen formL_pair_reader property
         end
+
+    fun eq_check2 uni_fn constraint_gen app_fn eq_fn (a,b) = 
+        let
+            (* unify a and b *)
+            val unification_res = Option.valOf (uni_fn(a,b))
+            (* exctract constraints from each unifier *)
+            val (new_subs,new_cons_l) = ListPair.unzip unification_res
+
+            val a_l = List.map (fn sub => app_fn(a,sub)) new_subs
+            val b_l = List.map (fn sub => app_fn(b,sub)) new_subs
+
+            val ab_pairs = ListPair.zip(a_l,b_l)
+            val gen_cons_l = List.map constraint_gen ab_pairs
+            val ab_cons_pairs = ListPair.zip(new_cons_l,gen_cons_l)
+        in
+            (List.all constraint_list_eq ab_cons_pairs) andalso (List.all eq_fn ab_pairs)
+        end
+
     fun ctx_unification_test () = 
         let
             val ctx_gen = G.context_gen
@@ -93,8 +166,8 @@ struct
 
             fun ctx_pair_condition (f1,f2) = Option.isSome (U.Unify_ctx(f1,f2))
 
-            val ctx_pair_check = eq_check (U.Unify_ctx) unifier_to_subs (App.apply_ctx_Unifier)
-                                             (D.ctx_eq)
+            val ctx_pair_check = eq_check2 (U.Unify_ctx) constraint_gen_ctx (App.apply_ctx_Unifier)
+                                             (E.ctx_equiv)
 
             val property = ("context unification" , Q.implies(ctx_pair_condition,Q.pred ctx_pair_check))
         in
@@ -110,8 +183,8 @@ struct
 
             fun ctx_struct_pair_condition (f1,f2) = Option.isSome (U.Unify_ctx_struct(f1,f2))
 
-            val ctx_struct_pair_check = eq_check (U.Unify_ctx_struct) unifier_to_subs 
-                (App.apply_ctx_struct_Unifier) (D.ctx_struct_eq)
+            val ctx_struct_pair_check = eq_check2 (U.Unify_ctx_struct) constraint_gen_ctx_struct 
+                (App.apply_ctx_struct_Unifier) (E.ctx_struct_equiv)
 
             val property = ("context struct unification" , Q.implies(ctx_struct_pair_condition,
                                                     Q.pred ctx_struct_pair_check))
@@ -128,8 +201,8 @@ struct
 
             fun seq_pair_condition (f1,f2) = Option.isSome (U.Unify_seq(f1,f2))
 
-            val seq_pair_check = eq_check (U.Unify_seq) unifier_to_subs 
-                (App.apply_seq_Unifier) (D.seq_eq)
+            val seq_pair_check = eq_check2 (U.Unify_seq) constraint_gen_seq 
+                (App.apply_seq_Unifier) (E.seq_equiv)
 
             val property = ("sequent unification" , Q.implies(seq_pair_condition,
                                                     Q.pred seq_pair_check))
