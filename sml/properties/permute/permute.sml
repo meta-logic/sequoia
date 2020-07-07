@@ -138,18 +138,30 @@ struct
 
     fun result_to_latex_strings ((true_list,fail_list)) = 
         let 
-            fun latex_res ((clist1,tree1),(clist2,tree2)) = 
+            fun print_helper_good ((clist1,tree1),(clist2,tree2)) = 
                 "$$"^Latex.der_tree_toLatex2(tree1)^"$$"
                 ^"$$"^Ut.constraintL_toString(clist1)^"$$"
                 ^"$$ \\leadsto $$"
                 ^"$$"^Latex.der_tree_toLatex2(tree2)^"$$"
                 ^"$$"^Ut.constraintL_toString(clist2)^"$$"
+            fun print_helper_bad (clist1,tree1) = 
+                "$$"^Latex.der_tree_toLatex2(tree1)^"$$"
+                ^"$$"^Ut.constraintL_toString(clist1)^"$$"
+                ^"$$ \\leadsto $$"
+                ^"$$ ? $$"
+            fun print_helper_good_latex ((clist1,tree1),(clist2,tree2)) = 
+                "\\["^Latex.der_tree_toLatex(tree1)^"\\]"^
+                "\\["^Ut.constraintL_toString(clist1)^"\\]"^
+                "\\[\\leadsto\\]\\[\\]"^
+                "\\["^Latex.der_tree_toLatex(tree2)^"\\]"^
+                "\\["^Ut.constraintL_toString(clist2)^"\\]"
+            fun print_helper_bad_latex (clist1,tree1) = 
+                "\\["^Latex.der_tree_toLatex(tree1)^"\\]"^
+                "\\["^Ut.constraintL_toString(clist1)^"\\]"^
+                "\\[\\leadsto\\]\\[\\]\\[?\\]"
         in
-            let val true_strings = List.map (latex_res) true_list
-                val fail_strings = List.map (fn (cl,dvt) => "$$"^Latex.der_tree_toLatex2(dvt)^"$$"
-                                                            ^"$$"^Ut.constraintL_toString(cl)^"$$"
-                                                            ^"$$ \\leadsto $$"
-                                                            ^"$$ ? $$") fail_list
+            let val true_strings = List.map (fn x => (print_helper_good x)^"~~~"^(print_helper_good_latex x)) true_list
+                val fail_strings = List.map (fn x => (print_helper_bad x)^"~~~"^(print_helper_bad_latex x)) fail_list
                 val true_string = List.foldr (fn (x,y) => x^"###"^y) "" true_strings
                 val fail_string = List.foldr (fn (x,y) => x^"###"^y) "" fail_strings
             in true_string^"&&&"^fail_string end
@@ -157,8 +169,8 @@ struct
 
     fun permute_res ((right,wrong)) = 
         (case (List.length(right),List.length(wrong)) of
-            ( 0 , 0 ) => "0"
-            | (_ , 0) => "1"
+            (0,0) => "0"
+            | (_,0) => "1"
             | (0,_) => "2"
             | (_,_) => "3")
     fun permute_res_to_string (res) = 

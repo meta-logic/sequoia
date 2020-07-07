@@ -4,7 +4,7 @@
 // under certain conditions; see LICENSE for details.
 
 
-var proof_content = {}
+var proof_content = {"axiom":[],"rank":[],"grade":[]}
 var rule1 = ""
 
 function selectRule(bl, i) {
@@ -102,10 +102,12 @@ function checkCut() {
                 )
                 for (var j = 0; j < proofs_list.length; j++) {
                     if (proofs_list[j] != "") {
+                        var display_proofs = proofs_list[j].split("~~~")
+                        proof_content["axiom"].push(display_proofs[1])
                         ax.append(
                             '<div class="ui card" id="AXproof'+i+""+j+'" style="display: none;>'+
                                 '<div class="content">'+
-                                    '<div class="header">'+proofs_list[j]+'</div>'+
+                                    '<div class="header">'+display_proofs[0]+'</div>'+
                                 '</div>'+
                             '</div>'
                         )
@@ -134,10 +136,12 @@ function checkCut() {
                 )
                 for (var j = 0; j < proofs_list.length; j++) {
                     if (proofs_list[j] != "") {
+                        var display_proofs = proofs_list[j].split("~~~")
+                        proof_content["rank"].push(display_proofs[1])
                         rk.append(
                             '<div class="ui card" id="RKproof'+i+""+j+'" style="display: none;>'+
                                 '<div class="content">'+
-                                    '<div class="header">'+proofs_list[j]+'</div>'+
+                                    '<div class="header">'+display_proofs[0]+'</div>'+
                                 '</div>'+
                             '</div>'
                         )
@@ -166,10 +170,12 @@ function checkCut() {
                 )
                 for (var j = 0; j < proofs_list.length; j++) {
                     if (proofs_list[j] != "") {
+                        var display_proofs = proofs_list[j].split("~~~")
+                        proof_content["grade"].push(display_proofs[1])
                         gd.append(
                             '<div class="ui card" id="GDproof'+i+""+j+'" style="display: none;>'+
                                 '<div class="content">'+
-                                    '<div class="header">'+proofs_list[j]+'</div>'+
+                                    '<div class="header">'+display_proofs[0]+'</div>'+
                                 '</div>'+
                             '</div>'
                         )
@@ -177,8 +183,8 @@ function checkCut() {
                 }
             }
         }
-        // $("#download").css("display", "block")
-        // $("#download").attr("onclick", "download(\"Cut_Admissibility\")")
+        $("#download").css("display", "block")
+        $("#download").attr("onclick", "download(\"Cut_Admissibility\")")
         MathJax.Hub.Queue(["Typeset", MathJax.Hub, ax[0]], function() { 
             MathJax.Hub.Queue(["Typeset", MathJax.Hub, rk[0]], function() {
                 MathJax.Hub.Queue(["Typeset", MathJax.Hub, gd[0]], function() {

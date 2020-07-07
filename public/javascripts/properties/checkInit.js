@@ -4,17 +4,21 @@
 // under certain conditions; see LICENSE for details.
 
 
-var proof_content = {}
+var proof_content = {"base":[],"induct":[]}
 
-function showProofInit(index, on) {
+function showProofInit(type, index, on, num) {
     if (on == "yes") {
-        $("#I"+index).attr("onClick", "showProofInit("+index+",'no')")
-        $("#Arrow"+index).attr("class", "caret down icon")
-        $("#proof"+index).css("display", "none")
+        $("#"+type+index).attr("onClick", "showProofInit('"+type+"',"+index+",'no',"+num+")")
+        $("#Arrow"+type+index).attr("class", "caret down icon")
+        for (var i = 0; i < num; i++) {
+            $("#"+type+"proof"+index+""+i).css("display", "none")
+        }
     } else {
-        $("#I"+index).attr("onClick", "showProofInit("+index+",'yes')")
-        $("#Arrow"+index).attr("class", "caret up icon")
-        $("#proof"+index).css("display", "flex")
+        $("#"+type+index).attr("onClick", "showProofInit('"+type+"',"+index+",'yes',"+num+")")
+        $("#Arrow"+type+index).attr("class", "caret up icon")
+        for (var i = 0; i < num; i++) {
+            $("#"+type+"proof"+index+""+i).css("display", "flex")
+        }
     }
 }
 
@@ -26,6 +30,7 @@ function checkInit() {
         var init_list = []
         var logical_list = []
         var connective_dict = {}
+        var init_ordered = []
         var con_ordered = []
         for (var i = 0; i < rules.length; i++) {
             var rule_name = rules[i].rule.replace(/\\/g, "\\\\")
@@ -49,6 +54,7 @@ function checkInit() {
                 }
             } else if (rule_type == "Axiom") {
                 init_list.push(rule_sml)
+                init_ordered.push(rule_name)
             }
         }
         for (var key in connective_dict) {
@@ -67,6 +73,7 @@ function checkInit() {
             return
         }
         $.post("/sequoia/initRules", {first : logical_strings, second : init_strings, third : "[]"}, function(data, status) {
+            $("#results").css("visibility", "visible")
             var output = data.output.split("%%%")
             var result = output[0]
             if (result == "Arity Problem") {
@@ -80,46 +87,92 @@ function checkInit() {
                 var answer = ["",""]
                 if (result == "T") {
                     answer[0] = "Identity expansion proof succeeds"
-                    answer[1] = "Identity expansion is a property of this calculus system. The proof proceeds by structural induction on P, and for each connective the proof tree transformation is shown below."
+                    answer[1] = "Identity expansion is a property of this calculus system. The proof proceeds by structural induction on <b><i>P</i></b>, and for each connective the proof tree transformation is shown below."
                 } else if (result == "F") {
                     answer[0] = "Identity expansion proof fails"
-                    answer[1] = "Identity expansion may not be a property of this calculus system. The proof proceeds by structural induction on P, and for certain connectives the proof tree transformation could not be found."
+                    answer[1] = "Identity expansion may not be a property of this calculus system. The proof proceeds by structural induction on <b><i>P</i></b>, and for certain connectives the proof tree transformation could not be found."
                 }
                 $("#info_header").html(answer[0])
                 $("#info_text").html(answer[1])
                 $("#info_answer").attr("class", "ui info message")
                 $("#info_answer").css("display", "block")
             }
-            var connective_out = output[1].split("@@@")
-            var cp = $("#proofs_connectives")
-            for (var i = 0; i < connective_out.length; i++) {
-                if (connective_out[i] != "") {
-                    var temp = connective_out[i].split("###")
+            var axioms = output[1].split("@@@")
+            var logicals = output[2].split("@@@")
+            var ax = $("#axiom")
+            for (var i = 0; i < axioms.length; i++) {
+                if (axioms[i] != "") {
+                    var temp = axioms[i].split("###")
                     var color = "red"
                     if (temp[0] == "T") {
                         color = "green"
                     }
-                    cp.append(
+                    var proofs_list = temp[1].split("&&&")
+                    ax.append(
+                        '<div class="'+color+' card">'+
+                            '<div class="content">'+
+                                '<div class="header">$$'+init_ordered[i]+'$$</div>'+
+                            '</div>'+
+                            '<div id="AX'+i+'" class="ui bottom attached button" onClick=showProofInit("AX",'+i+',"no",'+proofs_list.length+')>'+
+                                '<i id="ArrowAX'+i+'" class="caret down icon"></i>'+
+                            '</div>'+
+                        '</div>'
+                    )
+                    for (var j = 0; j < proofs_list.length; j++) {
+                        if (proofs_list[j] != "") {
+                            var display_proofs = proofs_list[j].split("~~~")
+                            proof_content["base"].push(display_proofs[1])
+                            ax.append(
+                                '<div class="ui card" id="AXproof'+i+""+j+'" style="display: none;>'+
+                                    '<div class="content">'+
+                                        '<div class="header">'+display_proofs[0]+'</div>'+
+                                    '</div>'+
+                                '</div>'
+                            )
+                        }
+                    }
+                }
+            }
+            var lg = $("#logical")
+            for (var i = 0; i < logicals.length; i++) {
+                if (logicals[i] != "") {
+                    var temp = logicals[i].split("###")
+                    var color = "red"
+                    if (temp[0] == "T") {
+                        color = "green"
+                    }
+                    var proofs_list = temp[1].split("&&&")
+                    lg.append(
                         '<div class="'+color+' card">'+
                             '<div class="content">'+
                                 '<div class="header">$$'+con_ordered[i]+'$$</div>'+
                             '</div>'+
-                            '<div id="I'+i+'" class="ui bottom attached button" onClick=showProofInit('+i+',"no")>'+
-                                '<i id="Arrow'+i+'" class="caret down icon"></i>'+
-                            '</div>'+
-                        '</div>'+
-                        '<div class="ui card" id="proof'+i+'" style="display: none;">'+
-                            '<div class="content">'+
-                                '<div class="header">'+temp[1]+'</div>'+
+                            '<div id="LG'+i+'" class="ui bottom attached button" onClick=showProofInit("LG",'+i+',"no",'+proofs_list.length+')>'+
+                                '<i id="ArrowLG'+i+'" class="caret down icon"></i>'+
                             '</div>'+
                         '</div>'
                     )
+                    for (var j = 0; j < proofs_list.length; j++) {
+                        if (proofs_list[j] != "") {
+                            var display_proofs = proofs_list[j].split("~~~")
+                            proof_content["induct"].push(display_proofs[1])
+                            lg.append(
+                                '<div class="ui card" id="LGproof'+i+""+j+'" style="display: none;>'+
+                                    '<div class="content">'+
+                                        '<div class="header">'+display_proofs[0]+'</div>'+
+                                    '</div>'+
+                                '</div>'
+                            )
+                        }
+                    }
                 }
             }
-            // $("#download").css("display", "block")
-            // $("#download").attr("onclick", "download(\"Identity_Expansion\")")
-            MathJax.Hub.Queue(["Typeset", MathJax.Hub, cp[0]], function() {
-                $("#loading").attr("class", "ui inactive inverted dimmer")
+            $("#download").css("display", "block")
+            $("#download").attr("onclick", "download(\"Identity_Expansion\")")
+            MathJax.Hub.Queue(["Typeset", MathJax.Hub, ax[0]], function() { 
+                MathJax.Hub.Queue(["Typeset", MathJax.Hub, lg[0]], function() {
+                    $("#loading").attr("class", "ui inactive inverted dimmer")
+                })
             })
         })
     })

@@ -268,9 +268,9 @@ structure treefuncImpl : TREEFUNC = struct
                     let val new_premises_strings = List.map (fn (cn_list, latex_tree, html_tree, sml_tree, pr_list) => 
                             (List.map (Dat.const_toString) cn_list, List.map (Dat.const_stringify) cn_list, List.map (Dat.seq_toString) pr_list, tree_to_vars(sml_tree), latex_tree, html_tree, Html.der_tree_toHtml2(sml_tree))) new_premises
                         val new_premises_strings2 = List.map (fn (c, z, p, v, l, h, s): (string list * string list * string list * string list * string * string * string) => 
-                                "{"^(String.concatWith ("##")c)^"%%["^(String.concatWith (",")z)^"]}@@"^
-                                "{"^(String.concatWith ("##")p)^"%%"^l^"%%"^h^"%%"^s^"}@@"^
-                                "{"^(String.concatWith ("##")v)^"}@@"^
+                                "{"^(String.concatWith ("###")c)^"%%%["^(String.concatWith (",")z)^"]}@@@"^
+                                "{"^(String.concatWith ("###")p)^"%%%"^l^"%%%"^h^"%%%"^s^"}@@@"^
+                                "{"^(String.concatWith ("###")v)^"}@@@"^
                                 "{"^(Int.toString(get_index()))^"}"
                                 )new_premises_strings
                         val final_form = "["^(List.foldl (fn (str1,str2) => str1^" && "^str2) (List.hd(new_premises_strings2)) (List.tl(new_premises_strings2)))^"]"

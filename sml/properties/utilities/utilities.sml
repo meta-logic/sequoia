@@ -4,8 +4,6 @@
     under certain conditions; see LICENSE for details.
 *)
 
-
-
 structure Utilities =
 struct
     structure D = datatypesImpl
@@ -36,8 +34,8 @@ struct
 
     val color2 = "red"
     val color = "blue"
-    fun set_color (x) = "\\color{"^color^"} {"^x^"}"
-    fun set_color2 (x) = "\\color{"^color2^"} {"^x^"}"
+    fun set_color (x) = "{\\color{"^color^"} {"^x^"}}"
+    fun set_color2 (x) = "{\\color{"^color2^"} {"^x^"}}"
 
 
     fun constraintL_toString(l)=
@@ -301,7 +299,7 @@ struct
             val Dat.Rule(nm,side,conc,prems) = update_rule(rule,form_insert,color_fn)
             val conc = color_seq(conc,color_fn)
             val prems = List.map (fn seq => color_seq(seq,color_fn)) prems
-            val nm = color_fn nm
+            val nm = nm
         in
             Dat.Rule(nm,side,conc,prems)
         end
@@ -369,8 +367,7 @@ struct
     | print_helper((clist1,tree1),NONE) = 
         "$$"^Latex.der_tree_toLatex2(tree1)^"$$"
         ^"$$"^constraintL_toString(clist1)^"$$"
-        ^"$$ \\leadsto $$"
-        ^"$$ ? $$"
+        ^"$$ \\leadsto $$$$ ? $$"
     
     fun print_helper2((clist1,tree1),SOME((clist2,tree2))) = 
         "$$"^Latex.der_tree_toLatex2(tree1)^"$$"
@@ -382,6 +379,25 @@ struct
         "$$"^Latex.der_tree_toLatex2(tree1)^"$$"
         ^"$$"^constraintL_toString(clist1)^"$$"
         
-
+    fun print_helper_latex((clist1,tree1),SOME((clist2,tree2))) = 
+        "\\["^Latex.der_tree_toLatex(tree1)^"\\]"^
+        "\\["^constraintL_toString(clist1)^"\\]"^
+        "\\[\\leadsto\\]\\[\\]"^
+        "\\["^Latex.der_tree_toLatex(tree2)^"\\]"^
+        "\\["^constraintL_toString(clist2)^"\\]"
+    | print_helper_latex((clist1,tree1),NONE) = 
+        "\\["^Latex.der_tree_toLatex(tree1)^"\\]"^
+        "\\["^constraintL_toString(clist1)^"\\]"^
+        "\\[\\leadsto\\]\\[\\]\\[?\\]"
+    
+    fun print_helper_latex2((clist1,tree1),SOME((clist2,tree2))) = 
+        "\\["^Latex.der_tree_toLatex(tree1)^"\\]"^
+        "\\["^constraintL_toString(clist1)^"\\]"^
+        "\\[\\leadsto\\]\\[\\]"^
+        "\\["^Latex.der_tree_toLatex(tree2)^"\\]"^
+        "\\["^constraintL_toString(clist2)^"\\]"
+    | print_helper_latex2((clist1,tree1),NONE) = 
+        "\\["^Latex.der_tree_toLatex(tree1)^"\\]"^
+        "\\["^constraintL_toString(clist1)^"\\]"
 
 end

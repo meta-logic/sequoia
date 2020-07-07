@@ -186,7 +186,7 @@ app.get('/sequoia/calculus/:calc_id/properties/invertibility', checkAuthenticate
 
 app.post('/sequoia/generate', checkAuthenticated, function(req, res) {
 	var data = req.body.proof
-	fs.writeFile(__dirname+"/tempProofs/"+req.user._id, data, function (err) {
+	fs.writeFile("/tmp/"+req.user._id, data, function (err) {
 		if (err) {
 			res.status(400).send("Proof genereation request fail")
 		} else {
@@ -197,8 +197,8 @@ app.post('/sequoia/generate', checkAuthenticated, function(req, res) {
 
 app.get('/sequoia/fetch/:property', checkAuthenticated, function(req, res) {
 	var fileName = req.params.property
-	res.set({"Content-Disposition":"attachment; filename=\""+fileName+".txt\""});
-	res.sendFile(__dirname+"/tempProofs/"+req.user._id, function (err) {
+	res.set({"Content-Disposition":"attachment; filename=\""+fileName+".tex\""});
+	res.sendFile("/tmp/"+req.user._id, function (err) {
 		if (err) {
 			console.log(err)
 		} else {
@@ -208,7 +208,7 @@ app.get('/sequoia/fetch/:property', checkAuthenticated, function(req, res) {
 });
 
 app.post('/sequoia/remove/', checkAuthenticated, function(req, res) {
-	fs.unlink(__dirname+"/tempProofs/"+req.user._id, function (err) {
+	fs.unlink("/tmp/"+req.user._id, function (err) {
 		if (err) {
 			res.status(200).send("File deletion request fail")
 		} else {
