@@ -10,6 +10,8 @@ sig
 
 	type constraint = (Dat.ctx_var * Dat.ctx_var list * Dat.ctx_var list)
 
+	val ctx_equiv : Dat.ctx * Dat.ctx -> bool
+
 	val ctx_struct_equiv : Dat.ctx_struct * Dat.ctx_struct -> bool
 	
 	val seq_equiv : Dat.seq*Dat.seq -> bool
