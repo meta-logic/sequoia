@@ -1,15 +1,20 @@
 Group
   structure Gen
+  structure Rules
   structure UnitTest
   structure U_Pred
   structure App_Pred
+  structure T_Pred
 is
   ../basics/basics.cm
   ../applyunifier/applyunifier.cm
   ../unification/unification.cm
   ../equiv/equiv.cm
   ../qcheck/qcheck.cm
+  ../tree_func/tree_func.cm
   generators/gen.sml
+  generators/rules.sml
   unification_pred/unification_pred.sml
   apply_sub_pred/apply_sub_pred.sml
+  tree_func_pred/tree_func_pred.sml
   unit_test.sml

@@ -3,7 +3,8 @@ struct
     structure Q = QCheck
     structure G = Gen
     structure U = U_Pred
-    structure AT = App_Pred
+    structure AP = App_Pred
+    structure TP = T_Pred
     structure D = datatypesImpl
 
     (* needed for QCheck function: *)
