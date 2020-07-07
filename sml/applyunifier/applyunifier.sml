@@ -112,9 +112,10 @@ structure applyunifierImpl : APPLYUNIFIER = struct
 
     fun UnifierComposition (sigma1,sigma2)=
         let
-            val sigma2new = List.filter (fn s2 => not 
+            val sigma2new = sigma2
+            (* val sigma2new = List.filter (fn s2 => not 
                             (List.exists (fn s1 => DAT.sub_prefix_eq(s2, s1)) 
-                            sigma1)) sigma2
+                            sigma1)) sigma2 *)
             val res = UnifierComposition'(sigma1,sigma2new)
         in
             res
