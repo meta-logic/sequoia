@@ -8,6 +8,38 @@ struct
     structure E = Equivalence
     structure H = helpersImpl
     structure C = Constraints
+    structure Sort = ListMergeSort
+    structure CV_Key = CtxVarKey
+    structure MCV = BinaryMapFn (CtxVarKey) 
+
+    (* returns true if x is greater than y*)
+    fun cmp_to_gt cmp (x,y) = 
+        (case cmp(x,y) of
+           GREATER => true
+         | _ => false)
+    
+    fun list_cmp cmp (l1,l2) = 
+        (case (l1,l2) of
+           ([],[]) => EQUAL
+         | ([],_) => LESS
+         | (_,[]) => GREATER
+         | (x::l1',y::l2') => 
+            (case (cmp(x,y)) of
+                EQUAL => list_cmp cmp (l1',l2')
+              | res => res))
+
+    val ctx_varL_cmp = list_cmp (CV_Key.compare)
+
+    val ctx_varL_sort = Sort.sort (cmp_to_gt CV_Key.compare)
+
+    fun sort_constraint (a,b,c) = (a,ctx_varL_sort b, ctx_varL_sort c)
+
+    fun constraint_cmp ((a1: D.ctx_var ,b1,c1),(a2 : D.ctx_var ,b2,c2)) = 
+        (case ctx_varL_cmp(b1,b2) of
+           EQUAL => (ctx_varL_cmp(c1,c2))
+         | res => res)
+    
+    val constraintL_sort = Sort.sort (cmp_to_gt constraint_cmp)
 
     fun empty_sub (v) = D.CTXs(v,D.Ctx([],[]))
     fun con_to_subs ((_,l1,l2)) = 
@@ -34,30 +66,48 @@ struct
     fun gen_to_pair_gen gen = Q.Gen.choose' (#[
                                 (9,Q.Gen.zip(gen,gen)),
                                 (1,Q.Gen.map (fn x => (x,x)) gen)])
-
     
-    val hat = #"^"
+    fun ctx_var_eq map (v1,v2) = 
+        (case MCV.find(!map,v1) of
+           SOME v2' => D.ctx_var_eq(v2,v2')
+         | NONE => (map := (MCV.insert(!map,v1,v2)) ; true))
 
-    fun remove_hat' (nil) = nil
-        |remove_hat' (x::L) = if (x=hat) then [] else x::remove_hat'(L)
 
-    fun remove_hat (x) = String.implode(remove_hat'(String.explode(x)))
+    fun ctx_varL_eq _ ([],[]) = true
+        | ctx_varL_eq map (v1::l1,v2::l2) = (ctx_var_eq map (v1,v2))
+                                   andalso (ctx_varL_eq map (l1,l2))
+        | ctx_varL_eq _ _ = false
 
-    fun remove_hat_ctx_var (D.CtxVar(a,b)) = D.CtxVar(a,remove_hat b)
-    fun remove_hat_constraint ((a,b,c)) = (a,List.map remove_hat_ctx_var b,List.map remove_hat_ctx_var c)
-    fun ctx_var_l_eq (a,b) = H.mset_eq(a,b,D.ctx_var_eq)
-    fun constraint_eq ((_,a1,b1),(_,a2,b2)) = 
-        ((ctx_var_l_eq(a1,a2)) andalso (ctx_var_l_eq(b1,b2))) orelse 
-        ((ctx_var_l_eq(a1,b2)) andalso (ctx_var_l_eq(b1,a2)))
-    fun constraint_list_eq' (a,b) = H.mset_eq(a,b,constraint_eq)
-    fun constraint_list_eq (a,b) = 
+
+    fun constraint_eq map ((_,b1,c1),(_,b2,c2)) =
         let
-            val a' = List.map remove_hat_constraint a
-            val b' = List.map remove_hat_constraint b
+            val eq = ctx_varL_eq map
         in
-            constraint_list_eq' (a',b')
+            (eq(b1,b2)) andalso (eq(c1,c2))
+        end
+
+    (* each constraint should be the same *)
+    fun constraint_list_eq' _ ([],[]) = true
+        |constraint_list_eq' map (c1::l1,c2::l2) = (constraint_eq map (c1,c2)) 
+                                     andalso (constraint_list_eq' map (l1,l2))
+        |constraint_list_eq' _ _ = false
+
+    type constraint = D.ctx_var * (D.ctx_var list) * (D.ctx_var list)
+
+    fun constraint_list_eq (l1: constraint list,l2: constraint list) = 
+        let
+            val eq_map = ref (MCV.empty)
+
+            val l1' = List.map (sort_constraint) l1
+            val l1'' = constraintL_sort l1'
+
+            val l2' = List.map (sort_constraint) l2
+            val l2'' = constraintL_sort l2'
+        in
+            constraint_list_eq' eq_map (l1'',l2'')
         end
     
+
     fun ctx_struct_to_ctx_list (D.Empty) = []
         |ctx_struct_to_ctx_list (D.Single(ctx)) = [ctx]
         |ctx_struct_to_ctx_list (D.Mult(_,ctx,c_struct)) = (ctx::(ctx_struct_to_ctx_list c_struct))
