@@ -7,6 +7,7 @@ struct
     val C = D.FormVar("Cr")
     val G1 = D.CtxVar(NONE, "G1")
     val G2 = D.CtxVar(NONE, "G2")
+    val D1 = D.CtxVar(NONE, "D1")
     val and_con = D.Con("\\wedge")
     val or_con = D.Con("\\vee")
     val imp_con = D.Con("\\supset")
@@ -91,6 +92,22 @@ struct
             val prem2 = D.Seq(D.Single(D.Ctx([G1],[B])),seq_con,D.Single(D.Ctx([],[C])))
         in
             D.Rule("\\supset_L",D.Left,conc,[prem1,prem2])
+        end
+
+    val split_left = 
+        let
+            val conc = D.Seq(D.Single(D.Ctx([G1,G2],[])),seq_con,D.Single(D.Ctx([D1],[])))
+            val prem1 = D.Seq(D.Single(D.Ctx([G1],[])),seq_con,D.Single(D.Ctx([D1],[])))
+            val prem2 = D.Seq(D.Single(D.Ctx([G2],[])),seq_con,D.Single(D.Ctx([D1],[])))
+        in
+            D.Rule("split_L",D.Left,conc,[prem1,prem2])
+        end
+    
+    val copy = 
+        let
+            val conc = D.Seq(D.Single(D.Ctx([G1],[])),seq_con,D.Single(D.Ctx([D1],[])))
+        in
+            D.Rule("copy",D.None,conc,[conc])
         end
 
     val rules = #[andR,andL,orR1,orR2,orLc,orLs,impR,impL]
