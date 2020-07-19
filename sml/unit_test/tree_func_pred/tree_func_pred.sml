@@ -9,6 +9,10 @@ struct
 
     val rule_gen = Q.Gen.select (R.rules)    
 
+
+    fun rule_to_copies (copies,D.Rule(nm,side,conc,prems)):D.rule list = 
+        List.tabulate (copies,fn i => D.Rule(nm^(Int.toString(i)),side,conc,prems))
+
     fun seq_to_tree seq = D.DerTree("0",seq,NONE,[])
 
     val fake_name = "fake rule"
@@ -17,8 +21,10 @@ struct
         let
             val prem0 = D.DerTree("00",seq,NONE,[])
             val prem1 = D.DerTree("01",seq,NONE,[])
+            val prem2 = D.DerTree("02",seq,NONE,[])
+            val prem3 = D.DerTree("03",seq,NONE,[])
         in
-            D.DerTree("0",seq,SOME fake_name,[prem0,prem1])
+            D.DerTree("0",seq,SOME fake_name,[prem0,prem1,prem2,prem3])
         end
     fun tree_to_conc (D.DerTree(_,conc,_,_)) = conc
 
@@ -194,6 +200,129 @@ struct
                true => List.all check1 trees
              | false => List.all check2 trees)
         end
+    
+    fun check_combinations (prem_ids,trees,rule_name) = 
+        let
+            val num_prems = List.length(prem_ids)
+            val wanted_prem_combinations' = List.tabulate(num_prems,(fn i => H.chooseDP(prem_ids,i+1)))
+            val wanted_prem_combinations = List.concat wanted_prem_combinations'
+
+            fun prem_filter(prems) = List.filter (fn D.DerTree(_,_,SOME nm,_) => nm = rule_name 
+                                                | _ => false) prems
+            fun prems_to_ids(prems) = List.map (fn D.DerTree(id,_,_,_) => id) (prem_filter(prems))
+            fun tree_to_prem_ids (D.DerTree(_,_,_,prems)) = prems_to_ids(prems)
+            val prem_combinations = List.map tree_to_prem_ids trees
+        in
+            H.mset_eq(wanted_prem_combinations,prem_combinations,(fn (l1,l2) => H.mset_eq(l1,l2,op=)))
+        end
+    
+    fun check_combinations2 (prem_ids,trees,rule_name) = 
+        let
+            val num_prems = List.length(prem_ids)
+            val wanted_prem_combinations' = List.tabulate(num_prems+1,(fn i => H.chooseDP(prem_ids,i)))
+            val wanted_prem_combinations = List.concat wanted_prem_combinations'
+
+            fun prem_filter(prems) = List.filter (fn D.DerTree(_,_,SOME nm,_) => nm = rule_name 
+                                                | _ => false) prems
+            fun prems_to_ids(prems) = List.map (fn D.DerTree(id,_,_,_) => id) (prem_filter(prems))
+            fun tree_to_prem_ids (D.DerTree(_,_,_,prems)) = prems_to_ids(prems)
+            val prem_combinations = List.map tree_to_prem_ids trees
+        in
+            H.mset_eq(wanted_prem_combinations,prem_combinations,(fn (l1,l2) => H.mset_eq(l1,l2,op=)))
+        end
+
+    fun check_applied_all_ways(seq,rule) = 
+        let
+            val tree = seq_to_tree2 seq
+            val res = check_rule_can_be_applied2(seq,rule)
+            val D.Rule(name,_,_,_) = rule
+            val base_tree = tree
+            val D.DerTree(_,_,_,prems) = base_tree
+            val prem_ids = List.map (fn D.DerTree(id,_,_,_) => id) prems
+            val rule_applied = T.apply_rule_all_ways(([],[],base_tree),rule,true)
+            val trees = List.map (#3) rule_applied
+            fun check1 (D.DerTree(_,_,SOME nm,prems)) = (nm = fake_name)
+                | check1 (_) = false
+            fun check2' (D.DerTree(_,_,NONE,_)) = true
+                | check2' (_) = false
+            fun check2 (D.DerTree(_,_,SOME nm,prems)) = (nm = fake_name) andalso (List.all check2' prems)
+                | check2 (_) = false
+        in  
+            (case res of
+               true => (List.all check1 trees) andalso (check_combinations(prem_ids,trees,name))
+             | false => List.all check2 trees)
+        end
+
+    fun check_applied_all_ways2(seq,rule) = 
+        let
+            val tree = seq_to_tree2 seq
+            val res = check_rule_can_be_applied2(seq,rule)
+            val D.Rule(name,_,_,_) = rule
+            val base_tree = tree
+            val D.DerTree(_,_,_,prems) = base_tree
+            val prem_ids = List.map (fn D.DerTree(id,_,_,_) => id) prems
+            val rule_applied = T.apply_rule_all_ways(([],[],base_tree),rule,false)
+            val trees = List.map (#3) rule_applied
+            fun check1 (D.DerTree(_,_,SOME nm,prems)) = (nm = fake_name)
+                | check1 (_) = false
+            fun check2' (D.DerTree(_,_,NONE,_)) = true
+                | check2' (_) = false
+            fun check2 (D.DerTree(_,_,SOME nm,prems)) = (nm = fake_name) andalso (List.all check2' prems)
+                | check2 (_) = false
+        in  
+            (case res of
+               true => (List.all check1 trees) andalso (check_combinations2(prem_ids,trees,name))
+             | false => List.all check2 trees)
+        end
+
+    fun check_comb_and_permutations(trees,names) = 
+        let
+            (* pick a subset (atleast 1) of names *)
+            val num_names = List.length(names)
+            val name_choices' = List.tabulate(num_names,fn i => H.chooseDP(names,(i+1)))
+            val name_choices = List.concat name_choices'
+            (* get all permutations of that subset *)
+            val name_permutations' = List.map (H.permutations) name_choices
+            val wanted_orders = List.concat name_permutations'
+            
+            (* turn tree into ordered list of rule names*)
+            fun tree_to_rules (D.DerTree(_,_,NONE,_)) = []
+                | tree_to_rules (D.DerTree(_,_,SOME nm,[prem])) = (nm) :: (tree_to_rules prem)
+                | tree_to_rules _ = raise Fail "unexpected input tree_to_rules"
+            val actual_orders' = List.map (tree_to_rules) trees
+
+
+            (* 2 name orders are equal if they have the same length and same names *)
+            val eq_check = ListPair.allEq (op=)
+            
+
+            (* remove duplicates from actual orders since the trees should be identical*)
+            fun fltr x = List.filter (fn y => not (eq_check(x,y)))
+            fun remove_dup ([]) = []
+              | remove_dup (x::l) = x::(remove_dup(fltr x l))
+
+            val actual_orders = remove_dup actual_orders'
+        in
+            H.mset_eq(wanted_orders,actual_orders,eq_check)
+        end
+    
+    fun check_applied_multiple_rules_all_ways(seq,rule) = 
+        let
+            val tree = seq_to_tree seq
+            val res = check_rule_can_be_applied2(seq,rule)
+            val rules = rule_to_copies (4,rule)
+            fun rule_to_name (D.Rule(name,_,_,_)) = name
+            val names = List.map rule_to_name rules
+            val base_tree = tree
+            val rule_applied = T.apply_multiple_rules_all_ways(([],[],base_tree),rules)
+            val trees = List.map (#3) rule_applied
+            fun check2 (D.DerTree(_,_,NONE,_)) = true
+                | check2 (_) = false
+        in  
+            (case res of
+               true => (check_comb_and_permutations(trees,names))
+             | false => List.all check2 trees)
+        end
 
     fun print_pair(seq,D.Rule(name,_,_,_)) = (D.seq_stringify(seq))^" and "^ name
 
@@ -246,9 +375,40 @@ struct
         end
     
     (* WIP *)
-    fun apply_rule_all_ways_test () = raise Fail "Unimplemented"
-    fun apply_multiple_rules_all_ways_test () = raise Fail "Unimplemented"
-        
+    fun apply_rule_all_ways_test1 () = 
+        let
+            val rule_gen2 = Q.Gen.lift (R.copy)
+            val tree_gen = G.seq_gen
+            val seq_rule_gen = Q.Gen.zip (tree_gen,rule_gen2)
+            val prop_reader = (seq_rule_gen,SOME print_pair) 
+            val prop = (Q.pred (check_applied_all_ways))
+            val prop_desc = ("apply_rule_all_ways test 1",prop)
+        in
+            Q.checkGen prop_reader prop_desc
+        end
+    fun apply_rule_all_ways_test2 () = 
+        let
+            val rule_gen2 = Q.Gen.lift (R.copy)
+            val tree_gen = G.seq_gen
+            val seq_rule_gen = Q.Gen.zip (tree_gen,rule_gen2)
+            val prop_reader = (seq_rule_gen,SOME print_pair) 
+            val prop = (Q.pred (check_applied_all_ways2))
+            val prop_desc = ("apply_rule_all_ways test 2",prop)
+        in
+            Q.checkGen prop_reader prop_desc
+        end
+
+    fun apply_multiple_rules_all_ways_test () =
+        let
+            val rule_gen2 = Q.Gen.lift (R.copy)
+            val seq_gen = G.seq_gen
+            val seq_rule_gen = Q.Gen.zip (seq_gen,rule_gen2)
+            val prop_reader = (seq_rule_gen,SOME print_pair) 
+            val prop = (Q.pred (check_applied_multiple_rules_all_ways))
+            val prop_desc = ("apply_multiple_rules_all_ways test",prop)
+        in
+            Q.checkGen prop_reader prop_desc
+        end      
     
 
 
@@ -257,5 +417,8 @@ struct
     val _ = apply_rule_test2 ()
     val _ = apply_rule_everywhere_test1 ()
     val _ = apply_rule_everywhere_test2 ()
+    val _ = apply_rule_all_ways_test1 ()
+    val _ = apply_rule_all_ways_test2 ()
+    val _ = apply_multiple_rules_all_ways_test ()
 
 end

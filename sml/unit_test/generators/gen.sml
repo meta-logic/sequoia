@@ -67,7 +67,7 @@ struct
     fun context_gen' range = Q.Gen.map (D.Ctx) (Q.Gen.zip (ctx_var_l_gen range,
       form_l_gen range))
 
-    val context_gen = context_gen' (0,5)
+    val context_gen = context_gen' (0,4)
 
 
     fun context_struct_gen' 0 = Q.Gen.choose' (#[
