@@ -7,6 +7,7 @@ Group
   structure T_Pred
   structure OrdKeysTest
   structure DatatypesTest
+  structure HelpersTest
 is
   ../basics/basics.cm
   ../applyunifier/applyunifier.cm
@@ -20,5 +21,6 @@ is
   apply_sub_pred/apply_sub_pred.sml
   tree_func_pred/tree_func_pred.sml
   basics_tests/datatypes_test.sml
+  basics_tests/helpers_test.sml
   basics_tests/ord_keys_test.sml
   unit_test.sml

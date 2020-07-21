@@ -8,6 +8,8 @@ struct
     structure TP = T_Pred
     structure D = datatypesImpl
     structure OK = OrdKeysTest
+    structure DT = DatatypesTest
+    structure HT = HelpersTest
 
     (* needed for QCheck function: *)
     (* reader: ('a gen * ('a -> string) option) *)
