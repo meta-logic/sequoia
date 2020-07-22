@@ -10,6 +10,7 @@ struct
     structure OK = OrdKeysTest
     structure DT = DatatypesTest
     structure HT = HelpersTest
+    structure PT = PropertiesTest
 
     (* needed for QCheck function: *)
     (* reader: ('a gen * ('a -> string) option) *)

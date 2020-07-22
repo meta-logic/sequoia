@@ -8,6 +8,7 @@ Group
   structure OrdKeysTest
   structure DatatypesTest
   structure HelpersTest
+  structure PropertiesTest
 is
   ../basics/basics.cm
   ../applyunifier/applyunifier.cm
@@ -15,6 +16,7 @@ is
   ../equiv/equiv.cm
   ../qcheck/qcheck.cm
   ../tree_func/tree_func.cm
+  ../properties/properties.cm
   generators/gen.sml
   generators/rules.sml
   unification_pred/unification_pred.sml
@@ -23,4 +25,10 @@ is
   basics_tests/datatypes_test.sml
   basics_tests/helpers_test.sml
   basics_tests/ord_keys_test.sml
+  properties_tests/test_cases.sml
+  properties_tests/properties_tests.sml
+  properties_tests/result_type.sml
+  properties_tests/id_expansion_test_cases.sml
+  properties_tests/permute_test_cases.sml
+  properties_tests/weakening_test_cases.sml
   unit_test.sml
