@@ -13,6 +13,23 @@ struct
     val imp_con = D.Con("\\supset")
     val seq_con = D.Con("\\vdash")
 
+    val id = 
+        let
+            val left_side = D.Single(D.Ctx([G1],[A]))
+            val conc = D.Seq(left_side,seq_con,D.Single(D.Ctx([],[A])))    
+        in
+            D.Rule("id",D.None,conc,[])
+        end
+    
+    val id_no_ctx = 
+        let
+            val left_side = D.Single(D.Ctx([],[A]))
+            val conc = D.Seq(left_side,seq_con,D.Single(D.Ctx([],[A])))    
+        in
+            D.Rule("id",D.None,conc,[])
+        end
+
+
     val andR = 
         let
             val left_side = D.Single(D.Ctx([G1],[]))
@@ -20,6 +37,19 @@ struct
             val conc = D.Seq(left_side,seq_con,D.Single(D.Ctx([],[and_form])))    
             val prem1 = D.Seq(left_side,seq_con,D.Single(D.Ctx([],[A])))    
             val prem2 = D.Seq(left_side,seq_con,D.Single(D.Ctx([],[B])))    
+        in
+            D.Rule("\\wedge_R",D.Right,conc,[prem1,prem2])
+        end
+    
+    val andRs = 
+        let
+            val left_side_conc = D.Single(D.Ctx([G1,G2],[]))
+            val left_side_prem1 = D.Single(D.Ctx([G1],[]))
+            val left_side_prem2 = D.Single(D.Ctx([G2],[]))
+            val and_form = D.Form(and_con,[A,B])
+            val conc = D.Seq(left_side_conc,seq_con,D.Single(D.Ctx([],[and_form])))    
+            val prem1 = D.Seq(left_side_prem1,seq_con,D.Single(D.Ctx([],[A])))    
+            val prem2 = D.Seq(left_side_prem2,seq_con,D.Single(D.Ctx([],[B])))    
         in
             D.Rule("\\wedge_R",D.Right,conc,[prem1,prem2])
         end
@@ -90,6 +120,16 @@ struct
             val conc = D.Seq(D.Single(D.Ctx([G1],[imp_form])),seq_con,D.Single(D.Ctx([],[C])))
             val prem1 = D.Seq(D.Single(D.Ctx([G1],[])),seq_con,D.Single(D.Ctx([],[A])))
             val prem2 = D.Seq(D.Single(D.Ctx([G1],[B])),seq_con,D.Single(D.Ctx([],[C])))
+        in
+            D.Rule("\\supset_L",D.Left,conc,[prem1,prem2])
+        end
+    
+    val impLs = 
+        let
+            val imp_form = D.Form(imp_con,[A,B])
+            val conc = D.Seq(D.Single(D.Ctx([G1,G2],[imp_form])),seq_con,D.Single(D.Ctx([],[C])))
+            val prem1 = D.Seq(D.Single(D.Ctx([G1],[])),seq_con,D.Single(D.Ctx([],[A])))
+            val prem2 = D.Seq(D.Single(D.Ctx([G2],[B])),seq_con,D.Single(D.Ctx([],[C])))
         in
             D.Rule("\\supset_L",D.Left,conc,[prem1,prem2])
         end
