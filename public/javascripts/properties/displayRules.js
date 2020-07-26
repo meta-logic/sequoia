@@ -136,8 +136,8 @@ function initWeak(calc_id) {
         var rule_strings = list_to_string(rule_list)
         $.post("/sequoia/weakenSides", {rules: rule_strings}, function(data, status) {
             var output = data.output.split("%%%")
-            var left_bools = output[0].split("@@@")
-            var right_bools = output[1].split("@@@")
+            var left_bools = output[1].split("@@@")
+            var right_bools = output[2].split("@@@")
             if (left_bools.length > 1) {
                 weak_l = ""
                 for (var i = 0; i < left_bools.length; i++) {
