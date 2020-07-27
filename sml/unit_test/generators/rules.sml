@@ -7,6 +7,8 @@ struct
     val C = D.FormVar("Cr")
     val G1 = D.CtxVar(NONE, "G1")
     val G2 = D.CtxVar(NONE, "G2")
+    val G3 = D.CtxVar(NONE, "G3")
+    val G4 = D.CtxVar(NONE, "G4")
     val D1 = D.CtxVar(NONE, "D1")
     val and_con = D.Con("\\wedge")
     val or_con = D.Con("\\vee")
@@ -149,6 +151,18 @@ struct
         in
             D.Rule("copy",D.None,conc,[conc])
         end
+
+    val cut = 
+        let
+            val left_side = D.Single(D.Ctx([G3,G4],[]))
+            val conc = D.Seq(left_side,seq_con,D.Single(D.Ctx([],[C])))    
+            val prem1 = D.Seq(D.Single(D.Ctx([G3],[])),seq_con,D.Single(D.Ctx([],[A])))    
+            val prem2 = D.Seq(D.Single(D.Ctx([G4],[A])),seq_con,D.Single(D.Ctx([],[C])))
+        in
+            D.Rule("cut",D.None,conc,[prem1,prem2])
+        end
+    
+    val cut_form = A
 
     val rules = #[andR,andL,orR1,orR2,orLc,orLs,impR,impL]
     

@@ -28,7 +28,8 @@ is
   properties_tests/test_cases.sml
   properties_tests/properties_tests.sml
   properties_tests/result_type.sml
-  properties_tests/id_expansion_test_cases.sml
-  properties_tests/permute_test_cases.sml
-  properties_tests/weakening_test_cases.sml
+  properties_tests/test_cases/id_expansion_test_cases.sml
+  properties_tests/test_cases/permute_test_cases.sml
+  properties_tests/test_cases/weakening_test_cases.sml
+  properties_tests/test_cases/cut_elim_test_cases.sml
   unit_test.sml
