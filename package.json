@@ -18,7 +18,7 @@
   },
   "homepage": "https://github.com/meta-logic/sequoia#readme",
   "dependencies": {
-    "bcrypt": "^3.0.7",
+    "bcrypt": "^5.0.1",
     "body-parser": "^1.18.3",
     "dotenv": "^8.2.0",
     "express": "^4.16.4",
