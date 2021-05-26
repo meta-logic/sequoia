@@ -80,13 +80,13 @@ app.use('/sequoia/api', symbolsRoutes);
 //Page Routes ===========================================================
 app.get('/sequoia', function(req, res) {
 	if (req.isAuthenticated()) {
-		return res.render('login/landing', {'layout' : 'landing_in', 'page' : "in"});
+		return res.render('login/landing', {'title' : 'Sequoia', 'layout' : 'landing_in', 'page' : "in"});
 	}
-	return res.render('login/landing', {'layout' : 'landing_out', 'page' : "out"});
+	return res.render('login/landing', {'title' : 'Sequoia', 'layout' : 'landing_out', 'page' : "out"});
 });
 
 app.get('/sequoia/home', checkAuthenticated, function(req, res) {
-	return res.render('main/index', {'title' : 'Sequoia','layout' : 'main', 'user_id' : req.user._id, 'username' : req.user.username});
+	return res.render('main/index', {'title' : 'Sequoia - home','layout' : 'main', 'user_id' : req.user._id, 'username' : req.user.username});
 });
 
 app.get('/sequoia/login', function(req, res) {

@@ -4,9 +4,10 @@
 // under certain conditions; see LICENSE for details.
 
 
+
 $("#main-menu").sticky({});
 if ($("#page").text() == "fail") {
     $("#warning").css("visibility", "visible")
-} else if (page == "in") {
+} else if ($("#page").text() == "in") {
     $("#go_button").html('Let\'s Go <i class="right arrow icon"></i>')
 }
