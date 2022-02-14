@@ -1,4 +1,4 @@
-{{!-- Sequoia Copyright (C) 2020  Zan Naeem, Abdulrahman Alfayad
+{{!-- Sequoia Copyright (C) 2020 Zan Naeem, Abdulrahman Alfayad
 This program comes with ABSOLUTELY NO WARRANTY; for details see LICENSE.
 This is free software, and you are welcome to redistribute it
 under certain conditions; see LICENSE for details. --}}
@@ -6,115 +6,118 @@ under certain conditions; see LICENSE for details. --}}
 
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>{{title}}</title>
-    <link rel="stylesheet" type="text/css" href="/sequoia/bower/semantic/dist/semantic.min.css">
-  </head>
-  <div id = "style">
-    <style> 
-      ::-webkit-scrollbar {
-          width: 0px;
-          background: transparent;
-      }
 
-      #side_menu_R{
-        height: 85vh;
-      }
+<head>
+  <title>{{title}}</title>
+  <link rel="stylesheet" type="text/css" href="/sequoia/bower/semantic/dist/semantic.min.css">
+</head>
+<div id="style">
+  <style>
+    ::-webkit-scrollbar {
+      width: 0px;
+      background: transparent;
+    }
 
-      #rules{
-        height: 100%;
-        overflow-y: auto;
-      }
+    #side_menu_R {
+      height: 85vh;
+    }
 
-      #main_grid{
-        width: 101.5vw;
-      }
+    #rules {
+      height: 100%;
+      overflow-y: auto;
+    }
 
-      #tree_grid{
-        width: 100%;
-        overflow-x: auto;
-      }
+    #main_grid {
+      width: 101.5vw;
+    }
 
-      *{
-        box-sizing: border-box;
-      }
-      
-      div.tree{
-        /*background-color: rgba(0,233,0,0.2);*/
-        display: inline-flex;
-        align-items: flex-end;
-        padding: 0px 12px;
-        font-size: 22px;
-      }
+    #tree_grid {
+      width: 100%;
+      overflow-x: auto;
+    }
 
-      div.rule {
-        padding-left: 3px;
-        padding-bottom: 23px;
-        /*background-color: #377;*/
-        font-size: 22px;
-      }
+    * {
+      box-sizing: border-box;
+    }
 
-      div.rule > .MathJax_Display{
-        margin: 0;
-      }
+    div.tree {
+      /*background-color: rgba(0,233,0,0.2);*/
+      display: inline-flex;
+      align-items: flex-end;
+      padding: 0px 12px;
+      font-size: 22px;
+    }
 
-      div.sequence{
-        display: inline-block;
-        /*border: 2px solid #fff;*/
-      }
+    div.rule {
+      padding-left: 3px;
+      padding-bottom: 23px;
+      /*background-color: #377;*/
+      font-size: 22px;
+    }
 
-      div.premises{
-        display: inline-flex;
-        align-items: flex-end;
-        justify-content: center;
-        /*background-color: #a0a;*/
-        text-align: center;
-      }
+    div.rule>.MathJax_Display {
+      margin: 0;
+    }
 
-      div.conclusion{
-        border-top: 1px solid #111;
-        /*background-color: #aa1;*/
-        text-align: center;
-      }
+    div.sequence {
+      display: inline-block;
+      /*border: 2px solid #fff;*/
+    }
 
-      div.conclusion > .MathJax_Display{
-        margin:0;
-      }
+    div.premises {
+      display: inline-flex;
+      align-items: flex-end;
+      justify-content: center;
+      /*background-color: #a0a;*/
+      text-align: center;
+    }
 
-      div.leaf{
-        /*background-color: #aa1;*/
-        text-align: center;
-        padding: 0px 21px;
-        cursor: pointer;
-      }
+    div.conclusion {
+      border-top: 1px solid #111;
+      /*background-color: #aa1;*/
+      text-align: center;
+    }
 
-      div.leaf > .MathJax_Display{
-        margin:0;
-      }
+    div.conclusion>.MathJax_Display {
+      margin: 0;
+    }
 
-      div.item > .MathJax_Display{
-        margin:0;
-      }
-    </style>
-  </div>
-  <body>
+    div.leaf {
+      background-color: rgb(255, 255, 255);
+      text-align: center;
+      padding: 0px 21px;
+      cursor: pointer;
+    }
+
+    div.leaf>.MathJax_Display {
+      margin: 0;
+    }
+
+    div.item>.MathJax_Display {
+      margin: 0;
+    }
+  </style>
+</div>
+
+<body>
   {{> navbar}}
   {{{body}}}
-    <script type="text/javascript" src="/sequoia/bower/MathJax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/javascript" src="/sequoia/bower/jquery/dist/jquery.min.js"></script>
-    <script type="text/javascript" src="/sequoia/bower/pegjs/peg-0.10.0.min.js"></script>
-    <script type="text/javascript" src="/sequoia/bower/semantic/dist/semantic.min.js"></script>
-    <script type="text/javascript" src="/sequoia/static/javascripts/apply/prooftree.js"></script>
-    <script type="text/javascript" src="/sequoia/static/javascripts/apply/applyRule.js"></script>
-    <script type="text/javascript" src="/sequoia/static/javascripts/parser_text.js"></script>
-    <script type="text/javascript" src="/sequoia/static/javascripts/symbols_table.js"></script>
-    <script type="text/javascript" src="/sequoia/static/javascripts/apply/initSequent.js"></script>
-    <script type="text/javascript" src="/sequoia/static/javascripts/apply/updateParser.js"></script>
-    <script type="text/javascript" src="/sequoia/static/javascripts/apply/rule_sidebar.js"></script>
-    <script type="text/javascript" src="/sequoia/static/javascripts/apply/preview.js"></script>
-    <script type="text/javascript" src="/sequoia/static/javascripts/rule/fixRules.js"></script>
-    <script type="text/javascript" src="/sequoia/static/javascripts/generateProof.js"></script>
-    <script type="text/javascript" src="/sequoia/static/javascripts/apply/setupItems.js"></script>
-    <script type="text/javascript" src="/sequoia/static/javascripts/escape_text.js"></script>
-  </body>
+  <script type="text/javascript" src="/sequoia/bower/MathJax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  <script type="text/javascript" src="/sequoia/bower/jquery/dist/jquery.min.js"></script>
+  <script type="text/javascript" src="/sequoia/bower/pegjs/peg-0.10.0.min.js"></script>
+  <script type="text/javascript" src="/sequoia/bower/semantic/dist/semantic.min.js"></script>
+  <script type="text/javascript" src="/sequoia/static/javascripts/apply/prooftree.js"></script>
+  <script type="text/javascript" src="/sequoia/static/javascripts/apply/applyRule.js"></script>
+  <script type="text/javascript" src="/sequoia/static/javascripts/parser_text.js"></script>
+  <script type="text/javascript" src="/sequoia/static/javascripts/symbols_table.js"></script>
+  <script type="text/javascript" src="/sequoia/static/javascripts/apply/initSequent.js"></script>
+  <script type="text/javascript" src="/sequoia/static/javascripts/apply/updateParser.js"></script>
+  <script type="text/javascript" src="/sequoia/static/javascripts/apply/rule_sidebar.js"></script>
+  <script type="text/javascript" src="/sequoia/static/javascripts/apply/preview.js"></script>
+  <script type="text/javascript" src="/sequoia/static/javascripts/rule/fixRules.js"></script>
+  <script type="text/javascript" src="/sequoia/static/javascripts/generateProof.js"></script>
+  <script type="text/javascript" src="/sequoia/static/javascripts/apply/setupItems.js"></script>
+  <script type="text/javascript" src="/sequoia/static/javascripts/escape_text.js"></script>
+</body>
+
 </html>

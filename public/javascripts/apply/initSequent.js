@@ -77,6 +77,7 @@ function parse_and_use(temp_parser) {
     $(".leaf").click(function() {
         leaf_id = this.id.split("_")[1]
         seq_text = $(this).find("script")[0].innerText
+        $(this).css('background-color', 'rgb(235, 235, 235)')
         $("#warning").css("visibility", "hidden")
     })
     var stree = "DerTree(\"0\","+sml_seq+",NONE,[])"
