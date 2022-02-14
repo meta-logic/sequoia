@@ -100,7 +100,7 @@ function add_symbol_toTable(tbl) {
                     var syms = sb.symbols
                     for (var i = 0; i < syms.length; i++) {
                         if (symb == syms[i].symbol) {
-                            if (other = "seq") {
+                            if (other == "seq") {
                                 var table = "sequent term"
                             } else {
                                 var table = "rule"
