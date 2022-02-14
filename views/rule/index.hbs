@@ -1,4 +1,4 @@
-{{!-- Sequoia Copyright (C) 2020  Zan Naeem, Abdulrahman Alfayad
+{{!-- Sequoia Copyright (C) 2020 Zan Naeem, Abdulrahman Alfayad
 This program comes with ABSOLUTELY NO WARRANTY; for details see LICENSE.
 This is free software, and you are welcome to redistribute it
 under certain conditions; see LICENSE for details. --}}
@@ -17,14 +17,14 @@ under certain conditions; see LICENSE for details. --}}
 		<div class="ui input">
 			<input id="rule_name" type="text" placeholder="Rule Name">
 		</div>
-		<select class="ui search dropdown" id="kind" >
+		<select class="ui search dropdown" id="kind">
 			<option value="">Type</option>
 			<option value="Logical">Logical</option>
 			<option value="Axiom">Axiom</option>
 			<option value="Structural">Structural</option>
 			<option value="Cut">Cut</option>
 		</select>
-		<select class="ui search dropdown" id="side" >
+		<select class="ui search dropdown" id="side">
 			<option value="">Side</option>
 			<option value="Left">Left</option>
 			<option value="Right">Right</option>
@@ -59,11 +59,17 @@ under certain conditions; see LICENSE for details. --}}
 		<div id="warning_header" class="header">TEMP</div>
 		<p id="warning_text">TEMP</p>
 	</div>
-	<table id="sym_table" class= "ui sortable fixed celled table">
-		<thead><tr><th>Rule Symbols</th><th>Types</th></tr></thead> 
-		<tbody id="init"><tbody> 
-		<tbody id="table_head"> 
-			<tr id ="input_row">
+	<table id="sym_table" class="ui sortable fixed celled table">
+		<thead>
+			<tr>
+				<th>Rule Symbols</th>
+				<th>Types</th>
+			</tr>
+		</thead>
+		<tbody id="init">
+		<tbody>
+		<tbody id="table_head">
+			<tr id="input_row">
 				<td id="input_field" style="text-align:center">
 					<div class="ui input focus">
 						<input id="sym" type="text" placeholder="Symbol Here">
@@ -79,7 +85,8 @@ under certain conditions; see LICENSE for details. --}}
 						<option value="sequent sign">sequent sign</option>
 						<option value="context separator">context separator</option>
 					</select>
-					<button class="ui large green right floated button" onclick="add_symbol_toTable('rule')">Add Symbol</button>
+					<button class="ui large green right floated button" onclick="add_symbol_toTable('rule')">Add
+						Symbol</button>
 				</td>
 			</tr>
 			<tr>
@@ -110,10 +117,11 @@ under certain conditions; see LICENSE for details. --}}
 	</table>
 	<br><br><br>
 </div>
-<div id ="modal1" class="ui special modal">
+<div id="modal1" class="ui special modal">
 	<div class="header">Rules Affected</div>
-	<div id = "change warning" class="content">
-		<p>Updating or removing existing symbols may alter the parsing of the rules already defined. This can result in the update or deletion of certain rules.
+	<div id="change warning" class="content">
+		<p>Updating or removing existing symbols may alter the parsing of the rules already defined. This can result in
+			the update or deletion of certain rules.
 			Would you like to continue?</p>
 	</div>
 	<div class="actions">
@@ -121,20 +129,20 @@ under certain conditions; see LICENSE for details. --}}
 		<div id="no_button" class="ui cancel button">No</div>
 	</div>
 </div>
-<div id ="modal2" class="ui special modal">
-	<div class="header">Symbol Used</div>
-	<div id = "change warning" class="content">
-		<p>This symbol already exists in the sequent symbols table. Try using a differnt one.</p>
+{{!-- <div id="modal2" class="ui special modal">
+	<div class="header">Symbol in Use</div>
+	<div id="change warning" class="content">
+		<p>This symbol already exists in the sequent term symbols table. Try using a different one.</p>
 	</div>
 	<div class="actions">
 		<div id="ok_button" class="ui cancel button">Okay</div>
 	</div>
-</div>
-<div id ="modal3" class="ui special modal">
+</div> --}}
+<div id="modal3" class="ui special modal">
 	<div class="header">Cut Formula Variable</div>
-	<div id = "change warning" class="content">
+	<div id="change warning" class="content">
 		<p>Please indicate the cut formula variable.</p>
-		<p id= "cut_rule"></p>
+		<p id="cut_rule"></p>
 		<div class="ui form">
 			<div class="two fields">
 				<div class="field">
