@@ -8,12 +8,13 @@ These instructions will get you a copy of the project up and running on your loc
 
 - [Node.js](http://nodejs.org/)
 - [MongoDB](https://www.mongodb.com/download-center?jmp=nav)
-- [Bower](https://bower.io/) (note that Bower can be installed via `npm` once Node.js is installed)
 - [Standard ML of New Jersey](https://www.smlnj.org/)
 - [Python3](https://www.python.org/download/releases/3.0/) 
 - [mip](https://pypi.org/project/mip/)
 
 ### Installing
+
+The commands below should be run once.
 
 Clone the repo
 
@@ -26,8 +27,8 @@ Installing the dependencies
 ```
 cd sequoia
 npm install
-npm install nodemon
-bower install
+npm install bower
+npx bower install
 ```
 
 ### Running
@@ -35,7 +36,7 @@ bower install
 Run mongoDB
 
 ```
-mongod
+mongod --dbpath .
 ```
 Then, run the server
 
